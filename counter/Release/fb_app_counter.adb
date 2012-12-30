@@ -81,6 +81,7 @@ S:G$fb_state$0$0({1}SC:U),E,0,0
 S:G$tx_nextwrite$0$0({1}SC:U),E,0,0
 S:G$tx_nextsend$0$0({1}SC:U),E,0,0
 S:G$status60$0$0({1}SC:U),E,0,0
+S:G$debugadr$0$0({2}SI:U),E,0,0
 S:G$RAM$0$0({0}DA0,SC:U),E,0,0
 S:G$timerstate$0$0({4}DA4,SC:U),E,0,0
 S:G$portbuffer$0$0({1}SC:U),E,0,0

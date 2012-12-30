@@ -1,7 +1,7 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
 ; Version 3.1.0 #7066 (Nov 22 2011) (MINGW32)
-; This file was generated Sun Nov 25 23:48:06 2012
+; This file was generated Sun Dec 30 12:23:20 2012
 ;--------------------------------------------------------
 	.module fb_app_counter
 	.optsdcc -mmcs51 --model-small
@@ -3531,15 +3531,15 @@ _restart_app:
 ;	..\fb_app_counter.c:540: START_WRITECYCLE
 	mov	_FMCON,#0x00
 	C$fb_app_counter.c$541$1$1 ==.
-;	..\fb_app_counter.c:541: WRITE_BYTE(0x01,0x03,0x00)	// Herstellercode 0x00B4 = VELUX
+;	..\fb_app_counter.c:541: WRITE_BYTE(0x01,0x03,0x00)	// Herstellercode 00 76 = Robert Bosch
 	mov	_FMADRH,#0x1D
 	mov	_FMADRL,#0x03
 	mov	_FMDATA,#0x00
 	C$fb_app_counter.c$542$1$1 ==.
-;	..\fb_app_counter.c:542: WRITE_BYTE(0x01,0x04,0xB4)
+;	..\fb_app_counter.c:542: WRITE_BYTE(0x01,0x04,76)
 	mov	_FMADRH,#0x1D
 	mov	_FMADRL,#0x04
-	mov	_FMDATA,#0xB4
+	mov	_FMDATA,#0x4C
 	C$fb_app_counter.c$543$1$1 ==.
 ;	..\fb_app_counter.c:543: WRITE_BYTE(0x01,0x05,0x04)	// Geräte Typ (2118) 04B0h
 	mov	_FMADRH,#0x1D

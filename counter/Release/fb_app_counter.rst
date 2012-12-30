@@ -1,7 +1,7 @@
                               1 ;--------------------------------------------------------
                               2 ; File Created by SDCC : free open source ANSI-C Compiler
                               3 ; Version 3.1.0 #7066 (Nov 22 2011) (MINGW32)
-                              4 ; This file was generated Sun Nov 25 23:48:06 2012
+                              4 ; This file was generated Sun Dec 30 12:23:20 2012
                               5 ;--------------------------------------------------------
                               6 	.module fb_app_counter
                               7 	.optsdcc -mmcs51 --model-small
@@ -3531,15 +3531,15 @@
                            3531 ;	..\fb_app_counter.c:540: START_WRITECYCLE
    116B 75 E4 00           3532 	mov	_FMCON,#0x00
                     0D7F   3533 	C$fb_app_counter.c$541$1$1 ==.
-                           3534 ;	..\fb_app_counter.c:541: WRITE_BYTE(0x01,0x03,0x00)	// Herstellercode 0x00B4 = VELUX
+                           3534 ;	..\fb_app_counter.c:541: WRITE_BYTE(0x01,0x03,0x00)	// Herstellercode 00 76 = Robert Bosch
    116E 75 E7 1D           3535 	mov	_FMADRH,#0x1D
    1171 75 E6 03           3536 	mov	_FMADRL,#0x03
    1174 75 E5 00           3537 	mov	_FMDATA,#0x00
                     0D88   3538 	C$fb_app_counter.c$542$1$1 ==.
-                           3539 ;	..\fb_app_counter.c:542: WRITE_BYTE(0x01,0x04,0xB4)
+                           3539 ;	..\fb_app_counter.c:542: WRITE_BYTE(0x01,0x04,76)
    1177 75 E7 1D           3540 	mov	_FMADRH,#0x1D
    117A 75 E6 04           3541 	mov	_FMADRL,#0x04
-   117D 75 E5 B4           3542 	mov	_FMDATA,#0xB4
+   117D 75 E5 4C           3542 	mov	_FMDATA,#0x4C
                     0D91   3543 	C$fb_app_counter.c$543$1$1 ==.
                            3544 ;	..\fb_app_counter.c:543: WRITE_BYTE(0x01,0x05,0x04)	// Geräte Typ (2118) 04B0h
    1180 75 E7 1D           3545 	mov	_FMADRH,#0x1D
