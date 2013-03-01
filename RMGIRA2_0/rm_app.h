@@ -66,7 +66,7 @@
 #define OBJ_STAT_TALARM_CENTRAL	22
 
 // Global extern Variables
-extern volatile unsigned char	g_objno;					// object to process data and send to knx
+extern volatile  unsigned char	g_objno;					// object to process data and send to knx
 
 // Prototypes
 void rs_init(unsigned int);									// init serial communication

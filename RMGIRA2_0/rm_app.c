@@ -252,7 +252,7 @@ unsigned long read_obj_value(unsigned char objno)
 // ********************** Processing logic *************************
 void state_machine(unsigned char objno)
 {
-	//__bit return_knx_send;
+	__bit return_knx_send;
 	static unsigned int gira_read_timeout = 0;
 	if (g_state)
 	{
@@ -485,16 +485,16 @@ void state_machine(unsigned char objno)
 		// Send data to KNX and ACK to Gira second time if data received
 		if (g_state == 0x05)
 		{
-			while( send_obj_value(objno));
-			//if (!return_knx_send)
-			//{
+			return_knx_send = send_obj_value(objno);
+			if (!return_knx_send)
+			{
 				// ACK 2nd time - data received
 				if (g_res_pointer)
 					rs_send_c(GIRA_ACK);
 
 				g_res_pointer = 0;
 				g_state = 0x00;
-			//}
+			}
 		}
 	}
 }
@@ -701,7 +701,7 @@ void conv_dpt_9_001 (unsigned long *p_data)
 void delay_timer(void)
 {
 	static unsigned char sec_timer, send_info = 0;
-	__bit info_send;
+
 	RTCCON=0x60;		// RTC anhalten und Flag löschen
 	RTCH=0x70;			// reload Real Time Clock (0,5s=0x7080)
 	RTCL=0x80;
@@ -775,34 +775,36 @@ void delay_timer(void)
 			{
 				// Send all Gira items
 				send_info = 4;
+				
 				if(eeprom[CONF_INFO_FAKTOR]&0x80){
-					if(eeprom[CONF_INFO_BASIS])
-						g_timer_info=g_timer+(eeprom[CONF_INFO_FAKTOR]&0x7F)*60;		// Min
-					else
-						g_timer_info=g_timer+(eeprom[CONF_INFO_FAKTOR]&0x7F);		// Min
-				}
+						if(eeprom[CONF_INFO_BASIS])
+							g_timer_info=g_timer+(eeprom[CONF_INFO_FAKTOR]&0x7F)*60;		// Min
+						else
+							g_timer_info=g_timer+(eeprom[CONF_INFO_FAKTOR]&0x7F);		// Min
+					}
 			}
 		}
-#define CONF_INFO_4TO10		252//0xFE
-#define CONF_INFO_11TO17	253//0xFE
-		if (!g_state && send_info)										// Send all Gira info
 
+		if (!g_state && send_info)										// Send all Gira info
 		{
-			info_send=0;
-			do {
-				if(send_info<=10){
-					info_send= (__bit)eeprom[CONF_INFO_4TO10]>> (send_info-4);
+	
+			if(send_info<=10){
+				if((eeprom[CONF_INFO_4TO10]>> (send_info-4))&0x01){
+					g_objno = send_info;
+					g_state = 0x01;
 				}
-				else{
-					info_send= (__bit)eeprom[CONF_INFO_11TO17]>> (send_info-11);
-				}
-			send_info++;	
-			} while (info_send==0&& send_info<=18);
-			if(info_send){
-				g_objno = send_info-1;
-				g_state = 0x01;
 			}
-			if (send_info >= 18) send_info = 0;
+			else{
+				if((eeprom[CONF_INFO_11TO17]>> (send_info-11))&0x01){
+					g_objno = send_info;
+					g_state = 0x01;
+					
+				}
+
+			}
+			send_info++;
+			if (send_info == 18)
+				send_info = 0;
 		}
 
 
@@ -843,10 +845,10 @@ void restart_app(void)		// Alle Applikations-Parameter zurücksetzen
 	EA=0;						// Interrupts sperren, damit flashen nicht unterbrochen wird
 	START_WRITECYCLE;
 	WRITE_BYTE(0x01,0x03,0x00);	// Herstellercode 0x0000 = Freebus
-	//WRITE_BYTE(0x01,0x04,0x00);
-	WRITE_BYTE(0x01,0x04,0x4C); // Herstellercode 0x004C = Bosch
-	WRITE_BYTE(0x01,0x05,0x03);	// Devicetype 0x1003
-	WRITE_BYTE(0x01,0x06,0xF2);
+	WRITE_BYTE(0x01,0x04,0x00);
+//	WRITE_BYTE(0x01,0x04,0x4C); // Herstellercode 0x004C = Bosch
+	WRITE_BYTE(0x01,0x05,0x10);	// Devicetype 0x1003
+	WRITE_BYTE(0x01,0x06,0x03);
 	WRITE_BYTE(0x01,0x07,0x01);	// Versionnumber of application programm
 	WRITE_BYTE(0x01,0x0C,0x00);	// PORT A Direction Bit Setting
 	WRITE_BYTE(0x01,0x0D,0xFF);	// Run-Status (00=stop FF=run)
