@@ -269,8 +269,9 @@ unsigned long read_obj_value(unsigned char objno)
 	// Kommunikations-Objekte verarbeiten die Werte vom Rauchmelder darstellen
 	if (objMappingTab[objno].cmd != GIRA_CMD_NONE)
 	{
-		unsigned char* answer = giraAnswerTab[objMappingTab[objno].cmd] + objMappingTab[objno].offset;
 		unsigned long result = 0;
+		unsigned char* answer = giraAnswerTab[objMappingTab[objno].cmd];
+		answer += objMappingTab[objno].offset;
 
 		switch (objMappingTab[objno].dataType)
 		{
@@ -300,7 +301,7 @@ unsigned long read_obj_value(unsigned char objno)
 		}
 	}
 
-	// Andere Kommunikationsobjekte
+	// Andere Kommunikations-Objekte
 	switch (objno)
 	{
 	case OBJ_STAT_ALARM:

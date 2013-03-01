@@ -47,39 +47,25 @@
 // Befehle an den Rauchmelder
 //-----------------------------------------------------------------------------
 
-/**
- * Gira Command: Seriennummer abfragen
- */
+// Gira Command: Seriennummer abfragen
 #define GIRA_CMD_SERIAL  0
 
-/**
- * Gira Command: Betriebszeit abfragen
- */
+// Gira Command: Betriebszeit abfragen
 #define GIRA_CMD_OPERATING_TIME  1
 
-/**
- * Gira Command: Rauchkammer Daten abfragen
- */
+// Gira Command: Rauchkammer Daten abfragen
 #define GIRA_CMD_SMOKEBOX 2
 
-/**
- * Gira Command: Batteriespannung und Temperaturen
- */
+// Gira Command: Batteriespannung und Temperaturen
 #define GIRA_CMD_BATTEMP  3
 
-/**
- * Gira Command: Anzahl der Alarme abfragen
- */
+// Gira Command: Anzahl der Alarme abfragen
 #define GIRA_CMD_NUM_ALARMS  4
 
-/**
- * Gira Command: Anzahl der Testalarme abfragen
- */
+// Gira Command: Anzahl der Testalarme abfragen
 #define GIRA_CMD_NUM_TEST_ALARMS  5
 
-/**
- * Gira Command: kein Befehl
- */
+// Gira Command: kein Befehl
 #define GIRA_CMD_NONE  127
 
 
@@ -87,34 +73,22 @@
 // Datentypen der Rauchmelder Antworten
 //-----------------------------------------------------------------------------
 
-/**
- * Rauchmelder Antwort: 4 Byte Zahl
- */
+// Rauchmelder Antwort: 4 Byte Zahl
 #define GIRA_TYPE_LONG 1
 
-/**
- * Rauchmelder Antwort: 2 Byte Zahl
- */
+// Rauchmelder Antwort: 2 Byte Zahl
 #define GIRA_TYPE_SHORT 2
 
-/**
- * Rauchmelder Antwort: 1 Byte Zahl
- */
+// Rauchmelder Antwort: 1 Byte Zahl
 #define GIRA_TYPE_BYTE 3
 
-/**
- * Rauchmelder Antwort: 1 Byte Temperatur
- */
+// Rauchmelder Antwort: 1 Byte Temperatur
 #define GIRA_TYPE_TEMP 4
 
-/**
- * Rauchmelder Antwort: 2 Byte Spannung
- */
+// Rauchmelder Antwort: 2 Byte Spannung
 #define GIRA_TYPE_VOLT 5
 
-/**
- * Rauchmelder Antwort: Kein Typ
- */
+// Rauchmelder Antwort: Kein Typ
 #define GIRA_TYPE_NONE 127
 
 
