@@ -50,8 +50,8 @@ unsigned char 				g_res[GIRA_SIZE_RES],			// Received raw data from GIRA
 							g_res_conv[GIRA_SIZE_RES/2],	// Received converted data from GIRA
 							g_res_pointer = 0;				// Position of first free byte in g_res for raw reading from gira
 
-unsigned int 				g_timer,						// Counting seconds
-							g_timer_alarm, 					// Cycle sending alarm
+unsigned int 				g_timer;						// Counting seconds
+unsigned int __idata		g_timer_alarm, 					// Cycle sending alarm
 							g_timer_test;					// Cycle sending testalarm
 unsigned int __idata		g_timer_alarm_delay,			// Delay for sending alarm
 							g_timer_info;					// Cycle sending all infos
@@ -634,15 +634,15 @@ void check_gira_stat(void)
 		g_state = 0x01;
 
 		// Init delayed telegram
-		if (eeprom[CONF_A_DELAY])
+		if (eeprom[CONF_A_DELAY]&0x80)
 		{
 			if (g_stat_alarm)
 			{
 				g_stat_alarm_delay = 1;
 				if (eeprom[CONF_A_DELAY_BASIS])
-					g_timer_alarm_delay=g_timer + eeprom[CONF_A_DELAY_FAKTOR]*60;		// Min
+					g_timer_alarm_delay=g_timer + (eeprom[CONF_A_DELAY_FAKTOR]&0x7F)*60;		// Min
 				else
-					g_timer_alarm_delay=g_timer + eeprom[CONF_A_DELAY_FAKTOR];			// Sec
+					g_timer_alarm_delay=g_timer + (eeprom[CONF_A_DELAY_FAKTOR]&0x7F);			// Sec
 				g_timer_alarm_delay++;         // because g_timer will also increase 1 before first compare
 			}
 			else
@@ -725,7 +725,7 @@ void delay_timer(void)
 			}
 			else
 			{
-				g_objno = OBJ_STAT_ALARM;
+				g_objno = OBJ_STAT_ALARM;// objno 18
 				g_state = 0x01;
 				if (eeprom[CONF_A_BASIS])
 					g_timer_alarm=g_timer+(eeprom[CONF_A_FAKTOR]&0x7F)*60;		// Min
@@ -742,7 +742,7 @@ void delay_timer(void)
 			}
 			else
 			{
-				g_objno = OBJ_STAT_TALARM;
+				g_objno = OBJ_STAT_TALARM;// objno 21
 				g_state = 0x01;
 				if (eeprom[CONF_S_BASIS])
 					g_timer_test=g_timer+(eeprom[CONF_S_FAKTOR]&0x7F)*60;		// Min
@@ -845,10 +845,9 @@ void restart_app(void)		// Alle Applikations-Parameter zurücksetzen
 	EA=0;						// Interrupts sperren, damit flashen nicht unterbrochen wird
 	START_WRITECYCLE;
 	WRITE_BYTE(0x01,0x03,0x00);	// Herstellercode 0x0000 = Freebus
-	WRITE_BYTE(0x01,0x04,0x00);
-//	WRITE_BYTE(0x01,0x04,0x4C); // Herstellercode 0x004C = Bosch
-	WRITE_BYTE(0x01,0x05,0x10);	// Devicetype 0x1003
-	WRITE_BYTE(0x01,0x06,0x03);
+	WRITE_BYTE(0x01,0x04,0x4C); // Herstellercode 0x004C = Bosch
+	WRITE_BYTE(0x01,0x05,0x03);	// Devicetype 0x03F2
+	WRITE_BYTE(0x01,0x06,0xF2);
 	WRITE_BYTE(0x01,0x07,0x01);	// Versionnumber of application programm
 	WRITE_BYTE(0x01,0x0C,0x00);	// PORT A Direction Bit Setting
 	WRITE_BYTE(0x01,0x0D,0xFF);	// Run-Status (00=stop FF=run)
