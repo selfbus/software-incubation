@@ -77,7 +77,7 @@
 #define GIRA_TYPE_LONG 1
 
 // Rauchmelder Antwort: 2 Byte Zahl
-#define GIRA_TYPE_SHORT 2
+#define GIRA_TYPE_INT  2
 
 // Rauchmelder Antwort: 1 Byte Zahl
 #define GIRA_TYPE_BYTE 3

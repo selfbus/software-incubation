@@ -41,7 +41,7 @@ void main(void)
 		//
 		if (APPLICATION_RUN)
 		{
-			gira_process_commands();
+			process_commands();
 
 			if (RTCCON >= 0x80)
 				timer_event();

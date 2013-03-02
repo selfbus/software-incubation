@@ -21,7 +21,7 @@ extern void restart_app();
 /**
  * Befehle an den Rauchmelder senden und Antworten verarbeiten.
  */
-extern void gira_process_commands();
+extern void process_commands();
 
 
 #endif /*rmgira_app_h*/

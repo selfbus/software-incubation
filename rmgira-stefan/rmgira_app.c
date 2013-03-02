@@ -59,7 +59,7 @@ const struct
 	/*OBJ_NOTUSED3*/            { GIRA_CMD_NONE,            0, GIRA_TYPE_NONE },
 	/*OBJ_SERIAL*/              { GIRA_CMD_SERIAL,          0, GIRA_TYPE_LONG },
 	/*OBJ_OPERATING_TIME*/      { GIRA_CMD_OPERATING_TIME,  0, GIRA_TYPE_LONG },
-	/*OBJ_SMOKEBOX_VALUE*/      { GIRA_CMD_SMOKEBOX,        0, GIRA_TYPE_SHORT},
+	/*OBJ_SMOKEBOX_VALUE*/      { GIRA_CMD_SMOKEBOX,        0, GIRA_TYPE_INT  },
 	/*OBJ_POLLUTION*/           { GIRA_CMD_SMOKEBOX,        3, GIRA_TYPE_BYTE },
 	/*OBJ_BAT_VOLTAGE*/         { GIRA_CMD_BATTEMP,         0, GIRA_TYPE_VOLT },
 	/*OBJ_TEMP1*/               { GIRA_CMD_BATTEMP,         3, GIRA_TYPE_TEMP },
@@ -101,7 +101,7 @@ char alarmType = 0;
 unsigned char remoteFullAlarmTime = 0;
 
 // Zähler für halbe Sekunden
-unsigned short timer = 0;
+unsigned int timer = 0;
 
 
 /**
@@ -162,7 +162,7 @@ void gira_send_ack()
 
 
 /**
- * Einen Wert auf DPT 9.001 Format wandeln
+ * Einen Wert auf DPT 9.001 2 Byte Float Format wandeln
  *
  * @param val - der zu wandelnde Wert
  * @return Der Wert val im DPT 9.001 Format
@@ -173,7 +173,7 @@ unsigned long conv_dpt_9_001(unsigned long val)
 	while (val >= 2047)
 	{
 		++div;
-		val /= 2;
+		val >>= 1;
 	}
 	val  |= div << 11;
 	return val;
@@ -281,8 +281,8 @@ unsigned long read_obj_value(unsigned char objno)
 		case GIRA_TYPE_LONG:
 			return *(unsigned long*) answer;
 
-		case GIRA_TYPE_SHORT:
-			return *(unsigned short*) answer;
+		case GIRA_TYPE_INT:
+			return *(unsigned int*) answer;
 
 		case GIRA_TYPE_TEMP:
 			result = *answer;
@@ -291,7 +291,7 @@ unsigned long read_obj_value(unsigned char objno)
 			return conv_dpt_9_001(result);
 
 		case GIRA_TYPE_VOLT:
-			result = *(unsigned short*) answer;
+			result = *(unsigned int*) answer;
 			result *= 9184;
 			result /= 5000;
 			return conv_dpt_9_001(result);
@@ -397,17 +397,20 @@ void gira_receive()
  * Befehle aus dem Ringpuffer an den Rauchmelder senden und Antworten
  * vom Rauchmelder weiter verarbeiten.
  */
-void gira_process_commands()
+void process_commands()
 {
+	// Ein Byte von der Seriellen empfangen, Antwort verarbeiten wenn vollständig
 	if (RI) gira_receive();
 
 	// Den nächsten Befehl aus dem Ringpuffer senden
 	if (readObjRingNextWrite != readObjRingNextRead)
 	{
-		unsigned char cmd = readObjRing[readObjRingNextRead];
+		unsigned char objno = readObjRing[readObjRingNextRead];
+		unsigned char cmd = objMappingTab[objno].cmd;
 
 		if (cmd < GIRA_CMD_COUNT)
 			gira_send_bytes(giraCmdTab[cmd]);
+		else send_obj_value(objno);
 	}
 }
 
