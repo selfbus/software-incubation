@@ -114,7 +114,7 @@ unsigned char cmdCurrent;
 __idata unsigned char objValueCurrent[GIRA_ANSWER_BYTES];
 
 // Zähler für die Antwort-Zeichen vom Rauchmelder
-__idata char answerCount;
+__idata char receiveCount;
 
 
 // Nummer des Com-Objekts das gerade bearbeitet wird. OBJ_NONE wenn keines.
@@ -141,7 +141,7 @@ void gira_send_ack()
 		;
 
  	TI = 0;
-	SBUF = GIRA_ACK_BYTE;
+	SBUF = ACK;
 }
 
 
@@ -155,12 +155,14 @@ void gira_send_cmd(unsigned char cmd)
 	const unsigned char* cmdBytes = giraCmdTab[cmd];
 	unsigned char idx;
 
-	// Alten Wert sichern, für den Fall das während des Empfangens
+	// Wenn der Rauchmelder gerade etwas sendet dann warten bis er fertig ist.
+	// TODO
+
+	// Alten Wert sichern, für den Fall dass während des Empfangens
 	// jemand den Wert des Com-Objekts lesen will.
 	for (idx = 0; idx < GIRA_ANSWER_BYTES; ++idx)
 		objValueCurrent[idx] = objValues[cmd][idx];
 
-	answerCount = -2;
 	cmdCurrent = cmd;
 
 	for (idx = 0; idx < GIRA_CMD_SIZE; ++idx)
@@ -214,33 +216,23 @@ void gira_receive()
 	unsigned char ch = SBUF;
 	RI = 0;
 
-	// Wenn wir auf keine Antwort warten dann alles ignorieren, nur
-	// Stopp Bytes bestätigen.
-	if (cmdCurrent == GIRA_CMD_NONE)
+	// Am Anfang auf das Start Byte warten
+	if (receiveCount < 0)
 	{
-		if (ch == GIRA_STOP_BYTE)
-			gira_send_ack();
-		return;
-	}
-
-	// Am Anfang auf das Start Byte warten, das Start Byte und das nachfolgende
-	// Byte aber ignorieren
-	if (answerCount < 0)
-	{
-		if (ch == GIRA_START_BYTE || answerCount == -1)
-			++answerCount;
+		if (ch == STX)
+			++receiveCount;
 		return;
 	}
 
 	// Am Ende den Empfang bestätigen und die erhaltene Antwort verarbeiten
-	if (ch == GIRA_STOP_BYTE)
+	if (ch == ETX)
 	{
 		gira_send_ack();
 		gira_process_answer();
 		return;
 	}
 
-	idx = answerCount >> 1;
+	idx = receiveCount >> 1;
 
 	// Bei Überlauf die restlichen Zeichen ignorieren, u.A. das Checksum-Byte
 	if (idx >= GIRA_ANSWER_BYTES)
@@ -259,14 +251,14 @@ void gira_receive()
 		ch -= 'A' - 10;
 	else return; // Ungültige Zeichen ignorieren
 
-	if (answerCount & 1)
+	if (receiveCount & 1)
 	{
 		objValues[cmdCurrent][idx] <<= 4;
 		objValues[cmdCurrent][idx] |= ch;
 	}
 	else objValues[cmdCurrent][idx] = ch;
 
-	++answerCount;
+	++receiveCount;
 }
 
 

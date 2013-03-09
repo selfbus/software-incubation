@@ -28,5 +28,10 @@ extern void timer_event();
  */
 extern void restart_app();
 
+/**
+ * Wenn >= 0 dann wird gerade etwas vom Rauchmelder empfangen
+ */
+extern char receiveCount;
+
 
 #endif /*rmgira_app_h*/

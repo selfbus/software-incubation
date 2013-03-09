@@ -98,12 +98,20 @@
 
 
 //-----------------------------------------------------------------------------
-// Rauchmelder Konstanten
+// Kommunikations Konstanten
 //-----------------------------------------------------------------------------
 
-#define GIRA_START_BYTE		0x02
-#define GIRA_STOP_BYTE 		0x03
-#define GIRA_ACK_BYTE	 	0x06
+// Start Byte
+#define STX		0x02
+
+// Ende Byte
+#define ETX		0x03
+
+// Acknowledged
+#define ACK	 	0x06
+
+// Not Acknowledged
+#define NAK	 	0x15
 
 
 #endif /*rmgira_const_h*/

@@ -51,9 +51,10 @@ void main(void)
 		}
 
 		//
-		// Empfangenes Telegramm bearbeiten
+		// Empfangenes Telegramm bearbeiten, aber nur wenn wir
+		// gerade nichts vom Rauchmelder empfangen.
 		//
-		if (tel_arrived)
+		if (tel_arrived && receiveCount < 0)
 			process_tel();
 
 		//

@@ -20,8 +20,24 @@ ETX 0x03 - Stopp
 ACK 0x06 - Acknowledge
 NAK 0x15 - Not Acknowledged
 
-Die Prüfsumme wird berechnet in dem die Bytes des Hex Strings addiert werden.
-Beispiel: <STX>0464<ETX> ist "04" also 0x30 0x34, das ergibt 0x64.
+Die Prüfsumme wird berechnet in dem die Bytes des Hex Strings addiert werden und
+das Ergebnis mit 255 UND verknüpft wird.
+Beispiel: <STX>0464<ETX> ist "04" also 0x30 0x34, das ergibt Checksumme 0x64.
+          <STX>822080F4<ETX> ist "822080" ... Summe 0x1F4, also Checksumme 0xF4.
+
+02 - Unbekannt
+--------------
+
+SEND: <STX>0262<ETX>
+RECV: <ACK>
+RECV: <STX>C228000000FF<ETX>
+SEND: <ACK>
+
+Unterschiedliche Werte wurden beobachtet, wobei wiederholen der Abfrage, ohne dass
+der RM was tut, den Wert nicht ändert:
+
+C228000000FF
+C220000000F7
 
 
 03 - Steuerbefehle
@@ -29,11 +45,13 @@ Beispiel: <STX>0464<ETX> ist "04" also 0x30 0x34, das ergibt 0x64.
 
 Diese Befehle wurden bei der Kommunikation Funkmodul mit Rauchmelder geloggt.
 
-03 02 10 26 - Remote Alarm über Funk, RM sendet dann 82 20 10 00 00 ED
-03 02 80 2D - Testalarm über Funk, RM sendet dann 82 20 80 00 00 F4
-03 00 00 23 - Alarm deaktivieren, RM sendet dann 82 20 00 00 00 EC
-03 02 02 27 - Pairing vom eigenen Funkmodul mit einem anderen Funkmodul
-03 02 00 25 - 
+03000023 - Alarm deaktivieren, RM sendet dann 82 20 00 00 00 EC
+           Deaktiviert keinen Wired Alarm
+03021026 - Remote Alarm über Funk, RM sendet dann 82 20 10 00 00 ED
+0302802D - Testalarm über Funk, RM sendet dann 82 20 80 00 00 F4
+03020227 - Pairing vom eigenen Funkmodul mit einem anderen Funkmodul
+03020126 - Zwei kurze Piep, wiederholen bewirkt nichts, erst nach Alarm Abschaltung, Testalarm möglich.
+03020025 -
 
 
 04 - Seriennummer
@@ -56,7 +74,17 @@ REPLY: 4 Byte Seriennummer: 111633CA
 
 Diese Befehle wurden bei der Kommunikation Funkmodul mit Rauchmelder geloggt.
 
-07 00 08 2F - Alarm über den Funk Handsender deaktiviert
+0700082F - Alarm über den Funk Handsender deaktiviert
+           Stoppt lokalen und Wired Alarm (über grüne Klemme)
+           Die LED am RM blinkt langsam (15min Alarmunterdrückung?)
+07002029 - RM beginnt mit 0,5Hz zu piepen und blinken, RM sendet nichts.
+           Piepen ist aber anders als bei Testalarm.
+           Deaktivieren dieses Piepens über RM Taste (1sek halten).
+           Deaktivieren über 0700082F nicht möglich.
+07000128 - Dump von irgendwelchen Registern
+07000229 - Erweiterter Dump
+0700032A - Erweiterter Dump
+0700042B - Erweiterter Dump
 
 
 08 - Unbekannt
@@ -81,7 +109,7 @@ SEND: <ACK>
 SEND: 0x02, 0x30, 0x39, 0x36, 0x39, 0x03
       (START "0969" STOPP)
 
-REPLY: 4 Byte Betriebszeit: 00059A21
+REPLY: 4 Byte Betriebszeit in 1/4 Sekunden: 00059A21
 
 
 0B - Rauchkammerrelevante Daten
@@ -98,7 +126,7 @@ SEND: 0x02, 0x30, 0x42, 0x37, 0x32, 0x03
 
 REPLY: 2 Byte Rauchkammer Wert: 005C
        1 Byte Anzahl der Rauchalarme: 00 
-       1 Byte Verschmutzungsgrad: 00
+       1 Byte Rauchkammer Verschmutzungsgrad: 00
 
 
 0C - Batteriespannung und Temperaturen
@@ -133,14 +161,14 @@ SEND: <ACK>
 SEND: 0x02, 0x30, 0x44, 0x37, 0x34, 0x03
       (START "0D74" STOPP)
 
-REPLY: 1 Byte Anzahl der Temperatur Alarme: 00
-       1 Byte Anzahl der Test Alarme: 00
+REPLY: 1 Byte Anzahl der lokalen Temperatur Alarme: 00
+       1 Byte Anzahl der lokalen Test Alarme: 00
        1 Byte Anzahl der Alarme über Kabel: 00
        1 Byte Anzahl der Alarme über Funk: 00
 
 
-0E - Anzahl der Alarme #2
--------------------------
+0E - Anzahl der Remote Test Alarme
+----------------------------------
 
 SEND: <STX>0E75<ETX>
 RECV: <ACK>
@@ -171,18 +199,20 @@ CF0078007726
 CF0079007727
 CF007A00772F
 CF0078007827
+CF00EF00F04A
 
 
 82 - Alarm Meldung ?
 --------------------
 
-Wird vom Rauchmelder selbstständig ausgegeben
+Wird vom Rauchmelder selbstständig ausgegeben.
 
-82 20 00 00 00 FC - nachdem am Funk Handsender der Alarm deaktiviert wurde
+82 20 00 00 00 EC - nachdem am Funk Handsender der Alarm deaktiviert wurde
 82 20 08 00 00 F4 - nachdem Remote Alarm über grüne Klemme ausgelöst
 82 20 00 00 00 F4 - nachdem Remote Alarm über grüne Klemme beendet
 82 30 00 00 00 FD - Hitzealarm mit Harfön erzeugt
-82 28 00 00 ...   - nachdem Knopf am Rauchmelder gedrückt wurde
+82 28 00 00 00 F4 - nachdem Knopf am Rauchmelder gedrückt wurde
+                    Wird zyklisch ein paar mal wiederholt, auch wenn geACKt wird.
 82 28 20 00 00 F6 -
 82 20 10 00 00 ED - Remote Alarm über Funkmodule
 
