@@ -13,6 +13,8 @@
 // Kommunikations Objekte
 //-----------------------------------------------------------------------------
 
+#define OBJ_NONE                127
+
 #define OBJ_SET_ALARM			0
 #define OBJ_SET_TALARM			1
 #define OBJ_NOTUSED2			2
@@ -36,10 +38,7 @@
 #define OBJ_STAT_ALARM_DELAYED	20
 #define OBJ_STAT_TALARM			21
 #define OBJ_STAT_TALARM_CENTRAL	22
-#define OBJ_MAX_INDEX           23
-
-// Intern verwendet um Response Telegramme zu kennzeichnen.
-#define RESPONSE_TEL_FLAG 0x40
+#define NUM_OBJS                23
 
 
 
@@ -59,11 +58,17 @@
 // Gira Command: Batteriespannung und Temperaturen
 #define GIRA_CMD_BATTEMP  3
 
-// Gira Command: Anzahl der Alarme abfragen
+// Gira Command: Anzahl der Alarme #1 abfragen
 #define GIRA_CMD_NUM_ALARMS  4
 
-// Gira Command: Anzahl der Testalarme abfragen
-#define GIRA_CMD_NUM_TEST_ALARMS  5
+// Gira Command: Anzahl der Alarme #2 abfragen
+#define GIRA_CMD_NUM_ALARMS_2  5
+
+// Anzahl der Gira Commands
+#define GIRA_CMD_COUNT  6
+
+// Gira Command: intern behandelt, kein Befehl an den Rauchmelder
+#define GIRA_CMD_INTERNAL 126
 
 // Gira Command: kein Befehl
 #define GIRA_CMD_NONE  127
@@ -93,32 +98,12 @@
 
 
 //-----------------------------------------------------------------------------
-// Alarm Typen
+// Rauchmelder Konstanten
 //-----------------------------------------------------------------------------
 
-// Lokaler Alarm
-#define ALARM_LOCAL  1
-
-// Lokaler Test Alarm
-#define ALARM_LOCAL_TEST 2
-
-// Initialer Remote Alarm
-#define ALARM_REMOTE_INIT  4
-
-// Remote Alarm
-#define ALARM_REMOTE  8
-
-// Remote Test Alarm
-#define ALARM_REMOTE_TEST  16
-
-// Bitmaske für lokale Alarme
-#define ALARM_LOCAL_MASK  3
-
-// Bitmaske für Alarme:  ALARM_LOCAL|ALARM_REMOTE_INIT|ALARM_REMOTE
-#define ALARM_MASK  13
-
-// Bitmaske für Test Alarme:  ALARM_LOCAL_TEST|ALARM_REMOTE_TEST
-#define ALARM_TEST_MASK  18
+#define GIRA_START_BYTE		0x02
+#define GIRA_STOP_BYTE 		0x03
+#define GIRA_ACK_BYTE	 	0x06
 
 
 #endif /*rmgira_const_h*/

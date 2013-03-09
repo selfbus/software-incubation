@@ -9,6 +9,16 @@
 #define rmgira_app_h
 
 /**
+ * Antworten vom Rauchmelder abholen.
+ */
+extern void gira_receive();
+
+/**
+ * Com-Objekte bearbeiten.
+ */
+extern void process_objs();
+
+/**
  * Der Timer ist übergelaufen.
  */
 extern void timer_event();
@@ -17,11 +27,6 @@ extern void timer_event();
  * Alle Applikations-Parameter zurücksetzen.
  */
 extern void restart_app();
-
-/**
- * Befehle an den Rauchmelder senden und Antworten verarbeiten.
- */
-extern void process_commands();
 
 
 #endif /*rmgira_app_h*/

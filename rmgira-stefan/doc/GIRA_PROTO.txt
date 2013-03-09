@@ -1,0 +1,188 @@
+Protokoll für die Kommunikation mit dem Gira Rauchmelder Dual
+=============================================================
+
+Diskussion siehe
+http://knx-user-forum.de/diy-do-yourself/15259-gira-dual-rauchmelder-vernetzung-einzelauswertung-fernausloesung.html
+
+Die Kommunikation mit dem Rauchmelder ist Seriell 9600 Baud, 8N1
+
+Die Antworten vom Rauchmelder bestehen aus einem String der Hex Bytes enthält,
+sprich jeweils zwei Zeichen ergeben ein Byte.
+
+Die Antwort beginnt mit einem Start Byte 0x02 (STX) und endet mit einem
+Stopp Byte 0x03 (ETX). Das letzte Byte vor dem ETX ist eine Prüfsumme.
+
+Jede Meldung muss nach Erhalt mit einem ACK Byte 0x06 bestätigt werden.
+Kommt keine Bestätigung, so wird die Meldung 3 mal wiederholt.
+
+STX 0x02 - Start
+ETX 0x03 - Stopp
+ACK 0x06 - Acknowledge
+NAK 0x15 - Not Acknowledged
+
+Die Prüfsumme wird berechnet in dem die Bytes des Hex Strings addiert werden.
+Beispiel: <STX>0464<ETX> ist "04" also 0x30 0x34, das ergibt 0x64.
+
+
+03 - Steuerbefehle
+------------------
+
+Diese Befehle wurden bei der Kommunikation Funkmodul mit Rauchmelder geloggt.
+
+03 02 10 26 - Remote Alarm über Funk, RM sendet dann 82 20 10 00 00 ED
+03 02 80 2D - Testalarm über Funk, RM sendet dann 82 20 80 00 00 F4
+03 00 00 23 - Alarm deaktivieren, RM sendet dann 82 20 00 00 00 EC
+03 02 02 27 - Pairing vom eigenen Funkmodul mit einem anderen Funkmodul
+03 02 00 25 - 
+
+
+04 - Seriennummer
+-----------------
+
+SEND: <STX>0464<ETX>
+RECV: <ACK>
+RECV: <NUL>
+RECV: <STX>C4111633CA2A<ETX>
+SEND: <ACK>
+
+SEND: 0x02, 0x30, 0x34, 0x36, 0x34, 0x03
+      (START "0464" STOPP)
+
+REPLY: 4 Byte Seriennummer: 111633CA
+
+
+07 - Steuerbefehle
+------------------
+
+Diese Befehle wurden bei der Kommunikation Funkmodul mit Rauchmelder geloggt.
+
+07 00 08 2F - Alarm über den Funk Handsender deaktiviert
+
+
+08 - Unbekannt
+--------------
+
+SEND: <STX>0868<ETX>
+RECV: <ACK>
+RECV: <NUL>
+RECV: <STX>C8014401420B<ETX>
+SEND: <ACK>
+
+
+09 - Betriebszeit
+-----------------
+
+SEND: <STX>0969<ETX>
+RECV: <ACK>
+RECV: <NUL>
+RECV: <STX>C900059A211E<ETX>
+SEND: <ACK>
+
+SEND: 0x02, 0x30, 0x39, 0x36, 0x39, 0x03
+      (START "0969" STOPP)
+
+REPLY: 4 Byte Betriebszeit: 00059A21
+
+
+0B - Rauchkammerrelevante Daten
+-------------------------------
+
+SEND: <STX>0B72<ETX>
+RECV: <ACK>
+RECV: <NUL>
+RECV: <STX>CB005C00001D<ETX>
+SEND: <ACK>
+
+SEND: 0x02, 0x30, 0x42, 0x37, 0x32, 0x03
+      (START "0B72" STOPP)
+
+REPLY: 2 Byte Rauchkammer Wert: 005C
+       1 Byte Anzahl der Rauchalarme: 00 
+       1 Byte Verschmutzungsgrad: 00
+
+
+0C - Batteriespannung und Temperaturen
+--------------------------------------
+
+SEND: <STX>0C73<ETX>
+RECV: <ACK>
+RECV: <NUL>
+RECV: <STX>CC01DB52533B<ETX>
+SEND: <ACK>
+
+SEND: 0x02, 0x30, 0x43, 0x37, 0x33, 0x03
+      (START "0C73" STOPP)
+
+REPLY: 2 Byte Batteriespannung: 01DB
+       1 Byte Temperatur #1: 52
+       1 Byte Temperatur #2: 53
+
+Bat.Spannung = x * 9184 / 5000;
+Temperatur = x * 50 - 2000
+
+
+0D - Anzahl der Alarme
+----------------------
+
+SEND: <STX>0D74<ETX>
+RECV: <ACK>
+RECV: <NUL>
+RECV: <STX>CD0000000007<ETX>
+SEND: <ACK>
+
+SEND: 0x02, 0x30, 0x44, 0x37, 0x34, 0x03
+      (START "0D74" STOPP)
+
+REPLY: 1 Byte Anzahl der Temperatur Alarme: 00
+       1 Byte Anzahl der Test Alarme: 00
+       1 Byte Anzahl der Alarme über Kabel: 00
+       1 Byte Anzahl der Alarme über Funk: 00
+
+
+0E - Anzahl der Alarme #2
+-------------------------
+
+SEND: <STX>0E75<ETX>
+RECV: <ACK>
+RECV: <NUL>
+RECV: <STX>CE020448<ETX>
+SEND: <ACK>
+
+SEND: 0x02, 0x30, 0x45, 0x37, 0x35, 0x03
+      (START "0E75" STOPP)
+
+REPLY: 1 Byte Anzahl der Test Alarme über Kabel: 02
+       1 Byte Anzahl der Test Alarme über Funk: 04
+
+
+0F - Unbekannt
+--------------
+
+SEND: <STX>0F76<ETX>
+RECV: <ACK>
+RECV: <NUL>
+RECV: <STX>CF0077007725<ETX>
+SEND: <ACK>
+
+Leicht unterschiedliche Antworten wurden erhalten:
+
+CF0077007725
+CF0078007726
+CF0079007727
+CF007A00772F
+CF0078007827
+
+
+82 - Alarm Meldung ?
+--------------------
+
+Wird vom Rauchmelder selbstständig ausgegeben
+
+82 20 00 00 00 FC - nachdem am Funk Handsender der Alarm deaktiviert wurde
+82 20 08 00 00 F4 - nachdem Remote Alarm über grüne Klemme ausgelöst
+82 20 00 00 00 F4 - nachdem Remote Alarm über grüne Klemme beendet
+82 30 00 00 00 FD - Hitzealarm mit Harfön erzeugt
+82 28 00 00 ...   - nachdem Knopf am Rauchmelder gedrückt wurde
+82 28 20 00 00 F6 -
+82 20 10 00 00 ED - Remote Alarm über Funkmodule
+
