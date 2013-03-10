@@ -51,9 +51,9 @@ Diese Befehle wurden bei der Kommunikation Funkmodul mit Rauchmelder geloggt.
            Deaktiviert keinen Wired Alarm
 03021026 - Remote Alarm über Funk, RM sendet dann 82 20 10 00 00 ED
 0302802D - Testalarm über Funk, RM sendet dann 82 20 80 00 00 F4
-03020227 - Pairing vom eigenen Funkmodul mit einem anderen Funkmodul
-03020126 - Zwei kurze Piep, wiederholen bewirkt nichts, erst nach Alarm Abschaltung, Testalarm möglich.
 03020025 -
+03020126 - Zwei kurze Piep, wiederholen bewirkt nichts, erst nach Alarm Abschaltung, Testalarm möglich.
+03020227 - Pairing vom eigenen Funkmodul mit einem anderen Funkmodul
 
 
 04 - Seriennummer
