@@ -6,14 +6,14 @@ http://knx-user-forum.de/diy-do-yourself/15259-gira-dual-rauchmelder-vernetzung-
 
 Die Kommunikation mit dem Rauchmelder ist Seriell 9600 Baud, 8N1
 
-Die Antworten vom Rauchmelder bestehen aus einem String der Hex Bytes enthält,
+Die Kommunikation mit dem Rauchmelder bestehen aus Strings die Hex Bytes enthalten,
 sprich jeweils zwei Zeichen ergeben ein Byte.
 
-Die Antwort beginnt mit einem Start Byte 0x02 (STX) und endet mit einem
+Die Nachrichten beginnen mit einem Start Byte 0x02 (STX) und enden mit einem
 Stopp Byte 0x03 (ETX). Das letzte Byte vor dem ETX ist eine Prüfsumme.
 
-Jede Meldung muss nach Erhalt mit einem ACK Byte 0x06 bestätigt werden.
-Kommt keine Bestätigung, so wird die Meldung 3 mal wiederholt.
+Jede Nachricht muss nach Erhalt mit einem ACK Byte 0x06 bestätigt werden.
+Kommt keine Bestätigung, so wird die Nachricht 3 mal wiederholt.
 
 STX 0x02 - Start
 ETX 0x03 - Stopp
@@ -21,9 +21,11 @@ ACK 0x06 - Acknowledge
 NAK 0x15 - Not Acknowledged
 
 Die Prüfsumme wird berechnet in dem die Bytes des Hex Strings addiert werden und
-das Ergebnis mit 255 UND verknüpft wird.
-Beispiel: <STX>0464<ETX> ist "04" also 0x30 0x34, das ergibt Checksumme 0x64.
-          <STX>822080F4<ETX> ist "822080" ... Summe 0x1F4, also Checksumme 0xF4.
+das Ergebnis mit 255 UND verknüpft wird. Die Prüfsumme selbst wird dann wieder
+als Hex String gesendet. Beispiel:
+  <STX>0464<ETX> ist "04" also 0x30 0x34, das ergibt Checksumme 0x64, also "64".
+  <STX>822080F4<ETX> ist "822080" ... Summe 0x1F4, also Checksumme 0xF4, also "F4".
+
 
 02 - Unbekannt
 --------------
@@ -33,7 +35,7 @@ RECV: <ACK>
 RECV: <STX>C228000000FF<ETX>
 SEND: <ACK>
 
-Unterschiedliche Werte wurden beobachtet, wobei wiederholen der Abfrage, ohne dass
+Unterschiedliche Werte wurden beobachtet, wobei wiederholen der Anfrage, ohne dass
 der RM was tut, den Wert nicht ändert:
 
 C228000000FF

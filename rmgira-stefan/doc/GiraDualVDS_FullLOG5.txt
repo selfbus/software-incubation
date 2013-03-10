@@ -1,3 +1,6 @@
+Aus dem KNX Forum.
+Temporär hier eingecheckt um das Nachschlagen zu vereinfachen.
+
 //************************************
 //* Start der Diagnose vom PC 
 //* 16.12.2011 14:02:08: ...prüfe Status [167B]: 1777 | TestRM
