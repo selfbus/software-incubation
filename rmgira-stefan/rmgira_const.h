@@ -8,12 +8,18 @@
 #ifndef rmgira_const_h
 #define rmgira_const_h
 
+// Damit die Eclipse Code Analyse nicht so viele Warnungen anzeigt:
+#ifndef SDCC
+# define __idata
+# define __code
+#endif
+
 
 //-----------------------------------------------------------------------------
 // Kommunikations Objekte
 //-----------------------------------------------------------------------------
 
-#define OBJ_NONE                127
+#define OBJ_NONE                31
 
 #define OBJ_SET_ALARM			0
 #define OBJ_SET_TALARM			1
@@ -68,10 +74,10 @@
 #define GIRA_CMD_COUNT  6
 
 // Gira Command: intern behandelt, kein Befehl an den Rauchmelder
-#define GIRA_CMD_INTERNAL 126
+#define GIRA_CMD_INTERNAL 14
 
 // Gira Command: kein Befehl
-#define GIRA_CMD_NONE  127
+#define GIRA_CMD_NONE  15
 
 
 //-----------------------------------------------------------------------------

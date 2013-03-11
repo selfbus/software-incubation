@@ -6,10 +6,11 @@
  *  published by the Free Software Foundation.
  */
 
-#include <P89LPC922.h>
+#include <mcs51/P89LPC922.h>
 #include <fb_lpc922.h>
 
 #include "rmgira_app.h"
+#include "rmgira_com.h"
 
 
 void main(void)
@@ -42,23 +43,27 @@ void main(void)
 		if (APPLICATION_RUN)
 		{
 			if (RI)
-				gira_receive();
-
-			process_objs();
+				gira_recv_byte();
 
 			if (RTCCON >= 0x80)
 				timer_event();
+
+			if (!answerWait)
+				process_alarm_stats();
+
+			if (!answerWait)
+				process_objs();
 		}
 
 		//
-		// Empfangenes Telegramm bearbeiten, aber nur wenn wir
-		// gerade nichts vom Rauchmelder empfangen.
+		// Empfangenes Telegramm bearbeiten, aber nur wenn wir gerade nichts
+		// vom Rauchmelder empfangen.
 		//
-		if (tel_arrived && receiveCount < 0)
+		if (tel_arrived && recvCount < 0)
 			process_tel();
 
 		//
-		// Watchdog
+		// Watchdog rücksetzen
 		//
 		EA = 0;
 		WFEED1 = 0xA5;
@@ -66,7 +71,7 @@ void main(void)
 		EA = 1;
 
 		//
-		// Abfrage Programmier-Taster
+		// Abfrage des Programmier-Tasters
 		//
 		TASTER = 1;
 		if (!TASTER)

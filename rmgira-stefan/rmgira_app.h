@@ -9,12 +9,12 @@
 #define rmgira_app_h
 
 /**
- * Antworten vom Rauchmelder abholen.
+ * Den Zustand der Alarme bearbeiten.
  */
-extern void gira_receive();
+extern void process_alarm_stats();
 
 /**
- * Com-Objekte bearbeiten.
+ * Com-Objekte bearbeiten deren Wert gesendet werden soll.
  */
 extern void process_objs();
 
@@ -29,9 +29,10 @@ extern void timer_event();
 extern void restart_app();
 
 /**
- * Wenn >= 0 dann wird gerade etwas vom Rauchmelder empfangen
+ * Zähler für die Zeit die auf eine Antwort vom Rauchmelder gewartet wird.
+ * Ist der Zähler 0 dann wird gerade auf keine Antwort gewartet.
  */
-extern char receiveCount;
+extern unsigned char answerWait;
 
 
 #endif /*rmgira_app_h*/

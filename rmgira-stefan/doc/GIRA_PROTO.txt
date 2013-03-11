@@ -47,13 +47,13 @@ C220000000F7
 
 Diese Befehle wurden bei der Kommunikation Funkmodul mit Rauchmelder geloggt.
 
-03000023 - Alarm deaktivieren, RM sendet dann 82 20 00 00 00 EC
-           Deaktiviert keinen Wired Alarm
-03021026 - Remote Alarm über Funk, RM sendet dann 82 20 10 00 00 ED
-0302802D - Testalarm über Funk, RM sendet dann 82 20 80 00 00 F4
-03020025 -
-03020126 - Zwei kurze Piep, wiederholen bewirkt nichts, erst nach Alarm Abschaltung, Testalarm möglich.
-03020227 - Pairing vom eigenen Funkmodul mit einem anderen Funkmodul
+03 00 00 23 - Alarm deaktivieren, RM sendet dann 82 20 00 00 00 EC
+              Deaktiviert keinen Wired Alarm (Lokaler Alarm nicht getestet)
+03 02 10 26 - Wireless Alarm (über Funk), RM sendet dann 82 20 10 00 00 ED
+03 02 80 2D - Wireless Testalarm (über Funk), RM sendet dann 82 20 80 00 00 F4
+03 02 00 25 - Alarm über Funk beendet?
+03 02 01 26 - Zwei kurze Piep, wiederholen bewirkt nichts, erst nach Alarm Abschaltung, Testalarm möglich.
+03 02 02 27 - Pairing vom eigenen Funkmodul mit einem anderen Funkmodul
 
 
 04 - Seriennummer
@@ -74,12 +74,12 @@ REPLY: 4 Byte Seriennummer: 111633CA
 07 - Steuerbefehle
 ------------------
 
-Diese Befehle wurden bei der Kommunikation Funkmodul mit Rauchmelder geloggt.
+Diese Befehle wurden vom Funkmodul an den Rauchmelder gesendet.
 
 0700082F - Alarm über den Funk Handsender deaktiviert
            Stoppt lokalen und Wired Alarm (über grüne Klemme)
            Die LED am RM blinkt langsam (15min Alarmunterdrückung?)
-07002029 - RM beginnt mit 0,5Hz zu piepen und blinken, RM sendet nichts.
+07002029 - RM beginnt mit 2Hz zu piepen und blinken, RM sendet nichts.
            Piepen ist aber anders als bei Testalarm.
            Deaktivieren dieses Piepens über RM Taste (1sek halten).
            Deaktivieren über 0700082F nicht möglich.
@@ -204,17 +204,18 @@ CF0078007827
 CF00EF00F04A
 
 
-82 - Alarm Meldung ?
---------------------
+82 - Alarm Status und Taste
+---------------------------
 
-Wird vom Rauchmelder selbstständig ausgegeben.
+Wird vom Rauchmelder selbstständig gesendet.
 
-82 20 00 00 00 EC - nachdem am Funk Handsender der Alarm deaktiviert wurde
-82 20 08 00 00 F4 - nachdem Remote Alarm über grüne Klemme ausgelöst
-82 20 00 00 00 F4 - nachdem Remote Alarm über grüne Klemme beendet
-82 30 00 00 00 FD - Hitzealarm mit Harfön erzeugt
-82 28 00 00 00 F4 - nachdem Knopf am Rauchmelder gedrückt wurde
-                    Wird zyklisch ein paar mal wiederholt, auch wenn geACKt wird.
-82 28 20 00 00 F6 -
-82 20 10 00 00 ED - Remote Alarm über Funkmodule
-
+82 20 00 00 00 EC - Alarm beendet
+                    nachdem am Funk Handsender der Alarm deaktiviert wurde
+                    nachdem Wired Alarm über grüne Klemme beendet
+82 20 08 00 00 F4 - Wired Alarm über grüne Klemme ausgelöst
+82 30 00 00 00 FD - Lokaler Alarm mit Harfön erzeugt (nochmals testen!)
+82 20 20 00 00 EE - Lokaler Testalarm, Taste nicht gedrückt
+82 28 20 00 00 F6 - Lokaler Testalarm, Taste gedrückt
+82 20 10 00 00 ED - Wireless Alarm (Remote über Funkmodul)
+82 20 80 00 00 F4 - Wireless Testalarm (Remote über Funkmodul)
+82 28 00 00 00 F4 - Taste gedrückt ohne Alarm

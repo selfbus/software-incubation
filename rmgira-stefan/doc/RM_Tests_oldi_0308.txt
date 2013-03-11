@@ -28,7 +28,7 @@ FU: 06
 
 -----
 
-Remote Testalarm
+Remote Testalarm (über Funk)
 
 FU: 03 02 80 2D
 RM: 06
