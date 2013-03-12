@@ -475,6 +475,19 @@ void process_alarm_stats()
 	}
 }
 
+/**
+ * Test / Debug Funktion
+ */
+void test_func()
+{
+	TASTER = 1;
+	if (!TASTER)
+	{
+		setTestAlarmBus = !setTestAlarmBus;
+	}
+	TASTER = !(testAlarmLocal | testAlarmWired | testAlarmBus);
+}
+
 
 /**
  * Timer Event.

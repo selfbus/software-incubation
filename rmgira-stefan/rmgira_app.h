@@ -29,6 +29,11 @@ extern void timer_event();
 extern void restart_app();
 
 /**
+ * Test / Debug Funktion
+ */
+extern void test_func();
+
+/**
  * Zähler für die Zeit die auf eine Antwort vom Rauchmelder gewartet wird.
  * Ist der Zähler 0 dann wird gerade auf keine Antwort gewartet.
  */

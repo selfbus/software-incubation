@@ -6,4 +6,3 @@ Fehlende Testfälle für Kommunikation mit dem Gira Rauchmelder
 * Varianten der Alarm Meldungen (82er Befehle) nochmals testen
 * Störmeldung Batterie leer
 * Störmeldung Rauchkammer verschmutzt/defekt
-* Störmeldung Temp Sensor - einen Temp Sensor überbrücken

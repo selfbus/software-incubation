@@ -54,7 +54,7 @@ Diese Befehle wurden bei der Kommunikation Funkmodul mit Rauchmelder geloggt.
 03 02 00 25 - Alarm über Funk beendet?
 03 02 01 26 - Zwei kurze Piep, wiederholen bewirkt nichts, erst nach Alarm Abschaltung, Testalarm möglich.
 03 02 02 27 - Pairing vom eigenen Funkmodul mit einem anderen Funkmodul
-
+03 02 08 2D - Von Diagnose Software initial u.A. gesendet
 
 04 - Seriennummer
 -----------------
@@ -204,8 +204,8 @@ CF0078007827
 CF00EF00F04A
 
 
-82 - Alarm Status und Taste
----------------------------
+82 - Status Meldungen
+---------------------
 
 Wird vom Rauchmelder selbstständig gesendet.
 
@@ -219,3 +219,10 @@ Wird vom Rauchmelder selbstständig gesendet.
 82 20 10 00 00 ED - Wireless Alarm (Remote über Funkmodul)
 82 20 80 00 00 F4 - Wireless Testalarm (Remote über Funkmodul)
 82 28 00 00 00 F4 - Taste gedrückt ohne Alarm
+82 22 00 00 04 F2 - Temp Sensor 1 überbrückt (dh defekt)
+82 22 00 00 10 EF - Temp Sensor 2 überbrückt (dh defekt)
+82 20 01 00 00 ED - Batterie schwach
+82 28 01 00 00 F5 - Batterie schwach, Taste gedrückt
+82 21 01 08 00 F6 - kam als ich darauf wartete dass "Batterie schwach" nach Erhöhung
+                    der Spannung wieder irgendwie beendet würde. Wurde mit ~4 Piepsern
+                    begleitet.
