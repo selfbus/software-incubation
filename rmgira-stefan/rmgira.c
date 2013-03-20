@@ -40,7 +40,7 @@ void main(void)
 		//
 		//  Hauptverarbeitung
 		//
-		//if (APPLICATION_RUN)
+		if (APPLICATION_RUN)
 		{
 			if (RI)
 				gira_recv_byte();
@@ -59,7 +59,7 @@ void main(void)
 		// Empfangenes Telegramm bearbeiten, aber nur wenn wir gerade nichts
 		// vom Rauchmelder empfangen.
 		//
-		if (tel_arrived && recvCount < 0)
+		if (tel_arrived) // && recvCount < 0)
 			process_tel();
 
 		//
@@ -71,8 +71,8 @@ void main(void)
 		EA = 1;
 
 		// Test / Debug Funktion
-		test_func();
-#if 0
+		//test_func();
+#if 1
 		//
 		// Abfrage des Programmier-Tasters
 		//

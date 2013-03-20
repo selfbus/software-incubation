@@ -1,0 +1,26 @@
+Folgende Punkte sollten noch in der VD angepasst werden:
+
+* Applikations-Version von 1 auf 2 erhöhen
+
+* Com-Objekt umnennen
+  NOTUSED2 auf STAT_BAT_LOW, Typ Schalten
+
+* Com-Objekt umnennen
+  NOTUSED3 auf STAT_MALFUNCTION, Typ Schalten
+  (oder 1 Byte f. Art des Defekts?)
+
+* Com-Objekt umnennen
+  TEMP1 auf TEMP, Typ gleich lassen
+
+* Com-Objekt umbenennen und ausblenden
+  Temp2 auf NOTUSED1
+
+* Parameter umbenennen
+  Option für zyklisches Senden bei Temp1 auf Temp
+
+* Parameter entfernen
+  Option für zyklisches Senden bei Temp2
+
+* Parameter für zyklisches Senden überarbeiten
+
+* Parameter für verzögertes Senden überarbeiten

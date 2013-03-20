@@ -94,11 +94,15 @@ sub convertChar #(ch)
 	my $ch = shift;
 
     my $ord = ord($ch);
-    if ($ord == 2) { $ch = '<STX>'; }
+    if ($ord == 0) { $ch = '<NUL>'; }
+    elsif ($ord == 2) { $ch = '<STX>'; }
     elsif ($ord == 3) { $ch = '<ETX>'; }
     elsif ($ord == 6) { $ch = '<ACK>'; }
     elsif ($ord == 15) { $ch = '<NAK>'; }
-    elsif ($ch < '0' || $ch > '9') { $ch = sprintf('<x%02x>', $ord); }
+    elsif (($ch lt '0' || $ch gt '9') && ($ch lt 'A' || $ch gt 'F'))
+    {
+    	$ch = sprintf('<x%02x>', $ord);
+    }
 
     return $ch;
 }

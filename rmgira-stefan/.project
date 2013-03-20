@@ -3,7 +3,7 @@
 	<name>rmgira-stefan</name>
 	<comment></comment>
 	<projects>
-		<project>lib_lpc922-incubation</project>
+		<project>lib_lpc922</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

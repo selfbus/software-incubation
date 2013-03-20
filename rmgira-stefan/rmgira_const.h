@@ -44,7 +44,12 @@
 #define OBJ_STAT_ALARM_DELAYED	20
 #define OBJ_STAT_TALARM			21
 #define OBJ_STAT_TALARM_CENTRAL	22
+
+// Anzahl der Com-Objekte
 #define NUM_OBJS                23
+
+// Höchstes Com-Objekt das bei Info-Senden gesendet wird
+#define OBJ_HIGH_INFO_SEND      17
 
 
 

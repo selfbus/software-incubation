@@ -1,5 +1,5 @@
-Protokoll für die Kommunikation mit dem Gira Rauchmelder Dual
-=============================================================
+Protokoll für die Kommunikation mit dem Rauchmelder
+===================================================
 
 Diskussion siehe
 http://knx-user-forum.de/diy-do-yourself/15259-gira-dual-rauchmelder-vernetzung-einzelauswertung-fernausloesung.html
@@ -209,6 +209,11 @@ CF00EF00F04A
 
 Wird vom Rauchmelder selbstständig gesendet.
 
+82 00 00 00 00 EA - Externe Spannung wurde an der grünen Klemme angelegt.
+                    Wird auch gemeldet wenn nur 3,3V angelegt werden.
+                    82 20 00 00 00 EC wenn die externe Spannung wieder entfernt wird.
+82 00 01 00 00 EB - Externe Spannung wurde an der grünen Klemme angelegt, Batterie ist schwach.
+82 08 01 00 00 F3 - Stützspannung, Batterie schwach, Taste gedrückt.
 82 20 00 00 00 EC - Alarm beendet
                     nachdem am Funk Handsender der Alarm deaktiviert wurde
                     nachdem Wired Alarm über grüne Klemme beendet
@@ -226,3 +231,7 @@ Wird vom Rauchmelder selbstständig gesendet.
 82 21 01 08 00 F6 - kam als ich darauf wartete dass "Batterie schwach" nach Erhöhung
                     der Spannung wieder irgendwie beendet würde. Wurde mit ~4 Piepsern
                     begleitet.
+86 00 01 2F -       Unbekannt.
+                    Kommt derzeit bei Taste am Rauchmelder 1sek gedrückt nachdem bei Stützspannung
+                    die schwache Batterie durch eine neue Batterie ersetzt wurde. Entfernen
+                    der Stützspannung und der Batterie entfernt diese Meldung wieder.

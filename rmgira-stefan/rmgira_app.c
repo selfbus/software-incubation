@@ -10,6 +10,7 @@
 #include "rmgira_const.h"
 #include "rmgira_com.h"
 #include "rmgira_conv.h"
+#include "rmgira_eeprom.h"
 
 #include <mcs51/P89LPC922.h>
 #include <fb_lpc922.h>
@@ -124,6 +125,25 @@ unsigned char answerWait;
 // Initialwert für answerWait
 #define INITIAL_ANSWER_WAIT 6
 
+
+// Countdown Zähler für zyklisches Senden eines Alarms oder Testalarms.
+unsigned char alarmCounter;
+
+// Countdown Zähler für zyklisches Senden des Alarm Zustands.
+unsigned char alarmStatusCounter;
+
+// Countdown Zähler für verzögertes Senden eines Alarms
+unsigned char delayedAlarmCounter;
+
+// Countdown Zähler für zyklisches Senden der (Info) Com-Objekte
+unsigned char infoCounter;
+
+// Nummer des Com-Objekts das bei zyklischem Info Senden als nächstes geprüft/gesendet wird
+unsigned char infoSendObjno;
+
+
+// Tabelle für 1<<x, d.h. pow2[3] == 1<<3
+const unsigned char pow2[] = { 1, 2, 4, 8, 16, 32, 64, 128 };
 
 // Verwendet um Response Telegramme zu kennzeichnen.
 #define OBJ_RESPONSE_FLAG 0x40
@@ -240,6 +260,21 @@ void gira_process_msg(unsigned char* bytes, unsigned char len)
 				testAlarmBus = 1;
 			}
 		}
+
+		if ((bytes[1] & 0x0f) == 8)  // Taste gedrückt
+		{
+			if (setAlarmBus)
+			{
+				setAlarmBus = 0;
+				send_obj_value(OBJ_STAT_ALARM);
+			}
+
+			if (setTestAlarmBus)
+			{
+				setTestAlarmBus = 0;
+				send_obj_value(OBJ_STAT_TALARM);
+			}
+		}
 	}
 }
 
@@ -338,10 +373,20 @@ void write_value_obj(unsigned char objno)
  	if (objno == OBJ_SET_ALARM) // Bus Alarm
 	{
  		setAlarmBus = telegramm[7] & 0x01;
+
+ 		// Wenn wir lokalen Alarm haben dann Bus Alarm wieder auslösen
+		// damit der Status der anderen Rauchmelder stimmt
+ 		if (!setAlarmBus && alarmLocal)
+ 			send_obj_value(OBJ_STAT_ALARM);
 	}
 	else if (objno == OBJ_SET_TALARM) // Bus Test Alarm
 	{
 		setTestAlarmBus = telegramm[7] & 0x01;
+
+ 		// Wenn wir lokalen Testalarm haben dann Bus Testalarm wieder auslösen
+		// damit der Status der anderen Rauchmelder stimmt
+ 		if (!setTestAlarmBus && testAlarmLocal)
+ 			send_obj_value(OBJ_STAT_TALARM);
  	}
 }
 
@@ -451,7 +496,9 @@ void process_objs()
 
 
 /**
- * Den Zustand der Alarme bearbeiten.
+ * Den Zustand der Alarme bearbeiten. Wenn wir der Meinung sind der Bus-Alarm soll einen
+ * bestimmten Zustand haben dann wird das dem Rauchmelder so lange gesagt bis der auch
+ * der gleichen Meinung ist.
  */
 void process_alarm_stats()
 {
@@ -494,16 +541,79 @@ void test_func()
  */
 void timer_event()
 {
+	static unsigned char seconds = 60;
+
 	RTCCON = 0x60;  // RTC anhalten und Flag löschen
-	RTCH = 0x70;    // RTC neu laden (0,5s = 0x7080)
-	RTCL = 0x80;
+	RTCH = 0xE1;    // RTC neu laden (1s = 0xE100; 0,5s = 0x7080; 0,25s = 0x3840)
+	RTCL = 0x00;
+	RTCCON = 0x61;  // RTC starten
+
+	--seconds;
 
 	if (answerWait)
 		--answerWait;
 
-	// TODO zyklisches Senden der Com-Objekte bzw Alarme
+	// Alarm und Testalarm behandeln
+	if (alarmLocal || alarmWired || testAlarmLocal || testAlarmWired)
+	{
+		// Verzögertes Alarm senden behandeln
+		if (delayedAlarmCounter && (!seconds || !eeprom[CONF_A_DELAY_BASIS]))
+		{
+			--delayedAlarmCounter;
+			if (!delayedAlarmCounter)
+			{
+				send_obj_alarm(1); // FIXME
+			}
+		}
 
-	RTCCON = 0x61;  // RTC starten
+		// Wenn Alarm zyklisch senden aktiviert ist dann herunterzählen, wobei je nach
+		// Zeitbasis jede Sekunde oder Minute gezählt wird. Erreicht der Zähler 0 dann
+		// wird die Aktion ausgeführt und der Zähler rückgesetzt.
+		if (!delayedAlarmCounter && (eeprom[CONF_A_ZYKLISCH]&0x80) && (!seconds || !eeprom[CONF_A_BASIS]))
+		{
+			--alarmCounter;
+			if (!alarmCounter)
+			{
+				alarmCounter = eeprom[CONF_A_ZYKLISCH] & 0x7f;
+				// TODO
+			}
+		}
+	}
+
+	// Wenn Info zyklisch senden aktiviert ist dann herunterzählen, wobei je nach
+	// Zeitbasis jede Sekunde oder Minute gezählt wird. Erreicht der Zähler 0 dann
+	// wird die Aktion ausgeführt und der Zähler rückgesetzt.
+	if ((eeprom[CONF_INFO_ZYKLISCH]&0x80) && (!seconds || !eeprom[CONF_INFO_BASIS]))
+	{
+		--infoCounter;
+		if (!infoCounter)
+		{
+			infoCounter = eeprom[CONF_INFO_ZYKLISCH] & 0x7f;
+
+			if (!infoSendObjno) // Sicherstellen dass alle Objekte verarbeitet wurden
+				infoSendObjno = OBJ_HIGH_INFO_SEND;
+		}
+	}
+
+	// Jede Sekunde ein Info Com-Objekt senden
+	if (infoSendObjno)
+	{
+		// Info Objekt zum Senden vormerken wenn es dafür konfiguriert ist.
+		if ((infoSendObjno >= 11 && (eeprom[CONF_INFO_11TO17] & pow2[infoSendObjno - 11])) ||
+			(infoSendObjno >= 4 && (eeprom[CONF_INFO_4TO10] & pow2[infoSendObjno - 4])))
+		{
+			objSendReqFlags |= 1 << infoSendObjno;
+		}
+
+		--infoSendObjno;
+	}
+
+	if (!seconds)
+		seconds = 60;
+
+//		// TODO verzögertes Senden des Alarms
+//		// TODO zyklisches Senden des Alarms
+//		// TODO zyklisches Senden des Alarm Status
 }
 
 
@@ -516,14 +626,14 @@ void restart_app()
 	P0M2 = 0x03;
 	P0 = ~0x04;	   // P0.2 low to enable serial gira communication. all other pins of p0 high
 
-	P1M1 |= (1 << 2);   // P1.2 to GIRA open drain with external pullup
+	P1M1 |= (1 << 2); // P1.2 to GIRA open drain with external pullup
 	P1M2 |= (1 << 2);
-	P1 |= (1 << 2);		// P1.2 high
+	P1 |= (1 << 2);	  // P1.2 high
 
 	gira_init();
 
-	RTCH = 0x70;	// Reload Real Time Clock (0,5s = 0x7080)
-	RTCL = 0x80;	// (RTC ist ein down-counter mit 128 bit prescaler und osc-clock)
+	RTCH = 0xE1;	// Reload Real Time Clock (1s = 0xE100; 0,5s = 0x7080; 0,25s = 0x3840)
+	RTCL = 0x00;	// (RTC ist ein down-counter mit 128 bit prescaler und osc-clock)
 	RTCCON = 0x61;	// ... und starten
 
 	// Werte initialisieren
@@ -533,6 +643,7 @@ void restart_app()
 	answerWait = 0;
 	cmdCurrent = GIRA_CMD_NONE;
 	remoteAlarmWait = 0;
+	recvCount = -1;
 
 	alarmBus = 0;
 	alarmLocal = 0;
@@ -545,15 +656,21 @@ void restart_app()
 	setAlarmBus = 0;
 	setTestAlarmBus = 0;
 
+	infoSendObjno = 0;
+	infoCounter = 1;
+	alarmCounter = 1;
+	alarmStatusCounter = 1;
+	delayedAlarmCounter = 0;
+
 	// EEPROM initialisieren
 
 	EA = 0;							// Interrupts sperren, damit Flashen nicht unterbrochen wird
 	START_WRITECYCLE;
 	WRITE_BYTE(0x01, 0x03, 0x00);	// Herstellercode 0x004C = Bosch
 	WRITE_BYTE(0x01, 0x04, 0x4C);
-	WRITE_BYTE(0x01, 0x05, 0x03);	// Devicetype 0x03F2
+	WRITE_BYTE(0x01, 0x05, 0x03);	// Devicetype 1010 (0x03F2)
 	WRITE_BYTE(0x01, 0x06, 0xF2);
-	WRITE_BYTE(0x01, 0x07, 0x01);	// Version der Applikation
+	WRITE_BYTE(0x01, 0x07, 0x01);	// Version der Applikation: 1
 	WRITE_BYTE(0x01, 0x0C, 0x00);	// PORT A Direction Bit Setting
 	WRITE_BYTE(0x01, 0x0D, 0xFF);	// Run-Status (00=stop FF=run)
 	WRITE_BYTE(0x01, 0x12, 0xA0);	// COMMSTAB Pointer

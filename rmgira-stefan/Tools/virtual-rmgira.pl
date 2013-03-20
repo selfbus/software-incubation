@@ -2,9 +2,11 @@
 #
 #  This program simulates a Gira Dual smoke alarm.
 #
+#  WARNING  most functionality is not yet implemented
+#
 use strict;
 
-use Term::ReadKey;       # Found in the package libterm-readkey-perl in Ubuntu / Debian
+use Term::ReadKey;    # Found in the package libterm-readkey-perl in Ubuntu / Debian
 use Device::SerialPort;
 use Time::HiRes qw(time sleep gettimeofday);
 
