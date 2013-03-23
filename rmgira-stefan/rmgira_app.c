@@ -94,14 +94,10 @@ unsigned char remoteAlarmWait;
 
 
 // Flags für Com-Objekte lesen
-unsigned long objReadReqFlags;
+unsigned char objReadReqFlags[NUM_OBJ_FLAG_BYTES];
 
 // Flags für Com-Objekte senden
-unsigned long objSendReqFlags;
-
-// Mask für objReadReqFlags bzw objSendReqFlags aus einer Com-Objekt Nummer berechnen
-#define OBJ_FLAG_MASK(objno) (1L << (objno))
-
+unsigned char objSendReqFlags[NUM_OBJ_FLAG_BYTES];
 
 // Werte der Com-Objekte. Index ist die der GIRA_CMD
 unsigned long objValues[GIRA_CMD_COUNT];
@@ -141,9 +137,22 @@ unsigned char infoCounter;
 // Nummer des Com-Objekts das bei zyklischem Info Senden als nächstes geprüft/gesendet wird
 unsigned char infoSendObjno;
 
+// Sekunden Zähler 0..60
+unsigned char seconds;
+
 
 // Tabelle für 1<<x, d.h. pow2[3] == 1<<3
 const unsigned char pow2[] = { 1, 2, 4, 8, 16, 32, 64, 128 };
+
+// Im Byte Array arr das bitno-te Bit setzen
+#define ARRAY_SET_BIT(arr, bitno) arr[bitno>>3] |= pow2[bitno & 7]
+
+// Im Byte Array arr das bitno-te Bit löschen
+#define ARRAY_CLEAR_BIT(arr, bitno) arr[bitno>>3] &= ~pow2[bitno & 7]
+
+// Testen ob im Byte Array arr das bitno-te Bit gesetzt ist
+#define ARRAY_IS_BIT_SET(arr, bitno) (arr[bitno>>3] & pow2[bitno & 7])
+
 
 // Verwendet um Response Telegramme zu kennzeichnen.
 #define OBJ_RESPONSE_FLAG 0x40
@@ -182,7 +191,7 @@ void send_obj_test_alarm(__bit newAlarm)
 void gira_process_msg(unsigned char* bytes, unsigned char len)
 {
 	unsigned char objno, cmd, msgType;
-	unsigned long mask;
+	unsigned char byteno, mask;
 
 	msgType = bytes[0];
 	if ((msgType & 0xf0) == 0xc0) // Com-Objekt Werte empfangen
@@ -198,24 +207,28 @@ void gira_process_msg(unsigned char* bytes, unsigned char len)
 
 		if (cmd < GIRA_CMD_COUNT)
 		{
-			cmdCurrent = cmd;
 			objValueCurrent = objValues[cmd];
+			cmdCurrent = cmd;
+			objValues[cmd] = *(unsigned long*)(bytes + 1);
 			cmdCurrent = GIRA_CMD_NONE;
 
 			// Versand der erhaltenen Com-Objekte einleiten. Dazu alle Com-Objekte suchen
 			// auf die die empfangenen Daten passen und diese senden. Sofern sie für
 			// den Versand vorgemerkt sind.
-			for (objno = 0, mask = 1; objno < NUM_OBJS; ++objno, mask <<= 1)
+			for (objno = 0; objno < NUM_OBJS; ++objno, mask <<= 1)
 			{
-				if (objReadReqFlags & mask)
+				byteno = objno >> 3;
+				mask = pow2[objno & 7];
+
+				if (objReadReqFlags[byteno] & mask)
 				{
 					send_obj_value(objno | OBJ_RESPONSE_FLAG);
-					objReadReqFlags &= ~mask;
+					objReadReqFlags[byteno] &= ~mask;
 				}
-				if (objSendReqFlags & mask)
+				if (objSendReqFlags[byteno] & mask)
 				{
 					send_obj_value(objno);
-					objSendReqFlags &= ~mask;
+					objSendReqFlags[byteno] &= ~mask;
 				}
 			}
 		}
@@ -237,7 +250,8 @@ void gira_process_msg(unsigned char* bytes, unsigned char len)
 				testAlarmLocal = 0;
 				testAlarmWired = 0;
 			}
-			// TODO Lokaler Temperatur- bzw Rauch-Alarm
+			// TODO Lokaler Temperatur Alarm
+			// TODO Lokaler Rauch Alarm
 
 			else if (bytes[2] == 0x20) // Lokaler Testalarm
 			{
@@ -289,9 +303,9 @@ void read_value_req()
 	objno = find_first_objno(telegramm[3], telegramm[4]);
 	objflags = read_objflags(objno);
 
-	// Wir antworten nur wenn READ und COM Flags
+	// Wir antworten nur wenn READ und COM Flag gesetzt sind
 	if ((objflags&0x0C) == 0x0C)
-		objReadReqFlags |= OBJ_FLAG_MASK(objno);
+		ARRAY_SET_BIT(objReadReqFlags, objno);
 }
 
 
@@ -304,6 +318,9 @@ void read_value_req()
 unsigned long read_obj_value(unsigned char objno)
 {
 	unsigned char cmd = objMappingTab[objno].cmd;
+
+//	if (objno < 100) // TODO Test-Code wieder entfernen
+//		return cmd;
 
 	// Interne Com-Objekte behandeln
 	if (cmd == GIRA_CMD_INTERNAL)
@@ -438,21 +455,22 @@ void process_obj(unsigned char objno)
 {
 	unsigned char cmd = objMappingTab[objno].cmd;
 
-	if (cmd == GIRA_CMD_NONE)
+	if (cmd == GIRA_CMD_NONE || cmd == GIRA_CMD_INTERNAL)
 	{
 		// Der Wert des Com-Objekts ist bekannt, also sofort senden
 
-		unsigned long mask = OBJ_FLAG_MASK(objno);
+		unsigned char byteno = objno >> 3;
+		unsigned char mask = pow2[objno & 7];
 
-		if (objReadReqFlags & mask)
+		if (objReadReqFlags[byteno] & mask)
 		{
 			send_obj_value(objno | OBJ_RESPONSE_FLAG);
-			objReadReqFlags &= ~mask;
+			objReadReqFlags[byteno] &= ~mask;
 		}
-		if (objSendReqFlags & mask)
+		if (objSendReqFlags[byteno] & mask)
 		{
 			send_obj_value(objno);
-			objSendReqFlags &= ~mask;
+			objSendReqFlags[byteno] &= ~mask;
 		}
 	}
 	else
@@ -473,20 +491,18 @@ void process_obj(unsigned char objno)
  */
 void process_objs()
 {
-	unsigned long mask;
-	unsigned char objno;
+	unsigned char mask, byteno, objno;
 
 	// Nichts tun wenn gerade auf eine Antwort vom Rauchmelder gewartet wird
 	if (answerWait > 0)
 		return;
 
-	// Gibt es zu bearbeitende Com-Objekte?
-	if (objReadReqFlags == 0 && objSendReqFlags == 0)
-		return;
-
-	for (objno = 0, mask = 1; objno < NUM_OBJS; ++objno, mask <<= 1)
+	for (objno = 0; objno < NUM_OBJS; ++objno)
 	{
-		if ((mask & objReadReqFlags) || (mask & objSendReqFlags))
+		byteno = objno >> 3;
+		mask = pow2[objno & 7];
+
+		if ((objReadReqFlags[byteno] & mask) || (objSendReqFlags[byteno] & mask))
 		{
 			process_obj(objno);
 			break;
@@ -522,17 +538,18 @@ void process_alarm_stats()
 	}
 }
 
+
 /**
  * Test / Debug Funktion
  */
 void test_func()
 {
-	TASTER = 1;
-	if (!TASTER)
-	{
-		setTestAlarmBus = !setTestAlarmBus;
-	}
-	TASTER = !(testAlarmLocal | testAlarmWired | testAlarmBus);
+//	TASTER = 1;
+//	if (!TASTER)
+//	{
+//		setTestAlarmBus = !setTestAlarmBus;
+//	}
+//	TASTER = !(testAlarmLocal | testAlarmWired | testAlarmBus);
 }
 
 
@@ -541,8 +558,6 @@ void test_func()
  */
 void timer_event()
 {
-	static unsigned char seconds = 60;
-
 	RTCCON = 0x60;  // RTC anhalten und Flag löschen
 	RTCH = 0xE1;    // RTC neu laden (1s = 0xE100; 0,5s = 0x7080; 0,25s = 0x3840)
 	RTCL = 0x00;
@@ -553,11 +568,11 @@ void timer_event()
 	if (answerWait)
 		--answerWait;
 
-	// Alarm und Testalarm behandeln
-	if (alarmLocal || alarmWired || testAlarmLocal || testAlarmWired)
+	// Alarm: verzögert und zyklisch senden
+	if (alarmLocal || alarmWired)
 	{
-		// Verzögertes Alarm senden behandeln
-		if (delayedAlarmCounter && (!seconds || !eeprom[CONF_A_DELAY_BASIS]))
+		// Alarm verzögert senden
+		if (delayedAlarmCounter)
 		{
 			--delayedAlarmCounter;
 			if (!delayedAlarmCounter)
@@ -565,55 +580,65 @@ void timer_event()
 				send_obj_alarm(1); // FIXME
 			}
 		}
+		else
+		{
+			// Alarm zyklisch senden
+			unsigned char conf = eeprom[CONF_A_ZYKLISCH];
+			if (conf & 0x80)
+			{
+				--alarmCounter;
+				if (!alarmCounter)
+				{
+					alarmCounter = conf & 0x7f;
+					// TODO
+				}
+			}
+		}
+	}
 
-		// Wenn Alarm zyklisch senden aktiviert ist dann herunterzählen, wobei je nach
-		// Zeitbasis jede Sekunde oder Minute gezählt wird. Erreicht der Zähler 0 dann
-		// wird die Aktion ausgeführt und der Zähler rückgesetzt.
-		if (!delayedAlarmCounter && (eeprom[CONF_A_ZYKLISCH]&0x80) && (!seconds || !eeprom[CONF_A_BASIS]))
+	// Testalarm: zyklisch senden
+	if (testAlarmLocal || testAlarmWired)
+	{
+		unsigned char conf = eeprom[CONF_S_ZYKLISCH];
+		if (conf & 0x80)
 		{
 			--alarmCounter;
 			if (!alarmCounter)
 			{
-				alarmCounter = eeprom[CONF_A_ZYKLISCH] & 0x7f;
+				alarmCounter = conf & 0x7f;
 				// TODO
 			}
 		}
 	}
 
-	// Wenn Info zyklisch senden aktiviert ist dann herunterzählen, wobei je nach
-	// Zeitbasis jede Sekunde oder Minute gezählt wird. Erreicht der Zähler 0 dann
-	// wird die Aktion ausgeführt und der Zähler rückgesetzt.
-	if ((eeprom[CONF_INFO_ZYKLISCH]&0x80) && (!seconds || !eeprom[CONF_INFO_BASIS]))
-	{
-		--infoCounter;
-		if (!infoCounter)
-		{
-			infoCounter = eeprom[CONF_INFO_ZYKLISCH] & 0x7f;
-
-			if (!infoSendObjno) // Sicherstellen dass alle Objekte verarbeitet wurden
-				infoSendObjno = OBJ_HIGH_INFO_SEND;
-		}
-	}
-
-	// Jede Sekunde ein Info Com-Objekt senden
+	// Jede Sekunde ein Status Com-Objekt senden
 	if (infoSendObjno)
 	{
 		// Info Objekt zum Senden vormerken wenn es dafür konfiguriert ist.
 		if ((infoSendObjno >= 11 && (eeprom[CONF_INFO_11TO17] & pow2[infoSendObjno - 11])) ||
 			(infoSendObjno >= 4 && (eeprom[CONF_INFO_4TO10] & pow2[infoSendObjno - 4])))
 		{
-			objSendReqFlags |= 1 << infoSendObjno;
+			ARRAY_SET_BIT(objSendReqFlags, infoSendObjno);
 		}
 
 		--infoSendObjno;
 	}
 
-	if (!seconds)
+	if (!seconds) // einmal pro Minute
+	{
 		seconds = 60;
 
-//		// TODO verzögertes Senden des Alarms
-//		// TODO zyklisches Senden des Alarms
-//		// TODO zyklisches Senden des Alarm Status
+		// Status Informationen zyklisch senden
+		if (eeprom[CONF_INFO_ZYKLISCH] & 0x80)
+		{
+			--infoCounter;
+			if (!infoCounter)
+			{
+				infoCounter = eeprom[CONF_INFO_ZYKLISCH] & 0x7f;
+				infoSendObjno = OBJ_HIGH_INFO_SEND;
+			}
+		}
+	}
 }
 
 
@@ -622,6 +647,8 @@ void timer_event()
  */
 void restart_app()
 {
+	unsigned char i;
+
 	P0M1 = 0x03;   // P0.0 and P0.1 open drain. all other pins of P0 as bidirectional
 	P0M2 = 0x03;
 	P0 = ~0x04;	   // P0.2 low to enable serial gira communication. all other pins of p0 high
@@ -638,12 +665,17 @@ void restart_app()
 
 	// Werte initialisieren
 
-	objReadReqFlags = 0;
-	objSendReqFlags = 0;
+	for (i = 0; i < NUM_OBJ_FLAG_BYTES; ++i)
+	{
+		objReadReqFlags[i] = 0;
+		objSendReqFlags[i] = 0;
+	}
+
 	answerWait = 0;
 	cmdCurrent = GIRA_CMD_NONE;
 	remoteAlarmWait = 0;
 	recvCount = -1;
+	seconds = eeprom[ADDRTAB + 2] % 60;
 
 	alarmBus = 0;
 	alarmLocal = 0;

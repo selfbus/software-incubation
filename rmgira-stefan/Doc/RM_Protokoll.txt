@@ -1,9 +1,6 @@
 Protokoll für die Kommunikation mit dem Rauchmelder
 ===================================================
 
-Diskussion siehe
-http://knx-user-forum.de/diy-do-yourself/15259-gira-dual-rauchmelder-vernetzung-einzelauswertung-fernausloesung.html
-
 Die Kommunikation mit dem Rauchmelder ist Seriell 9600 Baud, 8N1
 
 Die Kommunikation mit dem Rauchmelder bestehen aus Strings die Hex Bytes enthalten,

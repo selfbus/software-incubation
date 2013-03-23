@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-#  This program simulates a Gira Dual smoke alarm.
+#  This program simulates a smoke alarm.
 #
 #  WARNING  most functionality is not yet implemented
 #

@@ -48,9 +48,11 @@
 // Anzahl der Com-Objekte
 #define NUM_OBJS                23
 
-// Höchstes Com-Objekt das bei Info-Senden gesendet wird
-#define OBJ_HIGH_INFO_SEND      17
+// Anzahl der Bytes die benötigt werden um die Com-Objekte als Bits abzubilden
+#define NUM_OBJ_FLAG_BYTES ((NUM_OBJS + 7) >> 3)
 
+// Höchstes Com-Objekt das bei Info-Senden gesendet wird.
+#define OBJ_HIGH_INFO_SEND      17
 
 
 //-----------------------------------------------------------------------------

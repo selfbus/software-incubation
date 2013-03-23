@@ -5,8 +5,6 @@
  *  it under the terms of the GNU General Public License version 2 as
  *  published by the Free Software Foundation.
  */
-#ifndef rmgira_eeprom_h
-#define rmgira_eeprom_h
 
 //-----------------------------------------------------------------------------
 // ETS VD Konfigurations-Parameter
@@ -31,7 +29,7 @@
 #define CONF_A_BASIS		251
 
 /**
- * 0x80 - Alarm Status zyklisch senden aktiviert
+ * 0x80 - Testalarm zyklisch senden aktiviert
  * 0..0x7f - Intervall für zyklisches Senden (siehe CONF_S_BASIS)
  */
 #define CONF_S_ZYKLISCH 	246
@@ -42,7 +40,7 @@
 #define CONF_S_FAKTOR		246
 
 /**
- * Zeitbasis für Alarm Status zyklisch senden.
+ * Zeitbasis für Testalarm zyklisch senden.
  * Wenn 0 dann enthält CONF_S_ZYKLISCH Sekunden, sonst Minuten
  */
 #define CONF_S_BASIS		247
@@ -90,6 +88,3 @@
  * Bits aktivieren das zyklische Senden der Com-Objekte 11..17
  */
 #define CONF_INFO_11TO17	253
-
-
-#endif /*rmgira_eeprom_h*/

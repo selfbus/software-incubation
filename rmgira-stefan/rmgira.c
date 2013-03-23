@@ -53,6 +53,8 @@ void main(void)
 
 			if (!answerWait)
 				process_objs();
+
+			// TODO Alarm auslösen wenn der Alarm-Pin vom LPC x Zyklen low ist
 		}
 
 		//
