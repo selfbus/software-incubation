@@ -78,7 +78,9 @@ sub receive #(portObj, otherPortObj)
 
 #    while ($rlen > 0)
 #    {
-    	$portObj->{recvBuf} .= convertChar($ch);
+	    $ch = convertChar($ch);
+	    $portObj->{recvBuf} .= ' ' if ($portObj->{recvBuf} =~ /[A-Z0-9][A-Z0-9]$/ && length($ch)==1);
+    	$portObj->{recvBuf} .= $ch;
         ($rlen, $ch) = $portObj->{port}->read(1);
 #    }
 

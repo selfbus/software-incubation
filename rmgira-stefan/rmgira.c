@@ -53,8 +53,6 @@ void main(void)
 
 			if (!answerWait)
 				process_objs();
-
-			// TODO Alarm auslösen wenn der Alarm-Pin vom LPC x Zyklen low ist
 		}
 
 		//
@@ -72,9 +70,6 @@ void main(void)
 		WFEED2 = 0x5A;
 		EA = 1;
 
-		// Test / Debug Funktion
-		//test_func();
-#if 1
 		//
 		// Abfrage des Programmier-Tasters
 		//
@@ -88,7 +83,6 @@ void main(void)
 			status60 ^= 0x81;// Prog-Bit und Parity-Bit im system_state toggeln
 		}
 		TASTER = !(status60 & 0x01);// LED entsprechend Prog-Bit schalten (low=LED an)
-#endif
 
 	} while (1);
 }

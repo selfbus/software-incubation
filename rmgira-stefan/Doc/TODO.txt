@@ -1,15 +1,11 @@
 Fehlende Testfälle für Kommunikation mit dem Rauchmelder
 --------------------------------------------------------
 
-* Was sendet der Rauchmelder bei Rauchalarm?
-* Was sendet der Rauchmelder bei Wired Testalarm?
 * Was passiert wenn Testalarm ist und z.B. Wired Alarm ausgelöst wird?
-* Varianten der Alarm Meldungen (82er Befehle) nochmals prüfen
 * Störmeldung Rauchkammer verschmutzt/defekt
 
 Zu Lösen
 --------
 
 * Soll der Status des Bus Alarms bei Brownout ins EEPROM geschrieben werden?
-  Oder vielleicht bei jedem Bus Alarm?
 * Bei Start des LPC den Alarm Status vom RM abfragen

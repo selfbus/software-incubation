@@ -64,20 +64,17 @@ const struct
 };
 
 
-// Flag für lokalen Alarm
+// Flag für lokalen Alarm und Wired Alarm (über grüne Klemme / Rauchmelderbus)
 __bit alarmLocal;
-
-// Flag für remote Alarm über grüne Klemme / Rauchmelderbus
-__bit alarmWired;
 
 // Flag für remote Alarm über EIB
 __bit alarmBus;
 
-// Flag für lokalen Testalarm
-__bit testAlarmLocal;
+// Flag für remote Alarm über LPC Alarm Pin auf JP2
+__bit alarmExtra;
 
-// Flag für remote Testalarm über grüne Klemme / Rauchmelderbus
-__bit testAlarmWired;
+// Flag für lokalen Testalarm und Wired Testalarm
+__bit testAlarmLocal;
 
 // Flag für remote Testalarm über EIB
 __bit testAlarmBus;
@@ -118,8 +115,15 @@ __idata unsigned long objValueCurrent;
 // Ist der Zähler 0 dann wird gerade auf keine Antwort gewartet.
 unsigned char answerWait;
 
-// Initialwert für answerWait
+// Initialwert für answerWait in 0,5s
 #define INITIAL_ANSWER_WAIT 6
+
+
+// Zähler für Alarm am JP2 - EXTRA_ALARM_PIN
+unsigned char extraAlarmCounter;
+
+// Schwelle für extraAlarmCounter in 0,5s
+#define EXTRA_ALARM_LIMIT 5
 
 
 // Countdown Zähler für zyklisches Senden eines Alarms oder Testalarms.
@@ -137,8 +141,8 @@ unsigned char infoCounter;
 // Nummer des Com-Objekts das bei zyklischem Info Senden als nächstes geprüft/gesendet wird
 unsigned char infoSendObjno;
 
-// Sekunden Zähler 0..60
-unsigned char seconds;
+// Halbsekunden Zähler 0..119
+unsigned char halfSeconds;
 
 
 // Tabelle für 1<<x, d.h. pow2[3] == 1<<3
@@ -165,7 +169,7 @@ const unsigned char pow2[] = { 1, 2, 4, 8, 16, 32, 64, 128 };
  */
 void send_obj_alarm(__bit newAlarm)
 {
-	__bit alarm = alarmLocal | alarmWired;
+	__bit alarm = alarmLocal | alarmExtra;
 	if (alarm != newAlarm)
 		send_obj_value(OBJ_STAT_ALARM);
 }
@@ -178,9 +182,22 @@ void send_obj_alarm(__bit newAlarm)
  */
 void send_obj_test_alarm(__bit newAlarm)
 {
-	__bit alarm = testAlarmLocal | testAlarmWired;
+	__bit alarm = testAlarmLocal;
 	if (alarm != newAlarm)
 		send_obj_value(OBJ_STAT_TALARM);
+}
+
+
+/**
+ * Alarm-Status von JP2 Alarm-Pin setzen.
+ */
+void set_extra_alarm(__bit newAlarm)
+{
+	if (alarmExtra == newAlarm)
+		return;
+
+	alarmExtra = newAlarm;
+	send_obj_value(OBJ_STAT_ALARM);
 }
 
 
@@ -233,49 +250,36 @@ void gira_process_msg(unsigned char* bytes, unsigned char len)
 			}
 		}
 	}
-	else if (msgType == 0x82 && len >= 5) // Alarm Status
+	else if (msgType == 0x82 && len >= 5) // Status Meldung
 	{
-		if ((bytes[1] & 0xf0) == 0x20)
+		unsigned char subType = bytes[1];
+		__bit newAlarm;
+
+		if (subType & 0x20)   // (Alarm) Status
 		{
-			if (bytes[2] == 0x00)  // Alarm und Testalarm beendet
-			{
-				send_obj_alarm(0);
-				send_obj_test_alarm(0);
+			unsigned char status = bytes[2];
 
-				alarmBus = 0;
-				alarmLocal = 0;
-				alarmWired = 0;
+			// Lokaler Alarm: Rauch Alarm | Temperatur Alarm | Wired Alarm
+			newAlarm = (subType & 0x10) | (status & (0x04 | 0x08));
+			send_obj_alarm(newAlarm);
+			alarmLocal = newAlarm;
 
-				testAlarmBus = 0;
-				testAlarmLocal = 0;
-				testAlarmWired = 0;
-			}
-			// TODO Lokaler Temperatur Alarm
-			// TODO Lokaler Rauch Alarm
+			// Lokaler Testalarm: (lokaler) Testalarm || Wired Testalarm
+			newAlarm = status & (0x20 | 0x40);
+			send_obj_test_alarm(newAlarm);
+			testAlarmLocal = newAlarm;
 
-			else if (bytes[2] == 0x20) // Lokaler Testalarm
-			{
-				send_obj_test_alarm(1);
-				testAlarmLocal = 1;
-			}
-			else if (bytes[2] == 0x08) // Wired Alarm
-			{
-				send_obj_alarm(1);
-				alarmWired = 1;
-			}
-			// TODO Wired Testalarm
+			// Bus Alarm
+			alarmBus = status & 0x10;
 
-			else if (bytes[2] == 0x10) // Bus Alarm
-			{
-				alarmBus = 1;
-			}
-			else if (bytes[2] == 0x80) // Bus Testalarm
-			{
-				testAlarmBus = 1;
-			}
+			// Bus Testalarm
+			testAlarmBus = status & 0x80;
+
+			// TODO Batterie schwach
+			// status & 0x01
 		}
 
-		if ((bytes[1] & 0x0f) == 8)  // Taste gedrückt
+		if (subType & 0x08)  // Taste am Rauchmelder gedrückt
 		{
 			if (setAlarmBus)
 			{
@@ -289,6 +293,13 @@ void gira_process_msg(unsigned char* bytes, unsigned char len)
 				send_obj_value(OBJ_STAT_TALARM);
 			}
 		}
+
+//		if (subType & 0x02)  // Defekt am Rauchmelder
+//		{
+//			unsigned char status = bytes[4];
+//
+//			// TODO Defekt melden
+//		}
 	}
 }
 
@@ -298,13 +309,13 @@ void gira_process_msg(unsigned char* bytes, unsigned char len)
  */
 void read_value_req()
 {
-	unsigned char objno, objflags;
+	unsigned char objno; //, objflags;
 
 	objno = find_first_objno(telegramm[3], telegramm[4]);
-	objflags = read_objflags(objno);
 
-	// Wir antworten nur wenn READ und COM Flag gesetzt sind
-	if ((objflags&0x0C) == 0x0C)
+	// TODO Nur antworten wenn READ und COM Flag gesetzt sind
+//	objflags = read_objflags(objno);
+//	if ((objflags&0x0C) == 0x0C)
 		ARRAY_SET_BIT(objReadReqFlags, objno);
 }
 
@@ -319,9 +330,6 @@ unsigned long read_obj_value(unsigned char objno)
 {
 	unsigned char cmd = objMappingTab[objno].cmd;
 
-//	if (objno < 100) // TODO Test-Code wieder entfernen
-//		return cmd;
-
 	// Interne Com-Objekte behandeln
 	if (cmd == GIRA_CMD_INTERNAL)
 	{
@@ -330,11 +338,11 @@ unsigned long read_obj_value(unsigned char objno)
 		case OBJ_STAT_ALARM:
 		case OBJ_STAT_ALARM_CENTRAL:
 		case OBJ_STAT_ALARM_DELAYED:
-			return alarmLocal | alarmWired;
+			return alarmLocal | alarmExtra;
 
 		case OBJ_STAT_TALARM:
 		case OBJ_STAT_TALARM_CENTRAL:
-			return testAlarmLocal | testAlarmWired;
+			return testAlarmLocal;
 		}
 	}
 	// Com-Objekte verarbeiten die Werte vom Rauchmelder darstellen
@@ -540,36 +548,50 @@ void process_alarm_stats()
 
 
 /**
- * Test / Debug Funktion
- */
-void test_func()
-{
-//	TASTER = 1;
-//	if (!TASTER)
-//	{
-//		setTestAlarmBus = !setTestAlarmBus;
-//	}
-//	TASTER = !(testAlarmLocal | testAlarmWired | testAlarmBus);
-}
-
-
-/**
  * Timer Event.
  */
 void timer_event()
 {
 	RTCCON = 0x60;  // RTC anhalten und Flag löschen
-	RTCH = 0xE1;    // RTC neu laden (1s = 0xE100; 0,5s = 0x7080; 0,25s = 0x3840)
-	RTCL = 0x00;
+	RTCH = 0x70;    // RTC neu laden (1s = 0xE100; 0,5s = 0x7080; 0,25s = 0x3840)
+	RTCL = 0x80;
 	RTCCON = 0x61;  // RTC starten
 
-	--seconds;
+	--halfSeconds;
 
 	if (answerWait)
 		--answerWait;
 
+	// Alarm über JP2 behandeln
+	if (!EXTRA_ALARM_PIN)
+	{
+		if (extraAlarmCounter < EXTRA_ALARM_LIMIT)
+		{
+			++extraAlarmCounter;
+		}
+		else
+		{
+			send_obj_alarm(1);
+			alarmExtra = 1;
+		}
+	}
+	else if (extraAlarmCounter)
+	{
+		// Wenn Alarm, dann nach x Zyklen beenden wenn der Pin nicht mehr Low ist
+		--extraAlarmCounter;
+		if (!extraAlarmCounter)
+		{
+			send_obj_alarm(0);
+			alarmExtra = 0;
+		}
+	}
+
+	// Alles danach wird nur jede Sekunde gemacht
+	if (halfSeconds & 1)
+		return;
+
 	// Alarm: verzögert und zyklisch senden
-	if (alarmLocal || alarmWired)
+	if (alarmLocal | alarmExtra)
 	{
 		// Alarm verzögert senden
 		if (delayedAlarmCounter)
@@ -580,9 +602,8 @@ void timer_event()
 				send_obj_alarm(1); // FIXME
 			}
 		}
-		else
+		else // Alarm zyklisch senden
 		{
-			// Alarm zyklisch senden
 			unsigned char conf = eeprom[CONF_A_ZYKLISCH];
 			if (conf & 0x80)
 			{
@@ -597,7 +618,7 @@ void timer_event()
 	}
 
 	// Testalarm: zyklisch senden
-	if (testAlarmLocal || testAlarmWired)
+	if (testAlarmLocal)
 	{
 		unsigned char conf = eeprom[CONF_S_ZYKLISCH];
 		if (conf & 0x80)
@@ -611,8 +632,10 @@ void timer_event()
 		}
 	}
 
-	// Jede Sekunde ein Status Com-Objekt senden
-	if (infoSendObjno)
+	// Jede Sekunde ein Status Com-Objekt senden.
+	// Aber nur senden wenn kein Alarm anliegt.
+	if (infoSendObjno &&
+	    !(alarmLocal | alarmBus | alarmExtra | testAlarmLocal | testAlarmBus))
 	{
 		// Info Objekt zum Senden vormerken wenn es dafür konfiguriert ist.
 		if ((infoSendObjno >= 11 && (eeprom[CONF_INFO_11TO17] & pow2[infoSendObjno - 11])) ||
@@ -624,9 +647,9 @@ void timer_event()
 		--infoSendObjno;
 	}
 
-	if (!seconds) // einmal pro Minute
+	if (!halfSeconds) // einmal pro Minute
 	{
-		seconds = 60;
+		halfSeconds = 120;
 
 		// Status Informationen zyklisch senden
 		if (eeprom[CONF_INFO_ZYKLISCH] & 0x80)
@@ -651,16 +674,16 @@ void restart_app()
 
 	P0M1 = 0x03;   // P0.0 and P0.1 open drain. all other pins of P0 as bidirectional
 	P0M2 = 0x03;
-	P0 = ~0x04;	   // P0.2 low to enable serial gira communication. all other pins of p0 high
+	P0 = ~0x04;	   // P0.2 low to enable serial communication. all other pins of p0 high
 
-	P1M1 |= (1 << 2); // P1.2 to GIRA open drain with external pullup
+	P1M1 |= (1 << 2); // P1.2 to Rauchmelder open drain with external pullup
 	P1M2 |= (1 << 2);
 	P1 |= (1 << 2);	  // P1.2 high
 
 	gira_init();
 
-	RTCH = 0xE1;	// Reload Real Time Clock (1s = 0xE100; 0,5s = 0x7080; 0,25s = 0x3840)
-	RTCL = 0x00;	// (RTC ist ein down-counter mit 128 bit prescaler und osc-clock)
+	RTCH = 0x70;	// Reload Real Time Clock (1s = 0xE100; 0,5s = 0x7080; 0,25s = 0x3840)
+	RTCL = 0x80;	// (RTC ist ein down-counter mit 128 bit prescaler und osc-clock)
 	RTCCON = 0x61;	// ... und starten
 
 	// Werte initialisieren
@@ -675,15 +698,14 @@ void restart_app()
 	cmdCurrent = GIRA_CMD_NONE;
 	remoteAlarmWait = 0;
 	recvCount = -1;
-	seconds = eeprom[ADDRTAB + 2] % 60;
+	halfSeconds = eeprom[ADDRTAB + 2] & 127;
 
 	alarmBus = 0;
 	alarmLocal = 0;
-	alarmWired = 0;
+	alarmExtra = 0;
 
 	testAlarmBus = 0;
 	testAlarmLocal = 0;
-	testAlarmWired = 0;
 
 	setAlarmBus = 0;
 	setTestAlarmBus = 0;
@@ -693,6 +715,7 @@ void restart_app()
 	alarmCounter = 1;
 	alarmStatusCounter = 1;
 	delayedAlarmCounter = 0;
+	extraAlarmCounter = 0;
 
 	// EEPROM initialisieren
 
@@ -721,4 +744,6 @@ void restart_app()
 
 	gira_send_byte(ACK);
 	gira_send_byte(ACK);
+
+	// TODO Alarm-Status vom Rauchmelder abfragen
 }
