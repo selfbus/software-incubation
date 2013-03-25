@@ -33,7 +33,7 @@ RECV: <STX>C228000000FF<ETX>
 SEND: <ACK>
 
 Unterschiedliche Werte wurden beobachtet, wobei wiederholen der Anfrage, ohne dass
-der RM was tut, den Wert nicht ändert:
+der RM was tut, den Wert nicht signifikant ändert:
 
 C228000000FF
 C220000000F7
@@ -46,11 +46,14 @@ Diese Befehle wurden bei der Kommunikation Funkmodul mit Rauchmelder geloggt.
 
 03 00 00 23 - Alarm deaktivieren, RM sendet dann 82 20 00 00 00 EC
               Deaktiviert keinen Wired Alarm (Lokaler Alarm nicht getestet)
-03 02 10 26 - Wireless Alarm (über Funk), RM sendet dann 82 20 10 00 00 ED
-03 02 80 2D - Wireless Testalarm (über Funk), RM sendet dann 82 20 80 00 00 F4
-03 02 00 25 - Alarm über Funk beendet?
+03 00 01 24 - Batterie schwach, über Funk gemeldet. Alle 60sek wird mit zwei kurzen Piep
+              signalisiert dass irgendwo eine Batterie schwach ist. Kein LED Signal.
+              Mit 03 00 00 23 wird die Batterie-schwach Meldung wieder deaktiviert.
 03 02 01 26 - Zwei kurze Piep, wiederholen bewirkt nichts, erst nach Alarm Abschaltung, Testalarm möglich.
 03 02 02 27 - Pairing vom eigenen Funkmodul mit einem anderen Funkmodul
+03 02 10 26 - Wireless Alarm (über Funk), RM sendet dann 82 20 10 00 00 ED
+03 02 80 2D - Wireless Testalarm (über Funk), RM sendet dann 82 20 80 00 00 F4
+03 02 00 25 - Wireless Alarm / Testalarm beendet
 03 02 08 2D - Von Diagnose Software initial u.A. gesendet
 
 
@@ -96,6 +99,10 @@ RECV: <ACK>
 RECV: <NUL>
 RECV: <STX>C8014401420B<ETX>
 SEND: <ACK>
+
+Empfangene Werte:
+C8 01 44 01 42 0B
+C8 01 54 01 52 0D
 
 
 09 - Betriebszeit

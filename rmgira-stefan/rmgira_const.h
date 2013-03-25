@@ -110,6 +110,9 @@
 // Rauchmelder Antwort: 2 Byte Spannung
 #define GIRA_TYPE_VOLT 5
 
+// Rauchmelder Antwort: 4 Byte 1/4 Sekunden
+#define GIRA_TYPE_QSEC 6
+
 // Rauchmelder Antwort: Kein Typ
 #define GIRA_TYPE_NONE 127
 
