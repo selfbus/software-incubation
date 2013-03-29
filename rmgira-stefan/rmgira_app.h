@@ -9,6 +9,16 @@
 #define rmgira_app_h
 
 /**
+ * Den Zustand der Alarme bearbeiten.
+ */
+extern void process_alarm_stats();
+
+/**
+ * Com-Objekte bearbeiten deren Wert gesendet werden soll.
+ */
+extern void process_objs();
+
+/**
  * Der Timer ist übergelaufen.
  */
 extern void timer_event();
@@ -19,9 +29,10 @@ extern void timer_event();
 extern void restart_app();
 
 /**
- * Befehle an den Rauchmelder senden und Antworten verarbeiten.
+ * Zähler für die Zeit die auf eine Antwort vom Rauchmelder gewartet wird.
+ * Ist der Zähler 0 dann wird gerade auf keine Antwort gewartet.
  */
-extern void process_commands();
+extern unsigned char answerWait;
 
 
 #endif /*rmgira_app_h*/

@@ -1,4 +1,4 @@
-Tests mit 2 x Gira Dual, 2 x Funkmodul, Fernbedienung.
+Tests mit 2 x Rauchmelder, 2 x Funkmodul, Fernbedienung.
 
 RM: Rauchmelder
 FU: Funkmodul
@@ -28,7 +28,7 @@ FU: 06
 
 -----
 
-Remote Testalarm
+Remote Testalarm (über Funk)
 
 FU: 03 02 80 2D
 RM: 06

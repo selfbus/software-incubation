@@ -8,10 +8,22 @@
 #ifndef rmgira_const_h
 #define rmgira_const_h
 
+// Damit die Eclipse Code Analyse nicht so viele Warnungen anzeigt:
+#ifndef SDCC
+# define __idata
+# define __code
+#endif
+
+
+// Pin für externen Alarm an JP2
+#define EXTRA_ALARM_PIN P1_2
+
 
 //-----------------------------------------------------------------------------
 // Kommunikations Objekte
 //-----------------------------------------------------------------------------
+
+#define OBJ_NONE                31
 
 #define OBJ_SET_ALARM			0
 #define OBJ_SET_TALARM			1
@@ -36,11 +48,15 @@
 #define OBJ_STAT_ALARM_DELAYED	20
 #define OBJ_STAT_TALARM			21
 #define OBJ_STAT_TALARM_CENTRAL	22
-#define OBJ_MAX_INDEX           23
 
-// Intern verwendet um Response Telegramme zu kennzeichnen.
-#define RESPONSE_TEL_FLAG 0x40
+// Anzahl der Com-Objekte
+#define NUM_OBJS                23
 
+// Anzahl der Bytes die benötigt werden um die Com-Objekte als Bits abzubilden
+#define NUM_OBJ_FLAG_BYTES ((NUM_OBJS + 7) >> 3)
+
+// Höchstes Com-Objekt das bei Info-Senden gesendet wird.
+#define OBJ_HIGH_INFO_SEND      17
 
 
 //-----------------------------------------------------------------------------
@@ -59,14 +75,20 @@
 // Gira Command: Batteriespannung und Temperaturen
 #define GIRA_CMD_BATTEMP  3
 
-// Gira Command: Anzahl der Alarme abfragen
+// Gira Command: Anzahl der Alarme #1 abfragen
 #define GIRA_CMD_NUM_ALARMS  4
 
-// Gira Command: Anzahl der Testalarme abfragen
-#define GIRA_CMD_NUM_TEST_ALARMS  5
+// Gira Command: Anzahl der Alarme #2 abfragen
+#define GIRA_CMD_NUM_ALARMS_2  5
+
+// Anzahl der Gira Commands
+#define GIRA_CMD_COUNT  6
+
+// Gira Command: intern behandelt, kein Befehl an den Rauchmelder
+#define GIRA_CMD_INTERNAL 14
 
 // Gira Command: kein Befehl
-#define GIRA_CMD_NONE  127
+#define GIRA_CMD_NONE  15
 
 
 //-----------------------------------------------------------------------------
@@ -88,37 +110,28 @@
 // Rauchmelder Antwort: 2 Byte Spannung
 #define GIRA_TYPE_VOLT 5
 
+// Rauchmelder Antwort: 4 Byte 1/4 Sekunden
+#define GIRA_TYPE_QSEC 6
+
 // Rauchmelder Antwort: Kein Typ
 #define GIRA_TYPE_NONE 127
 
 
 //-----------------------------------------------------------------------------
-// Alarm Typen
+// Kommunikations Konstanten
 //-----------------------------------------------------------------------------
 
-// Lokaler Alarm
-#define ALARM_LOCAL  1
+// Start Byte
+#define STX		0x02
 
-// Lokaler Test Alarm
-#define ALARM_LOCAL_TEST 2
+// Ende Byte
+#define ETX		0x03
 
-// Initialer Remote Alarm
-#define ALARM_REMOTE_INIT  4
+// Acknowledged
+#define ACK	 	0x06
 
-// Remote Alarm
-#define ALARM_REMOTE  8
-
-// Remote Test Alarm
-#define ALARM_REMOTE_TEST  16
-
-// Bitmaske für lokale Alarme
-#define ALARM_LOCAL_MASK  3
-
-// Bitmaske für Alarme:  ALARM_LOCAL|ALARM_REMOTE_INIT|ALARM_REMOTE
-#define ALARM_MASK  13
-
-// Bitmaske für Test Alarme:  ALARM_LOCAL_TEST|ALARM_REMOTE_TEST
-#define ALARM_TEST_MASK  18
+// Not Acknowledged
+#define NAK	 	0x15
 
 
 #endif /*rmgira_const_h*/

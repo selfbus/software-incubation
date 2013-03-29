@@ -8,39 +8,24 @@
 
 #include "rmgira_app.h"
 #include "rmgira_const.h"
+#include "rmgira_com.h"
+#include "rmgira_conv.h"
+#include "rmgira_eeprom.h"
 
-#include <P89LPC922.h>
-
+#include <mcs51/P89LPC922.h>
 #include <fb_lpc922.h>
 
 
-// Rauchmelder Konstanten
-#define GIRA_START_BYTE		0x02
-#define GIRA_STOP_BYTE 		0x03
-#define GIRA_ACK_BYTE	 	0x06
-#define GIRA_CMD_COUNT      6
-#define GIRA_CMD_SIZE		6
-#define GIRA_ANSWER_SIZE    8
-#define GIRA_ANSWER_MAX     16
-#define GIRA_ANSWER_BYTES   4
-
-
-// GIRA_CMD Befehle an den Rauchmelder
-const unsigned char giraCmdTab[GIRA_CMD_COUNT][GIRA_CMD_SIZE] =
+// Befehle an den Rauchmelder
+const unsigned char giraCmdTab[GIRA_CMD_COUNT] =
 {
-	{0x02, 0x30, 0x34, 0x36, 0x34, 0x03},   // GIRA_CMD_SERIAL
-	{0x02, 0x30, 0x39, 0x36, 0x39, 0x03},   // GIRA_CMD_OPERATING_TIME
-	{0x02, 0x30, 0x42, 0x37, 0x32, 0x03},   // GIRA_CMD_SMOKEBOX
-	{0x02, 0x30, 0x43, 0x37, 0x33, 0x03},   // GIRA_CMD_BATTEMP
-	{0x02, 0x30, 0x44, 0x37, 0x34, 0x03},   // GIRA_CMD_NUM_ALARMS
-	{0x02, 0x30, 0x45, 0x37, 0x35, 0x03}	// GIRA_CMD_NUM_TEST_ALARMS
+	0x04,   // GIRA_CMD_SERIAL
+	0x09,   // GIRA_CMD_OPERATING_TIME
+	0x0B,   // GIRA_CMD_SMOKEBOX
+	0x0C,   // GIRA_CMD_BATTEMP
+	0x0D,   // GIRA_CMD_NUM_ALARMS
+	0x0E	// GIRA_CMD_NUM_TEST_ALARMS
 };
-
-
-// Array mit den Daten aus den Antworten auf die GIRA_CMD Befehle
-// Der erste Index ist der Befehl (GIRA_CMD_*), der zweite Index ist
-// das Byte aus der Antwort.
-unsigned char giraAnswerTab[GIRA_CMD_COUNT][GIRA_ANSWER_BYTES];
 
 
 // Mapping von den Kommunikations-Objekten auf die Rauchmelder Requests
@@ -51,14 +36,14 @@ const struct
 	unsigned const char cmd;       // Zu sendender GIRA_CMD Befehl
 	unsigned const char offset;    // Byte-Offset in der Antwort
 	unsigned const char dataType;  // Datentyp der Antwort
-} objMappingTab[OBJ_MAX_INDEX] =
+} objMappingTab[NUM_OBJS] =
 {
 	/*OBJ_SET_ALARM*/           { GIRA_CMD_NONE,            0, GIRA_TYPE_NONE },
 	/*OBJ_SET_TALARM*/          { GIRA_CMD_NONE,            0, GIRA_TYPE_NONE },
 	/*OBJ_NOTUSED2*/            { GIRA_CMD_NONE,            0, GIRA_TYPE_NONE },
 	/*OBJ_NOTUSED3*/            { GIRA_CMD_NONE,            0, GIRA_TYPE_NONE },
 	/*OBJ_SERIAL*/              { GIRA_CMD_SERIAL,          0, GIRA_TYPE_LONG },
-	/*OBJ_OPERATING_TIME*/      { GIRA_CMD_OPERATING_TIME,  0, GIRA_TYPE_LONG },
+	/*OBJ_OPERATING_TIME*/      { GIRA_CMD_OPERATING_TIME,  0, GIRA_TYPE_QSEC },
 	/*OBJ_SMOKEBOX_VALUE*/      { GIRA_CMD_SMOKEBOX,        0, GIRA_TYPE_INT  },
 	/*OBJ_POLLUTION*/           { GIRA_CMD_SMOKEBOX,        3, GIRA_TYPE_BYTE },
 	/*OBJ_BAT_VOLTAGE*/         { GIRA_CMD_BATTEMP,         0, GIRA_TYPE_VOLT },
@@ -69,114 +54,340 @@ const struct
 	/*OBJ_CNT_TESTALARM*/       { GIRA_CMD_NUM_ALARMS,      1, GIRA_TYPE_BYTE },
 	/*OBJ_CNT_ALARM_WIRE*/      { GIRA_CMD_NUM_ALARMS,      2, GIRA_TYPE_BYTE },
 	/*OBJ_CNT_ALARM_WIRELESS*/  { GIRA_CMD_NUM_ALARMS,      3, GIRA_TYPE_BYTE },
-	/*OBJ_CNT_TALARM_WIRE*/     { GIRA_CMD_NUM_TEST_ALARMS, 0, GIRA_TYPE_BYTE },
-	/*OBJ_CNT_TALARM_WIRELESS*/ { GIRA_CMD_NUM_TEST_ALARMS, 1, GIRA_TYPE_BYTE },
-	/*OBJ_STAT_ALARM*/          { GIRA_CMD_NONE,            0, GIRA_TYPE_NONE },
-	/*OBJ_STAT_ALARM_CENTRAL*/  { GIRA_CMD_NONE,            0, GIRA_TYPE_NONE },
-	/*OBJ_STAT_ALARM_DELAYED*/  { GIRA_CMD_NONE,            0, GIRA_TYPE_NONE },
-	/*OBJ_STAT_TALARM*/         { GIRA_CMD_NONE,            0, GIRA_TYPE_NONE },
-	/*OBJ_STAT_TALARM_CENTRAL*/ { GIRA_CMD_NONE,            0, GIRA_TYPE_NONE }
+	/*OBJ_CNT_TALARM_WIRE*/     { GIRA_CMD_NUM_ALARMS_2,    0, GIRA_TYPE_BYTE },
+	/*OBJ_CNT_TALARM_WIRELESS*/ { GIRA_CMD_NUM_ALARMS_2,    1, GIRA_TYPE_BYTE },
+	/*OBJ_STAT_ALARM*/          { GIRA_CMD_INTERNAL,        0, GIRA_TYPE_NONE },
+	/*OBJ_STAT_ALARM_CENTRAL*/  { GIRA_CMD_INTERNAL,        0, GIRA_TYPE_NONE },
+	/*OBJ_STAT_ALARM_DELAYED*/  { GIRA_CMD_INTERNAL,        0, GIRA_TYPE_NONE },
+	/*OBJ_STAT_TALARM*/         { GIRA_CMD_INTERNAL,        0, GIRA_TYPE_NONE },
+	/*OBJ_STAT_TALARM_CENTRAL*/ { GIRA_CMD_INTERNAL,        0, GIRA_TYPE_NONE }
 };
 
 
-// Ringpuffer für die Abfrage von Kommunikationsobjekten
-unsigned char __idata readObjRing[8];
+// Flag für lokalen Alarm und Wired Alarm (über grüne Klemme / Rauchmelderbus)
+__bit alarmLocal;
 
-// Schreib Index für readObjRing
-unsigned char __idata readObjRingNextWrite = 0;
+// Flag für remote Alarm über EIB
+__bit alarmBus;
 
-// Lese Index für readObjRing
-unsigned char __idata readObjRingNextRead = 0;
+// Flag für remote Alarm über LPC Alarm Pin auf JP2
+__bit alarmExtra;
 
-// Puffer für Antworten vom Rauchmelder
-unsigned char __idata giraAnswer[GIRA_ANSWER_SIZE];
+// Flag für lokalen Testalarm und Wired Testalarm
+__bit testAlarmLocal;
 
-// Zähler für die Antwort-Zeichen vom Rauchmelder
-char giraAnswerCount = -1;
+// Flag für remote Testalarm über EIB
+__bit testAlarmBus;
 
-// Alarm Typ
-char alarmType = 0;
+// Flag für den gewünschten Alarm Status wie wir ihn über den EIB empfangen haben
+__bit setAlarmBus;
 
-// Zeitpunkt bei dem ein Remote Alarm von Test-Alarm auf Alarm umschaltet
-unsigned char remoteFullAlarmTime = 0;
+// Flag für den gewünschten Testalarm Status wie wir ihn über den EIB empfangen haben
+__bit setTestAlarmBus;
 
-// Zähler für halbe Sekunden
-unsigned int timer = 0;
+
+// Zeit bis der remote Alarm als Alarm und nicht als Testalarm gemeldet wird
+unsigned char remoteAlarmWait;
+
+
+// Flags für Com-Objekte lesen
+unsigned char objReadReqFlags[NUM_OBJ_FLAG_BYTES];
+
+// Flags für Com-Objekte senden
+unsigned char objSendReqFlags[NUM_OBJ_FLAG_BYTES];
+
+// Werte der Com-Objekte. Index ist die der GIRA_CMD
+unsigned long objValues[GIRA_CMD_COUNT];
+
+
+// Nummer des Befehls an den Rauchmelder der gerade ausgeführt wird.
+// GIRA_CMD_NONE wenn keiner.  So lange ein GIRA_CMD ausgeführt wird darf auf
+// objValues[cmdCurrent] nicht zugegriffen werden. Es muss stattdessen objOldValue
+// verwendet werden.
+unsigned char cmdCurrent;
+
+// Backup des Com-Objekt Wertebereichs der gerade von cmdCurrent neu vom
+// Rauchmelder geholt wird.
+__idata unsigned long objValueCurrent;
+
+
+// Zähler für die Zeit die auf eine Antwort vom Rauchmelder gewartet wird.
+// Ist der Zähler 0 dann wird gerade auf keine Antwort gewartet.
+unsigned char answerWait;
+
+// Initialwert für answerWait in 0,5s
+#define INITIAL_ANSWER_WAIT 6
+
+
+// Zähler für Alarm am JP2 - EXTRA_ALARM_PIN
+unsigned char extraAlarmCounter;
+
+// Schwelle für extraAlarmCounter in 0,5s
+#define EXTRA_ALARM_LIMIT 5
+
+
+// Countdown Zähler für zyklisches Senden eines Alarms oder Testalarms.
+unsigned char alarmCounter;
+
+// Countdown Zähler für zyklisches Senden des Alarm Zustands.
+unsigned char alarmStatusCounter;
+
+// Countdown Zähler für verzögertes Senden eines Alarms
+unsigned char delayedAlarmCounter;
+
+// Countdown Zähler für zyklisches Senden der (Info) Com-Objekte
+unsigned char infoCounter;
+
+// Nummer des Com-Objekts das bei zyklischem Info Senden als nächstes geprüft/gesendet wird
+unsigned char infoSendObjno;
+
+// Halbsekunden Zähler 0..119
+unsigned char halfSeconds;
+
+
+// Tabelle für 1<<x, d.h. pow2[3] == 1<<3
+const unsigned char pow2[] = { 1, 2, 4, 8, 16, 32, 64, 128 };
+
+// Im Byte Array arr das bitno-te Bit setzen
+#define ARRAY_SET_BIT(arr, bitno) arr[bitno>>3] |= pow2[bitno & 7]
+
+// Im Byte Array arr das bitno-te Bit löschen
+#define ARRAY_CLEAR_BIT(arr, bitno) arr[bitno>>3] &= ~pow2[bitno & 7]
+
+// Testen ob im Byte Array arr das bitno-te Bit gesetzt ist
+#define ARRAY_IS_BIT_SET(arr, bitno) (arr[bitno>>3] & pow2[bitno & 7])
+
+
+// Verwendet um Response Telegramme zu kennzeichnen.
+#define OBJ_RESPONSE_FLAG 0x40
 
 
 /**
- * Eine Bytefolge an den Rauchmelder senden. Es werden die ersten
- * GIRA_CMD_SIZE Bytes aus str gesendet.
+ * Den Alarm Status auf den Bus senden falls noch nicht gesendet.
+ *
+ * @param newAlarm - neuer Alarm Status
  */
-void gira_send_bytes(unsigned char* str)
+void send_obj_alarm(__bit newAlarm)
 {
-	unsigned char idx = 0;
-	while (idx < GIRA_CMD_SIZE)
-	{
-		while (!TI)
-			;
+	__bit alarm = alarmLocal | alarmExtra;
+	if (alarm != newAlarm)
+		send_obj_value(OBJ_STAT_ALARM);
+}
 
-		TI = 0;
-		SBUF = str[idx];
-		++idx;
+
+/**
+ * Den Testalarm Status auf den Bus senden falls noch nicht gesendet.
+ *
+ * @param newAlarm - neuer Testalarm Status
+ */
+void send_obj_test_alarm(__bit newAlarm)
+{
+	__bit alarm = testAlarmLocal;
+	if (alarm != newAlarm)
+		send_obj_value(OBJ_STAT_TALARM);
+}
+
+
+/**
+ * Alarm-Status von JP2 Alarm-Pin setzen.
+ */
+void set_extra_alarm(__bit newAlarm)
+{
+	if (alarmExtra == newAlarm)
+		return;
+
+	alarmExtra = newAlarm;
+	send_obj_value(OBJ_STAT_ALARM);
+}
+
+
+/**
+ * Die empfangene Nachricht vom Rauchmelder verarbeiten.
+ * Wird von gira_receive() aufgerufen.
+ */
+void gira_process_msg(unsigned char* bytes, unsigned char len)
+{
+	unsigned char objno, cmd, msgType;
+	unsigned char byteno, mask;
+
+	msgType = bytes[0];
+	if ((msgType & 0xf0) == 0xc0) // Com-Objekt Werte empfangen
+	{
+		answerWait = 0;
+		msgType &= 0x0f;
+
+		for (cmd = 0; cmd < GIRA_CMD_COUNT; ++cmd)
+		{
+			if (giraCmdTab[cmd] == msgType)
+				break;
+		}
+
+		if (cmd < GIRA_CMD_COUNT)
+		{
+			objValueCurrent = objValues[cmd];
+			cmdCurrent = cmd;
+			objValues[cmd] = *(unsigned long*)(bytes + 1);
+			cmdCurrent = GIRA_CMD_NONE;
+
+			// Versand der erhaltenen Com-Objekte einleiten. Dazu alle Com-Objekte suchen
+			// auf die die empfangenen Daten passen und diese senden. Sofern sie für
+			// den Versand vorgemerkt sind.
+			for (objno = 0; objno < NUM_OBJS; ++objno, mask <<= 1)
+			{
+				byteno = objno >> 3;
+				mask = pow2[objno & 7];
+
+				if (objReadReqFlags[byteno] & mask)
+				{
+					send_obj_value(objno | OBJ_RESPONSE_FLAG);
+					objReadReqFlags[byteno] &= ~mask;
+				}
+				if (objSendReqFlags[byteno] & mask)
+				{
+					send_obj_value(objno);
+					objSendReqFlags[byteno] &= ~mask;
+				}
+			}
+		}
+	}
+	else if (msgType == 0x82 && len >= 5) // Status Meldung
+	{
+		unsigned char subType = bytes[1];
+		__bit newAlarm;
+
+		if (subType & 0x20)   // (Alarm) Status
+		{
+			unsigned char status = bytes[2];
+
+			// Lokaler Alarm: Rauch Alarm | Temperatur Alarm | Wired Alarm
+			newAlarm = (subType & 0x10) | (status & (0x04 | 0x08));
+			send_obj_alarm(newAlarm);
+			alarmLocal = newAlarm;
+
+			// Lokaler Testalarm: (lokaler) Testalarm || Wired Testalarm
+			newAlarm = status & (0x20 | 0x40);
+			send_obj_test_alarm(newAlarm);
+			testAlarmLocal = newAlarm;
+
+			// Bus Alarm
+			alarmBus = status & 0x10;
+
+			// Bus Testalarm
+			testAlarmBus = status & 0x80;
+
+			// TODO Batterie schwach
+			// status & 0x01
+		}
+
+		if (subType & 0x08)  // Taste am Rauchmelder gedrückt
+		{
+			if (setAlarmBus)
+			{
+				setAlarmBus = 0;
+				send_obj_value(OBJ_STAT_ALARM);
+			}
+
+			if (setTestAlarmBus)
+			{
+				setTestAlarmBus = 0;
+				send_obj_value(OBJ_STAT_TALARM);
+			}
+		}
+
+//		if (subType & 0x02)  // Defekt am Rauchmelder
+//		{
+//			unsigned char status = bytes[4];
+//
+//			// TODO Defekt melden
+//		}
 	}
 }
 
 
 /**
- * Ein Kommunikations-Objekt abfragen und danach auf den Bus senden.
- *
- * Die Befehle werden in einem Ringpuffer abgelegt und der Reihe nach in
- * gira_process_commands() verarbeitet.
- *
- * @param objid - Objekt ID
- * @param isResponse - 1 wenn ein Response Telegramm gesendet werden soll, 0 für ein normales Telegramm.
+ * Empfangenes read_value_request Telegramm verarbeiten.
  */
-void gira_send_cmd(unsigned char objid, __bit isResponse)
+void read_value_req()
 {
-	// Bei Überlauf oder ungültigem Befehl wird der Befehl ignoriert
-	if (((readObjRingNextWrite + 1) & 7) != readObjRingNextRead && objid < OBJ_MAX_INDEX)
-	{
-		if (isResponse)
-			objid |= RESPONSE_TEL_FLAG;
+	unsigned char objno; //, objflags;
 
-		readObjRing[readObjRingNextWrite] = objid;
+	objno = find_first_objno(telegramm[3], telegramm[4]);
 
-		++readObjRingNextWrite;
-		readObjRingNextWrite &= 7;
-	}
+	// TODO Nur antworten wenn READ und COM Flag gesetzt sind
+//	objflags = read_objflags(objno);
+//	if ((objflags&0x0C) == 0x0C)
+		ARRAY_SET_BIT(objReadReqFlags, objno);
 }
 
 
 /**
- * Ein Acknowledge an den Rauchmelder senden.
- */
-void gira_send_ack()
-{
-	while (!TI)
-		;
-
- 	TI = 0;
-	SBUF = GIRA_ACK_BYTE;
-}
-
-
-/**
- * Einen Wert auf DPT 9.001 2 Byte Float Format wandeln
+ * Wert eines Com-Objekts liefern.
  *
- * @param val - der zu wandelnde Wert
- * @return Der Wert val im DPT 9.001 Format
+ * @param objno - die ID des Kommunikations-Objekts
+ * @return Den Wert des Kommunikations Objekts
  */
-unsigned long conv_dpt_9_001(unsigned long val)
+unsigned long read_obj_value(unsigned char objno)
 {
-	unsigned int div = 0;
-	while (val >= 2047)
+	unsigned char cmd = objMappingTab[objno].cmd;
+
+	// Interne Com-Objekte behandeln
+	if (cmd == GIRA_CMD_INTERNAL)
 	{
-		++div;
-		val >>= 1;
+		switch (objno)
+		{
+		case OBJ_STAT_ALARM:
+		case OBJ_STAT_ALARM_CENTRAL:
+		case OBJ_STAT_ALARM_DELAYED:
+			return alarmLocal | alarmExtra;
+
+		case OBJ_STAT_TALARM:
+		case OBJ_STAT_TALARM_CENTRAL:
+			return testAlarmLocal;
+		}
 	}
-	val  |= div << 11;
-	return val;
+	// Com-Objekte verarbeiten die Werte vom Rauchmelder darstellen
+	else if (cmd != GIRA_CMD_NONE)
+	{
+		unsigned long result = 0;
+		unsigned char* answer;
+
+		if (cmd == cmdCurrent) answer = (unsigned char*) &objValueCurrent;
+		else answer = (unsigned char*) &objValues[cmd];
+		answer += objMappingTab[objno].offset;
+
+		switch (objMappingTab[objno].dataType)
+		{
+		case GIRA_TYPE_BYTE:
+			return *answer;
+
+		case GIRA_TYPE_LONG:
+			return *(unsigned long*) answer;
+
+		case GIRA_TYPE_QSEC:
+			return (*(unsigned long*) answer) >> 2;
+
+		case GIRA_TYPE_INT:
+			return *(unsigned int*) answer;
+
+		case GIRA_TYPE_TEMP:
+			result = *answer;
+			result *= 50;
+			result -= 2000;
+			return conv_dpt_9_001(result);
+
+		case GIRA_TYPE_VOLT:
+			result = *(unsigned int*) answer;
+			result *= 9184;
+			result /= 5000;
+			return conv_dpt_9_001(result);
+
+		default: // Fehler: unbekannter Datentyp
+			return (unsigned long) -2;
+		}
+	}
+
+	// Fehler: unbekanntes Com Objekt
+	return (unsigned long) -1;
 }
 
 
@@ -187,26 +398,30 @@ unsigned long conv_dpt_9_001(unsigned long val)
  */
 void write_value_obj(unsigned char objno)
 {
-	if (objno == OBJ_SET_ALARM) // Remote Alarm
+ 	if (objno == OBJ_SET_ALARM) // Bus Alarm
 	{
-		if (telegramm[7] & 0x01)
-		{
-			alarmType |= ALARM_REMOTE_TEST;
-			remoteFullAlarmTime = timer + 10;
-		}
-		else alarmType &= ~ALARM_REMOTE;
+ 		setAlarmBus = telegramm[7] & 0x01;
+
+ 		// Wenn wir lokalen Alarm haben dann Bus Alarm wieder auslösen
+		// damit der Status der anderen Rauchmelder stimmt
+ 		if (!setAlarmBus && alarmLocal)
+ 			send_obj_value(OBJ_STAT_ALARM);
 	}
-	else if (objno == OBJ_SET_TALARM) // Remote Test Alarm
+	else if (objno == OBJ_SET_TALARM) // Bus Test Alarm
 	{
-		if (telegramm[7] & 0x01)
-			alarmType |= ALARM_REMOTE_TEST;
-		else alarmType &= ~ALARM_REMOTE_TEST;
-	}
+		setTestAlarmBus = telegramm[7] & 0x01;
+
+ 		// Wenn wir lokalen Testalarm haben dann Bus Testalarm wieder auslösen
+		// damit der Status der anderen Rauchmelder stimmt
+ 		if (!setTestAlarmBus && testAlarmLocal)
+ 			send_obj_value(OBJ_STAT_TALARM);
+ 	}
 }
 
 
 /**
- * Empfangenes write_value_request Telegramm verarbeiten
+ * Empfangenes write_value_request Telegramm verarbeiten.
+ * Ruft write_value_obj(objno) auf, das die eigentliche Arbeit macht.
  */
 void write_value_req()
 {
@@ -243,227 +458,213 @@ void write_value_req()
 
 
 /**
- * Empfangenes read_value_request Telegramm verarbeiten.
- */
-void read_value_req()
-{
-	unsigned char objno, objflags;
-
-	objno = find_first_objno(telegramm[3], telegramm[4]);
-	objflags = read_objflags(objno);	// Read object flags
-	if ((objflags&0x0C) == 0x0C)		// Answer only when READ and COM flags are set
-	{
-		gira_send_cmd(objno, 1);
-	}
-}
-
-
-/**
- * Wert eines Kommunikations-Objekts liefern.
+ * Ein Com-Objekt bearbeiten.
  *
- * @param objno - die ID des Kommunikations-Objekts
- * @return Den Wert des Kommunikations Objekts
+ * @param objno - die Nummer des zu bearbeitenden Com Objekts
  */
-unsigned long read_obj_value(unsigned char objno)
+void process_obj(unsigned char objno)
 {
-	// Kommunikations-Objekte verarbeiten die Werte vom Rauchmelder darstellen
-	if (objMappingTab[objno].cmd != GIRA_CMD_NONE)
+	unsigned char cmd = objMappingTab[objno].cmd;
+
+	if (cmd == GIRA_CMD_NONE || cmd == GIRA_CMD_INTERNAL)
 	{
-		unsigned long result = 0;
-		unsigned char* answer = giraAnswerTab[objMappingTab[objno].cmd];
-		answer += objMappingTab[objno].offset;
+		// Der Wert des Com-Objekts ist bekannt, also sofort senden
 
-		switch (objMappingTab[objno].dataType)
+		unsigned char byteno = objno >> 3;
+		unsigned char mask = pow2[objno & 7];
+
+		if (objReadReqFlags[byteno] & mask)
 		{
-		case GIRA_TYPE_BYTE:
-			return *answer;
-
-		case GIRA_TYPE_LONG:
-			return *(unsigned long*) answer;
-
-		case GIRA_TYPE_INT:
-			return *(unsigned int*) answer;
-
-		case GIRA_TYPE_TEMP:
-			result = *answer;
-			result *= 50;
-			result -= 2000;
-			return conv_dpt_9_001(result);
-
-		case GIRA_TYPE_VOLT:
-			result = *(unsigned int*) answer;
-			result *= 9184;
-			result /= 5000;
-			return conv_dpt_9_001(result);
-
-		default: // Fehler
-			return (unsigned long) -1;
+			send_obj_value(objno | OBJ_RESPONSE_FLAG);
+			objReadReqFlags[byteno] &= ~mask;
+		}
+		if (objSendReqFlags[byteno] & mask)
+		{
+			send_obj_value(objno);
+			objSendReqFlags[byteno] &= ~mask;
 		}
 	}
-
-	// Andere Kommunikations-Objekte
-	switch (objno)
+	else
 	{
-	case OBJ_STAT_ALARM:
-	case OBJ_STAT_ALARM_CENTRAL:
-	case OBJ_STAT_ALARM_DELAYED:
-		if (alarmType & ALARM_MASK) return 1;
-		return 0;
-
-	case OBJ_STAT_TALARM:
-	case OBJ_STAT_TALARM_CENTRAL:
-		if (alarmType & ALARM_TEST_MASK) return 1;
-		return 0;
+		// Den Wert des Com-Objekts vom Rauchmelder anfordern. Der Versand erfolgt
+		// wenn die Antwort vom Rauchmelder erhalten wurde, in gira_process_msg().
+		if (recvCount < 0)
+		{
+			gira_send_cmd(giraCmdTab[cmd]);
+			answerWait = INITIAL_ANSWER_WAIT;
+		}
 	}
-
-	return (unsigned long) -2;
 }
 
 
 /**
- * Die Antwort vom Rauchmelder verarbeiten.
+ * Com-Objekte bearbeiten.
  */
-void gira_process_answer()
+void process_objs()
 {
-	unsigned char objno = readObjRing[readObjRingNextRead];
-	++readObjRingNextRead;
-	readObjRingNextRead &= 7;
+	unsigned char mask, byteno, objno;
 
-	send_obj_value(objno);
-	gira_send_ack();
+	// Nichts tun wenn gerade auf eine Antwort vom Rauchmelder gewartet wird
+	if (answerWait > 0)
+		return;
+
+	for (objno = 0; objno < NUM_OBJS; ++objno)
+	{
+		byteno = objno >> 3;
+		mask = pow2[objno & 7];
+
+		if ((objReadReqFlags[byteno] & mask) || (objSendReqFlags[byteno] & mask))
+		{
+			process_obj(objno);
+			break;
+		}
+	}
 }
 
 
 /**
- * Ein Byte über die Serielle vom Rauchmelder empfangen. Das Verarbeiten der
- * Nachricht auslösen wenn die empfangene Nachricht komplett ist.
+ * Den Zustand der Alarme bearbeiten. Wenn wir der Meinung sind der Bus-Alarm soll einen
+ * bestimmten Zustand haben dann wird das dem Rauchmelder so lange gesagt bis der auch
+ * der gleichen Meinung ist.
  */
-void gira_receive()
+void process_alarm_stats()
 {
-	char idx;
-
-	unsigned char ch = SBUF;
-	RI = 0;
-
-	// Bei Überlauf die Antwort verwerfen
-	if (giraAnswerCount >= GIRA_ANSWER_MAX)
+	if (setAlarmBus && !alarmBus)
 	{
-		giraAnswerCount = -1;
-		gira_send_ack();
-		gira_send_ack();
-		return;
+		// Alarm auslösen
+		gira_send_hexstr("030210");
+		answerWait = INITIAL_ANSWER_WAIT;
 	}
-
-	// Am Anfang auf das Start Byte warten, das Start Byte aber ignorieren
-	if (giraAnswerCount < 0)
+	else if (setTestAlarmBus && !testAlarmBus)
 	{
-		if (ch == GIRA_START_BYTE)
-			++giraAnswerCount;
-		return;
+		// Testalarm auslösen
+		gira_send_hexstr("030280");
+		answerWait = INITIAL_ANSWER_WAIT;
 	}
-
-	// Am Ende den Empfang bestätigen und die erhaltene Antwort verarbeiten
-	if (ch == GIRA_STOP_BYTE)
+	else if ((!setAlarmBus && alarmBus) || (!setTestAlarmBus && testAlarmBus))
 	{
-		gira_send_ack();
-		gira_process_answer();
-		return;
+		// Alarm und Testalarm beenden
+		gira_send_hexstr("030200");
+		answerWait = INITIAL_ANSWER_WAIT;
 	}
-
-	// Die empfangenen Zeichen sind ein Hex String.
-	// D.h. jeweils zwei Zeichen ergeben ein Byte.
-	// In giraAnswer gleich die dekodierten Bytes schreiben.
-	//
-	// Dieser Algorythmus ist fehlerhaft falls die Anzahl der empfangenen
-	// Zeichen ungerade ist.
-
-	if (ch >= '0' && ch <= '9')
-		ch -= '0';
-	else if (ch >= 'A' && ch <= 'F')
-		ch -= 'A' - 10;
-	else return; // Ungültige Zeichen ignorieren
-
-	idx = giraAnswerCount >> 1;
-
-	if (giraAnswerCount & 1)
-		giraAnswer[idx] = (giraAnswer[idx] << 4) | ch;
-	else giraAnswer[idx] = ch;
-
-	++giraAnswerCount;
 }
 
-
-/**
- * Befehle aus dem Ringpuffer an den Rauchmelder senden und Antworten
- * vom Rauchmelder weiter verarbeiten.
- */
-void process_commands()
-{
-	// Ein Byte von der Seriellen empfangen, Antwort verarbeiten wenn vollständig
-	if (RI) gira_receive();
-
-	// Den nächsten Befehl aus dem Ringpuffer senden
-	if (readObjRingNextWrite != readObjRingNextRead)
-	{
-		unsigned char objno = readObjRing[readObjRingNextRead];
-		unsigned char cmd = objMappingTab[objno].cmd;
-
-		if (cmd < GIRA_CMD_COUNT)
-			gira_send_bytes(giraCmdTab[cmd]);
-		else send_obj_value(objno);
-	}
-}
 
 /**
  * Timer Event.
- *
- * Wird alle 0,5 Sekunden aufgerufen.
  */
 void timer_event()
 {
-	RTCCON=0x60;		// RTC anhalten und Flag löschen
-	RTCH=0x70;			// Reload Real Time Clock (0,5s = 0x7080)
-	RTCL=0x80;
+	RTCCON = 0x60;  // RTC anhalten und Flag löschen
+	RTCH = 0x70;    // RTC neu laden (1s = 0xE100; 0,5s = 0x7080; 0,25s = 0x3840)
+	RTCL = 0x80;
+	RTCCON = 0x61;  // RTC starten
 
-	timer++;
+	--halfSeconds;
 
-	if (timer & 1) /*bei ganzer Sekunde*/
+	if (answerWait)
+		--answerWait;
+
+	// Alarm über JP2 behandeln
+	if (!EXTRA_ALARM_PIN)
 	{
-		// Initialen Remote Alarm nach Ablauf der Wartezeit auf Remote Alarm umschalten
-		if ((alarmType & ALARM_REMOTE_INIT) && remoteFullAlarmTime == timer)
+		if (extraAlarmCounter < EXTRA_ALARM_LIMIT)
 		{
-			alarmType &= ~ALARM_REMOTE_INIT;
-			alarmType |= ALARM_REMOTE;
+			++extraAlarmCounter;
+		}
+		else
+		{
+			send_obj_alarm(1);
+			alarmExtra = 1;
+		}
+	}
+	else if (extraAlarmCounter)
+	{
+		// Wenn Alarm, dann nach x Zyklen beenden wenn der Pin nicht mehr Low ist
+		--extraAlarmCounter;
+		if (!extraAlarmCounter)
+		{
+			send_obj_alarm(0);
+			alarmExtra = 0;
 		}
 	}
 
-	// TODO  zirkulär die Com Objekte senden
-	// TODO  Alarm Pins behandeln
+	// Alles danach wird nur jede Sekunde gemacht
+	if (halfSeconds & 1)
+		return;
 
-	RTCCON=0x61;		// RTC starten
-}
+	// Alarm: verzögert und zyklisch senden
+	if (alarmLocal | alarmExtra)
+	{
+		// Alarm verzögert senden
+		if (delayedAlarmCounter)
+		{
+			--delayedAlarmCounter;
+			if (!delayedAlarmCounter)
+			{
+				send_obj_alarm(1); // FIXME
+			}
+		}
+		else // Alarm zyklisch senden
+		{
+			unsigned char conf = eeprom[CONF_A_ZYKLISCH];
+			if (conf & 0x80)
+			{
+				--alarmCounter;
+				if (!alarmCounter)
+				{
+					alarmCounter = conf & 0x7f;
+					// TODO
+				}
+			}
+		}
+	}
 
+	// Testalarm: zyklisch senden
+	if (testAlarmLocal)
+	{
+		unsigned char conf = eeprom[CONF_S_ZYKLISCH];
+		if (conf & 0x80)
+		{
+			--alarmCounter;
+			if (!alarmCounter)
+			{
+				alarmCounter = conf & 0x7f;
+				// TODO
+			}
+		}
+	}
 
-/**
- * Serielle Kommunikation initialisieren
- */
-void rs_init()
-{
-	unsigned int brg = 0x02F0; // 9600 Baud
+	// Jede Sekunde ein Status Com-Objekt senden.
+	// Aber nur senden wenn kein Alarm anliegt.
+	if (infoSendObjno &&
+	    !(alarmLocal | alarmBus | alarmExtra | testAlarmLocal | testAlarmBus))
+	{
+		// Info Objekt zum Senden vormerken wenn es dafür konfiguriert ist.
+		if ((infoSendObjno >= 11 && (eeprom[CONF_INFO_11TO17] & pow2[infoSendObjno - 11])) ||
+			(infoSendObjno >= 4 && (eeprom[CONF_INFO_4TO10] & pow2[infoSendObjno - 4])))
+		{
+			ARRAY_SET_BIT(objSendReqFlags, infoSendObjno);
+		}
 
-	BRGCON&=0xFE;	// Baudrate generator stop
+		--infoSendObjno;
+	}
 
-	P1M1&=0xFC;		// Set RX and TX bidirectional
-	P1M2&=0xFC;
-	SCON=0x51;		// Mode 1, receive enable
-	SSTAT|=0xE0;	// TI at end of stopbit, Interrupt only at RX and double TX buffer on
-//	SSTAT|=0x60;	// TI at end of stopbit, Interrupt only at RX and double TX buffer off
-	BRGCON|=0x02;	// Use Baudrate generator but yet stopped
-	BRGR1=brg>>8;	// Baudrate = cclk / ((BRGR1,BRGR0) + 16)
-	BRGR0=brg;
+	if (!halfSeconds) // einmal pro Minute
+	{
+		halfSeconds = 120;
 
-	BRGCON|=0x01;	// Baudrate generator start
-	TI=1;
+		// Status Informationen zyklisch senden
+		if (eeprom[CONF_INFO_ZYKLISCH] & 0x80)
+		{
+			--infoCounter;
+			if (!infoCounter)
+			{
+				infoCounter = eeprom[CONF_INFO_ZYKLISCH] & 0x7f;
+				infoSendObjno = OBJ_HIGH_INFO_SEND;
+			}
+		}
+	}
 }
 
 
@@ -472,43 +673,62 @@ void rs_init()
  */
 void restart_app()
 {
-	P0M1 = 0x03;// P0.0 and P0.1 open drain. all other pins of P0 as bidirectional
+	unsigned char i;
+
+	P0M1 = 0x03;   // P0.0 and P0.1 open drain. all other pins of P0 as bidirectional
 	P0M2 = 0x03;
-	P0 = ~0x04;	// P0.2 low to enable serial gira communication. all other pins of p0 high
+	P0 = ~0x04;	   // P0.2 low to enable serial communication. all other pins of p0 high
 
-	P1M1 |= (1 << 2);		// P1.2 to GIRA open drain with external pullup
+	P1M1 |= (1 << 2); // P1.2 to Rauchmelder open drain with external pullup
 	P1M2 |= (1 << 2);
-	P1 |= (1 << 2);		// P1.2 high
+	P1 |= (1 << 2);	  // P1.2 high
 
-	rs_init();
+	gira_init();
 
-	RTCH = 0x70;	// reload Real Time Clock (0,5s=0x7080)
+	RTCH = 0x70;	// Reload Real Time Clock (1s = 0xE100; 0,5s = 0x7080; 0,25s = 0x3840)
 	RTCL = 0x80;	// (RTC ist ein down-counter mit 128 bit prescaler und osc-clock)
 	RTCCON = 0x61;	// ... und starten
 
-	giraAnswerCount = -1;
-	readObjRingNextRead = 0;
-	readObjRingNextWrite = 0;
-	alarmType = 0;
+	// Werte initialisieren
 
-#if 0
-	g_timer = 0;
-	if (eeprom[CONF_A_ZYKLISCH])
-		g_timer_alarm = g_timer + 2;
-	if (eeprom[CONF_S_ZYKLISCH])
-		g_timer_test = g_timer + 4;
-	if (eeprom[CONF_INFO_ZYKLISCH])
-		g_timer_info = g_timer + 6;
-#endif
+	for (i = 0; i < NUM_OBJ_FLAG_BYTES; ++i)
+	{
+		objReadReqFlags[i] = 0;
+		objSendReqFlags[i] = 0;
+	}
+
+	answerWait = 0;
+	cmdCurrent = GIRA_CMD_NONE;
+	remoteAlarmWait = 0;
+	recvCount = -1;
+	halfSeconds = eeprom[ADDRTAB + 2] & 127;
+
+	alarmBus = 0;
+	alarmLocal = 0;
+	alarmExtra = 0;
+
+	testAlarmBus = 0;
+	testAlarmLocal = 0;
+
+	setAlarmBus = 0;
+	setTestAlarmBus = 0;
+
+	infoSendObjno = 0;
+	infoCounter = 1;
+	alarmCounter = 1;
+	alarmStatusCounter = 1;
+	delayedAlarmCounter = 0;
+	extraAlarmCounter = 0;
 
 	// EEPROM initialisieren
+
 	EA = 0;							// Interrupts sperren, damit Flashen nicht unterbrochen wird
 	START_WRITECYCLE;
 	WRITE_BYTE(0x01, 0x03, 0x00);	// Herstellercode 0x004C = Bosch
 	WRITE_BYTE(0x01, 0x04, 0x4C);
-	WRITE_BYTE(0x01, 0x05, 0x03);	// Devicetype 0x03F2
+	WRITE_BYTE(0x01, 0x05, 0x03);	// Devicetype 1010 (0x03F2)
 	WRITE_BYTE(0x01, 0x06, 0xF2);
-	WRITE_BYTE(0x01, 0x07, 0x01);	// Version der Applikation
+	WRITE_BYTE(0x01, 0x07, 0x01);	// Version der Applikation: 1
 	WRITE_BYTE(0x01, 0x0C, 0x00);	// PORT A Direction Bit Setting
 	WRITE_BYTE(0x01, 0x0D, 0xFF);	// Run-Status (00=stop FF=run)
 	WRITE_BYTE(0x01, 0x12, 0xA0);	// COMMSTAB Pointer
@@ -519,14 +739,14 @@ void restart_app()
 	// select Watchdog clock at 400kHz
 	// start watchdog
 	WDL = 0xFF;
-	//  eacopy = EA;
 	EA = 0;
 	WDCON = 0xE5;
 	WFEED1 = 0xA5;
 	WFEED2 = 0x5A;
-	//  EA = eacopy;
 	EA = 1;
 
-	gira_send_ack();
-	gira_send_ack();
+	gira_send_byte(ACK);
+	gira_send_byte(ACK);
+
+	// TODO Alarm-Status vom Rauchmelder abfragen
 }

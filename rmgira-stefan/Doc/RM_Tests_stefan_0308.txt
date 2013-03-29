@@ -1,4 +1,4 @@
-Tests mit hterm am RM
+Tests mit hterm am Rauchmelder
 
 PC: was am hterm eingegeben wurde
 RM: was der Rauchmelder antwortet

@@ -1,0 +1,7 @@
+2013-03-xx Version 2.01
+        Komplett neu geschrieben, erste Release der neuen Version.
+        Die Kommunikation mit dem Rauchmelder erfolgt ausschliesslich über die
+        14-polige Steckverbindung. Die grüne Klemme dient nur der Stützspannung.
+        Die Signal Leitung der grünen Klemme soll nicht mit JP2 verbunden sein.
+        JP2 kann als zusätzlicher Alarm Eingang verwendet werden. Z.B. für
+        andere Brandmelder.
