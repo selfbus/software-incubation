@@ -14,9 +14,8 @@
 # define __code
 #endif
 
-
-// Pin für externen Alarm an JP2
-#define EXTRA_ALARM_PIN P1_2
+// Ein Byte auf der seriellen Schnittstelle ausgeben
+#define DEBUG_WRITE_BYTE(x) { while (!TI); TI = 0; SBUF = (x); }
 
 
 //-----------------------------------------------------------------------------
@@ -25,38 +24,103 @@
 
 #define OBJ_NONE                31
 
-#define OBJ_SET_ALARM			0
-#define OBJ_SET_TALARM			1
-#define OBJ_NOTUSED2			2
-#define OBJ_NOTUSED3			3
-#define OBJ_SERIAL				4
-#define OBJ_OPERATING_TIME		5
-#define OBJ_SMOKEBOX_VALUE		6
-#define OBJ_POLLUTION			7
-#define OBJ_BAT_VOLTAGE			8
-#define OBJ_TEMP1				9
-#define OBJ_TEMP2				10
-#define OBJ_CNT_SMOKEALARM		11
-#define OBJ_CNT_TEMPALARM		12
-#define OBJ_CNT_TESTALARM		13
-#define OBJ_CNT_ALARM_WIRE		14
-#define OBJ_CNT_ALARM_WIRELESS	15
-#define OBJ_CNT_TALARM_WIRE		16
-#define OBJ_CNT_TALARM_WIRELESS	17
-#define OBJ_STAT_ALARM			18
-#define OBJ_STAT_ALARM_CENTRAL	19
-#define OBJ_STAT_ALARM_DELAYED	20
-#define OBJ_STAT_TALARM			21
-#define OBJ_STAT_TALARM_CENTRAL	22
+// Alarm Vernetzung
+#define OBJ_ALARM_BUS			0
+
+// Testalarm Vernetzung
+#define OBJ_TALARM_BUS			1
+
+// Alarm / Testalarm rücksetzen
+#define OBJ_RESET_ALARM			2
+
+// Status Alarm
+#define OBJ_STAT_ALARM			3
+
+// Status verzögerter Alarm
+#define OBJ_STAT_ALARM_DELAYED	4
+
+// Status Testalarm
+#define OBJ_STAT_TALARM			5
+
+
+
+// Rauchmelder Seriennummer
+#define OBJ_SERIAL				6
+
+// Rauchmelder Betriebsdauer in Sekunden
+#define OBJ_OPERATING_TIME		7
+
+// Rauchkammer Wert
+#define OBJ_SMOKEBOX_VALUE		8
+
+// Rauchkammer Verschmutzung
+#define OBJ_POLLUTION			9
+
+// Batterie Spannung
+#define OBJ_BAT_VOLTAGE			10
+
+// Temperatur
+#define OBJ_TEMP				11
+
+// Rauchmelder Fehlercode, siehe ERRCODE_* Konstanten
+#define OBJ_ERRCODE				12
+
+// Batterie leer
+#define OBJ_BAT_LOW				13
+
+// Rauchmelder defekt
+#define OBJ_MALFUNCTION			14
+
+// Anzahl Rauchalarme
+#define OBJ_CNT_SMOKEALARM		15
+
+// Anzahl Temperatur Alarme
+#define OBJ_CNT_TEMPALARM		16
+
+// Anzahl Testalarme
+#define OBJ_CNT_TESTALARM		17
+
+// Anzahl Draht Alarme
+#define OBJ_CNT_ALARM_WIRE		18
+
+// Anzahl Bus Alarme
+#define OBJ_CNT_ALARM_BUS		19
+
+// Anzahl Draht Testalarme
+#define OBJ_CNT_TALARM_WIRE		20
+
+// Anzahl Bus Testalarme
+#define OBJ_CNT_TALARM_BUS		21
+
 
 // Anzahl der Com-Objekte
-#define NUM_OBJS                23
+#define NUM_OBJS                22
 
 // Anzahl der Bytes die benötigt werden um die Com-Objekte als Bits abzubilden
 #define NUM_OBJ_FLAG_BYTES ((NUM_OBJS + 7) >> 3)
 
 // Höchstes Com-Objekt das bei Info-Senden gesendet wird.
-#define OBJ_HIGH_INFO_SEND      17
+#define OBJ_HIGH_INFO_SEND      21
+
+
+//-----------------------------------------------------------------------------
+// Rauchmelder Fehlercodes
+//-----------------------------------------------------------------------------
+
+// Batterie schwach/leer
+#define ERRCODE_BATLOW		0x01
+
+// Rauchmelder antwortet nicht
+#define ERRCODE_COMM		0x02
+
+// Temperatursensor 1 defekt
+#define ERRCODE_TEMP1		0x04
+
+// Temperatursensor 2 defekt
+#define ERRCODE_TEMP2		0x08
+
+// Rauchkammer verschmutzt / defekt
+#define ERRCODE_SMOKEBOX	0x10
 
 
 //-----------------------------------------------------------------------------

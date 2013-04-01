@@ -265,7 +265,7 @@ Daten:  1 Byte       : Bit 0: Unbekannt (0x01)
 82 21 00 00 00 ED - Eventuell Meldung dass die Rauchkammer nicht mehr defekt ist.
 82 21 00 08 00 F5 - Unbekannt.
 82 21 00 80 00 F5 - Könnte Rauchkammer Fehler sein. Aufgetreten bei: Rauchmelder gestartet,
-                    Rauchkammer etwas zerlegt.
+                    Rauchkammer war halb zerlegt.
 82 21 01 08 00 F6 - kam als ich darauf wartete dass "Batterie schwach" nach Erhöhung
                     der Spannung wieder irgendwie beendet würde. Wurde mit ~4 Piepsern
                     begleitet.

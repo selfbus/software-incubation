@@ -12,79 +12,56 @@
 //-----------------------------------------------------------------------------
 
 /**
- * 0x80 - Alarm zyklisch senden aktiviert
- * 0..0x7f - Intervall für zyklisches Senden (siehe CONF_A_BASIS)
+ * Intervall für Alarm zyklisch senden in Sekunden
  */
-#define CONF_A_ZYKLISCH 	250
+#define CONF_ALARM_INTERVAL 250
 
 /**
- * Obsolet, verwende CONF_A_ZYKLISCH
+ * Alarm verzögert senden in Sekunden.
  */
-#define CONF_A_FAKTOR		250
+#define CONF_ALARM_DELAYED 248
 
 /**
- * Zeitbasis für Alarm zyklisch senden.
- * Wenn 0 dann enthält CONF_A_FAKTOR Sekunden, sonst Minuten
+ * Intervall für Testalarm zyklisch senden in Sekunden.
  */
-#define CONF_A_BASIS		251
+#define CONF_TALARM_INTERVAL 247
 
 /**
- * 0x80 - Testalarm zyklisch senden aktiviert
- * 0..0x7f - Intervall für zyklisches Senden (siehe CONF_S_BASIS)
+ * Intervall für Status-Informationen zyklisch senden in Minuten
  */
-#define CONF_S_ZYKLISCH 	246
+#define CONF_INFO_INTERVAL 249
 
 /**
- * Obsolet, verwende CONF_S_ZYKLISCH
+ * Konfigurationsbyte für zyklisches und verzögertes Senden.
  */
-#define CONF_S_FAKTOR		246
+#define CONF_SEND_ENABLE 251
 
 /**
- * Zeitbasis für Testalarm zyklisch senden.
- * Wenn 0 dann enthält CONF_S_ZYKLISCH Sekunden, sonst Minuten
+ * Bitmaske in CONF_SEND_ENABLE für Alarm verzögert senden.
  */
-#define CONF_S_BASIS		247
+#define CONF_ENABLE_ALARM_DELAYED 0x80
 
 /**
- * 0x80 - Alarm verzögert senden aktiviert
- * 0..0x7f - Verzögerung (siehe CONF_A_DELAY_BASIS)
+ * Bitmaske in CONF_SEND_ENABLE für Alarm zyklisch senden.
  */
-#define CONF_A_DELAY		248
+#define CONF_ENABLE_ALARM_INTERVAL 0x40
 
 /**
- * Obsolet, verwende CONF_A_DELAY
+ * Bitmaske in CONF_SEND_ENABLE für Testalarm zyklisch senden.
  */
-#define CONF_A_DELAY_FAKTOR	248
+#define CONF_ENABLE_TALARM_INTERVAL 0x20
 
 /**
- * Zeitbasis für Alarm verzögert senden.
- * Wenn 0 dann enthält CONF_A_DELAY Sekunden, sonst Minuten
+ * Bitmaske in CONF_SEND_ENABLE für Status-Informationen zyklisch senden.
  */
-#define CONF_A_DELAY_BASIS	249
+#define CONF_ENABLE_INFO_INTERVAL 0x10
 
 /**
- * 0x80 - Info Com-Objekte zyklisch senden
- * 0..0x7f - Intervall für zyklisches Senden (siehe CONF_INFO_BASIS)
+ * Bits aktivieren das zyklische Senden der Com-Objekte 6..13
  */
-#define CONF_INFO_ZYKLISCH	244
+#define CONF_INFO_6TO13		252
 
 /**
- * Obsolet, verwende CONF_INFO_ZYKLISCH
+ * Bits aktivieren das zyklische Senden der Com-Objekte 14..21
  */
-#define CONF_INFO_FAKTOR	244
-
-/**
- * Zeitbasis für Info Com-Objekte zyklisch senden.
- * Wenn 0 dann enthält CONF_INFO_ZYKLISCH Sekunden, sonst Minuten
- */
-#define CONF_INFO_BASIS		245
-
-/**
- * Bits aktivieren das zyklische Senden der Com-Objekte 4..10
- */
-#define CONF_INFO_4TO10		252
-
-/**
- * Bits aktivieren das zyklische Senden der Com-Objekte 11..17
- */
-#define CONF_INFO_11TO17	253
+#define CONF_INFO_14TO21	253

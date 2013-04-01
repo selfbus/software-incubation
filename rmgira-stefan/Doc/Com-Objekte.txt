@@ -1,6 +1,9 @@
 Aufstellung der Com-Objekte
 ---------------------------
 
+TODO:  Veraltert, bitte updaten
+
+
 OBJ_SET_ALARM
   1 Bit
   Schreiben: Bus Alarm ein/aus
@@ -31,7 +34,7 @@ OBJ_BAT_VOLTAGE
 
 OBJ_TEMP
   2 Byte Float (DPT 9.001)
-  Lesen: Temperatur an den Temperatur Sensoren (höhster Wert)
+  Lesen: Temperatur an den Temperatur Sensoren (höchster Wert)
 
 OBJ_CNT_SMOKEALARM
   1 Byte

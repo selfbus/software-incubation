@@ -38,29 +38,28 @@ const struct
 	unsigned const char dataType;  // Datentyp der Antwort
 } objMappingTab[NUM_OBJS] =
 {
-	/*OBJ_SET_ALARM*/           { GIRA_CMD_NONE,            0, GIRA_TYPE_NONE },
-	/*OBJ_SET_TALARM*/          { GIRA_CMD_NONE,            0, GIRA_TYPE_NONE },
-	/*OBJ_NOTUSED2*/            { GIRA_CMD_NONE,            0, GIRA_TYPE_NONE },
-	/*OBJ_NOTUSED3*/            { GIRA_CMD_NONE,            0, GIRA_TYPE_NONE },
-	/*OBJ_SERIAL*/              { GIRA_CMD_SERIAL,          0, GIRA_TYPE_LONG },
-	/*OBJ_OPERATING_TIME*/      { GIRA_CMD_OPERATING_TIME,  0, GIRA_TYPE_QSEC },
-	/*OBJ_SMOKEBOX_VALUE*/      { GIRA_CMD_SMOKEBOX,        0, GIRA_TYPE_INT  },
-	/*OBJ_POLLUTION*/           { GIRA_CMD_SMOKEBOX,        3, GIRA_TYPE_BYTE },
-	/*OBJ_BAT_VOLTAGE*/         { GIRA_CMD_BATTEMP,         0, GIRA_TYPE_VOLT },
-	/*OBJ_TEMP1*/               { GIRA_CMD_BATTEMP,         3, GIRA_TYPE_TEMP },
-	/*OBJ_TEMP2*/               { GIRA_CMD_BATTEMP,         2, GIRA_TYPE_TEMP },
-	/*OBJ_CNT_SMOKEALARM*/      { GIRA_CMD_SMOKEBOX,        2, GIRA_TYPE_BYTE },
-	/*OBJ_CNT_TEMPALARM*/       { GIRA_CMD_NUM_ALARMS,      0, GIRA_TYPE_BYTE },
-	/*OBJ_CNT_TESTALARM*/       { GIRA_CMD_NUM_ALARMS,      1, GIRA_TYPE_BYTE },
-	/*OBJ_CNT_ALARM_WIRE*/      { GIRA_CMD_NUM_ALARMS,      2, GIRA_TYPE_BYTE },
-	/*OBJ_CNT_ALARM_WIRELESS*/  { GIRA_CMD_NUM_ALARMS,      3, GIRA_TYPE_BYTE },
-	/*OBJ_CNT_TALARM_WIRE*/     { GIRA_CMD_NUM_ALARMS_2,    0, GIRA_TYPE_BYTE },
-	/*OBJ_CNT_TALARM_WIRELESS*/ { GIRA_CMD_NUM_ALARMS_2,    1, GIRA_TYPE_BYTE },
-	/*OBJ_STAT_ALARM*/          { GIRA_CMD_INTERNAL,        0, GIRA_TYPE_NONE },
-	/*OBJ_STAT_ALARM_CENTRAL*/  { GIRA_CMD_INTERNAL,        0, GIRA_TYPE_NONE },
-	/*OBJ_STAT_ALARM_DELAYED*/  { GIRA_CMD_INTERNAL,        0, GIRA_TYPE_NONE },
-	/*OBJ_STAT_TALARM*/         { GIRA_CMD_INTERNAL,        0, GIRA_TYPE_NONE },
-	/*OBJ_STAT_TALARM_CENTRAL*/ { GIRA_CMD_INTERNAL,        0, GIRA_TYPE_NONE }
+	/* 0 OBJ_ALARM_BUS*/           { GIRA_CMD_INTERNAL,        0, GIRA_TYPE_NONE },
+	/* 1 OBJ_TALARM_BUS*/          { GIRA_CMD_INTERNAL,        0, GIRA_TYPE_NONE },
+	/* 2 OBJ_RESET_ALARM*/         { GIRA_CMD_INTERNAL,        0, GIRA_TYPE_NONE },
+	/* 3 OBJ_STAT_ALARM*/          { GIRA_CMD_INTERNAL,        0, GIRA_TYPE_NONE },
+	/* 4 OBJ_STAT_ALARM_DELAYED*/  { GIRA_CMD_INTERNAL,        0, GIRA_TYPE_NONE },
+	/* 5 OBJ_STAT_TALARM*/         { GIRA_CMD_INTERNAL,        0, GIRA_TYPE_NONE },
+	/* 6 OBJ_SERIAL*/              { GIRA_CMD_SERIAL,          0, GIRA_TYPE_LONG },
+	/* 7 OBJ_OPERATING_TIME*/      { GIRA_CMD_OPERATING_TIME,  0, GIRA_TYPE_QSEC },
+	/* 8 OBJ_SMOKEBOX_VALUE*/      { GIRA_CMD_SMOKEBOX,        0, GIRA_TYPE_INT  },
+	/* 9 OBJ_POLLUTION*/           { GIRA_CMD_SMOKEBOX,        3, GIRA_TYPE_BYTE },
+	/*10 OBJ_BAT_VOLTAGE*/         { GIRA_CMD_BATTEMP,         0, GIRA_TYPE_VOLT },
+	/*11 OBJ_TEMP*/                { GIRA_CMD_BATTEMP,         2, GIRA_TYPE_TEMP },
+	/*12 OBJ_ERRCODE*/             { GIRA_CMD_INTERNAL,        0, GIRA_TYPE_NONE },
+	/*13 OBJ_BAT_LOW*/             { GIRA_CMD_INTERNAL,        0, GIRA_TYPE_NONE },
+	/*14 OBJ_MALFUNCTION*/         { GIRA_CMD_INTERNAL,        0, GIRA_TYPE_NONE },
+	/*15 OBJ_CNT_SMOKEALARM*/      { GIRA_CMD_SMOKEBOX,        2, GIRA_TYPE_BYTE },
+	/*16 OBJ_CNT_TEMPALARM*/       { GIRA_CMD_NUM_ALARMS,      0, GIRA_TYPE_BYTE },
+	/*17 OBJ_CNT_TESTALARM*/       { GIRA_CMD_NUM_ALARMS,      1, GIRA_TYPE_BYTE },
+	/*18 OBJ_CNT_ALARM_WIRE*/      { GIRA_CMD_NUM_ALARMS,      2, GIRA_TYPE_BYTE },
+	/*19 OBJ_CNT_ALARM_BUS*/	   { GIRA_CMD_NUM_ALARMS,      3, GIRA_TYPE_BYTE },
+	/*20 OBJ_CNT_TALARM_WIRE*/     { GIRA_CMD_NUM_ALARMS_2,    0, GIRA_TYPE_BYTE },
+	/*21 OBJ_CNT_TALARM_BUS*/	   { GIRA_CMD_NUM_ALARMS_2,    1, GIRA_TYPE_BYTE }
 };
 
 
@@ -69,9 +68,6 @@ __bit alarmLocal;
 
 // Flag für remote Alarm über EIB
 __bit alarmBus;
-
-// Flag für remote Alarm über LPC Alarm Pin auf JP2
-__bit alarmExtra;
 
 // Flag für lokalen Testalarm und Wired Testalarm
 __bit testAlarmLocal;
@@ -85,9 +81,11 @@ __bit setAlarmBus;
 // Flag für den gewünschten Testalarm Status wie wir ihn über den EIB empfangen haben
 __bit setTestAlarmBus;
 
+// Flag für Bus Alarm & -Testalarm ignorieren
+__bit ignoreBusAlarm;
 
-// Zeit bis der remote Alarm als Alarm und nicht als Testalarm gemeldet wird
-unsigned char remoteAlarmWait;
+// Rauchmelder Fehlercodes
+unsigned char errCode;
 
 
 // Flags für Com-Objekte lesen
@@ -118,6 +116,12 @@ unsigned char answerWait;
 // Initialwert für answerWait in 0,5s
 #define INITIAL_ANSWER_WAIT 6
 
+// Zähler für keine Antwort vom Rauchmelder
+unsigned char noAnswerCount;
+
+// Maximale Anzahl in noAnswerCount ab der ein Rauchmelder Fehler gemeldet wird
+#define NO_ANSWER_MAX 5
+
 
 // Zähler für Alarm am JP2 - EXTRA_ALARM_PIN
 unsigned char extraAlarmCounter;
@@ -146,7 +150,7 @@ unsigned char halfSeconds;
 
 
 // Tabelle für 1<<x, d.h. pow2[3] == 1<<3
-const unsigned char pow2[] = { 1, 2, 4, 8, 16, 32, 64, 128 };
+const unsigned char pow2[8] = { 128, 64, 32, 16, 8, 4, 2, 1 };
 
 // Im Byte Array arr das bitno-te Bit setzen
 #define ARRAY_SET_BIT(arr, bitno) arr[bitno>>3] |= pow2[bitno & 7]
@@ -169,9 +173,11 @@ const unsigned char pow2[] = { 1, 2, 4, 8, 16, 32, 64, 128 };
  */
 void send_obj_alarm(__bit newAlarm)
 {
-	__bit alarm = alarmLocal | alarmExtra;
-	if (alarm != newAlarm)
+	if (alarmLocal != newAlarm)
+	{
+		send_obj_value(OBJ_ALARM_BUS);
 		send_obj_value(OBJ_STAT_ALARM);
+	}
 }
 
 
@@ -182,22 +188,31 @@ void send_obj_alarm(__bit newAlarm)
  */
 void send_obj_test_alarm(__bit newAlarm)
 {
-	__bit alarm = testAlarmLocal;
-	if (alarm != newAlarm)
+	if (testAlarmLocal != newAlarm)
+	{
+		send_obj_value(OBJ_TALARM_BUS);
 		send_obj_value(OBJ_STAT_TALARM);
+	}
 }
 
 
 /**
- * Alarm-Status von JP2 Alarm-Pin setzen.
+ * Fehlercode setzen
+ *
+ * @param newErrCode - neuer Fehlercode
  */
-void set_extra_alarm(__bit newAlarm)
+void set_errcode(unsigned char newErrCode)
 {
-	if (alarmExtra == newAlarm)
+	if (newErrCode == errCode)
 		return;
 
-	alarmExtra = newAlarm;
-	send_obj_value(OBJ_STAT_ALARM);
+	// Wenn sich der Status der Batterie geändert hat dann OBJ_BAT_LOW senden,
+	// sonst den allgemeinen Fehler Indikator OBJ_MALFUNCTION.
+	if ((errCode ^ newErrCode) & ERRCODE_BATLOW)
+		ARRAY_SET_BIT(objSendReqFlags, OBJ_BAT_LOW);
+	else ARRAY_SET_BIT(objSendReqFlags, OBJ_MALFUNCTION);
+
+	errCode = newErrCode;
 }
 
 
@@ -210,10 +225,16 @@ void gira_process_msg(unsigned char* bytes, unsigned char len)
 	unsigned char objno, cmd, msgType;
 	unsigned char byteno, mask;
 
+	answerWait = 0;
+	if (noAnswerCount)
+	{
+		noAnswerCount = 0;
+		set_errcode(errCode & ~ERRCODE_COMM);
+	}
+
 	msgType = bytes[0];
 	if ((msgType & 0xf0) == 0xc0) // Com-Objekt Werte empfangen
 	{
-		answerWait = 0;
 		msgType &= 0x0f;
 
 		for (cmd = 0; cmd < GIRA_CMD_COUNT; ++cmd)
@@ -275,8 +296,9 @@ void gira_process_msg(unsigned char* bytes, unsigned char len)
 			// Bus Testalarm
 			testAlarmBus = status & 0x80;
 
-			// TODO Batterie schwach
-			// status & 0x01
+			// Batterie schwach/leer
+			if ((status ^ errCode) & ERRCODE_BATLOW)
+				set_errcode((errCode & ~ERRCODE_BATLOW) | (status & ERRCODE_BATLOW));
 		}
 
 		if (subType & 0x08)  // Taste am Rauchmelder gedrückt
@@ -294,12 +316,21 @@ void gira_process_msg(unsigned char* bytes, unsigned char len)
 			}
 		}
 
-//		if (subType & 0x02)  // Defekt am Rauchmelder
-//		{
-//			unsigned char status = bytes[4];
-//
-//			// TODO Defekt melden
-//		}
+		if (subType & 0x02)  // Defekt am Rauchmelder
+		{
+			unsigned char status = bytes[4];
+			unsigned char newErrCode = errCode & (ERRCODE_BATLOW | ERRCODE_COMM);
+
+			if (status & 0x04)
+				newErrCode |= ERRCODE_TEMP1;
+
+			if (status & 0x10)
+				newErrCode |= ERRCODE_TEMP2;
+
+			// TODO Rauchkammer Defekt behandeln
+
+			set_errcode(newErrCode);
+		}
 	}
 }
 
@@ -309,14 +340,58 @@ void gira_process_msg(unsigned char* bytes, unsigned char len)
  */
 void read_value_req()
 {
-	unsigned char objno; //, objflags;
-
-	objno = find_first_objno(telegramm[3], telegramm[4]);
+	unsigned char objno = find_first_objno(telegramm[3], telegramm[4]);
 
 	// TODO Nur antworten wenn READ und COM Flag gesetzt sind
-//	objflags = read_objflags(objno);
-//	if ((objflags&0x0C) == 0x0C)
+//	if ((read_objflags(objno) & 0x0C) == 0x0C)
+	if (objno < NUM_OBJS)
+	{
 		ARRAY_SET_BIT(objReadReqFlags, objno);
+	}
+}
+
+
+/**
+ * Die Rauchmelder Antwort als Long Zahl liefern.
+ *
+ * @param answer - das erste Byte der Rauchmelder Antwort.
+ * @return Der Wert mit getauschten Bytes.
+ */
+unsigned long answer_to_long(unsigned char* cvalue)
+{
+	union
+	{
+		unsigned long l;
+		unsigned char c[4];
+	} result;
+
+	result.c[3] = cvalue[0];
+	result.c[2] = cvalue[1];
+	result.c[1] = cvalue[2];
+	result.c[0] = cvalue[3];
+
+	return result.l;
+}
+
+
+/**
+ * Die Rauchmelder Antwort als Integer Zahl liefern.
+ *
+ * @param answer - das erste Byte der Rauchmelder Antwort.
+ * @return Der Wert mit getauschten Bytes.
+ */
+unsigned int answer_to_int(unsigned char* cvalue)
+{
+	union
+	{
+		unsigned int i;
+		unsigned char c[2];
+	} result;
+
+	result.c[1] = cvalue[0];
+	result.c[0] = cvalue[1];
+
+	return result.i;
 }
 
 
@@ -330,25 +405,41 @@ unsigned long read_obj_value(unsigned char objno)
 {
 	unsigned char cmd = objMappingTab[objno].cmd;
 
+//	// TODO diese Debug Ausgabe wieder entfernen
+//	DEBUG_WRITE_BYTE(objno);
+//	DEBUG_WRITE_BYTE(eeprom[COMMSTABPTR]);
+//	//DEBUG_WRITE_BYTE(eeprom[eeprom[COMMSTABPTR]+objno*3+4]); // objtype
+
 	// Interne Com-Objekte behandeln
 	if (cmd == GIRA_CMD_INTERNAL)
 	{
 		switch (objno)
 		{
+		case OBJ_ALARM_BUS:
 		case OBJ_STAT_ALARM:
-		case OBJ_STAT_ALARM_CENTRAL:
-		case OBJ_STAT_ALARM_DELAYED:
-			return alarmLocal | alarmExtra;
+			return alarmLocal;
 
+		case OBJ_TALARM_BUS:
 		case OBJ_STAT_TALARM:
-		case OBJ_STAT_TALARM_CENTRAL:
 			return testAlarmLocal;
+
+		case OBJ_STAT_ALARM_DELAYED:
+			return delayedAlarmCounter != 0;
+
+		case OBJ_BAT_LOW:
+			return (errCode & ERRCODE_BATLOW) != 0;
+
+		case OBJ_MALFUNCTION:
+			return (errCode & ~ERRCODE_BATLOW) != 0;
+
+		case OBJ_ERRCODE:
+			return errCode;
 		}
 	}
 	// Com-Objekte verarbeiten die Werte vom Rauchmelder darstellen
 	else if (cmd != GIRA_CMD_NONE)
 	{
-		unsigned long result = 0;
+		unsigned long lval;
 		unsigned char* answer;
 
 		if (cmd == cmdCurrent) answer = (unsigned char*) &objValueCurrent;
@@ -361,33 +452,33 @@ unsigned long read_obj_value(unsigned char objno)
 			return *answer;
 
 		case GIRA_TYPE_LONG:
-			return *(unsigned long*) answer;
+			return answer_to_long(answer);
 
 		case GIRA_TYPE_QSEC:
-			return (*(unsigned long*) answer) >> 2;
+			return answer_to_long(answer) >> 2;
 
 		case GIRA_TYPE_INT:
-			return *(unsigned int*) answer;
+			return answer_to_int(answer);
 
 		case GIRA_TYPE_TEMP:
-			result = *answer;
-			result *= 50;
-			result -= 2000;
-			return conv_dpt_9_001(result);
+			lval = answer[0] > answer[1] ? answer[0] : answer[1];
+			lval *= 50;
+			lval -= 2000;
+			return conv_dpt_9_001(lval);
 
 		case GIRA_TYPE_VOLT:
-			result = *(unsigned int*) answer;
-			result *= 9184;
-			result /= 5000;
-			return conv_dpt_9_001(result);
+			lval = answer_to_int(answer);
+			lval *= 9184;
+			lval /= 5000;
+			return conv_dpt_9_001(lval);
 
 		default: // Fehler: unbekannter Datentyp
-			return (unsigned long) -2;
+			return -2;
 		}
 	}
 
 	// Fehler: unbekanntes Com Objekt
-	return (unsigned long) -1;
+	return -1;
 }
 
 
@@ -398,24 +489,36 @@ unsigned long read_obj_value(unsigned char objno)
  */
 void write_value_obj(unsigned char objno)
 {
- 	if (objno == OBJ_SET_ALARM) // Bus Alarm
+ 	if (objno == OBJ_ALARM_BUS) // Bus Alarm
 	{
  		setAlarmBus = telegramm[7] & 0x01;
 
  		// Wenn wir lokalen Alarm haben dann Bus Alarm wieder auslösen
 		// damit der Status der anderen Rauchmelder stimmt
  		if (!setAlarmBus && alarmLocal)
- 			send_obj_value(OBJ_STAT_ALARM);
+ 			send_obj_value(OBJ_ALARM_BUS);
+
+ 		if (ignoreBusAlarm)
+ 			setAlarmBus = 0;
 	}
-	else if (objno == OBJ_SET_TALARM) // Bus Test Alarm
+	else if (objno == OBJ_TALARM_BUS) // Bus Test Alarm
 	{
 		setTestAlarmBus = telegramm[7] & 0x01;
 
  		// Wenn wir lokalen Testalarm haben dann Bus Testalarm wieder auslösen
 		// damit der Status der anderen Rauchmelder stimmt
  		if (!setTestAlarmBus && testAlarmLocal)
- 			send_obj_value(OBJ_STAT_TALARM);
+ 			send_obj_value(OBJ_TALARM_BUS);
+
+ 		if (ignoreBusAlarm)
+ 			setTestAlarmBus = 0;
  	}
+	else if (objno == OBJ_RESET_ALARM) // Bus Alarm rücksetzen
+	{
+		setAlarmBus = 0;
+		setTestAlarmBus = 0;
+		ignoreBusAlarm = 1;
+	}
 }
 
 
@@ -499,14 +602,13 @@ void process_obj(unsigned char objno)
 
 /**
  * Com-Objekte bearbeiten.
+ *
+ * Com-Objekte die Daten vom Rauchmelder benötigen werden nur bearbeitet wenn
+ * nicht gerade auf Antwort vom Rauchmelder gewartet wird.
  */
 void process_objs()
 {
 	unsigned char mask, byteno, objno;
-
-	// Nichts tun wenn gerade auf eine Antwort vom Rauchmelder gewartet wird
-	if (answerWait > 0)
-		return;
 
 	for (objno = 0; objno < NUM_OBJS; ++objno)
 	{
@@ -515,8 +617,12 @@ void process_objs()
 
 		if ((objReadReqFlags[byteno] & mask) || (objSendReqFlags[byteno] & mask))
 		{
-			process_obj(objno);
-			break;
+			unsigned char cmd = objMappingTab[objno].cmd;
+			if (!answerWait || cmd == GIRA_CMD_NONE || cmd == GIRA_CMD_INTERNAL)
+			{
+				process_obj(objno);
+				break;
+			}
 		}
 	}
 }
@@ -562,30 +668,21 @@ void timer_event()
 
 	--halfSeconds;
 
+	// Wir warten auf eine Antwort vom Rauchmelder
 	if (answerWait)
+	{
 		--answerWait;
 
-	// Alarm über JP2 behandeln
-	if (!EXTRA_ALARM_PIN)
-	{
-		if (extraAlarmCounter < EXTRA_ALARM_LIMIT)
+		// Wenn keine Antwort vom Rauchmelder kommt dann den noAnswerCount Zähler
+		// erhöhen. Wenn der Zähler NO_ANSWER_MAX erreicht dann ist es ein Rauchmelder
+		// Fehler.
+		if (!answerWait && noAnswerCount < 255)
 		{
-			++extraAlarmCounter;
-		}
-		else
-		{
-			send_obj_alarm(1);
-			alarmExtra = 1;
-		}
-	}
-	else if (extraAlarmCounter)
-	{
-		// Wenn Alarm, dann nach x Zyklen beenden wenn der Pin nicht mehr Low ist
-		--extraAlarmCounter;
-		if (!extraAlarmCounter)
-		{
-			send_obj_alarm(0);
-			alarmExtra = 0;
+			++noAnswerCount;
+			if (noAnswerCount >= NO_ANSWER_MAX)
+			{
+				set_errcode(errCode | ERRCODE_COMM);
+			}
 		}
 	}
 
@@ -594,7 +691,7 @@ void timer_event()
 		return;
 
 	// Alarm: verzögert und zyklisch senden
-	if (alarmLocal | alarmExtra)
+	if (alarmLocal)
 	{
 		// Alarm verzögert senden
 		if (delayedAlarmCounter)
@@ -602,19 +699,19 @@ void timer_event()
 			--delayedAlarmCounter;
 			if (!delayedAlarmCounter)
 			{
-				send_obj_alarm(1); // FIXME
+				ARRAY_SET_BIT(objSendReqFlags, OBJ_ALARM_BUS);
+				ARRAY_SET_BIT(objSendReqFlags, OBJ_STAT_ALARM);
 			}
 		}
 		else // Alarm zyklisch senden
 		{
-			unsigned char conf = eeprom[CONF_A_ZYKLISCH];
-			if (conf & 0x80)
+			if (eeprom[CONF_SEND_ENABLE] & CONF_ENABLE_ALARM_INTERVAL)
 			{
 				--alarmCounter;
 				if (!alarmCounter)
 				{
-					alarmCounter = conf & 0x7f;
-					// TODO
+					alarmCounter = eeprom[CONF_ALARM_INTERVAL];
+					ARRAY_SET_BIT(objSendReqFlags, OBJ_STAT_ALARM);
 				}
 			}
 		}
@@ -623,26 +720,24 @@ void timer_event()
 	// Testalarm: zyklisch senden
 	if (testAlarmLocal)
 	{
-		unsigned char conf = eeprom[CONF_S_ZYKLISCH];
-		if (conf & 0x80)
+		if (eeprom[CONF_SEND_ENABLE] & CONF_ENABLE_TALARM_INTERVAL)
 		{
 			--alarmCounter;
 			if (!alarmCounter)
 			{
-				alarmCounter = conf & 0x7f;
-				// TODO
+				alarmCounter = eeprom[CONF_TALARM_INTERVAL];
+				ARRAY_SET_BIT(objSendReqFlags, OBJ_STAT_TALARM);
 			}
 		}
 	}
 
 	// Jede Sekunde ein Status Com-Objekt senden.
 	// Aber nur senden wenn kein Alarm anliegt.
-	if (infoSendObjno &&
-	    !(alarmLocal | alarmBus | alarmExtra | testAlarmLocal | testAlarmBus))
+	if (infoSendObjno && !(alarmLocal | alarmBus | testAlarmLocal | testAlarmBus))
 	{
 		// Info Objekt zum Senden vormerken wenn es dafür konfiguriert ist.
-		if ((infoSendObjno >= 11 && (eeprom[CONF_INFO_11TO17] & pow2[infoSendObjno - 11])) ||
-			(infoSendObjno >= 4 && (eeprom[CONF_INFO_4TO10] & pow2[infoSendObjno - 4])))
+		if ((infoSendObjno >= 14 && (eeprom[CONF_INFO_14TO21] & pow2[infoSendObjno - 14])) ||
+			(infoSendObjno >= 6 && (eeprom[CONF_INFO_6TO13] & pow2[infoSendObjno - 6])))
 		{
 			ARRAY_SET_BIT(objSendReqFlags, infoSendObjno);
 		}
@@ -654,13 +749,17 @@ void timer_event()
 	{
 		halfSeconds = 120;
 
+		// Bus Alarm ignorieren Flag rücksetzen wenn kein Alarm mehr anliegt
+		if (ignoreBusAlarm & !(alarmBus | testAlarmBus))
+			ignoreBusAlarm = 0;
+
 		// Status Informationen zyklisch senden
-		if (eeprom[CONF_INFO_ZYKLISCH] & 0x80)
+		if (eeprom[CONF_SEND_ENABLE] & CONF_ENABLE_INFO_INTERVAL)
 		{
 			--infoCounter;
 			if (!infoCounter)
 			{
-				infoCounter = eeprom[CONF_INFO_ZYKLISCH] & 0x7f;
+				infoCounter = eeprom[CONF_INFO_INTERVAL];
 				infoSendObjno = OBJ_HIGH_INFO_SEND;
 			}
 		}
@@ -679,9 +778,9 @@ void restart_app()
 	P0M2 = 0x03;
 	P0 = ~0x04;	   // P0.2 low to enable serial communication. all other pins of p0 high
 
-	P1M1 |= (1 << 2); // P1.2 to Rauchmelder open drain with external pullup
-	P1M2 |= (1 << 2);
-	P1 |= (1 << 2);	  // P1.2 high
+//	P1M1 |= (1 << 2); // P1.2 to Rauchmelder open drain with external pullup
+//	P1M2 |= (1 << 2);
+//	P1 |= (1 << 2);	  // P1.2 high
 
 	gira_init();
 
@@ -698,20 +797,20 @@ void restart_app()
 	}
 
 	answerWait = 0;
+	noAnswerCount = 0;
 	cmdCurrent = GIRA_CMD_NONE;
-	remoteAlarmWait = 0;
 	recvCount = -1;
 	halfSeconds = eeprom[ADDRTAB + 2] & 127;
 
 	alarmBus = 0;
 	alarmLocal = 0;
-	alarmExtra = 0;
 
 	testAlarmBus = 0;
 	testAlarmLocal = 0;
 
 	setAlarmBus = 0;
 	setTestAlarmBus = 0;
+	ignoreBusAlarm = 0;
 
 	infoSendObjno = 0;
 	infoCounter = 1;
@@ -719,6 +818,8 @@ void restart_app()
 	alarmStatusCounter = 1;
 	delayedAlarmCounter = 0;
 	extraAlarmCounter = 0;
+
+	errCode = 0;
 
 	// EEPROM initialisieren
 
@@ -728,7 +829,7 @@ void restart_app()
 	WRITE_BYTE(0x01, 0x04, 0x4C);
 	WRITE_BYTE(0x01, 0x05, 0x03);	// Devicetype 1010 (0x03F2)
 	WRITE_BYTE(0x01, 0x06, 0xF2);
-	WRITE_BYTE(0x01, 0x07, 0x01);	// Version der Applikation: 1
+	WRITE_BYTE(0x01, 0x07, 0x21);	// Version der Applikation: 2.1
 	WRITE_BYTE(0x01, 0x0C, 0x00);	// PORT A Direction Bit Setting
 	WRITE_BYTE(0x01, 0x0D, 0xFF);	// Run-Status (00=stop FF=run)
 	WRITE_BYTE(0x01, 0x12, 0xA0);	// COMMSTAB Pointer
