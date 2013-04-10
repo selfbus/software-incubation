@@ -9,8 +9,8 @@
 #include <mcs51/P89LPC922.h>
 #include <fb_lpc922.h>
 
-#include "rmgira_app.h"
-#include "rmgira_com.h"
+#include "rm_app.h"
+#include "rm_com.h"
 
 
 void main(void)
@@ -43,7 +43,7 @@ void main(void)
 		if (APPLICATION_RUN)
 		{
 			if (RI)
-				gira_recv_byte();
+				_recv_byte();
 
 			if (RTCCON >= 0x80)
 				timer_event();

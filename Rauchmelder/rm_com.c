@@ -6,8 +6,8 @@
  *  published by the Free Software Foundation.
  */
 
-#include "rmgira_com.h"
-#include "rmgira_const.h"
+#include "rm_com.h"
+#include "rm_const.h"
 
 #include <mcs51/P89LPC922.h>
 #include <fb_lpc922.h>
@@ -31,7 +31,7 @@ __code unsigned const char *hexDigits = "0123456789ABCDEF";
 /**
  * Serielle Kommunikation mit dem Rauchmelder initialisieren
  */
-void gira_init()
+void _init()
 {
 	unsigned int brg = 0x02F0; // 9600 Baud
 
@@ -53,7 +53,7 @@ void gira_init()
 /**
  * Ein Byte an den Rauchmelder senden.
  */
-void gira_send_byte(unsigned char ch)
+void _send_byte(unsigned char ch)
 {
 	while (!TI)
 		;
@@ -66,32 +66,32 @@ void gira_send_byte(unsigned char ch)
 /**
  * Eine Nachricht an den Rauchmelder senden.
  */
-void gira_send_hexstr(unsigned char* hexstr)
+void _send_hexstr(unsigned char* hexstr)
 {
 	unsigned char checksum = 0;
 	unsigned char ch;
 
-	gira_send_byte(STX);
+	_send_byte(STX);
 
 	while (*hexstr)
 	{
 		ch = *hexstr;
 		checksum += ch;
-		gira_send_byte(ch);
+		_send_byte(ch);
 		++hexstr;
 	}
 
-	gira_send_byte(hexDigits[checksum >> 4]);
-	gira_send_byte(hexDigits[checksum & 15]);
+	_send_byte(hexDigits[checksum >> 4]);
+	_send_byte(hexDigits[checksum & 15]);
 
-	gira_send_byte(ETX);
+	_send_byte(ETX);
 }
 
 
 /**
  * Einen 1 Byte Befehl an den Rauchmelder senden.
  */
-void gira_send_cmd(unsigned char cmd)
+void _send_cmd(unsigned char cmd)
 {
 	unsigned char b, bytes[3];
 
@@ -102,14 +102,14 @@ void gira_send_cmd(unsigned char cmd)
 	bytes[1] = hexDigits[b];
 
 	bytes[2] = 0;
-	gira_send_hexstr(bytes);
+	_send_hexstr(bytes);
 }
 
 
 /**
  * Ein Byte über die Serielle vom Rauchmelder empfangen.
  */
-void gira_recv_byte()
+void _recv_byte()
 {
 	char idx;
 
@@ -129,10 +129,10 @@ void gira_recv_byte()
 	// Am Ende den Empfang bestätigen und die erhaltene Antwort verarbeiten
 	if (ch == ETX)
 	{
-		gira_send_byte(ACK);
+		_send_byte(ACK);
 
 		if (idx > 1)
-			gira_process_msg(recvBuf, idx - 1); // Verarbeitung aufrufen (ohne Prüfsumme)
+			_process_msg(recvBuf, idx - 1); // Verarbeitung aufrufen (ohne Prüfsumme)
 
 		recvCount = -1;
 
@@ -145,7 +145,7 @@ void gira_recv_byte()
 
 	// Die empfangenen Zeichen sind ein Hex String.
 	// D.h. jeweils zwei Zeichen ergeben ein Byte.
-	// In giraAnswer gleich die dekodierten Bytes schreiben.
+	// In Answer gleich die dekodierten Bytes schreiben.
 	//
 	// Dieser Algorythmus ist fehlerhaft falls die Anzahl der empfangenen
 	// Zeichen ungerade ist.

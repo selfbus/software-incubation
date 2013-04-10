@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>rmgira-stefan</name>
+	<name>Rauchmelder</name>
 	<comment></comment>
 	<projects>
 		<project>lib_lpc922</project>

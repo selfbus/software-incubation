@@ -6,7 +6,7 @@
  *  published by the Free Software Foundation.
  */
 
-#include "rmgira_conv.h"
+#include "rm_conv.h"
 
 /**
  * Einen Wert auf DPT 9.001 2 Byte Float Format wandeln

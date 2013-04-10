@@ -5,8 +5,8 @@
  *  it under the terms of the GNU General Public License version 2 as
  *  published by the Free Software Foundation.
  */
-#ifndef rmgira_conv_h
-#define rmgira_conv_h
+#ifndef rm_conv_h
+#define rm_conv_h
 
 //
 //  Funktionen für die Umwandlung von Datentypen
@@ -20,4 +20,4 @@
  */
 extern unsigned long conv_dpt_9_001(unsigned long val);
 
-#endif /*rmgira_conv_h*/
+#endif /*rm_conv_h*/

@@ -18,7 +18,7 @@
 
 
 #include <P89LPC922.h>
-#include "../lib_lpc922/fb_lpc922.h"
+#include <fb_lpc922.h>
 #include "rm_app.h"
 
 

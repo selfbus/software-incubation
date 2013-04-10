@@ -5,8 +5,8 @@
  *  it under the terms of the GNU General Public License version 2 as
  *  published by the Free Software Foundation.
  */
-#ifndef rmgira_app_h
-#define rmgira_app_h
+#ifndef rm_app_h
+#define rm_app_h
 
 /**
  * Den Zustand der Alarme bearbeiten.
@@ -35,4 +35,4 @@ extern void restart_app();
 extern unsigned char answerWait;
 
 
-#endif /*rmgira_app_h*/
+#endif /*rm_app_h*/

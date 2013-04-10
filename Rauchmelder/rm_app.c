@@ -6,25 +6,25 @@
  *  published by the Free Software Foundation.
  */
 
-#include "rmgira_app.h"
-#include "rmgira_const.h"
-#include "rmgira_com.h"
-#include "rmgira_conv.h"
-#include "rmgira_eeprom.h"
+#include "rm_app.h"
+#include "rm_const.h"
+#include "rm_com.h"
+#include "rm_conv.h"
+#include "rm_eeprom.h"
 
 #include <mcs51/P89LPC922.h>
 #include <fb_lpc922.h>
 
 
 // Befehle an den Rauchmelder
-const unsigned char giraCmdTab[GIRA_CMD_COUNT] =
+const unsigned char CmdTab[RM_CMD_COUNT] =
 {
-	0x04,   // GIRA_CMD_SERIAL
-	0x09,   // GIRA_CMD_OPERATING_TIME
-	0x0B,   // GIRA_CMD_SMOKEBOX
-	0x0C,   // GIRA_CMD_BATTEMP
-	0x0D,   // GIRA_CMD_NUM_ALARMS
-	0x0E	// GIRA_CMD_NUM_TEST_ALARMS
+	0x04,   // RM_CMD_SERIAL
+	0x09,   // RM_CMD_OPERATING_TIME
+	0x0B,   // RM_CMD_SMOKEBOX
+	0x0C,   // RM_CMD_BATTEMP
+	0x0D,   // RM_CMD_NUM_ALARMS
+	0x0E	// RM_CMD_NUM_TEST_ALARMS
 };
 
 
@@ -33,33 +33,33 @@ const unsigned char giraCmdTab[GIRA_CMD_COUNT] =
 // die ID vom Kommunikations-Objekt (objid).
 const struct
 {
-	unsigned const char cmd;       // Zu sendender GIRA_CMD Befehl
+	unsigned const char cmd;       // Zu sendender RM_CMD Befehl
 	unsigned const char offset;    // Byte-Offset in der Antwort
 	unsigned const char dataType;  // Datentyp der Antwort
 } objMappingTab[NUM_OBJS] =
 {
-	/* 0 OBJ_ALARM_BUS*/           { GIRA_CMD_INTERNAL,        0, GIRA_TYPE_NONE },
-	/* 1 OBJ_TALARM_BUS*/          { GIRA_CMD_INTERNAL,        0, GIRA_TYPE_NONE },
-	/* 2 OBJ_RESET_ALARM*/         { GIRA_CMD_INTERNAL,        0, GIRA_TYPE_NONE },
-	/* 3 OBJ_STAT_ALARM*/          { GIRA_CMD_INTERNAL,        0, GIRA_TYPE_NONE },
-	/* 4 OBJ_STAT_ALARM_DELAYED*/  { GIRA_CMD_INTERNAL,        0, GIRA_TYPE_NONE },
-	/* 5 OBJ_STAT_TALARM*/         { GIRA_CMD_INTERNAL,        0, GIRA_TYPE_NONE },
-	/* 6 OBJ_SERIAL*/              { GIRA_CMD_SERIAL,          0, GIRA_TYPE_LONG },
-	/* 7 OBJ_OPERATING_TIME*/      { GIRA_CMD_OPERATING_TIME,  0, GIRA_TYPE_QSEC },
-	/* 8 OBJ_SMOKEBOX_VALUE*/      { GIRA_CMD_SMOKEBOX,        0, GIRA_TYPE_INT  },
-	/* 9 OBJ_POLLUTION*/           { GIRA_CMD_SMOKEBOX,        3, GIRA_TYPE_BYTE },
-	/*10 OBJ_BAT_VOLTAGE*/         { GIRA_CMD_BATTEMP,         0, GIRA_TYPE_VOLT },
-	/*11 OBJ_TEMP*/                { GIRA_CMD_BATTEMP,         2, GIRA_TYPE_TEMP },
-	/*12 OBJ_ERRCODE*/             { GIRA_CMD_INTERNAL,        0, GIRA_TYPE_NONE },
-	/*13 OBJ_BAT_LOW*/             { GIRA_CMD_INTERNAL,        0, GIRA_TYPE_NONE },
-	/*14 OBJ_MALFUNCTION*/         { GIRA_CMD_INTERNAL,        0, GIRA_TYPE_NONE },
-	/*15 OBJ_CNT_SMOKEALARM*/      { GIRA_CMD_SMOKEBOX,        2, GIRA_TYPE_BYTE },
-	/*16 OBJ_CNT_TEMPALARM*/       { GIRA_CMD_NUM_ALARMS,      0, GIRA_TYPE_BYTE },
-	/*17 OBJ_CNT_TESTALARM*/       { GIRA_CMD_NUM_ALARMS,      1, GIRA_TYPE_BYTE },
-	/*18 OBJ_CNT_ALARM_WIRE*/      { GIRA_CMD_NUM_ALARMS,      2, GIRA_TYPE_BYTE },
-	/*19 OBJ_CNT_ALARM_BUS*/	   { GIRA_CMD_NUM_ALARMS,      3, GIRA_TYPE_BYTE },
-	/*20 OBJ_CNT_TALARM_WIRE*/     { GIRA_CMD_NUM_ALARMS_2,    0, GIRA_TYPE_BYTE },
-	/*21 OBJ_CNT_TALARM_BUS*/	   { GIRA_CMD_NUM_ALARMS_2,    1, GIRA_TYPE_BYTE }
+	/* 0 OBJ_ALARM_BUS*/           { RM_CMD_INTERNAL,        0, RM_TYPE_NONE },
+	/* 1 OBJ_TALARM_BUS*/          { RM_CMD_INTERNAL,        0, RM_TYPE_NONE },
+	/* 2 OBJ_RESET_ALARM*/         { RM_CMD_INTERNAL,        0, RM_TYPE_NONE },
+	/* 3 OBJ_STAT_ALARM*/          { RM_CMD_INTERNAL,        0, RM_TYPE_NONE },
+	/* 4 OBJ_STAT_ALARM_DELAYED*/  { RM_CMD_INTERNAL,        0, RM_TYPE_NONE },
+	/* 5 OBJ_STAT_TALARM*/         { RM_CMD_INTERNAL,        0, RM_TYPE_NONE },
+	/* 6 OBJ_SERIAL*/              { RM_CMD_SERIAL,          0, RM_TYPE_LONG },
+	/* 7 OBJ_OPERATING_TIME*/      { RM_CMD_OPERATING_TIME,  0, RM_TYPE_QSEC },
+	/* 8 OBJ_SMOKEBOX_VALUE*/      { RM_CMD_SMOKEBOX,        0, RM_TYPE_INT  },
+	/* 9 OBJ_POLLUTION*/           { RM_CMD_SMOKEBOX,        3, RM_TYPE_BYTE },
+	/*10 OBJ_BAT_VOLTAGE*/         { RM_CMD_BATTEMP,         0, RM_TYPE_VOLT },
+	/*11 OBJ_TEMP*/                { RM_CMD_BATTEMP,         2, RM_TYPE_TEMP },
+	/*12 OBJ_ERRCODE*/             { RM_CMD_INTERNAL,        0, RM_TYPE_NONE },
+	/*13 OBJ_BAT_LOW*/             { RM_CMD_INTERNAL,        0, RM_TYPE_NONE },
+	/*14 OBJ_MALFUNCTION*/         { RM_CMD_INTERNAL,        0, RM_TYPE_NONE },
+	/*15 OBJ_CNT_SMOKEALARM*/      { RM_CMD_SMOKEBOX,        2, RM_TYPE_BYTE },
+	/*16 OBJ_CNT_TEMPALARM*/       { RM_CMD_NUM_ALARMS,      0, RM_TYPE_BYTE },
+	/*17 OBJ_CNT_TESTALARM*/       { RM_CMD_NUM_ALARMS,      1, RM_TYPE_BYTE },
+	/*18 OBJ_CNT_ALARM_WIRE*/      { RM_CMD_NUM_ALARMS,      2, RM_TYPE_BYTE },
+	/*19 OBJ_CNT_ALARM_BUS*/	   { RM_CMD_NUM_ALARMS,      3, RM_TYPE_BYTE },
+	/*20 OBJ_CNT_TALARM_WIRE*/     { RM_CMD_NUM_ALARMS_2,    0, RM_TYPE_BYTE },
+	/*21 OBJ_CNT_TALARM_BUS*/	   { RM_CMD_NUM_ALARMS_2,    1, RM_TYPE_BYTE }
 };
 
 
@@ -94,12 +94,12 @@ unsigned char objReadReqFlags[NUM_OBJ_FLAG_BYTES];
 // Flags für Com-Objekte senden
 unsigned char objSendReqFlags[NUM_OBJ_FLAG_BYTES];
 
-// Werte der Com-Objekte. Index ist die der GIRA_CMD
-unsigned long objValues[GIRA_CMD_COUNT];
+// Werte der Com-Objekte. Index ist die der RM_CMD
+unsigned long objValues[RM_CMD_COUNT];
 
 
 // Nummer des Befehls an den Rauchmelder der gerade ausgeführt wird.
-// GIRA_CMD_NONE wenn keiner.  So lange ein GIRA_CMD ausgeführt wird darf auf
+// RM_CMD_NONE wenn keiner.  So lange ein RM_CMD ausgeführt wird darf auf
 // objValues[cmdCurrent] nicht zugegriffen werden. Es muss stattdessen objOldValue
 // verwendet werden.
 unsigned char cmdCurrent;
@@ -218,9 +218,9 @@ void set_errcode(unsigned char newErrCode)
 
 /**
  * Die empfangene Nachricht vom Rauchmelder verarbeiten.
- * Wird von gira_receive() aufgerufen.
+ * Wird von _receive() aufgerufen.
  */
-void gira_process_msg(unsigned char* bytes, unsigned char len)
+void _process_msg(unsigned char* bytes, unsigned char len)
 {
 	unsigned char objno, cmd, msgType;
 	unsigned char byteno, mask;
@@ -237,18 +237,18 @@ void gira_process_msg(unsigned char* bytes, unsigned char len)
 	{
 		msgType &= 0x0f;
 
-		for (cmd = 0; cmd < GIRA_CMD_COUNT; ++cmd)
+		for (cmd = 0; cmd < RM_CMD_COUNT; ++cmd)
 		{
-			if (giraCmdTab[cmd] == msgType)
+			if (CmdTab[cmd] == msgType)
 				break;
 		}
 
-		if (cmd < GIRA_CMD_COUNT)
+		if (cmd < RM_CMD_COUNT)
 		{
 			objValueCurrent = objValues[cmd];
 			cmdCurrent = cmd;
 			objValues[cmd] = *(unsigned long*)(bytes + 1);
-			cmdCurrent = GIRA_CMD_NONE;
+			cmdCurrent = RM_CMD_NONE;
 
 			// Versand der erhaltenen Com-Objekte einleiten. Dazu alle Com-Objekte suchen
 			// auf die die empfangenen Daten passen und diese senden. Sofern sie für
@@ -411,7 +411,7 @@ unsigned long read_obj_value(unsigned char objno)
 //	//DEBUG_WRITE_BYTE(eeprom[eeprom[COMMSTABPTR]+objno*3+4]); // objtype
 
 	// Interne Com-Objekte behandeln
-	if (cmd == GIRA_CMD_INTERNAL)
+	if (cmd == RM_CMD_INTERNAL)
 	{
 		switch (objno)
 		{
@@ -437,7 +437,7 @@ unsigned long read_obj_value(unsigned char objno)
 		}
 	}
 	// Com-Objekte verarbeiten die Werte vom Rauchmelder darstellen
-	else if (cmd != GIRA_CMD_NONE)
+	else if (cmd != RM_CMD_NONE)
 	{
 		unsigned long lval;
 		unsigned char* answer;
@@ -448,25 +448,25 @@ unsigned long read_obj_value(unsigned char objno)
 
 		switch (objMappingTab[objno].dataType)
 		{
-		case GIRA_TYPE_BYTE:
+		case RM_TYPE_BYTE:
 			return *answer;
 
-		case GIRA_TYPE_LONG:
+		case RM_TYPE_LONG:
 			return answer_to_long(answer);
 
-		case GIRA_TYPE_QSEC:
+		case RM_TYPE_QSEC:
 			return answer_to_long(answer) >> 2;
 
-		case GIRA_TYPE_INT:
+		case RM_TYPE_INT:
 			return answer_to_int(answer);
 
-		case GIRA_TYPE_TEMP:
+		case RM_TYPE_TEMP:
 			lval = answer[0] > answer[1] ? answer[0] : answer[1];
 			lval *= 50;
 			lval -= 2000;
 			return conv_dpt_9_001(lval);
 
-		case GIRA_TYPE_VOLT:
+		case RM_TYPE_VOLT:
 			lval = answer_to_int(answer);
 			lval *= 9184;
 			lval /= 5000;
@@ -569,7 +569,7 @@ void process_obj(unsigned char objno)
 {
 	unsigned char cmd = objMappingTab[objno].cmd;
 
-	if (cmd == GIRA_CMD_NONE || cmd == GIRA_CMD_INTERNAL)
+	if (cmd == RM_CMD_NONE || cmd == RM_CMD_INTERNAL)
 	{
 		// Der Wert des Com-Objekts ist bekannt, also sofort senden
 
@@ -590,10 +590,10 @@ void process_obj(unsigned char objno)
 	else
 	{
 		// Den Wert des Com-Objekts vom Rauchmelder anfordern. Der Versand erfolgt
-		// wenn die Antwort vom Rauchmelder erhalten wurde, in gira_process_msg().
+		// wenn die Antwort vom Rauchmelder erhalten wurde, in _process_msg().
 		if (recvCount < 0)
 		{
-			gira_send_cmd(giraCmdTab[cmd]);
+			_send_cmd(CmdTab[cmd]);
 			answerWait = INITIAL_ANSWER_WAIT;
 		}
 	}
@@ -618,7 +618,7 @@ void process_objs()
 		if ((objReadReqFlags[byteno] & mask) || (objSendReqFlags[byteno] & mask))
 		{
 			unsigned char cmd = objMappingTab[objno].cmd;
-			if (!answerWait || cmd == GIRA_CMD_NONE || cmd == GIRA_CMD_INTERNAL)
+			if (!answerWait || cmd == RM_CMD_NONE || cmd == RM_CMD_INTERNAL)
 			{
 				process_obj(objno);
 				break;
@@ -638,19 +638,19 @@ void process_alarm_stats()
 	if (setAlarmBus && !alarmBus)
 	{
 		// Alarm auslösen
-		gira_send_hexstr("030210");
+		_send_hexstr("030210");
 		answerWait = INITIAL_ANSWER_WAIT;
 	}
 	else if (setTestAlarmBus && !testAlarmBus)
 	{
 		// Testalarm auslösen
-		gira_send_hexstr("030280");
+		_send_hexstr("030280");
 		answerWait = INITIAL_ANSWER_WAIT;
 	}
 	else if ((!setAlarmBus && alarmBus) || (!setTestAlarmBus && testAlarmBus))
 	{
 		// Alarm und Testalarm beenden
-		gira_send_hexstr("030200");
+		_send_hexstr("030200");
 		answerWait = INITIAL_ANSWER_WAIT;
 	}
 }
@@ -782,7 +782,7 @@ void restart_app()
 //	P1M2 |= (1 << 2);
 //	P1 |= (1 << 2);	  // P1.2 high
 
-	gira_init();
+	_init();
 
 	RTCH = 0x70;	// Reload Real Time Clock (1s = 0xE100; 0,5s = 0x7080; 0,25s = 0x3840)
 	RTCL = 0x80;	// (RTC ist ein down-counter mit 128 bit prescaler und osc-clock)
@@ -798,7 +798,7 @@ void restart_app()
 
 	answerWait = 0;
 	noAnswerCount = 0;
-	cmdCurrent = GIRA_CMD_NONE;
+	cmdCurrent = RM_CMD_NONE;
 	recvCount = -1;
 	halfSeconds = eeprom[ADDRTAB + 2] & 127;
 
@@ -846,8 +846,8 @@ void restart_app()
 	WFEED2 = 0x5A;
 	EA = 1;
 
-	gira_send_byte(ACK);
-	gira_send_byte(ACK);
+	_send_byte(ACK);
+	_send_byte(ACK);
 
 	// TODO Alarm-Status vom Rauchmelder abfragen
 }

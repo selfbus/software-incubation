@@ -5,8 +5,8 @@
  *  it under the terms of the GNU General Public License version 2 as
  *  published by the Free Software Foundation.
  */
-#ifndef rmgira_const_h
-#define rmgira_const_h
+#ifndef rm_const_h
+#define rm_const_h
 
 // Damit die Eclipse Code Analyse nicht so viele Warnungen anzeigt:
 #ifndef SDCC
@@ -128,31 +128,31 @@
 //-----------------------------------------------------------------------------
 
 // Gira Command: Seriennummer abfragen
-#define GIRA_CMD_SERIAL  0
+#define RM_CMD_SERIAL  0
 
 // Gira Command: Betriebszeit abfragen
-#define GIRA_CMD_OPERATING_TIME  1
+#define RM_CMD_OPERATING_TIME  1
 
 // Gira Command: Rauchkammer Daten abfragen
-#define GIRA_CMD_SMOKEBOX 2
+#define RM_CMD_SMOKEBOX 2
 
 // Gira Command: Batteriespannung und Temperaturen
-#define GIRA_CMD_BATTEMP  3
+#define RM_CMD_BATTEMP  3
 
 // Gira Command: Anzahl der Alarme #1 abfragen
-#define GIRA_CMD_NUM_ALARMS  4
+#define RM_CMD_NUM_ALARMS  4
 
 // Gira Command: Anzahl der Alarme #2 abfragen
-#define GIRA_CMD_NUM_ALARMS_2  5
+#define RM_CMD_NUM_ALARMS_2  5
 
 // Anzahl der Gira Commands
-#define GIRA_CMD_COUNT  6
+#define RM_CMD_COUNT  6
 
 // Gira Command: intern behandelt, kein Befehl an den Rauchmelder
-#define GIRA_CMD_INTERNAL 14
+#define RM_CMD_INTERNAL 14
 
 // Gira Command: kein Befehl
-#define GIRA_CMD_NONE  15
+#define RM_CMD_NONE  15
 
 
 //-----------------------------------------------------------------------------
@@ -160,25 +160,25 @@
 //-----------------------------------------------------------------------------
 
 // Rauchmelder Antwort: 4 Byte Zahl
-#define GIRA_TYPE_LONG 1
+#define RM_TYPE_LONG 1
 
 // Rauchmelder Antwort: 2 Byte Zahl
-#define GIRA_TYPE_INT  2
+#define RM_TYPE_INT  2
 
 // Rauchmelder Antwort: 1 Byte Zahl
-#define GIRA_TYPE_BYTE 3
+#define RM_TYPE_BYTE 3
 
 // Rauchmelder Antwort: 1 Byte Temperatur
-#define GIRA_TYPE_TEMP 4
+#define RM_TYPE_TEMP 4
 
 // Rauchmelder Antwort: 2 Byte Spannung
-#define GIRA_TYPE_VOLT 5
+#define RM_TYPE_VOLT 5
 
 // Rauchmelder Antwort: 4 Byte 1/4 Sekunden
-#define GIRA_TYPE_QSEC 6
+#define RM_TYPE_QSEC 6
 
 // Rauchmelder Antwort: Kein Typ
-#define GIRA_TYPE_NONE 127
+#define RM_TYPE_NONE 127
 
 
 //-----------------------------------------------------------------------------
@@ -198,4 +198,4 @@
 #define NAK	 	0x15
 
 
-#endif /*rmgira_const_h*/
+#endif /*rm_const_h*/
