@@ -1,7 +1,7 @@
                               1 ;--------------------------------------------------------
                               2 ; File Created by SDCC : free open source ANSI-C Compiler
                               3 ; Version 3.1.0 #7066 (Nov 22 2011) (MINGW32)
-                              4 ; This file was generated Mon Nov 19 19:58:42 2012
+                              4 ; This file was generated Sun Apr 14 11:31:36 2013
                               5 ;--------------------------------------------------------
                               6 	.module fb_app_rollo10
                               7 	.optsdcc -mmcs51 --model-small
@@ -1145,7 +1145,7 @@
    0265 74 09              1145 	mov	a,#0x09
    0267 2E                 1146 	add	a,r6
    0268 F5 82              1147 	mov	dpl,a
-   026A 12s0Ar3B           1148 	lcall	_set_entriegeln
+   026A 12s0Ar37           1148 	lcall	_set_entriegeln
    026D                    1149 00106$:
                     026D   1150 	C$fb_app_rollo10.c$285$1$1 ==.
                            1151 ;	..\fb_app_rollo10.c:285: zuordnung=eeprom[0xF1] & zfstate;//in zuordnung jetzt eine 1 für jede sicherheit 
@@ -1510,7 +1510,7 @@
    0410 C0 07              1510 	push	ar7
    0412 C0 06              1511 	push	ar6
    0414 8F 82              1512 	mov	dpl,r7
-   0416 12s09rDE           1513 	lcall	_set_pause
+   0416 12s09rDA           1513 	lcall	_set_pause
    0419 15 81              1514 	dec	sp
    041B D0 07              1515 	pop	ar7
                     041D   1516 	C$fb_app_rollo10.c$349$5$5 ==.
@@ -1610,7 +1610,7 @@
    0485 C0 03              1610 	push	ar3
    0487 C0 06              1611 	push	ar6
    0489 8F 82              1612 	mov	dpl,r7
-   048B 12s09rDE           1613 	lcall	_set_pause
+   048B 12s09rDA           1613 	lcall	_set_pause
    048E 15 81              1614 	dec	sp
    0490 D0 03              1615 	pop	ar3
    0492 D0 04              1616 	pop	ar4
@@ -1888,7 +1888,7 @@
    05BE 74 05              1888 	mov	a,#0x05
    05C0 C0 E0              1889 	push	acc
    05C2 8F 82              1890 	mov	dpl,r7
-   05C4 12s09rDE           1891 	lcall	_set_pause
+   05C4 12s09rDA           1891 	lcall	_set_pause
    05C7 15 81              1892 	dec	sp
    05C9 D0 02              1893 	pop	ar2
    05CB D0 04              1894 	pop	ar4
@@ -2069,7 +2069,7 @@
    0682 74 06              2069 	mov	a,#0x06
    0684 C0 E0              2070 	push	acc
    0686 8F 82              2071 	mov	dpl,r7
-   0688 12s09rDE           2072 	lcall	_set_pause
+   0688 12s09rDA           2072 	lcall	_set_pause
    068B 15 81              2073 	dec	sp
    068D D0 03              2074 	pop	ar3
    068F D0 04              2075 	pop	ar4
@@ -2236,7 +2236,7 @@
                            2236 ;------------------------------------------------------------
                     0730   2237 	G$delay_timer$0$0 ==.
                     0730   2238 	C$fb_app_rollo10.c$516$2$1 ==.
-                           2239 ;	..\fb_app_rollo10.c:516: void delay_timer(void)	// zählt alle 65ms die Variable Timer hoch und prüft Queue
+                           2239 ;	..\fb_app_rollo10.c:516: void delay_timer(void)	// zählt alle 8 ms die Variable Timer hoch und prüft Queue
                            2240 ;	-----------------------------------------
                            2241 ;	 function delay_timer
                            2242 ;	-----------------------------------------
@@ -2409,7 +2409,7 @@
    07EB C0 06              2409 	push	ar6
    07ED C0 06              2410 	push	ar6
    07EF 8F 82              2411 	mov	dpl,r7
-   07F1 12s09rDE           2412 	lcall	_set_pause
+   07F1 12s09rDA           2412 	lcall	_set_pause
    07F4 15 81              2413 	dec	sp
    07F6 D0 06              2414 	pop	ar6
    07F8 D0 07              2415 	pop	ar7
@@ -2520,7 +2520,7 @@
    0879                    2520 00196$:
    0879 40 18              2521 	jc	00130$
                     087B   2522 	C$fb_app_rollo10.c$582$5$15 ==.
-                           2523 ;	..\fb_app_rollo10.c:582: if (delay_state == 0x12) timerstate[15]=0x22; // wenn ziel 2 erreicht in delrec sichern
+                           2523 ;	..\fb_app_rollo10.c:582: if (delay_state == 0x12) timerstate[15]=0x22; // wenn ziel 2 erreicht,  sichern
    087B BE 12 03           2524 	cjne	r6,#0x12,00124$
    087E 75*1F 22           2525 	mov	(_timerstate + 0x000f),#0x22
    0881                    2526 00124$:
@@ -2534,11 +2534,11 @@
                            2534 ;	..\fb_app_rollo10.c:585: timerstate[15]=0x12;
    0887 75*1F 12           2535 	mov	(_timerstate + 0x000f),#0x12
                     088A   2536 	C$fb_app_rollo10.c$586$6$16 ==.
-                           2537 ;	..\fb_app_rollo10.c:586: timercnt[15]= 20;// wenn ziel 1 erreicht in delrec sichern und restzeit fuer ziel 2 schreiben
+                           2537 ;	..\fb_app_rollo10.c:586: timercnt[15]= 20;// wenn ziel 1 erreicht , sichern und restzeit fuer ziel 2 schreiben
    088A 75*0F 14           2538 	mov	(_timercnt + 0x000f),#0x14
    088D                    2539 00126$:
                     088D   2540 	C$fb_app_rollo10.c$589$5$15 ==.
-                           2541 ;	..\fb_app_rollo10.c:589: if (delay_state == 0x04) timerstate[15]= 0x08;// wenn ziel erreicht in delrec sichern
+                           2541 ;	..\fb_app_rollo10.c:589: if (delay_state == 0x04) timerstate[15]= 0x08;// wenn ziel erreicht , sichern
    088D BE 04 03           2542 	cjne	r6,#0x04,00130$
    0890 75*1F 08           2543 	mov	(_timerstate + 0x000f),#0x08
    0893                    2544 00130$:
@@ -2586,884 +2586,877 @@
    08A7 74 0F              2586 	mov	a,#0x0F
    08A9 55 89              2587 	anl	a,_TMOD
    08AB FF                 2588 	mov	r7,a
-   08AC BF 02 02           2589 	cjne	r7,#0x02,00158$
-   08AF 80 03              2590 	sjmp	00159$
-   08B1                    2591 00158$:
-   08B1 02s09rB2           2592 	ljmp	00137$
-   08B4                    2593 00159$:
+   08AC BF 02 02           2589 	cjne	r7,#0x02,00157$
+   08AF 80 03              2590 	sjmp	00158$
+   08B1                    2591 00157$:
+   08B1 02s09rAE           2592 	ljmp	00137$
+   08B4                    2593 00158$:
    08B4 E5*00              2594 	mov	a,_fb_state
-   08B6 60 03              2595 	jz	00160$
-   08B8 02s09rB2           2596 	ljmp	00137$
-   08BB                    2597 00160$:
-                    08BB   2598 	C$fb_app_rollo10.c$697$2$2 ==.
-                           2599 ;	..\fb_app_rollo10.c:697: ET1=0;	
-   08BB C2 AB              2600 	clr	_IEN0_3
-                    08BD   2601 	C$fb_app_rollo10.c$698$2$2 ==.
-                           2602 ;	..\fb_app_rollo10.c:698: while(  (!PWM || (TL0>0x72)));// PWM scannen um "Hand"-Tasten abzufragen
-   08BD                    2603 00102$:
-   08BD 30 92 FD           2604 	jnb	_P1_2,00102$
-   08C0 E5 8A              2605 	mov	a,_TL0
-   08C2 24 8D              2606 	add	a,#0xff - 0x72
-   08C4 40 F7              2607 	jc	00102$
-                    08C6   2608 	C$fb_app_rollo10.c$717$2$2 ==.
-                           2609 ;	..\fb_app_rollo10.c:717: key_pattern=(0x01<<(delay_toggle&0x07));
-   08C6 74 07              2610 	mov	a,#0x07
-   08C8 55 09              2611 	anl	a,_delay_toggle
-   08CA FF                 2612 	mov	r7,a
-   08CB 8F F0              2613 	mov	b,r7
-   08CD 05 F0              2614 	inc	b
-   08CF 74 01              2615 	mov	a,#0x01
-   08D1 80 02              2616 	sjmp	00165$
-   08D3                    2617 00163$:
-   08D3 25 E0              2618 	add	a,acc
-   08D5                    2619 00165$:
-   08D5 D5 F0 FB           2620 	djnz	b,00163$
-                    08D8   2621 	C$fb_app_rollo10.c$718$2$2 ==.
-                           2622 ;	..\fb_app_rollo10.c:718: P0 = ~key_pattern;
-   08D8 FF                 2623 	mov	r7,a
-   08D9 F4                 2624 	cpl	a
-   08DA F5 80              2625 	mov	_P0,a
-                    08DC   2626 	C$fb_app_rollo10.c$719$2$2 ==.
-                           2627 ;	..\fb_app_rollo10.c:719: if (!P1_3){
-   08DC 20 93 0C           2628 	jb	_P1_3,00108$
-                    08DF   2629 	C$fb_app_rollo10.c$720$3$3 ==.
-                           2630 ;	..\fb_app_rollo10.c:720: if(!ledport) ledport=0x08+(delay_toggle&0x07);
-   08DF E5*28              2631 	mov	a,_ledport
-   08E1 70 08              2632 	jnz	00108$
-   08E3 74 07              2633 	mov	a,#0x07
-   08E5 55 09              2634 	anl	a,_delay_toggle
-   08E7 24 08              2635 	add	a,#0x08
-   08E9 F5*28              2636 	mov	_ledport,a
-   08EB                    2637 00108$:
-                    08EB   2638 	C$fb_app_rollo10.c$722$2$2 ==.
-                           2639 ;	..\fb_app_rollo10.c:722: P0=oldportbuffer; 
-   08EB 85 0E 80           2640 	mov	_P0,_oldportbuffer
-                    08EE   2641 	C$fb_app_rollo10.c$725$2$2 ==.
-                           2642 ;	..\fb_app_rollo10.c:725: if (key_pattern==0x80){
-   08EE BF 80 02           2643 	cjne	r7,#0x80,00168$
-   08F1 80 03              2644 	sjmp	00169$
-   08F3                    2645 00168$:
-   08F3 02s09rB2           2646 	ljmp	00137$
-   08F6                    2647 00169$:
-                    08F6   2648 	C$fb_app_rollo10.c$726$3$4 ==.
-                           2649 ;	..\fb_app_rollo10.c:726: Tasten=ledport;
-   08F6 AF*28              2650 	mov	r7,_ledport
-                    08F8   2651 	C$fb_app_rollo10.c$727$3$4 ==.
-                           2652 ;	..\fb_app_rollo10.c:727: ledport=0;
-   08F8 75*28 00           2653 	mov	_ledport,#0x00
-                    08FB   2654 	C$fb_app_rollo10.c$731$3$4 ==.
-                           2655 ;	..\fb_app_rollo10.c:731: if (Tasten & 0x08 ){
-   08FB EF                 2656 	mov	a,r7
-   08FC 30 E3 13           2657 	jnb	acc.3,00124$
-                    08FF   2658 	C$fb_app_rollo10.c$732$4$5 ==.
-                           2659 ;	..\fb_app_rollo10.c:732: if (!Tval ){// steigende Flanke des Tasters 
-   08FF E5*20              2660 	mov	a,_Tval
-   0901 60 03              2661 	jz	00171$
-   0903 02s09r9B           2662 	ljmp	00125$
-   0906                    2663 00171$:
-                    0906   2664 	C$fb_app_rollo10.c$735$5$6 ==.
-                           2665 ;	..\fb_app_rollo10.c:735: timerstate[15]=0x01;
-   0906 75*1F 01           2666 	mov	(_timerstate + 0x000f),#0x01
-                    0909   2667 	C$fb_app_rollo10.c$736$5$6 ==.
-                           2668 ;	..\fb_app_rollo10.c:736: timerbase[15]=0x80 + 2;
-   0909 75 1F 82           2669 	mov	(_timerbase + 0x000f),#0x82
-                    090C   2670 	C$fb_app_rollo10.c$737$5$6 ==.
-                           2671 ;	..\fb_app_rollo10.c:737: timercnt[15]= 50;
-   090C 75*0F 32           2672 	mov	(_timercnt + 0x000f),#0x32
-   090F 02s09r9B           2673 	ljmp	00125$
-   0912                    2674 00124$:
-                    0912   2675 	C$fb_app_rollo10.c$741$4$7 ==.
-                           2676 ;	..\fb_app_rollo10.c:741: if ( Tval & 0x08){ // wenn tasten >7 und Tval <=7 also taste losgelassen...
-   0912 E5*20              2677 	mov	a,_Tval
-   0914 20 E3 03           2678 	jb	acc.3,00172$
-   0917 02s09r9B           2679 	ljmp	00125$
-   091A                    2680 00172$:
-                    091A   2681 	C$fb_app_rollo10.c$742$5$8 ==.
-                           2682 ;	..\fb_app_rollo10.c:742: if (timerstate[15]&0x20){
-   091A E5*1F              2683 	mov	a,(_timerstate + 0x000f)
-   091C 30 E5 29           2684 	jnb	acc.5,00115$
-                    091F   2685 	C$fb_app_rollo10.c$743$6$9 ==.
-                           2686 ;	..\fb_app_rollo10.c:743: handmode = !handmode;
-   091F B2*02              2687 	cpl	_handmode
-                    0921   2688 	C$fb_app_rollo10.c$744$6$9 ==.
-                           2689 ;	..\fb_app_rollo10.c:744: timerbase[15]=0;
-   0921 75 1F 00           2690 	mov	(_timerbase + 0x000f),#0x00
-                    0924   2691 	C$fb_app_rollo10.c$745$6$9 ==.
-                           2692 ;	..\fb_app_rollo10.c:745: timerstate[15]=0;
-   0924 75*1F 00           2693 	mov	(_timerstate + 0x000f),#0x00
-                    0927   2694 	C$fb_app_rollo10.c$746$6$9 ==.
-                           2695 ;	..\fb_app_rollo10.c:746: timercnt[15]=0;
-   0927 75*0F 00           2696 	mov	(_timercnt + 0x000f),#0x00
-                    092A   2697 	C$fb_app_rollo10.c$747$6$9 ==.
-                           2698 ;	..\fb_app_rollo10.c:747: if (handmode){
-   092A 30*02 14           2699 	jnb	_handmode,00112$
-                    092D   2700 	C$fb_app_rollo10.c$748$7$10 ==.
-                           2701 ;	..\fb_app_rollo10.c:748: for(n=0;n<=3;n++) kanal[n]=0x00;
-   092D 7E 00              2702 	mov	r6,#0x00
-   092F                    2703 00133$:
-   092F EE                 2704 	mov	a,r6
-   0930 24 FC              2705 	add	a,#0xff - 0x03
-   0932 40 09              2706 	jc	00136$
-   0934 EE                 2707 	mov	a,r6
-   0935 24r23              2708 	add	a,#_kanal
-   0937 F8                 2709 	mov	r0,a
-   0938 76 00              2710 	mov	@r0,#0x00
-   093A 0E                 2711 	inc	r6
-   093B 80 F2              2712 	sjmp	00133$
-   093D                    2713 00136$:
-                    093D   2714 	C$fb_app_rollo10.c$749$7$10 ==.
-                           2715 ;	..\fb_app_rollo10.c:749: portchanged=1;
-   093D D2*00              2716 	setb	_portchanged
-   093F 80 07              2717 	sjmp	00115$
-   0941                    2718 00112$:
-                    0941   2719 	C$fb_app_rollo10.c$752$7$11 ==.
-                           2720 ;	..\fb_app_rollo10.c:752: sobj_update();
-   0941 C0 07              2721 	push	ar7
-   0943 12s09rB3           2722 	lcall	_sobj_update
-   0946 D0 07              2723 	pop	ar7
-   0948                    2724 00115$:
-                    0948   2725 	C$fb_app_rollo10.c$755$5$8 ==.
-                           2726 ;	..\fb_app_rollo10.c:755: if (handmode){// wenn handmode aktiv...
-   0948 30*02 47           2727 	jnb	_handmode,00120$
-                    094B   2728 	C$fb_app_rollo10.c$756$6$12 ==.
-                           2729 ;	..\fb_app_rollo10.c:756: if (timerstate[15]&0x02){// status der zeit=2 also abgelaufen..
-   094B E5*1F              2730 	mov	a,(_timerstate + 0x000f)
-   094D 30 E1 22           2731 	jnb	acc.1,00117$
-                    0950   2732 	C$fb_app_rollo10.c$757$7$13 ==.
-                           2733 ;	..\fb_app_rollo10.c:757: object_schalten(((Tval&0x07)>>1)+12,(Tval&0x01==0x01));
-   0950 E5*20              2734 	mov	a,_Tval
-   0952 54 01              2735 	anl	a,#0x01
-   0954 24 FF              2736 	add	a,#0xff
-   0956 92*00              2737 	mov	b0,c
-   0958 74 07              2738 	mov	a,#0x07
-   095A 55*20              2739 	anl	a,_Tval
-   095C C3                 2740 	clr	c
-   095D 13                 2741 	rrc	a
-   095E 24 0C              2742 	add	a,#0x0C
-   0960 F5 82              2743 	mov	dpl,a
-   0962 A2*00              2744 	mov	c,b0
-   0964 92 F0              2745 	mov	b[0],c
-   0966 C0 07              2746 	push	ar7
-   0968 85 F0*00           2747 	mov	bits,b
-   096B 12s03r26           2748 	lcall	_object_schalten
-   096E D0 07              2749 	pop	ar7
-   0970 80 20              2750 	sjmp	00120$
-   0972                    2751 00117$:
-                    0972   2752 	C$fb_app_rollo10.c$760$7$14 ==.
-                           2753 ;	..\fb_app_rollo10.c:760: object_schalten(((Tval&0x07)>>1)+8,(Tval&0x01==0x01));
-   0972 E5*20              2754 	mov	a,_Tval
-   0974 54 01              2755 	anl	a,#0x01
-   0976 24 FF              2756 	add	a,#0xff
-   0978 92*00              2757 	mov	b0,c
-   097A 74 07              2758 	mov	a,#0x07
-   097C 55*20              2759 	anl	a,_Tval
-   097E C3                 2760 	clr	c
-   097F 13                 2761 	rrc	a
-   0980 24 08              2762 	add	a,#0x08
-   0982 F5 82              2763 	mov	dpl,a
-   0984 A2*00              2764 	mov	c,b0
-   0986 92 F0              2765 	mov	b[0],c
-   0988 C0 07              2766 	push	ar7
-   098A 85 F0*00           2767 	mov	bits,b
-   098D 12s03r26           2768 	lcall	_object_schalten
-   0990 D0 07              2769 	pop	ar7
-   0992                    2770 00120$:
-                    0992   2771 	C$fb_app_rollo10.c$764$5$8 ==.
-                           2772 ;	..\fb_app_rollo10.c:764: timerbase[15]=0x80 + 3;//130ms
-   0992 75 1F 83           2773 	mov	(_timerbase + 0x000f),#0x83
-                    0995   2774 	C$fb_app_rollo10.c$765$5$8 ==.
-                           2775 ;	..\fb_app_rollo10.c:765: timerstate[15]=0x04;
-   0995 75*1F 04           2776 	mov	(_timerstate + 0x000f),#0x04
-                    0998   2777 	C$fb_app_rollo10.c$766$5$8 ==.
-                           2778 ;	..\fb_app_rollo10.c:766: timercnt[15]=116;//=15 Sekunden
-   0998 75*0F 74           2779 	mov	(_timercnt + 0x000f),#0x74
-   099B                    2780 00125$:
-                    099B   2781 	C$fb_app_rollo10.c$769$3$4 ==.
-                           2782 ;	..\fb_app_rollo10.c:769: Tval=Tasten;
-   099B 8F*20              2783 	mov	_Tval,r7
-                    099D   2784 	C$fb_app_rollo10.c$771$3$4 ==.
-                           2785 ;	..\fb_app_rollo10.c:771: if(timerstate[15]&0x08){
-   099D E5*1F              2786 	mov	a,(_timerstate + 0x000f)
-   099F 30 E3 0E           2787 	jnb	acc.3,00127$
-                    09A2   2788 	C$fb_app_rollo10.c$772$4$15 ==.
-                           2789 ;	..\fb_app_rollo10.c:772: handmode=0;//handmode automatisch ausschalten
-   09A2 C2*02              2790 	clr	_handmode
-                    09A4   2791 	C$fb_app_rollo10.c$774$4$15 ==.
-                           2792 ;	..\fb_app_rollo10.c:774: timerbase[15]=0;
-   09A4 75 1F 00           2793 	mov	(_timerbase + 0x000f),#0x00
-                    09A7   2794 	C$fb_app_rollo10.c$775$4$15 ==.
-                           2795 ;	..\fb_app_rollo10.c:775: timerstate[15]=0;
-   09A7 75*1F 00           2796 	mov	(_timerstate + 0x000f),#0x00
-                    09AA   2797 	C$fb_app_rollo10.c$776$4$15 ==.
-                           2798 ;	..\fb_app_rollo10.c:776: timercnt[15]=0;
-   09AA 75*0F 00           2799 	mov	(_timercnt + 0x000f),#0x00
-                    09AD   2800 	C$fb_app_rollo10.c$777$4$15 ==.
-                           2801 ;	..\fb_app_rollo10.c:777: sobj_update();
-   09AD 12s09rB3           2802 	lcall	_sobj_update
-   09B0                    2803 00127$:
-                    09B0   2804 	C$fb_app_rollo10.c$779$3$4 ==.
-                           2805 ;	..\fb_app_rollo10.c:779: ET1=1;
-   09B0 D2 AB              2806 	setb	_IEN0_3
-   09B2                    2807 00137$:
-                    09B2   2808 	C$fb_app_rollo10.c$782$1$1 ==.
-                    09B2   2809 	XG$handsteuerung$0$0 ==.
-   09B2 22                 2810 	ret
-                           2811 ;------------------------------------------------------------
-                           2812 ;Allocation info for local variables in function 'sobj_update'
-                           2813 ;------------------------------------------------------------
-                    09B3   2814 	G$sobj_update$0$0 ==.
-                    09B3   2815 	C$fb_app_rollo10.c$786$1$1 ==.
-                           2816 ;	..\fb_app_rollo10.c:786: void sobj_update(void)
-                           2817 ;	-----------------------------------------
-                           2818 ;	 function sobj_update
-                           2819 ;	-----------------------------------------
-   09B3                    2820 _sobj_update:
-                    09B3   2821 	C$fb_app_rollo10.c$788$1$1 ==.
-                           2822 ;	..\fb_app_rollo10.c:788: Sobject_schalten(16,read_obj_value(16)&0x01);
-   09B3 75 82 10           2823 	mov	dpl,#0x10
-   09B6 12s00rDF           2824 	lcall	_read_obj_value
-   09B9 AC 82              2825 	mov	r4,dpl
-   09BB 53 04 01           2826 	anl	ar4,#0x01
-   09BE C0 04              2827 	push	ar4
-   09C0 75 82 10           2828 	mov	dpl,#0x10
-   09C3 12s01rBC           2829 	lcall	_Sobject_schalten
-   09C6 15 81              2830 	dec	sp
-                    09C8   2831 	C$fb_app_rollo10.c$789$1$1 ==.
-                           2832 ;	..\fb_app_rollo10.c:789: Sobject_schalten(17,read_obj_value(17)&0x01);
-   09C8 75 82 11           2833 	mov	dpl,#0x11
-   09CB 12s00rDF           2834 	lcall	_read_obj_value
-   09CE AC 82              2835 	mov	r4,dpl
-   09D0 53 04 01           2836 	anl	ar4,#0x01
-   09D3 C0 04              2837 	push	ar4
-   09D5 75 82 11           2838 	mov	dpl,#0x11
-   09D8 12s01rBC           2839 	lcall	_Sobject_schalten
-   09DB 15 81              2840 	dec	sp
-                    09DD   2841 	C$fb_app_rollo10.c$790$1$1 ==.
-                    09DD   2842 	XG$sobj_update$0$0 ==.
-   09DD 22                 2843 	ret
+   08B6 60 03              2595 	jz	00159$
+   08B8 02s09rAE           2596 	ljmp	00137$
+   08BB                    2597 00159$:
+                    08BB   2598 	C$fb_app_rollo10.c$698$2$2 ==.
+                           2599 ;	..\fb_app_rollo10.c:698: while(  (!PWM || (TL0>0x72)));// PWM scannen um "Hand"-Tasten abzufragen
+   08BB                    2600 00102$:
+   08BB 30 92 FD           2601 	jnb	_P1_2,00102$
+   08BE E5 8A              2602 	mov	a,_TL0
+   08C0 24 8D              2603 	add	a,#0xff - 0x72
+   08C2 40 F7              2604 	jc	00102$
+                    08C4   2605 	C$fb_app_rollo10.c$717$2$2 ==.
+                           2606 ;	..\fb_app_rollo10.c:717: key_pattern=(0x01<<(delay_toggle&0x07));
+   08C4 74 07              2607 	mov	a,#0x07
+   08C6 55 09              2608 	anl	a,_delay_toggle
+   08C8 FF                 2609 	mov	r7,a
+   08C9 8F F0              2610 	mov	b,r7
+   08CB 05 F0              2611 	inc	b
+   08CD 74 01              2612 	mov	a,#0x01
+   08CF 80 02              2613 	sjmp	00164$
+   08D1                    2614 00162$:
+   08D1 25 E0              2615 	add	a,acc
+   08D3                    2616 00164$:
+   08D3 D5 F0 FB           2617 	djnz	b,00162$
+                    08D6   2618 	C$fb_app_rollo10.c$718$2$2 ==.
+                           2619 ;	..\fb_app_rollo10.c:718: P0 = ~key_pattern;
+   08D6 FF                 2620 	mov	r7,a
+   08D7 F4                 2621 	cpl	a
+   08D8 F5 80              2622 	mov	_P0,a
+                    08DA   2623 	C$fb_app_rollo10.c$719$2$2 ==.
+                           2624 ;	..\fb_app_rollo10.c:719: if (!P1_3){
+   08DA 20 93 0C           2625 	jb	_P1_3,00108$
+                    08DD   2626 	C$fb_app_rollo10.c$720$3$3 ==.
+                           2627 ;	..\fb_app_rollo10.c:720: if(!ledport) ledport=0x08+(delay_toggle&0x07);
+   08DD E5*28              2628 	mov	a,_ledport
+   08DF 70 08              2629 	jnz	00108$
+   08E1 74 07              2630 	mov	a,#0x07
+   08E3 55 09              2631 	anl	a,_delay_toggle
+   08E5 24 08              2632 	add	a,#0x08
+   08E7 F5*28              2633 	mov	_ledport,a
+   08E9                    2634 00108$:
+                    08E9   2635 	C$fb_app_rollo10.c$722$2$2 ==.
+                           2636 ;	..\fb_app_rollo10.c:722: P0=oldportbuffer; 
+   08E9 85 0E 80           2637 	mov	_P0,_oldportbuffer
+                    08EC   2638 	C$fb_app_rollo10.c$725$2$2 ==.
+                           2639 ;	..\fb_app_rollo10.c:725: if (key_pattern==0x80){
+   08EC BF 80 02           2640 	cjne	r7,#0x80,00167$
+   08EF 80 03              2641 	sjmp	00168$
+   08F1                    2642 00167$:
+   08F1 02s09rAE           2643 	ljmp	00137$
+   08F4                    2644 00168$:
+                    08F4   2645 	C$fb_app_rollo10.c$726$3$4 ==.
+                           2646 ;	..\fb_app_rollo10.c:726: Tasten=ledport;
+   08F4 AF*28              2647 	mov	r7,_ledport
+                    08F6   2648 	C$fb_app_rollo10.c$727$3$4 ==.
+                           2649 ;	..\fb_app_rollo10.c:727: ledport=0;
+   08F6 75*28 00           2650 	mov	_ledport,#0x00
+                    08F9   2651 	C$fb_app_rollo10.c$731$3$4 ==.
+                           2652 ;	..\fb_app_rollo10.c:731: if (Tasten & 0x08 ){
+   08F9 EF                 2653 	mov	a,r7
+   08FA 30 E3 13           2654 	jnb	acc.3,00124$
+                    08FD   2655 	C$fb_app_rollo10.c$732$4$5 ==.
+                           2656 ;	..\fb_app_rollo10.c:732: if (!Tval ){// steigende Flanke des Tasters 
+   08FD E5*20              2657 	mov	a,_Tval
+   08FF 60 03              2658 	jz	00170$
+   0901 02s09r99           2659 	ljmp	00125$
+   0904                    2660 00170$:
+                    0904   2661 	C$fb_app_rollo10.c$735$5$6 ==.
+                           2662 ;	..\fb_app_rollo10.c:735: timerstate[15]=0x01;
+   0904 75*1F 01           2663 	mov	(_timerstate + 0x000f),#0x01
+                    0907   2664 	C$fb_app_rollo10.c$736$5$6 ==.
+                           2665 ;	..\fb_app_rollo10.c:736: timerbase[15]=0x80 + 2;
+   0907 75 1F 82           2666 	mov	(_timerbase + 0x000f),#0x82
+                    090A   2667 	C$fb_app_rollo10.c$737$5$6 ==.
+                           2668 ;	..\fb_app_rollo10.c:737: timercnt[15]= 50;
+   090A 75*0F 32           2669 	mov	(_timercnt + 0x000f),#0x32
+   090D 02s09r99           2670 	ljmp	00125$
+   0910                    2671 00124$:
+                    0910   2672 	C$fb_app_rollo10.c$741$4$7 ==.
+                           2673 ;	..\fb_app_rollo10.c:741: if ( Tval & 0x08){ // wenn tasten >7 und Tval <=7 also taste losgelassen...
+   0910 E5*20              2674 	mov	a,_Tval
+   0912 20 E3 03           2675 	jb	acc.3,00171$
+   0915 02s09r99           2676 	ljmp	00125$
+   0918                    2677 00171$:
+                    0918   2678 	C$fb_app_rollo10.c$742$5$8 ==.
+                           2679 ;	..\fb_app_rollo10.c:742: if (timerstate[15]&0x20){
+   0918 E5*1F              2680 	mov	a,(_timerstate + 0x000f)
+   091A 30 E5 29           2681 	jnb	acc.5,00115$
+                    091D   2682 	C$fb_app_rollo10.c$743$6$9 ==.
+                           2683 ;	..\fb_app_rollo10.c:743: handmode = !handmode;
+   091D B2*02              2684 	cpl	_handmode
+                    091F   2685 	C$fb_app_rollo10.c$744$6$9 ==.
+                           2686 ;	..\fb_app_rollo10.c:744: timerbase[15]=0;
+   091F 75 1F 00           2687 	mov	(_timerbase + 0x000f),#0x00
+                    0922   2688 	C$fb_app_rollo10.c$745$6$9 ==.
+                           2689 ;	..\fb_app_rollo10.c:745: timerstate[15]=0;
+   0922 75*1F 00           2690 	mov	(_timerstate + 0x000f),#0x00
+                    0925   2691 	C$fb_app_rollo10.c$746$6$9 ==.
+                           2692 ;	..\fb_app_rollo10.c:746: timercnt[15]=0;
+   0925 75*0F 00           2693 	mov	(_timercnt + 0x000f),#0x00
+                    0928   2694 	C$fb_app_rollo10.c$747$6$9 ==.
+                           2695 ;	..\fb_app_rollo10.c:747: if (handmode){
+   0928 30*02 14           2696 	jnb	_handmode,00112$
+                    092B   2697 	C$fb_app_rollo10.c$748$7$10 ==.
+                           2698 ;	..\fb_app_rollo10.c:748: for(n=0;n<=3;n++) kanal[n]=0x00;
+   092B 7E 00              2699 	mov	r6,#0x00
+   092D                    2700 00133$:
+   092D EE                 2701 	mov	a,r6
+   092E 24 FC              2702 	add	a,#0xff - 0x03
+   0930 40 09              2703 	jc	00136$
+   0932 EE                 2704 	mov	a,r6
+   0933 24r23              2705 	add	a,#_kanal
+   0935 F8                 2706 	mov	r0,a
+   0936 76 00              2707 	mov	@r0,#0x00
+   0938 0E                 2708 	inc	r6
+   0939 80 F2              2709 	sjmp	00133$
+   093B                    2710 00136$:
+                    093B   2711 	C$fb_app_rollo10.c$749$7$10 ==.
+                           2712 ;	..\fb_app_rollo10.c:749: portchanged=1;
+   093B D2*00              2713 	setb	_portchanged
+   093D 80 07              2714 	sjmp	00115$
+   093F                    2715 00112$:
+                    093F   2716 	C$fb_app_rollo10.c$752$7$11 ==.
+                           2717 ;	..\fb_app_rollo10.c:752: sobj_update();
+   093F C0 07              2718 	push	ar7
+   0941 12s09rAF           2719 	lcall	_sobj_update
+   0944 D0 07              2720 	pop	ar7
+   0946                    2721 00115$:
+                    0946   2722 	C$fb_app_rollo10.c$755$5$8 ==.
+                           2723 ;	..\fb_app_rollo10.c:755: if (handmode){// wenn handmode aktiv...
+   0946 30*02 47           2724 	jnb	_handmode,00120$
+                    0949   2725 	C$fb_app_rollo10.c$756$6$12 ==.
+                           2726 ;	..\fb_app_rollo10.c:756: if (timerstate[15]&0x02){// status der zeit=2 also abgelaufen..
+   0949 E5*1F              2727 	mov	a,(_timerstate + 0x000f)
+   094B 30 E1 22           2728 	jnb	acc.1,00117$
+                    094E   2729 	C$fb_app_rollo10.c$757$7$13 ==.
+                           2730 ;	..\fb_app_rollo10.c:757: object_schalten(((Tval&0x07)>>1)+12,(Tval&0x01));
+   094E E5*20              2731 	mov	a,_Tval
+   0950 54 01              2732 	anl	a,#0x01
+   0952 24 FF              2733 	add	a,#0xff
+   0954 92*00              2734 	mov	b0,c
+   0956 74 07              2735 	mov	a,#0x07
+   0958 55*20              2736 	anl	a,_Tval
+   095A C3                 2737 	clr	c
+   095B 13                 2738 	rrc	a
+   095C 24 0C              2739 	add	a,#0x0C
+   095E F5 82              2740 	mov	dpl,a
+   0960 A2*00              2741 	mov	c,b0
+   0962 92 F0              2742 	mov	b[0],c
+   0964 C0 07              2743 	push	ar7
+   0966 85 F0*00           2744 	mov	bits,b
+   0969 12s03r26           2745 	lcall	_object_schalten
+   096C D0 07              2746 	pop	ar7
+   096E 80 20              2747 	sjmp	00120$
+   0970                    2748 00117$:
+                    0970   2749 	C$fb_app_rollo10.c$760$7$14 ==.
+                           2750 ;	..\fb_app_rollo10.c:760: object_schalten(((Tval&0x07)>>1)+8,(Tval&0x01));
+   0970 E5*20              2751 	mov	a,_Tval
+   0972 54 01              2752 	anl	a,#0x01
+   0974 24 FF              2753 	add	a,#0xff
+   0976 92*00              2754 	mov	b0,c
+   0978 74 07              2755 	mov	a,#0x07
+   097A 55*20              2756 	anl	a,_Tval
+   097C C3                 2757 	clr	c
+   097D 13                 2758 	rrc	a
+   097E 24 08              2759 	add	a,#0x08
+   0980 F5 82              2760 	mov	dpl,a
+   0982 A2*00              2761 	mov	c,b0
+   0984 92 F0              2762 	mov	b[0],c
+   0986 C0 07              2763 	push	ar7
+   0988 85 F0*00           2764 	mov	bits,b
+   098B 12s03r26           2765 	lcall	_object_schalten
+   098E D0 07              2766 	pop	ar7
+   0990                    2767 00120$:
+                    0990   2768 	C$fb_app_rollo10.c$764$5$8 ==.
+                           2769 ;	..\fb_app_rollo10.c:764: timerbase[15]=0x80 + 3;//130ms
+   0990 75 1F 83           2770 	mov	(_timerbase + 0x000f),#0x83
+                    0993   2771 	C$fb_app_rollo10.c$765$5$8 ==.
+                           2772 ;	..\fb_app_rollo10.c:765: timerstate[15]=0x04;
+   0993 75*1F 04           2773 	mov	(_timerstate + 0x000f),#0x04
+                    0996   2774 	C$fb_app_rollo10.c$766$5$8 ==.
+                           2775 ;	..\fb_app_rollo10.c:766: timercnt[15]=116;//=15 Sekunden
+   0996 75*0F 74           2776 	mov	(_timercnt + 0x000f),#0x74
+   0999                    2777 00125$:
+                    0999   2778 	C$fb_app_rollo10.c$769$3$4 ==.
+                           2779 ;	..\fb_app_rollo10.c:769: Tval=Tasten;
+   0999 8F*20              2780 	mov	_Tval,r7
+                    099B   2781 	C$fb_app_rollo10.c$771$3$4 ==.
+                           2782 ;	..\fb_app_rollo10.c:771: if(timerstate[15]&0x08){
+   099B E5*1F              2783 	mov	a,(_timerstate + 0x000f)
+   099D 30 E3 0E           2784 	jnb	acc.3,00137$
+                    09A0   2785 	C$fb_app_rollo10.c$772$4$15 ==.
+                           2786 ;	..\fb_app_rollo10.c:772: handmode=0;//handmode automatisch ausschalten
+   09A0 C2*02              2787 	clr	_handmode
+                    09A2   2788 	C$fb_app_rollo10.c$774$4$15 ==.
+                           2789 ;	..\fb_app_rollo10.c:774: timerbase[15]=0;
+   09A2 75 1F 00           2790 	mov	(_timerbase + 0x000f),#0x00
+                    09A5   2791 	C$fb_app_rollo10.c$775$4$15 ==.
+                           2792 ;	..\fb_app_rollo10.c:775: timerstate[15]=0;
+   09A5 75*1F 00           2793 	mov	(_timerstate + 0x000f),#0x00
+                    09A8   2794 	C$fb_app_rollo10.c$776$4$15 ==.
+                           2795 ;	..\fb_app_rollo10.c:776: timercnt[15]=0;
+   09A8 75*0F 00           2796 	mov	(_timercnt + 0x000f),#0x00
+                    09AB   2797 	C$fb_app_rollo10.c$777$4$15 ==.
+                           2798 ;	..\fb_app_rollo10.c:777: sobj_update();
+   09AB 12s09rAF           2799 	lcall	_sobj_update
+   09AE                    2800 00137$:
+                    09AE   2801 	C$fb_app_rollo10.c$782$1$1 ==.
+                    09AE   2802 	XG$handsteuerung$0$0 ==.
+   09AE 22                 2803 	ret
+                           2804 ;------------------------------------------------------------
+                           2805 ;Allocation info for local variables in function 'sobj_update'
+                           2806 ;------------------------------------------------------------
+                    09AF   2807 	G$sobj_update$0$0 ==.
+                    09AF   2808 	C$fb_app_rollo10.c$786$1$1 ==.
+                           2809 ;	..\fb_app_rollo10.c:786: void sobj_update(void)
+                           2810 ;	-----------------------------------------
+                           2811 ;	 function sobj_update
+                           2812 ;	-----------------------------------------
+   09AF                    2813 _sobj_update:
+                    09AF   2814 	C$fb_app_rollo10.c$788$1$1 ==.
+                           2815 ;	..\fb_app_rollo10.c:788: Sobject_schalten(16,read_obj_value(16)&0x01);
+   09AF 75 82 10           2816 	mov	dpl,#0x10
+   09B2 12s00rDF           2817 	lcall	_read_obj_value
+   09B5 AC 82              2818 	mov	r4,dpl
+   09B7 53 04 01           2819 	anl	ar4,#0x01
+   09BA C0 04              2820 	push	ar4
+   09BC 75 82 10           2821 	mov	dpl,#0x10
+   09BF 12s01rBC           2822 	lcall	_Sobject_schalten
+   09C2 15 81              2823 	dec	sp
+                    09C4   2824 	C$fb_app_rollo10.c$789$1$1 ==.
+                           2825 ;	..\fb_app_rollo10.c:789: Sobject_schalten(17,read_obj_value(17)&0x01);
+   09C4 75 82 11           2826 	mov	dpl,#0x11
+   09C7 12s00rDF           2827 	lcall	_read_obj_value
+   09CA AC 82              2828 	mov	r4,dpl
+   09CC 53 04 01           2829 	anl	ar4,#0x01
+   09CF C0 04              2830 	push	ar4
+   09D1 75 82 11           2831 	mov	dpl,#0x11
+   09D4 12s01rBC           2832 	lcall	_Sobject_schalten
+   09D7 15 81              2833 	dec	sp
+                    09D9   2834 	C$fb_app_rollo10.c$790$1$1 ==.
+                    09D9   2835 	XG$sobj_update$0$0 ==.
+   09D9 22                 2836 	ret
+                           2837 ;------------------------------------------------------------
+                           2838 ;Allocation info for local variables in function 'set_pause'
+                           2839 ;------------------------------------------------------------
+                           2840 ;Pstate                    Allocated to stack - _bp -3
+                           2841 ;objnr                     Allocated to registers r7 
+                           2842 ;pause                     Allocated to registers r7 
+                           2843 ;pauseobj                  Allocated to registers r6 
                            2844 ;------------------------------------------------------------
-                           2845 ;Allocation info for local variables in function 'set_pause'
-                           2846 ;------------------------------------------------------------
-                           2847 ;Pstate                    Allocated to stack - _bp -3
-                           2848 ;objnr                     Allocated to registers r7 
-                           2849 ;pause                     Allocated to registers r7 
-                           2850 ;pauseobj                  Allocated to registers r6 
-                           2851 ;------------------------------------------------------------
-                    09DE   2852 	G$set_pause$0$0 ==.
-                    09DE   2853 	C$fb_app_rollo10.c$791$1$1 ==.
-                           2854 ;	..\fb_app_rollo10.c:791: void set_pause(unsigned char objnr,unsigned char Pstate)// setzt die Pausezeit und traegt Pstate in timerstate[ ] ein
-                           2855 ;	-----------------------------------------
-                           2856 ;	 function set_pause
-                           2857 ;	-----------------------------------------
-   09DE                    2858 _set_pause:
-   09DE C0*00              2859 	push	_bp
-   09E0 85 81*00           2860 	mov	_bp,sp
-   09E3 AF 82              2861 	mov	r7,dpl
-                    09E5   2862 	C$fb_app_rollo10.c$794$1$1 ==.
-                           2863 ;	..\fb_app_rollo10.c:794: pauseobj=(objnr&0x03)+11;
-   09E5 53 07 03           2864 	anl	ar7,#0x03
-   09E8 74 0B              2865 	mov	a,#0x0B
-   09EA 2F                 2866 	add	a,r7
-                    09EB   2867 	C$fb_app_rollo10.c$795$1$1 ==.
-                           2868 ;	..\fb_app_rollo10.c:795: timerstate[pauseobj]=Pstate;
-   09EB FE                 2869 	mov	r6,a
-   09EC 24r10              2870 	add	a,#_timerstate
-   09EE F8                 2871 	mov	r0,a
-   09EF E5*00              2872 	mov	a,_bp
-   09F1 24 FD              2873 	add	a,#0xfd
-   09F3 F9                 2874 	mov	r1,a
-   09F4 E7                 2875 	mov	a,@r1
-   09F5 F6                 2876 	mov	@r0,a
-                    09F6   2877 	C$fb_app_rollo10.c$796$1$1 ==.
-                           2878 ;	..\fb_app_rollo10.c:796: switch ((eeprom[0xEE]>>((objnr&0x03)<<1))&0x03) { // Dauer zwischen auf und ab
-   09F6 90s00rEE           2879 	mov	dptr,#(_eeprom + 0x00ee)
-   09F9 E4                 2880 	clr	a
-   09FA 93                 2881 	movc	a,@a+dptr
-   09FB FD                 2882 	mov	r5,a
-   09FC E4                 2883 	clr	a
-   09FD CF                 2884 	xch	a,r7
-   09FE 25 E0              2885 	add	a,acc
-   0A00 CF                 2886 	xch	a,r7
-   0A01 33                 2887 	rlc	a
-   0A02 FC                 2888 	mov	r4,a
-   0A03 8F F0              2889 	mov	b,r7
-   0A05 05 F0              2890 	inc	b
-   0A07 ED                 2891 	mov	a,r5
-   0A08 80 02              2892 	sjmp	00112$
-   0A0A                    2893 00111$:
-   0A0A C3                 2894 	clr	c
-   0A0B 13                 2895 	rrc	a
-   0A0C                    2896 00112$:
-   0A0C D5 F0 FB           2897 	djnz	b,00111$
-   0A0F 54 03              2898 	anl	a,#0x03
-   0A11 FF                 2899 	mov	r7,a
-   0A12 60 0A              2900 	jz	00101$
-   0A14 BF 01 02           2901 	cjne	r7,#0x01,00114$
-   0A17 80 09              2902 	sjmp	00102$
-   0A19                    2903 00114$:
-                    0A19   2904 	C$fb_app_rollo10.c$797$2$2 ==.
-                           2905 ;	..\fb_app_rollo10.c:797: case 0:	// 0,5s
-   0A19 BF 02 0E           2906 	cjne	r7,#0x02,00104$
-   0A1C 80 08              2907 	sjmp	00103$
-   0A1E                    2908 00101$:
-                    0A1E   2909 	C$fb_app_rollo10.c$798$2$2 ==.
-                           2910 ;	..\fb_app_rollo10.c:798: pause=4 ;
-   0A1E 7F 04              2911 	mov	r7,#0x04
-                    0A20   2912 	C$fb_app_rollo10.c$799$2$2 ==.
-                           2913 ;	..\fb_app_rollo10.c:799: break;
-                    0A20   2914 	C$fb_app_rollo10.c$800$2$2 ==.
-                           2915 ;	..\fb_app_rollo10.c:800: case 1:	// 1s
-   0A20 80 0A              2916 	sjmp	00105$
-   0A22                    2917 00102$:
-                    0A22   2918 	C$fb_app_rollo10.c$801$2$2 ==.
-                           2919 ;	..\fb_app_rollo10.c:801: pause=8 ;
-   0A22 7F 08              2920 	mov	r7,#0x08
-                    0A24   2921 	C$fb_app_rollo10.c$802$2$2 ==.
-                           2922 ;	..\fb_app_rollo10.c:802: break;
-                    0A24   2923 	C$fb_app_rollo10.c$803$2$2 ==.
-                           2924 ;	..\fb_app_rollo10.c:803: case 2:	// 2s
-   0A24 80 06              2925 	sjmp	00105$
-   0A26                    2926 00103$:
-                    0A26   2927 	C$fb_app_rollo10.c$804$2$2 ==.
-                           2928 ;	..\fb_app_rollo10.c:804: pause=16 ;
-   0A26 7F 10              2929 	mov	r7,#0x10
-                    0A28   2930 	C$fb_app_rollo10.c$805$2$2 ==.
-                           2931 ;	..\fb_app_rollo10.c:805: break;
-                    0A28   2932 	C$fb_app_rollo10.c$806$2$2 ==.
-                           2933 ;	..\fb_app_rollo10.c:806: default:	// 5s
-   0A28 80 02              2934 	sjmp	00105$
-   0A2A                    2935 00104$:
-                    0A2A   2936 	C$fb_app_rollo10.c$807$2$2 ==.
-                           2937 ;	..\fb_app_rollo10.c:807: pause=39 ;
-   0A2A 7F 27              2938 	mov	r7,#0x27
-                    0A2C   2939 	C$fb_app_rollo10.c$809$1$1 ==.
-                           2940 ;	..\fb_app_rollo10.c:809: }
-   0A2C                    2941 00105$:
-                    0A2C   2942 	C$fb_app_rollo10.c$810$1$1 ==.
-                           2943 ;	..\fb_app_rollo10.c:810: timercnt[pauseobj]=pause;
-   0A2C EE                 2944 	mov	a,r6
-   0A2D 24r00              2945 	add	a,#_timercnt
-   0A2F F8                 2946 	mov	r0,a
-   0A30 A6 07              2947 	mov	@r0,ar7
-                    0A32   2948 	C$fb_app_rollo10.c$811$1$1 ==.
-                           2949 ;	..\fb_app_rollo10.c:811: timerbase[pauseobj]= 3 | 0x80;
-   0A32 EE                 2950 	mov	a,r6
-   0A33 24 10              2951 	add	a,#_timerbase
-   0A35 F8                 2952 	mov	r0,a
-   0A36 76 83              2953 	mov	@r0,#0x83
-   0A38 D0*00              2954 	pop	_bp
-                    0A3A   2955 	C$fb_app_rollo10.c$813$1$1 ==.
-                    0A3A   2956 	XG$set_pause$0$0 ==.
-   0A3A 22                 2957 	ret
-                           2958 ;------------------------------------------------------------
-                           2959 ;Allocation info for local variables in function 'set_entriegeln'
-                           2960 ;------------------------------------------------------------
-                           2961 ;zeitnr                    Allocated to registers r7 
-                           2962 ;svbase                    Allocated to registers r6 
-                           2963 ;------------------------------------------------------------
-                    0A3B   2964 	G$set_entriegeln$0$0 ==.
-                    0A3B   2965 	C$fb_app_rollo10.c$816$1$1 ==.
-                           2966 ;	..\fb_app_rollo10.c:816: void set_entriegeln(unsigned char zeitnr)// Setzt die zyklische überwachungszeit
-                           2967 ;	-----------------------------------------
-                           2968 ;	 function set_entriegeln
-                           2969 ;	-----------------------------------------
-   0A3B                    2970 _set_entriegeln:
-   0A3B AF 82              2971 	mov	r7,dpl
-                    0A3D   2972 	C$fb_app_rollo10.c$821$1$1 ==.
-                           2973 ;	..\fb_app_rollo10.c:821: svbase=eeprom[0xD9]&0x0F;
-   0A3D 90s00rD9           2974 	mov	dptr,#(_eeprom + 0x00d9)
-   0A40 E4                 2975 	clr	a
-   0A41 93                 2976 	movc	a,@a+dptr
-                    0A42   2977 	C$fb_app_rollo10.c$822$1$1 ==.
-                           2978 ;	..\fb_app_rollo10.c:822: if(svbase){
-   0A42 54 0F              2979 	anl	a,#0x0F
-   0A44 FE                 2980 	mov	r6,a
-   0A45 60 19              2981 	jz	00102$
-                    0A47   2982 	C$fb_app_rollo10.c$823$2$2 ==.
-                           2983 ;	..\fb_app_rollo10.c:823: timercnt[zeitnr]=svfaktorarray[svbase];
-   0A47 EF                 2984 	mov	a,r7
-   0A48 24r00              2985 	add	a,#_timercnt
-   0A4A F9                 2986 	mov	r1,a
-   0A4B EE                 2987 	mov	a,r6
-   0A4C 90s00r0C           2988 	mov	dptr,#_svfaktorarray
-   0A4F 93                 2989 	movc	a,@a+dptr
-   0A50 FE                 2990 	mov	r6,a
-   0A51 F7                 2991 	mov	@r1,a
-                    0A52   2992 	C$fb_app_rollo10.c$824$2$2 ==.
-                           2993 ;	..\fb_app_rollo10.c:824: timerbase[zeitnr]=5 | 0x80;
-   0A52 EF                 2994 	mov	a,r7
-   0A53 24 10              2995 	add	a,#_timerbase
-   0A55 F8                 2996 	mov	r0,a
-   0A56 76 85              2997 	mov	@r0,#0x85
-                    0A58   2998 	C$fb_app_rollo10.c$825$2$2 ==.
-                           2999 ;	..\fb_app_rollo10.c:825: timerstate[zeitnr]=0x01;
-   0A58 EF                 3000 	mov	a,r7
-   0A59 24r10              3001 	add	a,#_timerstate
-   0A5B F8                 3002 	mov	r0,a
-   0A5C 76 01              3003 	mov	@r0,#0x01
-   0A5E 80 0C              3004 	sjmp	00104$
-   0A60                    3005 00102$:
-                    0A60   3006 	C$fb_app_rollo10.c$828$2$3 ==.
-                           3007 ;	..\fb_app_rollo10.c:828: timerbase[zeitnr]=0;
-   0A60 EF                 3008 	mov	a,r7
-   0A61 24 10              3009 	add	a,#_timerbase
-   0A63 F8                 3010 	mov	r0,a
-   0A64 76 00              3011 	mov	@r0,#0x00
-                    0A66   3012 	C$fb_app_rollo10.c$829$2$3 ==.
-                           3013 ;	..\fb_app_rollo10.c:829: timerstate[zeitnr]=0;
-   0A66 EF                 3014 	mov	a,r7
-   0A67 24r10              3015 	add	a,#_timerstate
-   0A69 F8                 3016 	mov	r0,a
-   0A6A 76 00              3017 	mov	@r0,#0x00
-   0A6C                    3018 00104$:
-                    0A6C   3019 	C$fb_app_rollo10.c$832$1$1 ==.
-                    0A6C   3020 	XG$set_entriegeln$0$0 ==.
-   0A6C 22                 3021 	ret
-                           3022 ;------------------------------------------------------------
-                           3023 ;Allocation info for local variables in function 'port_schalten'
-                           3024 ;------------------------------------------------------------
-                           3025 ;kmod                      Allocated to registers r7 
-                           3026 ;------------------------------------------------------------
-                    0A6D   3027 	G$port_schalten$0$0 ==.
-                    0A6D   3028 	C$fb_app_rollo10.c$894$1$1 ==.
-                           3029 ;	..\fb_app_rollo10.c:894: void port_schalten(void)		// Schaltet die Ports mit PWM, DUTY ist Pulsverhältnis
-                           3030 ;	-----------------------------------------
-                           3031 ;	 function port_schalten
-                           3032 ;	-----------------------------------------
-   0A6D                    3033 _port_schalten:
-                    0A6D   3034 	C$fb_app_rollo10.c$898$1$1 ==.
-                           3035 ;	..\fb_app_rollo10.c:898: portbuffer=0;
-   0A6D 75 0D 00           3036 	mov	_portbuffer,#0x00
-                    0A70   3037 	C$fb_app_rollo10.c$899$1$1 ==.
-                           3038 ;	..\fb_app_rollo10.c:899: if (eeprom[0xE4]& 0x80) kmod=0x01;		// bit 7 ist Kanal-mode
-   0A70 90s00rE4           3039 	mov	dptr,#(_eeprom + 0x00e4)
-   0A73 E4                 3040 	clr	a
-   0A74 93                 3041 	movc	a,@a+dptr
-   0A75 FF                 3042 	mov	r7,a
-   0A76 30 E7 04           3043 	jnb	acc.7,00102$
-   0A79 7F 01              3044 	mov	r7,#0x01
-   0A7B 80 02              3045 	sjmp	00103$
-   0A7D                    3046 00102$:
-                    0A7D   3047 	C$fb_app_rollo10.c$900$1$1 ==.
-                           3048 ;	..\fb_app_rollo10.c:900: else kmod=0x03;
-   0A7D 7F 03              3049 	mov	r7,#0x03
-   0A7F                    3050 00103$:
-                    0A7F   3051 	C$fb_app_rollo10.c$901$1$1 ==.
-                           3052 ;	..\fb_app_rollo10.c:901: for (knr=0;knr<=0x03;knr++){
-   0A7F 75*27 00           3053 	mov	_knr,#0x00
-   0A82                    3054 00107$:
-   0A82 E5*27              3055 	mov	a,_knr
-   0A84 24 FC              3056 	add	a,#0xff - 0x03
-   0A86 40 23              3057 	jc	00110$
-                    0A88   3058 	C$fb_app_rollo10.c$902$2$2 ==.
-                           3059 ;	..\fb_app_rollo10.c:902: portbuffer=portbuffer|((kanal[knr & kmod]& 0x03)<<(knr<<1));
-   0A88 EF                 3060 	mov	a,r7
-   0A89 55*27              3061 	anl	a,_knr
-   0A8B 24r23              3062 	add	a,#_kanal
-   0A8D F9                 3063 	mov	r1,a
-   0A8E 87 06              3064 	mov	ar6,@r1
-   0A90 53 06 03           3065 	anl	ar6,#0x03
-   0A93 E5*27              3066 	mov	a,_knr
-   0A95 25*27              3067 	add	a,_knr
-   0A97 FD                 3068 	mov	r5,a
-   0A98 8D F0              3069 	mov	b,r5
-   0A9A 05 F0              3070 	inc	b
-   0A9C EE                 3071 	mov	a,r6
-   0A9D 80 02              3072 	sjmp	00121$
-   0A9F                    3073 00119$:
-   0A9F 25 E0              3074 	add	a,acc
-   0AA1                    3075 00121$:
-   0AA1 D5 F0 FB           3076 	djnz	b,00119$
-   0AA4 FE                 3077 	mov	r6,a
-   0AA5 42 0D              3078 	orl	_portbuffer,a
-                    0AA7   3079 	C$fb_app_rollo10.c$901$1$1 ==.
-                           3080 ;	..\fb_app_rollo10.c:901: for (knr=0;knr<=0x03;knr++){
-   0AA7 05*27              3081 	inc	_knr
-   0AA9 80 D7              3082 	sjmp	00107$
-   0AAB                    3083 00110$:
-                    0AAB   3084 	C$fb_app_rollo10.c$967$1$1 ==.
-                           3085 ;	..\fb_app_rollo10.c:967: if(portbuffer & ~oldportbuffer) {	// Vollstrom nur wenn ein relais eingeschaltet wird
-   0AAB AE 0E              3086 	mov	r6,_oldportbuffer
-   0AAD 7F 00              3087 	mov	r7,#0x00
-   0AAF EE                 3088 	mov	a,r6
-   0AB0 F4                 3089 	cpl	a
-   0AB1 FE                 3090 	mov	r6,a
-   0AB2 EF                 3091 	mov	a,r7
-   0AB3 F4                 3092 	cpl	a
-   0AB4 FF                 3093 	mov	r7,a
-   0AB5 AC 0D              3094 	mov	r4,_portbuffer
-   0AB7 7D 00              3095 	mov	r5,#0x00
-   0AB9 EC                 3096 	mov	a,r4
-   0ABA 52 06              3097 	anl	ar6,a
-   0ABC ED                 3098 	mov	a,r5
-   0ABD 52 07              3099 	anl	ar7,a
-   0ABF EE                 3100 	mov	a,r6
-   0AC0 4F                 3101 	orl	a,r7
-   0AC1 60 1F              3102 	jz	00105$
-                    0AC3   3103 	C$fb_app_rollo10.c$968$2$3 ==.
-                           3104 ;	..\fb_app_rollo10.c:968: TR0=0;
-   0AC3 C2 8C              3105 	clr	_TCON_4
-                    0AC5   3106 	C$fb_app_rollo10.c$969$2$3 ==.
-                           3107 ;	..\fb_app_rollo10.c:969: AUXR1&=0xE9;	// PWM von Timer 0 nicht mehr auf Pin ausgeben
-   0AC5 53 A2 E9           3108 	anl	_AUXR1,#0xE9
-                    0AC8   3109 	C$fb_app_rollo10.c$972$2$3 ==.
-                           3110 ;	..\fb_app_rollo10.c:972: PWM=0;			// Vollstrom an
-   0AC8 C2 92              3111 	clr	_P1_2
-                    0ACA   3112 	C$fb_app_rollo10.c$974$2$3 ==.
-                           3113 ;	..\fb_app_rollo10.c:974: P0=portbuffer;		// Ports schalten
-   0ACA 85 0D 80           3114 	mov	_P0,_portbuffer
-                    0ACD   3115 	C$fb_app_rollo10.c$975$2$3 ==.
-                           3116 ;	..\fb_app_rollo10.c:975: TF0=0;			// Timer 0 für Haltezeit Vollstrom verwenden
-   0ACD C2 8D              3117 	clr	_TCON_5
-                    0ACF   3118 	C$fb_app_rollo10.c$976$2$3 ==.
-                           3119 ;	..\fb_app_rollo10.c:976: TH0=0x00;		// 16ms (10ms=6fff)
-                    0ACF   3120 	C$fb_app_rollo10.c$977$2$3 ==.
-                           3121 ;	..\fb_app_rollo10.c:977: TL0=0x00;
-                    0ACF   3122 	C$fb_app_rollo10.c$978$2$3 ==.
-                           3123 ;	..\fb_app_rollo10.c:978: TMOD=(TMOD & 0xF0) +1;		// Timer 0 als 16-Bit Timer
-   0ACF E4                 3124 	clr	a
-   0AD0 F5 8C              3125 	mov	_TH0,a
-   0AD2 F5 8A              3126 	mov	_TL0,a
-   0AD4 74 F0              3127 	mov	a,#0xF0
-   0AD6 55 89              3128 	anl	a,_TMOD
-   0AD8 04                 3129 	inc	a
-   0AD9 F5 89              3130 	mov	_TMOD,a
-                    0ADB   3131 	C$fb_app_rollo10.c$979$2$3 ==.
-                           3132 ;	..\fb_app_rollo10.c:979: TAMOD=0x00;
-   0ADB 75 8F 00           3133 	mov	_TAMOD,#0x00
-                    0ADE   3134 	C$fb_app_rollo10.c$980$2$3 ==.
-                           3135 ;	..\fb_app_rollo10.c:980: TR0=1;
-   0ADE D2 8C              3136 	setb	_TCON_4
-   0AE0 80 03              3137 	sjmp	00106$
-   0AE2                    3138 00105$:
-                    0AE2   3139 	C$fb_app_rollo10.c$982$1$1 ==.
-                           3140 ;	..\fb_app_rollo10.c:982: else P0=portbuffer;
-   0AE2 85 0D 80           3141 	mov	_P0,_portbuffer
-   0AE5                    3142 00106$:
-                    0AE5   3143 	C$fb_app_rollo10.c$985$1$1 ==.
-                           3144 ;	..\fb_app_rollo10.c:985: oldportbuffer=portbuffer;
-   0AE5 85 0D 0E           3145 	mov	_oldportbuffer,_portbuffer
-                    0AE8   3146 	C$fb_app_rollo10.c$986$1$1 ==.
-                           3147 ;	..\fb_app_rollo10.c:986: portchanged=0;
-   0AE8 C2*00              3148 	clr	_portchanged
-                    0AEA   3149 	C$fb_app_rollo10.c$990$1$1 ==.
-                    0AEA   3150 	XG$port_schalten$0$0 ==.
-   0AEA 22                 3151 	ret
-                           3152 ;------------------------------------------------------------
-                           3153 ;Allocation info for local variables in function 'bus_return'
-                           3154 ;------------------------------------------------------------
-                           3155 ;n                         Allocated to registers r7 
-                           3156 ;------------------------------------------------------------
-                    0AEB   3157 	G$bus_return$0$0 ==.
-                    0AEB   3158 	C$fb_app_rollo10.c$1112$1$1 ==.
-                           3159 ;	..\fb_app_rollo10.c:1112: void bus_return(void)		// Aktionen bei Busspannungswiederkehr
-                           3160 ;	-----------------------------------------
-                           3161 ;	 function bus_return
-                           3162 ;	-----------------------------------------
-   0AEB                    3163 _bus_return:
-                    0AEB   3164 	C$fb_app_rollo10.c$1115$1$1 ==.
-                           3165 ;	..\fb_app_rollo10.c:1115: blocked=blockedsave;		// Ausgänge gesperrt?
-   0AEB 90 1B FD           3166 	mov	dptr,#_blockedsave
+                    09DA   2845 	G$set_pause$0$0 ==.
+                    09DA   2846 	C$fb_app_rollo10.c$791$1$1 ==.
+                           2847 ;	..\fb_app_rollo10.c:791: void set_pause(unsigned char objnr,unsigned char Pstate)// setzt die Pausezeit und traegt Pstate in timerstate[ ] ein
+                           2848 ;	-----------------------------------------
+                           2849 ;	 function set_pause
+                           2850 ;	-----------------------------------------
+   09DA                    2851 _set_pause:
+   09DA C0*00              2852 	push	_bp
+   09DC 85 81*00           2853 	mov	_bp,sp
+   09DF AF 82              2854 	mov	r7,dpl
+                    09E1   2855 	C$fb_app_rollo10.c$794$1$1 ==.
+                           2856 ;	..\fb_app_rollo10.c:794: pauseobj=(objnr&0x03)+11;
+   09E1 53 07 03           2857 	anl	ar7,#0x03
+   09E4 74 0B              2858 	mov	a,#0x0B
+   09E6 2F                 2859 	add	a,r7
+                    09E7   2860 	C$fb_app_rollo10.c$795$1$1 ==.
+                           2861 ;	..\fb_app_rollo10.c:795: timerstate[pauseobj]=Pstate;
+   09E7 FE                 2862 	mov	r6,a
+   09E8 24r10              2863 	add	a,#_timerstate
+   09EA F8                 2864 	mov	r0,a
+   09EB E5*00              2865 	mov	a,_bp
+   09ED 24 FD              2866 	add	a,#0xfd
+   09EF F9                 2867 	mov	r1,a
+   09F0 E7                 2868 	mov	a,@r1
+   09F1 F6                 2869 	mov	@r0,a
+                    09F2   2870 	C$fb_app_rollo10.c$796$1$1 ==.
+                           2871 ;	..\fb_app_rollo10.c:796: switch ((eeprom[0xEE]>>((objnr&0x03)<<1))&0x03) { // Dauer zwischen auf und ab
+   09F2 90s00rEE           2872 	mov	dptr,#(_eeprom + 0x00ee)
+   09F5 E4                 2873 	clr	a
+   09F6 93                 2874 	movc	a,@a+dptr
+   09F7 FD                 2875 	mov	r5,a
+   09F8 E4                 2876 	clr	a
+   09F9 CF                 2877 	xch	a,r7
+   09FA 25 E0              2878 	add	a,acc
+   09FC CF                 2879 	xch	a,r7
+   09FD 33                 2880 	rlc	a
+   09FE FC                 2881 	mov	r4,a
+   09FF 8F F0              2882 	mov	b,r7
+   0A01 05 F0              2883 	inc	b
+   0A03 ED                 2884 	mov	a,r5
+   0A04 80 02              2885 	sjmp	00112$
+   0A06                    2886 00111$:
+   0A06 C3                 2887 	clr	c
+   0A07 13                 2888 	rrc	a
+   0A08                    2889 00112$:
+   0A08 D5 F0 FB           2890 	djnz	b,00111$
+   0A0B 54 03              2891 	anl	a,#0x03
+   0A0D FF                 2892 	mov	r7,a
+   0A0E 60 0A              2893 	jz	00101$
+   0A10 BF 01 02           2894 	cjne	r7,#0x01,00114$
+   0A13 80 09              2895 	sjmp	00102$
+   0A15                    2896 00114$:
+                    0A15   2897 	C$fb_app_rollo10.c$797$2$2 ==.
+                           2898 ;	..\fb_app_rollo10.c:797: case 0:	// 0,5s
+   0A15 BF 02 0E           2899 	cjne	r7,#0x02,00104$
+   0A18 80 08              2900 	sjmp	00103$
+   0A1A                    2901 00101$:
+                    0A1A   2902 	C$fb_app_rollo10.c$798$2$2 ==.
+                           2903 ;	..\fb_app_rollo10.c:798: pause=4 ;
+   0A1A 7F 04              2904 	mov	r7,#0x04
+                    0A1C   2905 	C$fb_app_rollo10.c$799$2$2 ==.
+                           2906 ;	..\fb_app_rollo10.c:799: break;
+                    0A1C   2907 	C$fb_app_rollo10.c$800$2$2 ==.
+                           2908 ;	..\fb_app_rollo10.c:800: case 1:	// 1s
+   0A1C 80 0A              2909 	sjmp	00105$
+   0A1E                    2910 00102$:
+                    0A1E   2911 	C$fb_app_rollo10.c$801$2$2 ==.
+                           2912 ;	..\fb_app_rollo10.c:801: pause=8 ;
+   0A1E 7F 08              2913 	mov	r7,#0x08
+                    0A20   2914 	C$fb_app_rollo10.c$802$2$2 ==.
+                           2915 ;	..\fb_app_rollo10.c:802: break;
+                    0A20   2916 	C$fb_app_rollo10.c$803$2$2 ==.
+                           2917 ;	..\fb_app_rollo10.c:803: case 2:	// 2s
+   0A20 80 06              2918 	sjmp	00105$
+   0A22                    2919 00103$:
+                    0A22   2920 	C$fb_app_rollo10.c$804$2$2 ==.
+                           2921 ;	..\fb_app_rollo10.c:804: pause=16 ;
+   0A22 7F 10              2922 	mov	r7,#0x10
+                    0A24   2923 	C$fb_app_rollo10.c$805$2$2 ==.
+                           2924 ;	..\fb_app_rollo10.c:805: break;
+                    0A24   2925 	C$fb_app_rollo10.c$806$2$2 ==.
+                           2926 ;	..\fb_app_rollo10.c:806: default:	// 5s
+   0A24 80 02              2927 	sjmp	00105$
+   0A26                    2928 00104$:
+                    0A26   2929 	C$fb_app_rollo10.c$807$2$2 ==.
+                           2930 ;	..\fb_app_rollo10.c:807: pause=39 ;
+   0A26 7F 27              2931 	mov	r7,#0x27
+                    0A28   2932 	C$fb_app_rollo10.c$809$1$1 ==.
+                           2933 ;	..\fb_app_rollo10.c:809: }
+   0A28                    2934 00105$:
+                    0A28   2935 	C$fb_app_rollo10.c$810$1$1 ==.
+                           2936 ;	..\fb_app_rollo10.c:810: timercnt[pauseobj]=pause;
+   0A28 EE                 2937 	mov	a,r6
+   0A29 24r00              2938 	add	a,#_timercnt
+   0A2B F8                 2939 	mov	r0,a
+   0A2C A6 07              2940 	mov	@r0,ar7
+                    0A2E   2941 	C$fb_app_rollo10.c$811$1$1 ==.
+                           2942 ;	..\fb_app_rollo10.c:811: timerbase[pauseobj]= 3 | 0x80;
+   0A2E EE                 2943 	mov	a,r6
+   0A2F 24 10              2944 	add	a,#_timerbase
+   0A31 F8                 2945 	mov	r0,a
+   0A32 76 83              2946 	mov	@r0,#0x83
+   0A34 D0*00              2947 	pop	_bp
+                    0A36   2948 	C$fb_app_rollo10.c$813$1$1 ==.
+                    0A36   2949 	XG$set_pause$0$0 ==.
+   0A36 22                 2950 	ret
+                           2951 ;------------------------------------------------------------
+                           2952 ;Allocation info for local variables in function 'set_entriegeln'
+                           2953 ;------------------------------------------------------------
+                           2954 ;zeitnr                    Allocated to registers r7 
+                           2955 ;svbase                    Allocated to registers r6 
+                           2956 ;------------------------------------------------------------
+                    0A37   2957 	G$set_entriegeln$0$0 ==.
+                    0A37   2958 	C$fb_app_rollo10.c$816$1$1 ==.
+                           2959 ;	..\fb_app_rollo10.c:816: void set_entriegeln(unsigned char zeitnr)// Setzt die zyklische überwachungszeit
+                           2960 ;	-----------------------------------------
+                           2961 ;	 function set_entriegeln
+                           2962 ;	-----------------------------------------
+   0A37                    2963 _set_entriegeln:
+   0A37 AF 82              2964 	mov	r7,dpl
+                    0A39   2965 	C$fb_app_rollo10.c$821$1$1 ==.
+                           2966 ;	..\fb_app_rollo10.c:821: svbase=eeprom[0xD9]&0x0F;
+   0A39 90s00rD9           2967 	mov	dptr,#(_eeprom + 0x00d9)
+   0A3C E4                 2968 	clr	a
+   0A3D 93                 2969 	movc	a,@a+dptr
+                    0A3E   2970 	C$fb_app_rollo10.c$822$1$1 ==.
+                           2971 ;	..\fb_app_rollo10.c:822: if(svbase){
+   0A3E 54 0F              2972 	anl	a,#0x0F
+   0A40 FE                 2973 	mov	r6,a
+   0A41 60 19              2974 	jz	00102$
+                    0A43   2975 	C$fb_app_rollo10.c$823$2$2 ==.
+                           2976 ;	..\fb_app_rollo10.c:823: timercnt[zeitnr]=svfaktorarray[svbase];
+   0A43 EF                 2977 	mov	a,r7
+   0A44 24r00              2978 	add	a,#_timercnt
+   0A46 F9                 2979 	mov	r1,a
+   0A47 EE                 2980 	mov	a,r6
+   0A48 90s00r0C           2981 	mov	dptr,#_svfaktorarray
+   0A4B 93                 2982 	movc	a,@a+dptr
+   0A4C FE                 2983 	mov	r6,a
+   0A4D F7                 2984 	mov	@r1,a
+                    0A4E   2985 	C$fb_app_rollo10.c$824$2$2 ==.
+                           2986 ;	..\fb_app_rollo10.c:824: timerbase[zeitnr]=5 | 0x80;
+   0A4E EF                 2987 	mov	a,r7
+   0A4F 24 10              2988 	add	a,#_timerbase
+   0A51 F8                 2989 	mov	r0,a
+   0A52 76 85              2990 	mov	@r0,#0x85
+                    0A54   2991 	C$fb_app_rollo10.c$825$2$2 ==.
+                           2992 ;	..\fb_app_rollo10.c:825: timerstate[zeitnr]=0x01;
+   0A54 EF                 2993 	mov	a,r7
+   0A55 24r10              2994 	add	a,#_timerstate
+   0A57 F8                 2995 	mov	r0,a
+   0A58 76 01              2996 	mov	@r0,#0x01
+   0A5A 80 0C              2997 	sjmp	00104$
+   0A5C                    2998 00102$:
+                    0A5C   2999 	C$fb_app_rollo10.c$828$2$3 ==.
+                           3000 ;	..\fb_app_rollo10.c:828: timerbase[zeitnr]=0;
+   0A5C EF                 3001 	mov	a,r7
+   0A5D 24 10              3002 	add	a,#_timerbase
+   0A5F F8                 3003 	mov	r0,a
+   0A60 76 00              3004 	mov	@r0,#0x00
+                    0A62   3005 	C$fb_app_rollo10.c$829$2$3 ==.
+                           3006 ;	..\fb_app_rollo10.c:829: timerstate[zeitnr]=0;
+   0A62 EF                 3007 	mov	a,r7
+   0A63 24r10              3008 	add	a,#_timerstate
+   0A65 F8                 3009 	mov	r0,a
+   0A66 76 00              3010 	mov	@r0,#0x00
+   0A68                    3011 00104$:
+                    0A68   3012 	C$fb_app_rollo10.c$832$1$1 ==.
+                    0A68   3013 	XG$set_entriegeln$0$0 ==.
+   0A68 22                 3014 	ret
+                           3015 ;------------------------------------------------------------
+                           3016 ;Allocation info for local variables in function 'port_schalten'
+                           3017 ;------------------------------------------------------------
+                           3018 ;kmod                      Allocated to registers r7 
+                           3019 ;------------------------------------------------------------
+                    0A69   3020 	G$port_schalten$0$0 ==.
+                    0A69   3021 	C$fb_app_rollo10.c$894$1$1 ==.
+                           3022 ;	..\fb_app_rollo10.c:894: void port_schalten(void)		// Schaltet die Ports mit PWM, DUTY ist Pulsverhältnis
+                           3023 ;	-----------------------------------------
+                           3024 ;	 function port_schalten
+                           3025 ;	-----------------------------------------
+   0A69                    3026 _port_schalten:
+                    0A69   3027 	C$fb_app_rollo10.c$898$1$1 ==.
+                           3028 ;	..\fb_app_rollo10.c:898: portbuffer=0;
+   0A69 75 0D 00           3029 	mov	_portbuffer,#0x00
+                    0A6C   3030 	C$fb_app_rollo10.c$899$1$1 ==.
+                           3031 ;	..\fb_app_rollo10.c:899: if (eeprom[0xE4]& 0x80) kmod=0x01;		// bit 7 ist Kanal-mode
+   0A6C 90s00rE4           3032 	mov	dptr,#(_eeprom + 0x00e4)
+   0A6F E4                 3033 	clr	a
+   0A70 93                 3034 	movc	a,@a+dptr
+   0A71 FF                 3035 	mov	r7,a
+   0A72 30 E7 04           3036 	jnb	acc.7,00102$
+   0A75 7F 01              3037 	mov	r7,#0x01
+   0A77 80 02              3038 	sjmp	00103$
+   0A79                    3039 00102$:
+                    0A79   3040 	C$fb_app_rollo10.c$900$1$1 ==.
+                           3041 ;	..\fb_app_rollo10.c:900: else kmod=0x03;
+   0A79 7F 03              3042 	mov	r7,#0x03
+   0A7B                    3043 00103$:
+                    0A7B   3044 	C$fb_app_rollo10.c$901$1$1 ==.
+                           3045 ;	..\fb_app_rollo10.c:901: for (knr=0;knr<=0x03;knr++){
+   0A7B 75*27 00           3046 	mov	_knr,#0x00
+   0A7E                    3047 00107$:
+   0A7E E5*27              3048 	mov	a,_knr
+   0A80 24 FC              3049 	add	a,#0xff - 0x03
+   0A82 40 23              3050 	jc	00110$
+                    0A84   3051 	C$fb_app_rollo10.c$902$2$2 ==.
+                           3052 ;	..\fb_app_rollo10.c:902: portbuffer=portbuffer|((kanal[knr & kmod]& 0x03)<<(knr<<1));
+   0A84 EF                 3053 	mov	a,r7
+   0A85 55*27              3054 	anl	a,_knr
+   0A87 24r23              3055 	add	a,#_kanal
+   0A89 F9                 3056 	mov	r1,a
+   0A8A 87 06              3057 	mov	ar6,@r1
+   0A8C 53 06 03           3058 	anl	ar6,#0x03
+   0A8F E5*27              3059 	mov	a,_knr
+   0A91 25*27              3060 	add	a,_knr
+   0A93 FD                 3061 	mov	r5,a
+   0A94 8D F0              3062 	mov	b,r5
+   0A96 05 F0              3063 	inc	b
+   0A98 EE                 3064 	mov	a,r6
+   0A99 80 02              3065 	sjmp	00121$
+   0A9B                    3066 00119$:
+   0A9B 25 E0              3067 	add	a,acc
+   0A9D                    3068 00121$:
+   0A9D D5 F0 FB           3069 	djnz	b,00119$
+   0AA0 FE                 3070 	mov	r6,a
+   0AA1 42 0D              3071 	orl	_portbuffer,a
+                    0AA3   3072 	C$fb_app_rollo10.c$901$1$1 ==.
+                           3073 ;	..\fb_app_rollo10.c:901: for (knr=0;knr<=0x03;knr++){
+   0AA3 05*27              3074 	inc	_knr
+   0AA5 80 D7              3075 	sjmp	00107$
+   0AA7                    3076 00110$:
+                    0AA7   3077 	C$fb_app_rollo10.c$967$1$1 ==.
+                           3078 ;	..\fb_app_rollo10.c:967: if(portbuffer & ~oldportbuffer) {	// Vollstrom nur wenn ein relais eingeschaltet wird
+   0AA7 AE 0E              3079 	mov	r6,_oldportbuffer
+   0AA9 7F 00              3080 	mov	r7,#0x00
+   0AAB EE                 3081 	mov	a,r6
+   0AAC F4                 3082 	cpl	a
+   0AAD FE                 3083 	mov	r6,a
+   0AAE EF                 3084 	mov	a,r7
+   0AAF F4                 3085 	cpl	a
+   0AB0 FF                 3086 	mov	r7,a
+   0AB1 AC 0D              3087 	mov	r4,_portbuffer
+   0AB3 7D 00              3088 	mov	r5,#0x00
+   0AB5 EC                 3089 	mov	a,r4
+   0AB6 52 06              3090 	anl	ar6,a
+   0AB8 ED                 3091 	mov	a,r5
+   0AB9 52 07              3092 	anl	ar7,a
+   0ABB EE                 3093 	mov	a,r6
+   0ABC 4F                 3094 	orl	a,r7
+   0ABD 60 1F              3095 	jz	00105$
+                    0ABF   3096 	C$fb_app_rollo10.c$968$2$3 ==.
+                           3097 ;	..\fb_app_rollo10.c:968: TR0=0;
+   0ABF C2 8C              3098 	clr	_TCON_4
+                    0AC1   3099 	C$fb_app_rollo10.c$969$2$3 ==.
+                           3100 ;	..\fb_app_rollo10.c:969: AUXR1&=0xE9;	// PWM von Timer 0 nicht mehr auf Pin ausgeben
+   0AC1 53 A2 E9           3101 	anl	_AUXR1,#0xE9
+                    0AC4   3102 	C$fb_app_rollo10.c$972$2$3 ==.
+                           3103 ;	..\fb_app_rollo10.c:972: PWM=0;			// Vollstrom an
+   0AC4 C2 92              3104 	clr	_P1_2
+                    0AC6   3105 	C$fb_app_rollo10.c$974$2$3 ==.
+                           3106 ;	..\fb_app_rollo10.c:974: P0=portbuffer;		// Ports schalten
+   0AC6 85 0D 80           3107 	mov	_P0,_portbuffer
+                    0AC9   3108 	C$fb_app_rollo10.c$975$2$3 ==.
+                           3109 ;	..\fb_app_rollo10.c:975: TF0=0;			// Timer 0 für Haltezeit Vollstrom verwenden
+   0AC9 C2 8D              3110 	clr	_TCON_5
+                    0ACB   3111 	C$fb_app_rollo10.c$976$2$3 ==.
+                           3112 ;	..\fb_app_rollo10.c:976: TH0=0x00;		// 16ms (10ms=6fff)
+                    0ACB   3113 	C$fb_app_rollo10.c$977$2$3 ==.
+                           3114 ;	..\fb_app_rollo10.c:977: TL0=0x00;
+                    0ACB   3115 	C$fb_app_rollo10.c$978$2$3 ==.
+                           3116 ;	..\fb_app_rollo10.c:978: TMOD=(TMOD & 0xF0) +1;		// Timer 0 als 16-Bit Timer
+   0ACB E4                 3117 	clr	a
+   0ACC F5 8C              3118 	mov	_TH0,a
+   0ACE F5 8A              3119 	mov	_TL0,a
+   0AD0 74 F0              3120 	mov	a,#0xF0
+   0AD2 55 89              3121 	anl	a,_TMOD
+   0AD4 04                 3122 	inc	a
+   0AD5 F5 89              3123 	mov	_TMOD,a
+                    0AD7   3124 	C$fb_app_rollo10.c$979$2$3 ==.
+                           3125 ;	..\fb_app_rollo10.c:979: TAMOD=0x00;
+   0AD7 75 8F 00           3126 	mov	_TAMOD,#0x00
+                    0ADA   3127 	C$fb_app_rollo10.c$980$2$3 ==.
+                           3128 ;	..\fb_app_rollo10.c:980: TR0=1;
+   0ADA D2 8C              3129 	setb	_TCON_4
+   0ADC 80 03              3130 	sjmp	00106$
+   0ADE                    3131 00105$:
+                    0ADE   3132 	C$fb_app_rollo10.c$982$1$1 ==.
+                           3133 ;	..\fb_app_rollo10.c:982: else P0=portbuffer;
+   0ADE 85 0D 80           3134 	mov	_P0,_portbuffer
+   0AE1                    3135 00106$:
+                    0AE1   3136 	C$fb_app_rollo10.c$985$1$1 ==.
+                           3137 ;	..\fb_app_rollo10.c:985: oldportbuffer=portbuffer;
+   0AE1 85 0D 0E           3138 	mov	_oldportbuffer,_portbuffer
+                    0AE4   3139 	C$fb_app_rollo10.c$986$1$1 ==.
+                           3140 ;	..\fb_app_rollo10.c:986: portchanged=0;
+   0AE4 C2*00              3141 	clr	_portchanged
+                    0AE6   3142 	C$fb_app_rollo10.c$990$1$1 ==.
+                    0AE6   3143 	XG$port_schalten$0$0 ==.
+   0AE6 22                 3144 	ret
+                           3145 ;------------------------------------------------------------
+                           3146 ;Allocation info for local variables in function 'bus_return'
+                           3147 ;------------------------------------------------------------
+                           3148 ;n                         Allocated to registers r7 
+                           3149 ;------------------------------------------------------------
+                    0AE7   3150 	G$bus_return$0$0 ==.
+                    0AE7   3151 	C$fb_app_rollo10.c$1112$1$1 ==.
+                           3152 ;	..\fb_app_rollo10.c:1112: void bus_return(void)		// Aktionen bei Busspannungswiederkehr
+                           3153 ;	-----------------------------------------
+                           3154 ;	 function bus_return
+                           3155 ;	-----------------------------------------
+   0AE7                    3156 _bus_return:
+                    0AE7   3157 	C$fb_app_rollo10.c$1115$1$1 ==.
+                           3158 ;	..\fb_app_rollo10.c:1115: blocked=blockedsave;		// Ausgänge gesperrt?
+   0AE7 90 1B FD           3159 	mov	dptr,#_blockedsave
+   0AEA E4                 3160 	clr	a
+   0AEB 93                 3161 	movc	a,@a+dptr
+   0AEC F5 0F              3162 	mov	_blocked,a
+                    0AEE   3163 	C$fb_app_rollo10.c$1116$1$1 ==.
+                           3164 ;	..\fb_app_rollo10.c:1116: timer=0;			// Timer-Variable, wird alle 8 ms inkrementiert
+                    0AEE   3165 	C$fb_app_rollo10.c$1117$2$2 ==.
+                           3166 ;	..\fb_app_rollo10.c:1117: for (n=0;n<=15;n++){// Löschen aller zeiten
    0AEE E4                 3167 	clr	a
-   0AEF 93                 3168 	movc	a,@a+dptr
-   0AF0 F5 0F              3169 	mov	_blocked,a
-                    0AF2   3170 	C$fb_app_rollo10.c$1116$1$1 ==.
-                           3171 ;	..\fb_app_rollo10.c:1116: timer=0;			// Timer-Variable, wird alle 8 ms inkrementiert
-                    0AF2   3172 	C$fb_app_rollo10.c$1117$2$2 ==.
-                           3173 ;	..\fb_app_rollo10.c:1117: for (n=0;n<=15;n++){// Löschen aller zeiten
-   0AF2 E4                 3174 	clr	a
-   0AF3 F5 09              3175 	mov	_timer,a
-   0AF5 F5 0A              3176 	mov	(_timer + 1),a
-   0AF7 FF                 3177 	mov	r7,a
-   0AF8                    3178 00107$:
-   0AF8 EF                 3179 	mov	a,r7
-   0AF9 24 F0              3180 	add	a,#0xff - 0x0F
-   0AFB 40 15              3181 	jc	00110$
-                    0AFD   3182 	C$fb_app_rollo10.c$1118$2$2 ==.
-                           3183 ;	..\fb_app_rollo10.c:1118: timerstate[n]=0;
-   0AFD EF                 3184 	mov	a,r7
-   0AFE 24r10              3185 	add	a,#_timerstate
-   0B00 F8                 3186 	mov	r0,a
-   0B01 76 00              3187 	mov	@r0,#0x00
-                    0B03   3188 	C$fb_app_rollo10.c$1119$2$2 ==.
-                           3189 ;	..\fb_app_rollo10.c:1119: timerbase[n]=0;
-   0B03 EF                 3190 	mov	a,r7
-   0B04 24 10              3191 	add	a,#_timerbase
-   0B06 F8                 3192 	mov	r0,a
-   0B07 76 00              3193 	mov	@r0,#0x00
-                    0B09   3194 	C$fb_app_rollo10.c$1120$2$2 ==.
-                           3195 ;	..\fb_app_rollo10.c:1120: timercnt[n]=0;
-   0B09 EF                 3196 	mov	a,r7
-   0B0A 24r00              3197 	add	a,#_timercnt
-   0B0C F8                 3198 	mov	r0,a
-   0B0D 76 00              3199 	mov	@r0,#0x00
-                    0B0F   3200 	C$fb_app_rollo10.c$1117$1$1 ==.
-                           3201 ;	..\fb_app_rollo10.c:1117: for (n=0;n<=15;n++){// Löschen aller zeiten
-   0B0F 0F                 3202 	inc	r7
-   0B10 80 E6              3203 	sjmp	00107$
-   0B12                    3204 00110$:
-                    0B12   3205 	C$fb_app_rollo10.c$1122$1$1 ==.
-                           3206 ;	..\fb_app_rollo10.c:1122: for (n=0;n<=3;n++){
-   0B12 7F 00              3207 	mov	r7,#0x00
-   0B14                    3208 00111$:
-   0B14 EF                 3209 	mov	a,r7
-   0B15 24 FC              3210 	add	a,#0xff - 0x03
-   0B17 40 63              3211 	jc	00114$
-                    0B19   3212 	C$fb_app_rollo10.c$1123$2$3 ==.
-                           3213 ;	..\fb_app_rollo10.c:1123: if(((eeprom[0xF1]>>n)&0x11)==0 ){// wenn keine Sperrfunktion zugewiesen
-   0B19 90s00rF1           3214 	mov	dptr,#(_eeprom + 0x00f1)
-   0B1C E4                 3215 	clr	a
-   0B1D 93                 3216 	movc	a,@a+dptr
-   0B1E FE                 3217 	mov	r6,a
-   0B1F 8F F0              3218 	mov	b,r7
-   0B21 05 F0              3219 	inc	b
-   0B23 EE                 3220 	mov	a,r6
-   0B24 80 02              3221 	sjmp	00129$
-   0B26                    3222 00128$:
-   0B26 C3                 3223 	clr	c
-   0B27 13                 3224 	rrc	a
-   0B28                    3225 00129$:
-   0B28 D5 F0 FB           3226 	djnz	b,00128$
-   0B2B 54 11              3227 	anl	a,#0x11
-   0B2D 60 02              3228 	jz	00131$
-   0B2F 80 11              3229 	sjmp	00102$
-   0B31                    3230 00131$:
-                    0B31   3231 	C$fb_app_rollo10.c$1124$3$4 ==.
-                           3232 ;	..\fb_app_rollo10.c:1124: blocked &= ~(0x11<<n);  // dann blocked löschen, damit nach umpara
-   0B31 8F F0              3233 	mov	b,r7
-   0B33 05 F0              3234 	inc	b
-   0B35 74 11              3235 	mov	a,#0x11
-   0B37 80 02              3236 	sjmp	00134$
-   0B39                    3237 00132$:
-   0B39 25 E0              3238 	add	a,acc
-   0B3B                    3239 00134$:
-   0B3B D5 F0 FB           3240 	djnz	b,00132$
-   0B3E F4                 3241 	cpl	a
-   0B3F FE                 3242 	mov	r6,a
-   0B40 52 0F              3243 	anl	_blocked,a
-   0B42                    3244 00102$:
-                    0B42   3245 	C$fb_app_rollo10.c$1126$2$3 ==.
-                           3246 ;	..\fb_app_rollo10.c:1126: switch(eeprom[0xD9]& 0xC0){
-   0B42 90s00rD9           3247 	mov	dptr,#(_eeprom + 0x00d9)
-   0B45 E4                 3248 	clr	a
-   0B46 93                 3249 	movc	a,@a+dptr
-   0B47 FE                 3250 	mov	r6,a
-   0B48 53 06 C0           3251 	anl	ar6,#0xC0
-   0B4B BE 40 02           3252 	cjne	r6,#0x40,00135$
-   0B4E 80 05              3253 	sjmp	00103$
-   0B50                    3254 00135$:
-                    0B50   3255 	C$fb_app_rollo10.c$1127$3$5 ==.
-                           3256 ;	..\fb_app_rollo10.c:1127: case 0x40:
-   0B50 BE 80 26           3257 	cjne	r6,#0x80,00113$
-   0B53 80 13              3258 	sjmp	00104$
-   0B55                    3259 00103$:
-                    0B55   3260 	C$fb_app_rollo10.c$1128$3$5 ==.
-                           3261 ;	..\fb_app_rollo10.c:1128: object_schalten(n+12,0);
-   0B55 74 0C              3262 	mov	a,#0x0C
-   0B57 2F                 3263 	add	a,r7
-   0B58 F5 82              3264 	mov	dpl,a
-   0B5A C2 F0              3265 	clr	b[0]
-   0B5C C0 07              3266 	push	ar7
-   0B5E 85 F0*00           3267 	mov	bits,b
-   0B61 12s03r26           3268 	lcall	_object_schalten
-   0B64 D0 07              3269 	pop	ar7
-                    0B66   3270 	C$fb_app_rollo10.c$1129$3$5 ==.
-                           3271 ;	..\fb_app_rollo10.c:1129: break;
-                    0B66   3272 	C$fb_app_rollo10.c$1130$3$5 ==.
-                           3273 ;	..\fb_app_rollo10.c:1130: case 0x80:
-   0B66 80 11              3274 	sjmp	00113$
-   0B68                    3275 00104$:
-                    0B68   3276 	C$fb_app_rollo10.c$1131$3$5 ==.
-                           3277 ;	..\fb_app_rollo10.c:1131: object_schalten(n+12,1);
-   0B68 74 0C              3278 	mov	a,#0x0C
-   0B6A 2F                 3279 	add	a,r7
-   0B6B F5 82              3280 	mov	dpl,a
-   0B6D D2 F0              3281 	setb	b[0]
-   0B6F C0 07              3282 	push	ar7
-   0B71 85 F0*00           3283 	mov	bits,b
-   0B74 12s03r26           3284 	lcall	_object_schalten
-   0B77 D0 07              3285 	pop	ar7
-                    0B79   3286 	C$fb_app_rollo10.c$1134$2$3 ==.
-                           3287 ;	..\fb_app_rollo10.c:1134: }
-   0B79                    3288 00113$:
-                    0B79   3289 	C$fb_app_rollo10.c$1122$1$1 ==.
-                           3290 ;	..\fb_app_rollo10.c:1122: for (n=0;n<=3;n++){
-   0B79 0F                 3291 	inc	r7
-   0B7A 80 98              3292 	sjmp	00111$
-   0B7C                    3293 00114$:
-                    0B7C   3294 	C$fb_app_rollo10.c$1138$1$1 ==.
-                           3295 ;	..\fb_app_rollo10.c:1138: oldportbuffer=0; 	// auf 0 setzen, da sonst kein Vollstrom aktiviert wird
-   0B7C 75 0E 00           3296 	mov	_oldportbuffer,#0x00
-                    0B7F   3297 	C$fb_app_rollo10.c$1139$1$1 ==.
-                           3298 ;	..\fb_app_rollo10.c:1139: portchanged=1;		// Post hinterlegen damit in delaytimer nach portschalten springt
-   0B7F D2*00              3299 	setb	_portchanged
-                    0B81   3300 	C$fb_app_rollo10.c$1141$1$1 ==.
-                           3301 ;	..\fb_app_rollo10.c:1141: set_entriegeln(9);	// Überwachungszeit Sicherheitsfahrt
-   0B81 75 82 09           3302 	mov	dpl,#0x09
-   0B84 12s0Ar3B           3303 	lcall	_set_entriegeln
-                    0B87   3304 	C$fb_app_rollo10.c$1142$1$1 ==.
-                           3305 ;	..\fb_app_rollo10.c:1142: set_entriegeln(10);	// dto
-   0B87 75 82 0A           3306 	mov	dpl,#0x0A
-   0B8A 12s0Ar3B           3307 	lcall	_set_entriegeln
-                    0B8D   3308 	C$fb_app_rollo10.c$1145$1$1 ==.
-                    0B8D   3309 	XG$bus_return$0$0 ==.
-   0B8D 22                 3310 	ret
-                           3311 ;------------------------------------------------------------
-                           3312 ;Allocation info for local variables in function 'restart_app'
-                           3313 ;------------------------------------------------------------
-                    0B8E   3314 	G$restart_app$0$0 ==.
-                    0B8E   3315 	C$fb_app_rollo10.c$1148$1$1 ==.
-                           3316 ;	..\fb_app_rollo10.c:1148: void restart_app(void) 		// Alle Applikations-Parameter zurücksetzen
-                           3317 ;	-----------------------------------------
-                           3318 ;	 function restart_app
-                           3319 ;	-----------------------------------------
-   0B8E                    3320 _restart_app:
-                    0B8E   3321 	C$fb_app_rollo10.c$1151$1$1 ==.
-                           3322 ;	..\fb_app_rollo10.c:1151: Tval=0x00;
-   0B8E 75*20 00           3323 	mov	_Tval,#0x00
-                    0B91   3324 	C$fb_app_rollo10.c$1152$1$1 ==.
-                           3325 ;	..\fb_app_rollo10.c:1152: handmode=0;
-   0B91 C2*02              3326 	clr	_handmode
-                    0B93   3327 	C$fb_app_rollo10.c$1154$1$1 ==.
-                           3328 ;	..\fb_app_rollo10.c:1154: P0=0;
-   0B93 75 80 00           3329 	mov	_P0,#0x00
-                    0B96   3330 	C$fb_app_rollo10.c$1155$1$1 ==.
-                           3331 ;	..\fb_app_rollo10.c:1155: P0M1=0x00;		// Port 0 Modus push-pull für Ausgang
-   0B96 75 84 00           3332 	mov	_P0M1,#0x00
-                    0B99   3333 	C$fb_app_rollo10.c$1156$1$1 ==.
-                           3334 ;	..\fb_app_rollo10.c:1156: P0M2=0xFF;
-   0B99 75 85 FF           3335 	mov	_P0M2,#0xFF
-                    0B9C   3336 	C$fb_app_rollo10.c$1161$1$1 ==.
-                           3337 ;	..\fb_app_rollo10.c:1161: TMOD=(TMOD & 0xF0) + 2;		// Timer 0 als PWM
-   0B9C 74 F0              3338 	mov	a,#0xF0
-   0B9E 55 89              3339 	anl	a,_TMOD
-   0BA0 24 02              3340 	add	a,#0x02
-   0BA2 F5 89              3341 	mov	_TMOD,a
-                    0BA4   3342 	C$fb_app_rollo10.c$1162$1$1 ==.
-                           3343 ;	..\fb_app_rollo10.c:1162: TAMOD=0x01;
-   0BA4 75 8F 01           3344 	mov	_TAMOD,#0x01
-                    0BA7   3345 	C$fb_app_rollo10.c$1163$1$1 ==.
-                           3346 ;	..\fb_app_rollo10.c:1163: TH0=DUTY;		// Pulsverhältnis PWM
-   0BA7 75 8C 50           3347 	mov	_TH0,#0x50
-                    0BAA   3348 	C$fb_app_rollo10.c$1164$1$1 ==.
-                           3349 ;	..\fb_app_rollo10.c:1164: AUXR1|=0x10;	// PWM von Timer 0 auf Pin ausgeben, gleichzeitig low-powermode ein (da <8MHz)
-   0BAA 43 A2 10           3350 	orl	_AUXR1,#0x10
-                    0BAD   3351 	C$fb_app_rollo10.c$1165$1$1 ==.
-                           3352 ;	..\fb_app_rollo10.c:1165: TR0=1;			// Timer 0 starten (PWM)
-   0BAD D2 8C              3353 	setb	_TCON_4
-                    0BAF   3354 	C$fb_app_rollo10.c$1170$1$1 ==.
-                           3355 ;	..\fb_app_rollo10.c:1170: ET0=0;			// Interrupt für Timer 0 sperren
-   0BAF C2 A9              3356 	clr	_IEN0_1
-                    0BB1   3357 	C$fb_app_rollo10.c$1171$1$1 ==.
-                           3358 ;	..\fb_app_rollo10.c:1171: IT0=1;
-   0BB1 D2 88              3359 	setb	_TCON_0
-                    0BB3   3360 	C$fb_app_rollo10.c$1172$1$1 ==.
-                           3361 ;	..\fb_app_rollo10.c:1172: blocked=0x00;		// Ausgänge nicht gesperrt
-                    0BB3   3362 	C$fb_app_rollo10.c$1173$1$1 ==.
-                           3363 ;	..\fb_app_rollo10.c:1173: timer=0;			// Timer-Variable, wird alle 8ms inkrementiert
-                    0BB3   3364 	C$fb_app_rollo10.c$1176$1$1 ==.
-                           3365 ;	..\fb_app_rollo10.c:1176: delay_toggle=0;
-   0BB3 E4                 3366 	clr	a
-   0BB4 F5 0F              3367 	mov	_blocked,a
-   0BB6 F5 09              3368 	mov	_timer,a
-   0BB8 F5 0A              3369 	mov	(_timer + 1),a
-   0BBA F5 09              3370 	mov	_delay_toggle,a
-                    0BBC   3371 	C$fb_app_rollo10.c$1178$1$1 ==.
-                           3372 ;	..\fb_app_rollo10.c:1178: EA=0;						// Interrupts sperren, damit flashen nicht unterbrochen wird
-   0BBC C2 AF              3373 	clr	_IEN0_7
-                    0BBE   3374 	C$fb_app_rollo10.c$1179$1$1 ==.
-                           3375 ;	..\fb_app_rollo10.c:1179: START_WRITECYCLE
-   0BBE 75 E4 00           3376 	mov	_FMCON,#0x00
-                    0BC1   3377 	C$fb_app_rollo10.c$1180$1$1 ==.
-                           3378 ;	..\fb_app_rollo10.c:1180: WRITE_BYTE(0x01,0x03,0x00)	// Herstellercode 0x0004 = Jung
-   0BC1 75 E7 1D           3379 	mov	_FMADRH,#0x1D
-   0BC4 75 E6 03           3380 	mov	_FMADRL,#0x03
-   0BC7 75 E5 00           3381 	mov	_FMDATA,#0x00
-                    0BCA   3382 	C$fb_app_rollo10.c$1181$1$1 ==.
-                           3383 ;	..\fb_app_rollo10.c:1181: WRITE_BYTE(0x01,0x04,0x04)
-   0BCA 75 E7 1D           3384 	mov	_FMADRH,#0x1D
-   0BCD 75 E6 04           3385 	mov	_FMADRL,#0x04
-   0BD0 75 E5 04           3386 	mov	_FMDATA,#0x04
-                    0BD3   3387 	C$fb_app_rollo10.c$1182$1$1 ==.
-                           3388 ;	..\fb_app_rollo10.c:1182: WRITE_BYTE(0x01,0x05,0x20)	// Devicetype 0x2070 = Jung Aktor 2138.10
-   0BD3 75 E7 1D           3389 	mov	_FMADRH,#0x1D
-   0BD6 75 E6 05           3390 	mov	_FMADRL,#0x05
-   0BD9 75 E5 20           3391 	mov	_FMDATA,#0x20
-                    0BDC   3392 	C$fb_app_rollo10.c$1183$1$1 ==.
-                           3393 ;	..\fb_app_rollo10.c:1183: WRITE_BYTE(0x01,0x06,0x70)	
-   0BDC 75 E7 1D           3394 	mov	_FMADRH,#0x1D
-   0BDF 75 E6 06           3395 	mov	_FMADRL,#0x06
-   0BE2 75 E5 70           3396 	mov	_FMDATA,#0x70
-                    0BE5   3397 	C$fb_app_rollo10.c$1184$1$1 ==.
-                           3398 ;	..\fb_app_rollo10.c:1184: WRITE_BYTE(0x01,0x07,0x01)	// Versionnumber of application programm
-   0BE5 75 E7 1D           3399 	mov	_FMADRH,#0x1D
-   0BE8 75 E6 07           3400 	mov	_FMADRL,#0x07
-   0BEB 75 E5 01           3401 	mov	_FMDATA,#0x01
-                    0BEE   3402 	C$fb_app_rollo10.c$1185$1$1 ==.
-                           3403 ;	..\fb_app_rollo10.c:1185: WRITE_BYTE(0x01,0x0C,0x00)	// PORT A Direction Bit Setting
-   0BEE 75 E7 1D           3404 	mov	_FMADRH,#0x1D
-   0BF1 75 E6 0C           3405 	mov	_FMADRL,#0x0C
-   0BF4 75 E5 00           3406 	mov	_FMDATA,#0x00
-                    0BF7   3407 	C$fb_app_rollo10.c$1186$1$1 ==.
-                           3408 ;	..\fb_app_rollo10.c:1186: WRITE_BYTE(0x01,0x0D,0xFF)	// Run-Status (00=stop FF=run)
-   0BF7 75 E7 1D           3409 	mov	_FMADRH,#0x1D
-   0BFA 75 E6 0D           3410 	mov	_FMADRL,#0x0D
-   0BFD 75 E5 FF           3411 	mov	_FMDATA,#0xFF
-                    0C00   3412 	C$fb_app_rollo10.c$1187$1$1 ==.
-                           3413 ;	..\fb_app_rollo10.c:1187: WRITE_BYTE(0x01,0x12,0x9A)	// COMMSTAB Pointer
-   0C00 75 E7 1D           3414 	mov	_FMADRH,#0x1D
-   0C03 75 E6 12           3415 	mov	_FMADRL,#0x12
-   0C06 75 E5 9A           3416 	mov	_FMDATA,#0x9A
-                    0C09   3417 	C$fb_app_rollo10.c$1188$1$1 ==.
-                           3418 ;	..\fb_app_rollo10.c:1188: STOP_WRITECYCLE
-   0C09 75 E4 68           3419 	mov	_FMCON,#0x68
-                    0C0C   3420 	C$fb_app_rollo10.c$1189$1$1 ==.
-                           3421 ;	..\fb_app_rollo10.c:1189: EA=1;						// Interrupts freigeben
-   0C0C D2 AF              3422 	setb	_IEN0_7
-                    0C0E   3423 	C$fb_app_rollo10.c$1191$1$1 ==.
-                           3424 ;	..\fb_app_rollo10.c:1191: RTCCON=0x60;		// RTC Flag löschen
-   0C0E 75 D1 60           3425 	mov	_RTCCON,#0x60
-                    0C11   3426 	C$fb_app_rollo10.c$1192$1$1 ==.
-                           3427 ;	..\fb_app_rollo10.c:1192: RTCH=0x01;			// reload Real Time Clock
-   0C11 75 D2 01           3428 	mov	_RTCH,#0x01
-                    0C14   3429 	C$fb_app_rollo10.c$1193$1$1 ==.
-                           3430 ;	..\fb_app_rollo10.c:1193: RTCL=0xCD;			// 8ms
-   0C14 75 D3 CD           3431 	mov	_RTCL,#0xCD
-                    0C17   3432 	C$fb_app_rollo10.c$1194$1$1 ==.
-                           3433 ;	..\fb_app_rollo10.c:1194: RTCCON=0x61;
-   0C17 75 D1 61           3434 	mov	_RTCCON,#0x61
-                    0C1A   3435 	C$fb_app_rollo10.c$1195$1$1 ==.
-                    0C1A   3436 	XG$restart_app$0$0 ==.
-   0C1A 22                 3437 	ret
-                           3438 	.area CSEG    (CODE)
-                           3439 	.area CONST   (CODE)
-                    1BFD   3440 Ffb_app_rollo10$blockedsave$0$0 == 0x1bfd
-                    1BFD   3441 _blockedsave	=	0x1bfd
-                    0000   3442 G$timerflagmask$0$0 == .
-   0000                    3443 _timerflagmask:
-   0000 00 00              3444 	.byte #0x00,#0x00	; 0
-   0002 00 00              3445 	.byte #0x00,#0x00	; 0
-   0004 00 00              3446 	.byte #0x00,#0x00	; 0
-   0006 08 00              3447 	.byte #0x08,#0x00	; 8
-   0008 80 00              3448 	.byte #0x80,#0x00	; 128
-   000A 00 08              3449 	.byte #0x00,#0x08	; 2048
-                    000C   3450 G$svfaktorarray$0$0 == .
-   000C                    3451 _svfaktorarray:
-   000C 00                 3452 	.db #0x00	; 0
-   000D 02                 3453 	.db #0x02	; 2
-   000E 04                 3454 	.db #0x04	; 4
-   000F 06                 3455 	.db #0x06	; 6
-   0010 08                 3456 	.db #0x08	; 8
-   0011 0A                 3457 	.db #0x0A	; 10
-   0012 0C                 3458 	.db #0x0C	; 12
-   0013 0E                 3459 	.db #0x0E	; 14
-   0014 10                 3460 	.db #0x10	; 16
-   0015 12                 3461 	.db #0x12	; 18
-   0016 14                 3462 	.db #0x14	; 20
-   0017 16                 3463 	.db #0x16	; 22
-   0018 24                 3464 	.db #0x24	; 36
-   0019 48                 3465 	.db #0x48	; 72	'H'
-   001A 6D                 3466 	.db #0x6D	; 109	'm'
-   001B DA                 3467 	.db #0xDA	; 218
-                           3468 	.area XINIT   (CODE)
-                           3469 	.area CABS    (ABS,CODE)
+   0AEF F5 09              3168 	mov	_timer,a
+   0AF1 F5 0A              3169 	mov	(_timer + 1),a
+   0AF3 FF                 3170 	mov	r7,a
+   0AF4                    3171 00107$:
+   0AF4 EF                 3172 	mov	a,r7
+   0AF5 24 F0              3173 	add	a,#0xff - 0x0F
+   0AF7 40 15              3174 	jc	00110$
+                    0AF9   3175 	C$fb_app_rollo10.c$1118$2$2 ==.
+                           3176 ;	..\fb_app_rollo10.c:1118: timerstate[n]=0;
+   0AF9 EF                 3177 	mov	a,r7
+   0AFA 24r10              3178 	add	a,#_timerstate
+   0AFC F8                 3179 	mov	r0,a
+   0AFD 76 00              3180 	mov	@r0,#0x00
+                    0AFF   3181 	C$fb_app_rollo10.c$1119$2$2 ==.
+                           3182 ;	..\fb_app_rollo10.c:1119: timerbase[n]=0;
+   0AFF EF                 3183 	mov	a,r7
+   0B00 24 10              3184 	add	a,#_timerbase
+   0B02 F8                 3185 	mov	r0,a
+   0B03 76 00              3186 	mov	@r0,#0x00
+                    0B05   3187 	C$fb_app_rollo10.c$1120$2$2 ==.
+                           3188 ;	..\fb_app_rollo10.c:1120: timercnt[n]=0;
+   0B05 EF                 3189 	mov	a,r7
+   0B06 24r00              3190 	add	a,#_timercnt
+   0B08 F8                 3191 	mov	r0,a
+   0B09 76 00              3192 	mov	@r0,#0x00
+                    0B0B   3193 	C$fb_app_rollo10.c$1117$1$1 ==.
+                           3194 ;	..\fb_app_rollo10.c:1117: for (n=0;n<=15;n++){// Löschen aller zeiten
+   0B0B 0F                 3195 	inc	r7
+   0B0C 80 E6              3196 	sjmp	00107$
+   0B0E                    3197 00110$:
+                    0B0E   3198 	C$fb_app_rollo10.c$1122$1$1 ==.
+                           3199 ;	..\fb_app_rollo10.c:1122: for (n=0;n<=3;n++){
+   0B0E 7F 00              3200 	mov	r7,#0x00
+   0B10                    3201 00111$:
+   0B10 EF                 3202 	mov	a,r7
+   0B11 24 FC              3203 	add	a,#0xff - 0x03
+   0B13 40 63              3204 	jc	00114$
+                    0B15   3205 	C$fb_app_rollo10.c$1123$2$3 ==.
+                           3206 ;	..\fb_app_rollo10.c:1123: if(((eeprom[0xF1]>>n)&0x11)==0 ){// wenn keine Sperrfunktion zugewiesen
+   0B15 90s00rF1           3207 	mov	dptr,#(_eeprom + 0x00f1)
+   0B18 E4                 3208 	clr	a
+   0B19 93                 3209 	movc	a,@a+dptr
+   0B1A FE                 3210 	mov	r6,a
+   0B1B 8F F0              3211 	mov	b,r7
+   0B1D 05 F0              3212 	inc	b
+   0B1F EE                 3213 	mov	a,r6
+   0B20 80 02              3214 	sjmp	00129$
+   0B22                    3215 00128$:
+   0B22 C3                 3216 	clr	c
+   0B23 13                 3217 	rrc	a
+   0B24                    3218 00129$:
+   0B24 D5 F0 FB           3219 	djnz	b,00128$
+   0B27 54 11              3220 	anl	a,#0x11
+   0B29 60 02              3221 	jz	00131$
+   0B2B 80 11              3222 	sjmp	00102$
+   0B2D                    3223 00131$:
+                    0B2D   3224 	C$fb_app_rollo10.c$1124$3$4 ==.
+                           3225 ;	..\fb_app_rollo10.c:1124: blocked &= ~(0x11<<n);  // dann blocked löschen, damit nach umpara
+   0B2D 8F F0              3226 	mov	b,r7
+   0B2F 05 F0              3227 	inc	b
+   0B31 74 11              3228 	mov	a,#0x11
+   0B33 80 02              3229 	sjmp	00134$
+   0B35                    3230 00132$:
+   0B35 25 E0              3231 	add	a,acc
+   0B37                    3232 00134$:
+   0B37 D5 F0 FB           3233 	djnz	b,00132$
+   0B3A F4                 3234 	cpl	a
+   0B3B FE                 3235 	mov	r6,a
+   0B3C 52 0F              3236 	anl	_blocked,a
+   0B3E                    3237 00102$:
+                    0B3E   3238 	C$fb_app_rollo10.c$1126$2$3 ==.
+                           3239 ;	..\fb_app_rollo10.c:1126: switch(eeprom[0xD9]& 0xC0){
+   0B3E 90s00rD9           3240 	mov	dptr,#(_eeprom + 0x00d9)
+   0B41 E4                 3241 	clr	a
+   0B42 93                 3242 	movc	a,@a+dptr
+   0B43 FE                 3243 	mov	r6,a
+   0B44 53 06 C0           3244 	anl	ar6,#0xC0
+   0B47 BE 40 02           3245 	cjne	r6,#0x40,00135$
+   0B4A 80 05              3246 	sjmp	00103$
+   0B4C                    3247 00135$:
+                    0B4C   3248 	C$fb_app_rollo10.c$1127$3$5 ==.
+                           3249 ;	..\fb_app_rollo10.c:1127: case 0x40:
+   0B4C BE 80 26           3250 	cjne	r6,#0x80,00113$
+   0B4F 80 13              3251 	sjmp	00104$
+   0B51                    3252 00103$:
+                    0B51   3253 	C$fb_app_rollo10.c$1128$3$5 ==.
+                           3254 ;	..\fb_app_rollo10.c:1128: object_schalten(n+12,0);
+   0B51 74 0C              3255 	mov	a,#0x0C
+   0B53 2F                 3256 	add	a,r7
+   0B54 F5 82              3257 	mov	dpl,a
+   0B56 C2 F0              3258 	clr	b[0]
+   0B58 C0 07              3259 	push	ar7
+   0B5A 85 F0*00           3260 	mov	bits,b
+   0B5D 12s03r26           3261 	lcall	_object_schalten
+   0B60 D0 07              3262 	pop	ar7
+                    0B62   3263 	C$fb_app_rollo10.c$1129$3$5 ==.
+                           3264 ;	..\fb_app_rollo10.c:1129: break;
+                    0B62   3265 	C$fb_app_rollo10.c$1130$3$5 ==.
+                           3266 ;	..\fb_app_rollo10.c:1130: case 0x80:
+   0B62 80 11              3267 	sjmp	00113$
+   0B64                    3268 00104$:
+                    0B64   3269 	C$fb_app_rollo10.c$1131$3$5 ==.
+                           3270 ;	..\fb_app_rollo10.c:1131: object_schalten(n+12,1);
+   0B64 74 0C              3271 	mov	a,#0x0C
+   0B66 2F                 3272 	add	a,r7
+   0B67 F5 82              3273 	mov	dpl,a
+   0B69 D2 F0              3274 	setb	b[0]
+   0B6B C0 07              3275 	push	ar7
+   0B6D 85 F0*00           3276 	mov	bits,b
+   0B70 12s03r26           3277 	lcall	_object_schalten
+   0B73 D0 07              3278 	pop	ar7
+                    0B75   3279 	C$fb_app_rollo10.c$1134$2$3 ==.
+                           3280 ;	..\fb_app_rollo10.c:1134: }
+   0B75                    3281 00113$:
+                    0B75   3282 	C$fb_app_rollo10.c$1122$1$1 ==.
+                           3283 ;	..\fb_app_rollo10.c:1122: for (n=0;n<=3;n++){
+   0B75 0F                 3284 	inc	r7
+   0B76 80 98              3285 	sjmp	00111$
+   0B78                    3286 00114$:
+                    0B78   3287 	C$fb_app_rollo10.c$1138$1$1 ==.
+                           3288 ;	..\fb_app_rollo10.c:1138: oldportbuffer=0; 	// auf 0 setzen, da sonst kein Vollstrom aktiviert wird
+   0B78 75 0E 00           3289 	mov	_oldportbuffer,#0x00
+                    0B7B   3290 	C$fb_app_rollo10.c$1139$1$1 ==.
+                           3291 ;	..\fb_app_rollo10.c:1139: portchanged=1;		// Post hinterlegen damit in delaytimer nach portschalten springt
+   0B7B D2*00              3292 	setb	_portchanged
+                    0B7D   3293 	C$fb_app_rollo10.c$1141$1$1 ==.
+                           3294 ;	..\fb_app_rollo10.c:1141: set_entriegeln(9);	// Überwachungszeit Sicherheitsfahrt
+   0B7D 75 82 09           3295 	mov	dpl,#0x09
+   0B80 12s0Ar37           3296 	lcall	_set_entriegeln
+                    0B83   3297 	C$fb_app_rollo10.c$1142$1$1 ==.
+                           3298 ;	..\fb_app_rollo10.c:1142: set_entriegeln(10);	// dto
+   0B83 75 82 0A           3299 	mov	dpl,#0x0A
+   0B86 12s0Ar37           3300 	lcall	_set_entriegeln
+                    0B89   3301 	C$fb_app_rollo10.c$1145$1$1 ==.
+                    0B89   3302 	XG$bus_return$0$0 ==.
+   0B89 22                 3303 	ret
+                           3304 ;------------------------------------------------------------
+                           3305 ;Allocation info for local variables in function 'restart_app'
+                           3306 ;------------------------------------------------------------
+                    0B8A   3307 	G$restart_app$0$0 ==.
+                    0B8A   3308 	C$fb_app_rollo10.c$1148$1$1 ==.
+                           3309 ;	..\fb_app_rollo10.c:1148: void restart_app(void) 		// Alle Applikations-Parameter zurücksetzen
+                           3310 ;	-----------------------------------------
+                           3311 ;	 function restart_app
+                           3312 ;	-----------------------------------------
+   0B8A                    3313 _restart_app:
+                    0B8A   3314 	C$fb_app_rollo10.c$1151$1$1 ==.
+                           3315 ;	..\fb_app_rollo10.c:1151: Tval=0x00;
+   0B8A 75*20 00           3316 	mov	_Tval,#0x00
+                    0B8D   3317 	C$fb_app_rollo10.c$1152$1$1 ==.
+                           3318 ;	..\fb_app_rollo10.c:1152: handmode=0;
+   0B8D C2*02              3319 	clr	_handmode
+                    0B8F   3320 	C$fb_app_rollo10.c$1154$1$1 ==.
+                           3321 ;	..\fb_app_rollo10.c:1154: P0=0;
+   0B8F 75 80 00           3322 	mov	_P0,#0x00
+                    0B92   3323 	C$fb_app_rollo10.c$1155$1$1 ==.
+                           3324 ;	..\fb_app_rollo10.c:1155: P0M1=0x00;		// Port 0 Modus push-pull für Ausgang
+   0B92 75 84 00           3325 	mov	_P0M1,#0x00
+                    0B95   3326 	C$fb_app_rollo10.c$1156$1$1 ==.
+                           3327 ;	..\fb_app_rollo10.c:1156: P0M2=0xFF;
+   0B95 75 85 FF           3328 	mov	_P0M2,#0xFF
+                    0B98   3329 	C$fb_app_rollo10.c$1161$1$1 ==.
+                           3330 ;	..\fb_app_rollo10.c:1161: TMOD=(TMOD & 0xF0) + 2;		// Timer 0 als PWM
+   0B98 74 F0              3331 	mov	a,#0xF0
+   0B9A 55 89              3332 	anl	a,_TMOD
+   0B9C 24 02              3333 	add	a,#0x02
+   0B9E F5 89              3334 	mov	_TMOD,a
+                    0BA0   3335 	C$fb_app_rollo10.c$1162$1$1 ==.
+                           3336 ;	..\fb_app_rollo10.c:1162: TAMOD=0x01;
+   0BA0 75 8F 01           3337 	mov	_TAMOD,#0x01
+                    0BA3   3338 	C$fb_app_rollo10.c$1163$1$1 ==.
+                           3339 ;	..\fb_app_rollo10.c:1163: TH0=DUTY;		// Pulsverhältnis PWM
+   0BA3 75 8C 50           3340 	mov	_TH0,#0x50
+                    0BA6   3341 	C$fb_app_rollo10.c$1164$1$1 ==.
+                           3342 ;	..\fb_app_rollo10.c:1164: AUXR1|=0x10;	// PWM von Timer 0 auf Pin ausgeben, gleichzeitig low-powermode ein (da <8MHz)
+   0BA6 43 A2 10           3343 	orl	_AUXR1,#0x10
+                    0BA9   3344 	C$fb_app_rollo10.c$1165$1$1 ==.
+                           3345 ;	..\fb_app_rollo10.c:1165: TR0=1;			// Timer 0 starten (PWM)
+   0BA9 D2 8C              3346 	setb	_TCON_4
+                    0BAB   3347 	C$fb_app_rollo10.c$1170$1$1 ==.
+                           3348 ;	..\fb_app_rollo10.c:1170: ET0=0;			// Interrupt für Timer 0 sperren
+   0BAB C2 A9              3349 	clr	_IEN0_1
+                    0BAD   3350 	C$fb_app_rollo10.c$1171$1$1 ==.
+                           3351 ;	..\fb_app_rollo10.c:1171: IT0=1;
+   0BAD D2 88              3352 	setb	_TCON_0
+                    0BAF   3353 	C$fb_app_rollo10.c$1172$1$1 ==.
+                           3354 ;	..\fb_app_rollo10.c:1172: blocked=0x00;		// Ausgänge nicht gesperrt
+                    0BAF   3355 	C$fb_app_rollo10.c$1173$1$1 ==.
+                           3356 ;	..\fb_app_rollo10.c:1173: timer=0;			// Timer-Variable, wird alle 8ms inkrementiert
+                    0BAF   3357 	C$fb_app_rollo10.c$1176$1$1 ==.
+                           3358 ;	..\fb_app_rollo10.c:1176: delay_toggle=0;
+   0BAF E4                 3359 	clr	a
+   0BB0 F5 0F              3360 	mov	_blocked,a
+   0BB2 F5 09              3361 	mov	_timer,a
+   0BB4 F5 0A              3362 	mov	(_timer + 1),a
+   0BB6 F5 09              3363 	mov	_delay_toggle,a
+                    0BB8   3364 	C$fb_app_rollo10.c$1178$1$1 ==.
+                           3365 ;	..\fb_app_rollo10.c:1178: EA=0;						// Interrupts sperren, damit flashen nicht unterbrochen wird
+   0BB8 C2 AF              3366 	clr	_IEN0_7
+                    0BBA   3367 	C$fb_app_rollo10.c$1179$1$1 ==.
+                           3368 ;	..\fb_app_rollo10.c:1179: START_WRITECYCLE
+   0BBA 75 E4 00           3369 	mov	_FMCON,#0x00
+                    0BBD   3370 	C$fb_app_rollo10.c$1180$1$1 ==.
+                           3371 ;	..\fb_app_rollo10.c:1180: WRITE_BYTE(0x01,0x03,0x00)	// Herstellercode 0x0004 = Jung
+   0BBD 75 E7 1D           3372 	mov	_FMADRH,#0x1D
+   0BC0 75 E6 03           3373 	mov	_FMADRL,#0x03
+   0BC3 75 E5 00           3374 	mov	_FMDATA,#0x00
+                    0BC6   3375 	C$fb_app_rollo10.c$1181$1$1 ==.
+                           3376 ;	..\fb_app_rollo10.c:1181: WRITE_BYTE(0x01,0x04,0x04)
+   0BC6 75 E7 1D           3377 	mov	_FMADRH,#0x1D
+   0BC9 75 E6 04           3378 	mov	_FMADRL,#0x04
+   0BCC 75 E5 04           3379 	mov	_FMDATA,#0x04
+                    0BCF   3380 	C$fb_app_rollo10.c$1182$1$1 ==.
+                           3381 ;	..\fb_app_rollo10.c:1182: WRITE_BYTE(0x01,0x05,0x20)	// Devicetype 0x2070 = Jung Aktor 2138.10
+   0BCF 75 E7 1D           3382 	mov	_FMADRH,#0x1D
+   0BD2 75 E6 05           3383 	mov	_FMADRL,#0x05
+   0BD5 75 E5 20           3384 	mov	_FMDATA,#0x20
+                    0BD8   3385 	C$fb_app_rollo10.c$1183$1$1 ==.
+                           3386 ;	..\fb_app_rollo10.c:1183: WRITE_BYTE(0x01,0x06,0x70)	
+   0BD8 75 E7 1D           3387 	mov	_FMADRH,#0x1D
+   0BDB 75 E6 06           3388 	mov	_FMADRL,#0x06
+   0BDE 75 E5 70           3389 	mov	_FMDATA,#0x70
+                    0BE1   3390 	C$fb_app_rollo10.c$1184$1$1 ==.
+                           3391 ;	..\fb_app_rollo10.c:1184: WRITE_BYTE(0x01,0x07,0x01)	// Versionnumber of application programm
+   0BE1 75 E7 1D           3392 	mov	_FMADRH,#0x1D
+   0BE4 75 E6 07           3393 	mov	_FMADRL,#0x07
+   0BE7 75 E5 01           3394 	mov	_FMDATA,#0x01
+                    0BEA   3395 	C$fb_app_rollo10.c$1185$1$1 ==.
+                           3396 ;	..\fb_app_rollo10.c:1185: WRITE_BYTE(0x01,0x0C,0x00)	// PORT A Direction Bit Setting
+   0BEA 75 E7 1D           3397 	mov	_FMADRH,#0x1D
+   0BED 75 E6 0C           3398 	mov	_FMADRL,#0x0C
+   0BF0 75 E5 00           3399 	mov	_FMDATA,#0x00
+                    0BF3   3400 	C$fb_app_rollo10.c$1186$1$1 ==.
+                           3401 ;	..\fb_app_rollo10.c:1186: WRITE_BYTE(0x01,0x0D,0xFF)	// Run-Status (00=stop FF=run)
+   0BF3 75 E7 1D           3402 	mov	_FMADRH,#0x1D
+   0BF6 75 E6 0D           3403 	mov	_FMADRL,#0x0D
+   0BF9 75 E5 FF           3404 	mov	_FMDATA,#0xFF
+                    0BFC   3405 	C$fb_app_rollo10.c$1187$1$1 ==.
+                           3406 ;	..\fb_app_rollo10.c:1187: WRITE_BYTE(0x01,0x12,0x9A)	// COMMSTAB Pointer
+   0BFC 75 E7 1D           3407 	mov	_FMADRH,#0x1D
+   0BFF 75 E6 12           3408 	mov	_FMADRL,#0x12
+   0C02 75 E5 9A           3409 	mov	_FMDATA,#0x9A
+                    0C05   3410 	C$fb_app_rollo10.c$1188$1$1 ==.
+                           3411 ;	..\fb_app_rollo10.c:1188: STOP_WRITECYCLE
+   0C05 75 E4 68           3412 	mov	_FMCON,#0x68
+                    0C08   3413 	C$fb_app_rollo10.c$1189$1$1 ==.
+                           3414 ;	..\fb_app_rollo10.c:1189: EA=1;						// Interrupts freigeben
+   0C08 D2 AF              3415 	setb	_IEN0_7
+                    0C0A   3416 	C$fb_app_rollo10.c$1191$1$1 ==.
+                           3417 ;	..\fb_app_rollo10.c:1191: RTCCON=0x60;		// RTC Flag löschen
+   0C0A 75 D1 60           3418 	mov	_RTCCON,#0x60
+                    0C0D   3419 	C$fb_app_rollo10.c$1192$1$1 ==.
+                           3420 ;	..\fb_app_rollo10.c:1192: RTCH=0x01;			// reload Real Time Clock
+   0C0D 75 D2 01           3421 	mov	_RTCH,#0x01
+                    0C10   3422 	C$fb_app_rollo10.c$1193$1$1 ==.
+                           3423 ;	..\fb_app_rollo10.c:1193: RTCL=0xCD;			// 8ms
+   0C10 75 D3 CD           3424 	mov	_RTCL,#0xCD
+                    0C13   3425 	C$fb_app_rollo10.c$1194$1$1 ==.
+                           3426 ;	..\fb_app_rollo10.c:1194: RTCCON=0x61;
+   0C13 75 D1 61           3427 	mov	_RTCCON,#0x61
+                    0C16   3428 	C$fb_app_rollo10.c$1195$1$1 ==.
+                    0C16   3429 	XG$restart_app$0$0 ==.
+   0C16 22                 3430 	ret
+                           3431 	.area CSEG    (CODE)
+                           3432 	.area CONST   (CODE)
+                    1BFD   3433 Ffb_app_rollo10$blockedsave$0$0 == 0x1bfd
+                    1BFD   3434 _blockedsave	=	0x1bfd
+                    0000   3435 G$timerflagmask$0$0 == .
+   0000                    3436 _timerflagmask:
+   0000 00 00              3437 	.byte #0x00,#0x00	; 0
+   0002 00 00              3438 	.byte #0x00,#0x00	; 0
+   0004 00 00              3439 	.byte #0x00,#0x00	; 0
+   0006 08 00              3440 	.byte #0x08,#0x00	; 8
+   0008 80 00              3441 	.byte #0x80,#0x00	; 128
+   000A 00 08              3442 	.byte #0x00,#0x08	; 2048
+                    000C   3443 G$svfaktorarray$0$0 == .
+   000C                    3444 _svfaktorarray:
+   000C 00                 3445 	.db #0x00	; 0
+   000D 02                 3446 	.db #0x02	; 2
+   000E 04                 3447 	.db #0x04	; 4
+   000F 06                 3448 	.db #0x06	; 6
+   0010 08                 3449 	.db #0x08	; 8
+   0011 0A                 3450 	.db #0x0A	; 10
+   0012 0C                 3451 	.db #0x0C	; 12
+   0013 0E                 3452 	.db #0x0E	; 14
+   0014 10                 3453 	.db #0x10	; 16
+   0015 12                 3454 	.db #0x12	; 18
+   0016 14                 3455 	.db #0x14	; 20
+   0017 16                 3456 	.db #0x16	; 22
+   0018 24                 3457 	.db #0x24	; 36
+   0019 48                 3458 	.db #0x48	; 72	'H'
+   001A 6D                 3459 	.db #0x6D	; 109	'm'
+   001B DA                 3460 	.db #0xDA	; 218
+                           3461 	.area XINIT   (CODE)
+                           3462 	.area CABS    (ABS,CODE)

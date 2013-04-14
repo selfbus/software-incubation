@@ -39,6 +39,7 @@
 #endif
 
 #define VERSION 10
+unsigned char __at 0x00 RAM[00]; 
 
 void main(void)
 { 
@@ -85,8 +86,8 @@ void main(void)
 	SCON=0x50;		// Mode 1, receive enable
 	SSTAT|=0xE0;	// TI wird am Ende des Stopbits gesetzt und Interrupt nur bei RX und double TX buffer an
 	BRGCON|=0x02;	// Baudrate Generator verwenden aber noch gestoppt
-	BRGR1=0x00;	// Baudrate = cclk/((BRGR1,BRGR0)+16)
-	BRGR0=0x30;	// für 115200 0030 nehmen, autocal: 600bd= 0x2FF0
+	BRGR1=0x2F;	// Baudrate = cclk/((BRGR1,BRGR0)+16)
+	BRGR0=0xF0;	// für 115200 0030 nehmen, autocal: 600bd= 0x2FF0
 	BRGCON|=0x01;	// Baudrate Generator starten
 	SBUF=0x55;
 	do  {
@@ -167,10 +168,10 @@ void main(void)
 			for(n=0;n<100;n++);	// falls Hauptroutine keine Zeit verbraucht, der PROG LED etwas Zeit geben, damit sie auch leuchten kann
 		}
 
-BREAKPOINT
-cmd;
+//BREAKPOINT
+//cmd;
 		// Eingehendes Terminal Kommando verarbeiten...
-/*		if (RI){
+		if (RI){
 			RI=0;
 			cmd=SBUF;
 			if(cmd=='c'){
@@ -230,7 +231,7 @@ cmd;
 			}
 
 		}//end if(RI...
-*/		
+		
 		TASTER=1;				// Pin als Eingang schalten um Taster abzufragen
 		if(!TASTER){ // Taster gedrückt
 			if(tasterpegel<255)	tasterpegel++;

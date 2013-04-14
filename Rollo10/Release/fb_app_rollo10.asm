@@ -1,7 +1,7 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
 ; Version 3.1.0 #7066 (Nov 22 2011) (MINGW32)
-; This file was generated Mon Nov 19 19:58:42 2012
+; This file was generated Sun Apr 14 11:31:36 2013
 ;--------------------------------------------------------
 	.module fb_app_rollo10
 	.optsdcc -mmcs51 --model-small
@@ -2236,7 +2236,7 @@ _object_schalten:
 ;------------------------------------------------------------
 	G$delay_timer$0$0 ==.
 	C$fb_app_rollo10.c$516$2$1 ==.
-;	..\fb_app_rollo10.c:516: void delay_timer(void)	// zählt alle 65ms die Variable Timer hoch und prüft Queue
+;	..\fb_app_rollo10.c:516: void delay_timer(void)	// zählt alle 8 ms die Variable Timer hoch und prüft Queue
 ;	-----------------------------------------
 ;	 function delay_timer
 ;	-----------------------------------------
@@ -2520,7 +2520,7 @@ _delay_timer:
 00196$:
 	jc	00130$
 	C$fb_app_rollo10.c$582$5$15 ==.
-;	..\fb_app_rollo10.c:582: if (delay_state == 0x12) timerstate[15]=0x22; // wenn ziel 2 erreicht in delrec sichern
+;	..\fb_app_rollo10.c:582: if (delay_state == 0x12) timerstate[15]=0x22; // wenn ziel 2 erreicht,  sichern
 	cjne	r6,#0x12,00124$
 	mov	(_timerstate + 0x000f),#0x22
 00124$:
@@ -2534,11 +2534,11 @@ _delay_timer:
 ;	..\fb_app_rollo10.c:585: timerstate[15]=0x12;
 	mov	(_timerstate + 0x000f),#0x12
 	C$fb_app_rollo10.c$586$6$16 ==.
-;	..\fb_app_rollo10.c:586: timercnt[15]= 20;// wenn ziel 1 erreicht in delrec sichern und restzeit fuer ziel 2 schreiben
+;	..\fb_app_rollo10.c:586: timercnt[15]= 20;// wenn ziel 1 erreicht , sichern und restzeit fuer ziel 2 schreiben
 	mov	(_timercnt + 0x000f),#0x14
 00126$:
 	C$fb_app_rollo10.c$589$5$15 ==.
-;	..\fb_app_rollo10.c:589: if (delay_state == 0x04) timerstate[15]= 0x08;// wenn ziel erreicht in delrec sichern
+;	..\fb_app_rollo10.c:589: if (delay_state == 0x04) timerstate[15]= 0x08;// wenn ziel erreicht , sichern
 	cjne	r6,#0x04,00130$
 	mov	(_timerstate + 0x000f),#0x08
 00130$:
@@ -2586,18 +2586,15 @@ _handsteuerung:
 	mov	a,#0x0F
 	anl	a,_TMOD
 	mov	r7,a
-	cjne	r7,#0x02,00158$
-	sjmp	00159$
+	cjne	r7,#0x02,00157$
+	sjmp	00158$
+00157$:
+	ljmp	00137$
 00158$:
+	mov	a,_fb_state
+	jz	00159$
 	ljmp	00137$
 00159$:
-	mov	a,_fb_state
-	jz	00160$
-	ljmp	00137$
-00160$:
-	C$fb_app_rollo10.c$697$2$2 ==.
-;	..\fb_app_rollo10.c:697: ET1=0;	
-	clr	_IEN0_3
 	C$fb_app_rollo10.c$698$2$2 ==.
 ;	..\fb_app_rollo10.c:698: while(  (!PWM || (TL0>0x72)));// PWM scannen um "Hand"-Tasten abzufragen
 00102$:
@@ -2613,11 +2610,11 @@ _handsteuerung:
 	mov	b,r7
 	inc	b
 	mov	a,#0x01
-	sjmp	00165$
-00163$:
+	sjmp	00164$
+00162$:
 	add	a,acc
-00165$:
-	djnz	b,00163$
+00164$:
+	djnz	b,00162$
 	C$fb_app_rollo10.c$718$2$2 ==.
 ;	..\fb_app_rollo10.c:718: P0 = ~key_pattern;
 	mov	r7,a
@@ -2640,11 +2637,11 @@ _handsteuerung:
 	mov	_P0,_oldportbuffer
 	C$fb_app_rollo10.c$725$2$2 ==.
 ;	..\fb_app_rollo10.c:725: if (key_pattern==0x80){
-	cjne	r7,#0x80,00168$
-	sjmp	00169$
-00168$:
+	cjne	r7,#0x80,00167$
+	sjmp	00168$
+00167$:
 	ljmp	00137$
-00169$:
+00168$:
 	C$fb_app_rollo10.c$726$3$4 ==.
 ;	..\fb_app_rollo10.c:726: Tasten=ledport;
 	mov	r7,_ledport
@@ -2658,9 +2655,9 @@ _handsteuerung:
 	C$fb_app_rollo10.c$732$4$5 ==.
 ;	..\fb_app_rollo10.c:732: if (!Tval ){// steigende Flanke des Tasters 
 	mov	a,_Tval
-	jz	00171$
+	jz	00170$
 	ljmp	00125$
-00171$:
+00170$:
 	C$fb_app_rollo10.c$735$5$6 ==.
 ;	..\fb_app_rollo10.c:735: timerstate[15]=0x01;
 	mov	(_timerstate + 0x000f),#0x01
@@ -2675,9 +2672,9 @@ _handsteuerung:
 	C$fb_app_rollo10.c$741$4$7 ==.
 ;	..\fb_app_rollo10.c:741: if ( Tval & 0x08){ // wenn tasten >7 und Tval <=7 also taste losgelassen...
 	mov	a,_Tval
-	jb	acc.3,00172$
+	jb	acc.3,00171$
 	ljmp	00125$
-00172$:
+00171$:
 	C$fb_app_rollo10.c$742$5$8 ==.
 ;	..\fb_app_rollo10.c:742: if (timerstate[15]&0x20){
 	mov	a,(_timerstate + 0x000f)
@@ -2730,7 +2727,7 @@ _handsteuerung:
 	mov	a,(_timerstate + 0x000f)
 	jnb	acc.1,00117$
 	C$fb_app_rollo10.c$757$7$13 ==.
-;	..\fb_app_rollo10.c:757: object_schalten(((Tval&0x07)>>1)+12,(Tval&0x01==0x01));
+;	..\fb_app_rollo10.c:757: object_schalten(((Tval&0x07)>>1)+12,(Tval&0x01));
 	mov	a,_Tval
 	anl	a,#0x01
 	add	a,#0xff
@@ -2750,7 +2747,7 @@ _handsteuerung:
 	sjmp	00120$
 00117$:
 	C$fb_app_rollo10.c$760$7$14 ==.
-;	..\fb_app_rollo10.c:760: object_schalten(((Tval&0x07)>>1)+8,(Tval&0x01==0x01));
+;	..\fb_app_rollo10.c:760: object_schalten(((Tval&0x07)>>1)+8,(Tval&0x01));
 	mov	a,_Tval
 	anl	a,#0x01
 	add	a,#0xff
@@ -2784,7 +2781,7 @@ _handsteuerung:
 	C$fb_app_rollo10.c$771$3$4 ==.
 ;	..\fb_app_rollo10.c:771: if(timerstate[15]&0x08){
 	mov	a,(_timerstate + 0x000f)
-	jnb	acc.3,00127$
+	jnb	acc.3,00137$
 	C$fb_app_rollo10.c$772$4$15 ==.
 ;	..\fb_app_rollo10.c:772: handmode=0;//handmode automatisch ausschalten
 	clr	_handmode
@@ -2800,10 +2797,6 @@ _handsteuerung:
 	C$fb_app_rollo10.c$777$4$15 ==.
 ;	..\fb_app_rollo10.c:777: sobj_update();
 	lcall	_sobj_update
-00127$:
-	C$fb_app_rollo10.c$779$3$4 ==.
-;	..\fb_app_rollo10.c:779: ET1=1;
-	setb	_IEN0_3
 00137$:
 	C$fb_app_rollo10.c$782$1$1 ==.
 	XG$handsteuerung$0$0 ==.

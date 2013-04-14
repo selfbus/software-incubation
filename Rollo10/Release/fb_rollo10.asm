@@ -1,7 +1,7 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
 ; Version 3.1.0 #7066 (Nov 22 2011) (MINGW32)
-; This file was generated Thu Nov 22 19:35:53 2012
+; This file was generated Sun Apr 14 12:17:07 2013
 ;--------------------------------------------------------
 	.module fb_rollo10
 	.optsdcc -mmcs51 --model-small
@@ -551,17 +551,17 @@ __sdcc_program_startup:
 ;------------------------------------------------------------
 ;Allocation info for local variables in function 'main'
 ;------------------------------------------------------------
-;n                         Allocated to registers r6 
-;cmd                       Allocated to registers 
+;n                         Allocated to registers r5 
+;cmd                       Allocated to registers r5 
 ;tasterpegel               Allocated to registers r7 
-;cal                       Allocated to registers 
+;cal                       Allocated to registers r6 
 ;rm_count                  Allocated to registers 
 ;wduf                      Allocated to registers b1 
 ;tastergetoggelt           Allocated to registers b0 
 ;------------------------------------------------------------
 	G$main$0$0 ==.
-	C$fb_rollo10.c$43$0$0 ==.
-;	..\fb_rollo10.c:43: void main(void)
+	C$fb_rollo10.c$44$0$0 ==.
+;	..\fb_rollo10.c:44: void main(void)
 ;	-----------------------------------------
 ;	 function main
 ;	-----------------------------------------
@@ -574,226 +574,238 @@ _main:
 	ar2 = 0x02
 	ar1 = 0x01
 	ar0 = 0x00
-	C$fb_rollo10.c$45$1$0 ==.
-;	..\fb_rollo10.c:45: unsigned char n,cmd,tasterpegel=0;
+	C$fb_rollo10.c$46$1$0 ==.
+;	..\fb_rollo10.c:46: unsigned char n,cmd,tasterpegel=0;
 	mov	r7,#0x00
-	C$fb_rollo10.c$53$1$0 ==.
-;	..\fb_rollo10.c:53: __bit wduf,tastergetoggelt=0;
+	C$fb_rollo10.c$54$1$0 ==.
+;	..\fb_rollo10.c:54: __bit wduf,tastergetoggelt=0;
 	clr	b0
-	C$fb_rollo10.c$54$1$1 ==.
-;	..\fb_rollo10.c:54: wduf=WDCON&0x02;
+	C$fb_rollo10.c$55$1$1 ==.
+;	..\fb_rollo10.c:55: wduf=WDCON&0x02;
 	mov	a,_WDCON
 	rr	a
 	anl	a,#0x01
 	add	a,#0xff
 	mov	b1,c
-	C$fb_rollo10.c$55$1$1 ==.
-;	..\fb_rollo10.c:55: restart_hw();							// Hardware zuruecksetzen
+	C$fb_rollo10.c$56$1$1 ==.
+;	..\fb_rollo10.c:56: restart_hw();							// Hardware zuruecksetzen
 	push	ar7
 	push	bits
 	lcall	_restart_hw
 	pop	bits
 	pop	ar7
-	C$fb_rollo10.c$58$1$1 ==.
-;	..\fb_rollo10.c:58: TASTER=1;
-	setb	_P1_7
 	C$fb_rollo10.c$59$1$1 ==.
-;	..\fb_rollo10.c:59: if(!TASTER && wduf)cal=0;
-	jb	_P1_7,00102$
-	jb	b1,00103$
-00102$:
+;	..\fb_rollo10.c:59: TASTER=1;
+	setb	_P1_7
 	C$fb_rollo10.c$60$1$1 ==.
-;	..\fb_rollo10.c:60: else cal=trimsave;
-	mov	dptr,#_main_trimsave_1_1
-	clr	a
-	movc	a,@a+dptr
-00103$:
-	C$fb_rollo10.c$61$1$1 ==.
-;	..\fb_rollo10.c:61: TRIM = (TRIM+trimsave);
-	mov	dptr,#_main_trimsave_1_1
-	clr	a
-	movc	a,@a+dptr
-	mov	r5,_TRIM
-	add	a,r5
-	mov	r6,a
-	mov	_TRIM,r6
-	C$fb_rollo10.c$62$1$1 ==.
-;	..\fb_rollo10.c:62: TRIM &= 0x3F;//oberen 2 bits ausblenden
-	anl	_TRIM,#0x3F
-	C$fb_rollo10.c$67$1$1 ==.
-;	..\fb_rollo10.c:67: if (!wduf){// BUS return verzögerung nur wenn nicht watchdog underflow
-	jb	b1,00109$
-	C$fb_rollo10.c$68$1$1 ==.
-;	..\fb_rollo10.c:68: for (n=0;n<50;n++) {		// Warten bis Bus stabil
+;	..\fb_rollo10.c:60: if(!TASTER && wduf)cal=0;
+	jb	_P1_7,00102$
+	jnb	b1,00102$
 	mov	r6,#0x00
-00150$:
-	cjne	r6,#0x32,00192$
-00192$:
+	sjmp	00103$
+00102$:
+	C$fb_rollo10.c$61$1$1 ==.
+;	..\fb_rollo10.c:61: else cal=trimsave;
+	mov	dptr,#_main_trimsave_1_1
+	clr	a
+	movc	a,@a+dptr
+	mov	r5,a
+	mov	r6,a
+00103$:
+	C$fb_rollo10.c$62$1$1 ==.
+;	..\fb_rollo10.c:62: TRIM = (TRIM+trimsave);
+	mov	dptr,#_main_trimsave_1_1
+	clr	a
+	movc	a,@a+dptr
+	mov	r4,_TRIM
+	add	a,r4
+	mov	r5,a
+	mov	_TRIM,r5
+	C$fb_rollo10.c$63$1$1 ==.
+;	..\fb_rollo10.c:63: TRIM &= 0x3F;//oberen 2 bits ausblenden
+	anl	_TRIM,#0x3F
+	C$fb_rollo10.c$68$1$1 ==.
+;	..\fb_rollo10.c:68: if (!wduf){// BUS return verzögerung nur wenn nicht watchdog underflow
+	jb	b1,00109$
+	C$fb_rollo10.c$69$1$1 ==.
+;	..\fb_rollo10.c:69: for (n=0;n<50;n++) {		// Warten bis Bus stabil
+	mov	r5,#0x00
+00170$:
+	cjne	r5,#0x32,00221$
+00221$:
 	jnc	00109$
-	C$fb_rollo10.c$69$3$3 ==.
-;	..\fb_rollo10.c:69: TR0=0;					// Timer 0 anhalten
-	clr	_TCON_4
 	C$fb_rollo10.c$70$3$3 ==.
-;	..\fb_rollo10.c:70: TH0=eeprom[ADDRTAB+1];	// Timer 0 setzen mit phys. Adr. damit Geräte unterschiedlich beginnen zu senden
+;	..\fb_rollo10.c:70: TR0=0;					// Timer 0 anhalten
+	clr	_TCON_4
+	C$fb_rollo10.c$71$3$3 ==.
+;	..\fb_rollo10.c:71: TH0=eeprom[ADDRTAB+1];	// Timer 0 setzen mit phys. Adr. damit Geräte unterschiedlich beginnen zu senden
 	mov	dptr,#(_eeprom + 0x0017)
 	clr	a
 	movc	a,@a+dptr
 	mov	_TH0,a
-	C$fb_rollo10.c$71$3$3 ==.
-;	..\fb_rollo10.c:71: TL0=eeprom[ADDRTAB+2];
+	C$fb_rollo10.c$72$3$3 ==.
+;	..\fb_rollo10.c:72: TL0=eeprom[ADDRTAB+2];
 	mov	dptr,#(_eeprom + 0x0018)
 	clr	a
 	movc	a,@a+dptr
 	mov	_TL0,a
-	C$fb_rollo10.c$72$3$3 ==.
-;	..\fb_rollo10.c:72: TF0=0;					// Überlauf-Flag zurücksetzen
-	clr	_TCON_5
 	C$fb_rollo10.c$73$3$3 ==.
-;	..\fb_rollo10.c:73: TR0=1;					// Timer 0 starten
-	setb	_TCON_4
+;	..\fb_rollo10.c:73: TF0=0;					// Überlauf-Flag zurücksetzen
+	clr	_TCON_5
 	C$fb_rollo10.c$74$3$3 ==.
-;	..\fb_rollo10.c:74: while(!TF0);
+;	..\fb_rollo10.c:74: TR0=1;					// Timer 0 starten
+	setb	_TCON_4
+	C$fb_rollo10.c$75$3$3 ==.
+;	..\fb_rollo10.c:75: while(!TF0);
 00105$:
 	jnb	_TCON_5,00105$
-	C$fb_rollo10.c$68$2$2 ==.
-;	..\fb_rollo10.c:68: for (n=0;n<50;n++) {		// Warten bis Bus stabil
-	inc	r6
-	sjmp	00150$
+	C$fb_rollo10.c$69$2$2 ==.
+;	..\fb_rollo10.c:69: for (n=0;n<50;n++) {		// Warten bis Bus stabil
+	inc	r5
+	sjmp	00170$
 00109$:
-	C$fb_rollo10.c$77$1$1 ==.
-;	..\fb_rollo10.c:77: WATCHDOG_INIT
+	C$fb_rollo10.c$78$1$1 ==.
+;	..\fb_rollo10.c:78: WATCHDOG_INIT
 	mov	_WDL,#0xFF
 	clr	_IEN0_7
 	mov	_WDCON,#0xE5
 	mov	_WFEED1,#0xA5
 	mov	_WFEED2,#0x5A
 	setb	_IEN0_7
-	C$fb_rollo10.c$78$1$1 ==.
-;	..\fb_rollo10.c:78: WATCHDOG_START
+	C$fb_rollo10.c$79$1$1 ==.
+;	..\fb_rollo10.c:79: WATCHDOG_START
 	clr	_IEN0_7
 	orl	_WDCON,#0x04
 	mov	_WFEED1,#0xA5
 	mov	_WFEED2,#0x5A
 	setb	_IEN0_7
-	C$fb_rollo10.c$79$1$1 ==.
-;	..\fb_rollo10.c:79: restart_app();							// Anwendungsspezifische Einstellungen zuruecksetzen
+	C$fb_rollo10.c$80$1$1 ==.
+;	..\fb_rollo10.c:80: restart_app();							// Anwendungsspezifische Einstellungen zuruecksetzen
 	push	ar7
+	push	ar6
 	push	bits
 	lcall	_restart_app
 	pop	bits
+	pop	ar6
 	pop	ar7
-	C$fb_rollo10.c$80$1$1 ==.
-;	..\fb_rollo10.c:80: if(!wduf)bus_return();							// Aktionen bei Busspannungswiederkehr
+	C$fb_rollo10.c$81$1$1 ==.
+;	..\fb_rollo10.c:81: if(!wduf)bus_return();							// Aktionen bei Busspannungswiederkehr
 	jb	b1,00111$
 	push	ar7
+	push	ar6
 	push	bits
 	lcall	_bus_return
 	pop	bits
+	pop	ar6
 	pop	ar7
 00111$:
-	C$fb_rollo10.c$82$1$1 ==.
-;	..\fb_rollo10.c:82: BRGCON&=0xFE;	// Baudrate Generator stoppen
-	anl	_BRGCON,#0xFE
 	C$fb_rollo10.c$83$1$1 ==.
-;	..\fb_rollo10.c:83: P1M1&=0xFC;		// RX und TX auf bidirectional setzen
-	anl	_P1M1,#0xFC
+;	..\fb_rollo10.c:83: BRGCON&=0xFE;	// Baudrate Generator stoppen
+	anl	_BRGCON,#0xFE
 	C$fb_rollo10.c$84$1$1 ==.
-;	..\fb_rollo10.c:84: P1M2&=0xFC;
-	anl	_P1M2,#0xFC
+;	..\fb_rollo10.c:84: P1M1&=0xFC;		// RX und TX auf bidirectional setzen
+	anl	_P1M1,#0xFC
 	C$fb_rollo10.c$85$1$1 ==.
-;	..\fb_rollo10.c:85: SCON=0x50;		// Mode 1, receive enable
-	mov	_SCON,#0x50
+;	..\fb_rollo10.c:85: P1M2&=0xFC;
+	anl	_P1M2,#0xFC
 	C$fb_rollo10.c$86$1$1 ==.
-;	..\fb_rollo10.c:86: SSTAT|=0xE0;	// TI wird am Ende des Stopbits gesetzt und Interrupt nur bei RX und double TX buffer an
-	orl	_SSTAT,#0xE0
+;	..\fb_rollo10.c:86: SCON=0x50;		// Mode 1, receive enable
+	mov	_SCON,#0x50
 	C$fb_rollo10.c$87$1$1 ==.
-;	..\fb_rollo10.c:87: BRGCON|=0x02;	// Baudrate Generator verwenden aber noch gestoppt
-	orl	_BRGCON,#0x02
+;	..\fb_rollo10.c:87: SSTAT|=0xE0;	// TI wird am Ende des Stopbits gesetzt und Interrupt nur bei RX und double TX buffer an
+	orl	_SSTAT,#0xE0
 	C$fb_rollo10.c$88$1$1 ==.
-;	..\fb_rollo10.c:88: BRGR1=0x00;	// Baudrate = cclk/((BRGR1,BRGR0)+16)
-	mov	_BRGR1,#0x00
+;	..\fb_rollo10.c:88: BRGCON|=0x02;	// Baudrate Generator verwenden aber noch gestoppt
+	orl	_BRGCON,#0x02
 	C$fb_rollo10.c$89$1$1 ==.
-;	..\fb_rollo10.c:89: BRGR0=0x30;	// für 115200 0030 nehmen, autocal: 600bd= 0x2FF0
-	mov	_BRGR0,#0x30
+;	..\fb_rollo10.c:89: BRGR1=0x2F;	// Baudrate = cclk/((BRGR1,BRGR0)+16)
+	mov	_BRGR1,#0x2F
 	C$fb_rollo10.c$90$1$1 ==.
-;	..\fb_rollo10.c:90: BRGCON|=0x01;	// Baudrate Generator starten
-	orl	_BRGCON,#0x01
+;	..\fb_rollo10.c:90: BRGR0=0xF0;	// für 115200 0030 nehmen, autocal: 600bd= 0x2FF0
+	mov	_BRGR0,#0xF0
 	C$fb_rollo10.c$91$1$1 ==.
-;	..\fb_rollo10.c:91: SBUF=0x55;
-	mov	_SBUF,#0x55
+;	..\fb_rollo10.c:91: BRGCON|=0x01;	// Baudrate Generator starten
+	orl	_BRGCON,#0x01
 	C$fb_rollo10.c$92$1$1 ==.
-;	..\fb_rollo10.c:92: do  {
-00147$:
-	C$fb_rollo10.c$93$2$4 ==.
-;	..\fb_rollo10.c:93: WATCHDOG_FEED
+;	..\fb_rollo10.c:92: SBUF=0x55;
+	mov	_SBUF,#0x55
+	C$fb_rollo10.c$93$1$1 ==.
+;	..\fb_rollo10.c:93: do  {
+00167$:
+	C$fb_rollo10.c$94$2$4 ==.
+;	..\fb_rollo10.c:94: WATCHDOG_FEED
 	clr	_IEN0_7
 	mov	_WFEED1,#0xA5
 	mov	_WFEED2,#0x5A
 	setb	_IEN0_7
-	C$fb_rollo10.c$95$2$4 ==.
-;	..\fb_rollo10.c:95: if(APPLICATION_RUN) {	// nur wenn run-mode gesetzt
+	C$fb_rollo10.c$96$2$4 ==.
+;	..\fb_rollo10.c:96: if(APPLICATION_RUN) {	// nur wenn run-mode gesetzt
 	mov	dptr,#(_eeprom + 0x000d)
 	clr	a
 	movc	a,@a+dptr
-	mov	r6,a
-	cjne	r6,#0xFF,00125$
+	mov	r5,a
+	cjne	r5,#0xFF,00125$
 	jb	_connected,00125$
 	mov	a,_status60
 	jb	acc.0,00125$
-	C$fb_rollo10.c$99$3$5 ==.
-;	..\fb_rollo10.c:99: */			if(RTCCON>=0x80) delay_timer();	// Realtime clock Ueberlauf
+	C$fb_rollo10.c$100$3$5 ==.
+;	..\fb_rollo10.c:100: */			if(RTCCON>=0x80) delay_timer();	// Realtime clock Ueberlauf
 	mov	a,#0x100 - 0x80
 	add	a,_RTCCON
 	jnc	00113$
 	push	ar7
+	push	ar6
 	push	bits
 	lcall	_delay_timer
 	pop	bits
+	pop	ar6
 	pop	ar7
 00113$:
-	C$fb_rollo10.c$101$3$5 ==.
-;	..\fb_rollo10.c:101: if(TF0 && (TMOD & 0x0F)==0x01) {	// Vollstrom für Relais ausschalten und wieder PWM ein
+	C$fb_rollo10.c$102$3$5 ==.
+;	..\fb_rollo10.c:102: if(TF0 && (TMOD & 0x0F)==0x01) {	// Vollstrom für Relais ausschalten und wieder PWM ein
 	jnb	_TCON_5,00115$
 	mov	a,#0x0F
 	anl	a,_TMOD
-	mov	r6,a
-	cjne	r6,#0x01,00115$
-	C$fb_rollo10.c$103$4$6 ==.
-;	..\fb_rollo10.c:103: TMOD=(TMOD & 0xF0) + 2;			// Timer 0 als PWM
+	mov	r5,a
+	cjne	r5,#0x01,00115$
+	C$fb_rollo10.c$104$4$6 ==.
+;	..\fb_rollo10.c:104: TMOD=(TMOD & 0xF0) + 2;			// Timer 0 als PWM
 	mov	a,#0xF0
 	anl	a,_TMOD
 	add	a,#0x02
 	mov	_TMOD,a
-	C$fb_rollo10.c$104$4$6 ==.
-;	..\fb_rollo10.c:104: TAMOD=0x01;
-	mov	_TAMOD,#0x01
 	C$fb_rollo10.c$105$4$6 ==.
-;	..\fb_rollo10.c:105: TH0=DUTY;
+;	..\fb_rollo10.c:105: TAMOD=0x01;
+	mov	_TAMOD,#0x01
+	C$fb_rollo10.c$106$4$6 ==.
+;	..\fb_rollo10.c:106: TH0=DUTY;
 	mov	_TH0,#0x50
-	C$fb_rollo10.c$107$4$6 ==.
-;	..\fb_rollo10.c:107: TF0=0;
+	C$fb_rollo10.c$108$4$6 ==.
+;	..\fb_rollo10.c:108: TF0=0;
 	clr	_TCON_5
-	C$fb_rollo10.c$109$4$6 ==.
-;	..\fb_rollo10.c:109: AUXR1|=0x10;	// PWM von Timer 0 auf Pin ausgeben
+	C$fb_rollo10.c$110$4$6 ==.
+;	..\fb_rollo10.c:110: AUXR1|=0x10;	// PWM von Timer 0 auf Pin ausgeben
 	orl	_AUXR1,#0x10
-	C$fb_rollo10.c$111$4$6 ==.
-;	..\fb_rollo10.c:111: PWM=1;			// PWM Pin muss auf 1 gesetzt werden, damit PWM geht !!!
+	C$fb_rollo10.c$112$4$6 ==.
+;	..\fb_rollo10.c:112: PWM=1;			// PWM Pin muss auf 1 gesetzt werden, damit PWM geht !!!
 	setb	_P1_2
-	C$fb_rollo10.c$113$4$6 ==.
-;	..\fb_rollo10.c:113: TR0=1;
+	C$fb_rollo10.c$114$4$6 ==.
+;	..\fb_rollo10.c:114: TR0=1;
 	setb	_TCON_4
 00115$:
-	C$fb_rollo10.c$120$3$5 ==.
-;	..\fb_rollo10.c:120: if (portchanged)port_schalten();	// Ausgänge schalten
+	C$fb_rollo10.c$121$3$5 ==.
+;	..\fb_rollo10.c:121: if (portchanged)port_schalten();	// Ausgänge schalten
 	jnb	_portchanged,00118$
 	push	ar7
+	push	ar6
 	push	bits
 	lcall	_port_schalten
 	pop	bits
+	pop	ar6
 	pop	ar7
 00118$:
-	C$fb_rollo10.c$149$3$5 ==.
-;	..\fb_rollo10.c:149: if (fb_state==0 && (TH1<0XC0) && (!wait_for_ack)&& blocked!=blockedsave) {
+	C$fb_rollo10.c$150$3$5 ==.
+;	..\fb_rollo10.c:150: if (fb_state==0 && (TH1<0XC0) && (!wait_for_ack)&& blocked!=blockedsave) {
 	mov	a,_fb_state
 	jnz	00125$
 	mov	a,#0x100 - 0xC0
@@ -803,119 +815,213 @@ _main:
 	mov	dptr,#_main_blockedsave_1_1
 	clr	a
 	movc	a,@a+dptr
-	mov	r6,a
-	cjne	a,_blocked,00208$
+	mov	r5,a
+	cjne	a,_blocked,00237$
 	sjmp	00125$
-00208$:
-	C$fb_rollo10.c$150$4$7 ==.
-;	..\fb_rollo10.c:150: START_WRITECYCLE;
-	mov	_FMCON,#0x00
+00237$:
 	C$fb_rollo10.c$151$4$7 ==.
-;	..\fb_rollo10.c:151: FMADRH= 0x1B;		
-	mov	_FMADRH,#0x1B
+;	..\fb_rollo10.c:151: START_WRITECYCLE;
+	mov	_FMCON,#0x00
 	C$fb_rollo10.c$152$4$7 ==.
-;	..\fb_rollo10.c:152: FMADRL= 0xFD; 
-	mov	_FMADRL,#0xFD
+;	..\fb_rollo10.c:152: FMADRH= 0x1B;		
+	mov	_FMADRH,#0x1B
 	C$fb_rollo10.c$153$4$7 ==.
-;	..\fb_rollo10.c:153: FMDATA= blocked;
-	mov	_FMDATA,_blocked
+;	..\fb_rollo10.c:153: FMADRL= 0xFD; 
+	mov	_FMADRL,#0xFD
 	C$fb_rollo10.c$154$4$7 ==.
-;	..\fb_rollo10.c:154: STOP_WRITECYCLE;
+;	..\fb_rollo10.c:154: FMDATA= blocked;
+	mov	_FMDATA,_blocked
+	C$fb_rollo10.c$155$4$7 ==.
+;	..\fb_rollo10.c:155: STOP_WRITECYCLE;
 	mov	_FMCON,#0x68
 00125$:
-	C$fb_rollo10.c$161$2$4 ==.
-;	..\fb_rollo10.c:161: if (tel_arrived ) {//|| tel_sent
-	C$fb_rollo10.c$162$3$8 ==.
-;	..\fb_rollo10.c:162: tel_arrived=0;
-	jbc	_tel_arrived,00209$
-	sjmp	00129$
-00209$:
+	C$fb_rollo10.c$162$2$4 ==.
+;	..\fb_rollo10.c:162: if (tel_arrived ) {//|| tel_sent
 	C$fb_rollo10.c$163$3$8 ==.
-;	..\fb_rollo10.c:163: tel_sent=0;
-	clr	_tel_sent
+;	..\fb_rollo10.c:163: tel_arrived=0;
+	jbc	_tel_arrived,00238$
+	sjmp	00129$
+00238$:
 	C$fb_rollo10.c$164$3$8 ==.
-;	..\fb_rollo10.c:164: process_tel();
+;	..\fb_rollo10.c:164: tel_sent=0;
+	clr	_tel_sent
+	C$fb_rollo10.c$165$3$8 ==.
+;	..\fb_rollo10.c:165: process_tel();
 	push	ar7
+	push	ar6
 	push	bits
 	lcall	_process_tel
 	pop	bits
+	pop	ar6
 	pop	ar7
 	sjmp	00130$
 00129$:
-	C$fb_rollo10.c$167$3$4 ==.
-;	..\fb_rollo10.c:167: for(n=0;n<100;n++);	// falls Hauptroutine keine Zeit verbraucht, der PROG LED etwas Zeit geben, damit sie auch leuchten kann
-	mov	r6,#0x64
-00156$:
-	mov	ar5,r6
-	dec	r5
-	mov	ar6,r5
-	mov	a,r6
-	jnz	00156$
+	C$fb_rollo10.c$168$3$4 ==.
+;	..\fb_rollo10.c:168: for(n=0;n<100;n++);	// falls Hauptroutine keine Zeit verbraucht, der PROG LED etwas Zeit geben, damit sie auch leuchten kann
+	mov	r5,#0x64
+00176$:
+	mov	ar4,r5
+	dec	r4
+	mov	ar5,r4
+	mov	a,r5
+	jnz	00176$
 00130$:
-	C$fb_rollo10.c$170$2$4 ==.
-;	..\fb_rollo10.c:170: BREAKPOINT
-	jnb	_SCON_0,00135$
+	C$fb_rollo10.c$174$2$4 ==.
+;	..\fb_rollo10.c:174: if (RI){
+	C$fb_rollo10.c$175$3$10 ==.
+;	..\fb_rollo10.c:175: RI=0;
+	jbc	_SCON_0,00240$
+	sjmp	00155$
+00240$:
+	C$fb_rollo10.c$176$3$10 ==.
+;	..\fb_rollo10.c:176: cmd=SBUF;
+	mov	r5,_SBUF
+	C$fb_rollo10.c$177$3$10 ==.
+;	..\fb_rollo10.c:177: if(cmd=='c'){
+	cjne	r5,#0x63,00135$
+	C$fb_rollo10.c$178$4$11 ==.
+;	..\fb_rollo10.c:178: while(!TI);
 00131$:
-	jbc	_SCON_1,00212$
+	C$fb_rollo10.c$179$4$11 ==.
+;	..\fb_rollo10.c:179: TI=0;
+	jbc	_SCON_1,00243$
 	sjmp	00131$
-00212$:
-	mov	a,_SBUF
-	add	a,#_RAM
-	mov	r1,a
-	mov	_SBUF,@r1
-	clr	_SCON_0
+00243$:
+	C$fb_rollo10.c$180$4$11 ==.
+;	..\fb_rollo10.c:180: SBUF=0x55;
+	mov	_SBUF,#0x55
 00135$:
-	C$fb_rollo10.c$234$2$4 ==.
-;	..\fb_rollo10.c:234: TASTER=1;				// Pin als Eingang schalten um Taster abzufragen
-	setb	_P1_7
-	C$fb_rollo10.c$235$2$4 ==.
-;	..\fb_rollo10.c:235: if(!TASTER){ // Taster gedrückt
-	jb	_P1_7,00145$
-	C$fb_rollo10.c$236$3$11 ==.
-;	..\fb_rollo10.c:236: if(tasterpegel<255)	tasterpegel++;
-	cjne	r7,#0xFF,00214$
-00214$:
-	jnc	00139$
-	inc	r7
-	sjmp	00146$
-00139$:
-	C$fb_rollo10.c$238$4$12 ==.
-;	..\fb_rollo10.c:238: if(!tastergetoggelt)status60^=0x81;	// Prog-Bit und Parity-Bit im system_state toggeln
-	jb	b0,00137$
-	xrl	_status60,#0x81
+	C$fb_rollo10.c$182$3$10 ==.
+;	..\fb_rollo10.c:182: if(cmd=='+'){
+	cjne	r5,#0x2B,00137$
+	C$fb_rollo10.c$183$4$12 ==.
+;	..\fb_rollo10.c:183: TRIM--;
+	dec	_TRIM
+	C$fb_rollo10.c$184$4$12 ==.
+;	..\fb_rollo10.c:184: cal--;
+	dec	r6
 00137$:
-	C$fb_rollo10.c$239$4$12 ==.
-;	..\fb_rollo10.c:239: tastergetoggelt=1;
+	C$fb_rollo10.c$186$3$10 ==.
+;	..\fb_rollo10.c:186: if(cmd=='-'){
+	cjne	r5,#0x2D,00139$
+	C$fb_rollo10.c$187$4$13 ==.
+;	..\fb_rollo10.c:187: TRIM++;
+	inc	_TRIM
+	C$fb_rollo10.c$188$4$13 ==.
+;	..\fb_rollo10.c:188: cal++;
+	inc	r6
+00139$:
+	C$fb_rollo10.c$190$3$10 ==.
+;	..\fb_rollo10.c:190: if(cmd=='w'){
+	cjne	r5,#0x77,00141$
+	C$fb_rollo10.c$191$4$14 ==.
+;	..\fb_rollo10.c:191: EA=0;
+	clr	_IEN0_7
+	C$fb_rollo10.c$192$4$14 ==.
+;	..\fb_rollo10.c:192: START_WRITECYCLE;	//cal an 0x1bff schreiben
+	mov	_FMCON,#0x00
+	C$fb_rollo10.c$198$4$14 ==.
+;	..\fb_rollo10.c:198: FMADRH= 0x1B;		
+	mov	_FMADRH,#0x1B
+	C$fb_rollo10.c$199$4$14 ==.
+;	..\fb_rollo10.c:199: FMADRL= 0xFF; 
+	mov	_FMADRL,#0xFF
+	C$fb_rollo10.c$201$4$14 ==.
+;	..\fb_rollo10.c:201: FMDATA=	cal;
+	mov	_FMDATA,r6
+	C$fb_rollo10.c$202$4$14 ==.
+;	..\fb_rollo10.c:202: STOP_WRITECYCLE;
+	mov	_FMCON,#0x68
+	C$fb_rollo10.c$203$4$14 ==.
+;	..\fb_rollo10.c:203: EA=1;				//int wieder freigeben
+	setb	_IEN0_7
+00141$:
+	C$fb_rollo10.c$205$3$10 ==.
+;	..\fb_rollo10.c:205: if(cmd=='p')status60^=0x81;	// Prog-Bit und Parity-Bit im system_state toggeln
+	cjne	r5,#0x70,00143$
+	xrl	_status60,#0x81
+00143$:
+	C$fb_rollo10.c$222$3$10 ==.
+;	..\fb_rollo10.c:222: if(cmd=='v'){
+	cjne	r5,#0x76,00148$
+	C$fb_rollo10.c$223$4$15 ==.
+;	..\fb_rollo10.c:223: while(!TI);
+00144$:
+	C$fb_rollo10.c$224$4$15 ==.
+;	..\fb_rollo10.c:224: TI=0;
+	jbc	_SCON_1,00254$
+	sjmp	00144$
+00254$:
+	C$fb_rollo10.c$225$4$15 ==.
+;	..\fb_rollo10.c:225: SBUF=VERSION;
+	mov	_SBUF,#0x0A
+00148$:
+	C$fb_rollo10.c$227$3$10 ==.
+;	..\fb_rollo10.c:227: if(cmd=='t'){
+	cjne	r5,#0x74,00155$
+	C$fb_rollo10.c$228$4$16 ==.
+;	..\fb_rollo10.c:228: while(!TI);
+00149$:
+	C$fb_rollo10.c$229$4$16 ==.
+;	..\fb_rollo10.c:229: TI=0;
+	jbc	_SCON_1,00257$
+	sjmp	00149$
+00257$:
+	C$fb_rollo10.c$230$4$16 ==.
+;	..\fb_rollo10.c:230: SBUF=TYPE;
+	mov	_SBUF,#0x00
+00155$:
+	C$fb_rollo10.c$235$2$4 ==.
+;	..\fb_rollo10.c:235: TASTER=1;				// Pin als Eingang schalten um Taster abzufragen
+	setb	_P1_7
+	C$fb_rollo10.c$236$2$4 ==.
+;	..\fb_rollo10.c:236: if(!TASTER){ // Taster gedrückt
+	jb	_P1_7,00165$
+	C$fb_rollo10.c$237$3$17 ==.
+;	..\fb_rollo10.c:237: if(tasterpegel<255)	tasterpegel++;
+	cjne	r7,#0xFF,00259$
+00259$:
+	jnc	00159$
+	inc	r7
+	sjmp	00166$
+00159$:
+	C$fb_rollo10.c$239$4$18 ==.
+;	..\fb_rollo10.c:239: if(!tastergetoggelt)status60^=0x81;	// Prog-Bit und Parity-Bit im system_state toggeln
+	jb	b0,00157$
+	xrl	_status60,#0x81
+00157$:
+	C$fb_rollo10.c$240$4$18 ==.
+;	..\fb_rollo10.c:240: tastergetoggelt=1;
 	setb	b0
-	sjmp	00146$
-00145$:
-	C$fb_rollo10.c$243$3$13 ==.
-;	..\fb_rollo10.c:243: if(tasterpegel>0) tasterpegel--;
+	sjmp	00166$
+00165$:
+	C$fb_rollo10.c$244$3$19 ==.
+;	..\fb_rollo10.c:244: if(tasterpegel>0) tasterpegel--;
 	mov	a,r7
-	jz	00142$
+	jz	00162$
 	dec	r7
-	sjmp	00146$
-00142$:
-	C$fb_rollo10.c$244$3$13 ==.
-;	..\fb_rollo10.c:244: else tastergetoggelt=0;
+	sjmp	00166$
+00162$:
+	C$fb_rollo10.c$245$3$19 ==.
+;	..\fb_rollo10.c:245: else tastergetoggelt=0;
 	clr	b0
-00146$:
-	C$fb_rollo10.c$246$2$4 ==.
-;	..\fb_rollo10.c:246: TASTER=!(status60 & 0x01);	// LED entsprechend Prog-Bit schalten (low=LED an)
+00166$:
+	C$fb_rollo10.c$247$2$4 ==.
+;	..\fb_rollo10.c:247: TASTER=!(status60 & 0x01);	// LED entsprechend Prog-Bit schalten (low=LED an)
 	mov	a,_status60
 	anl	a,#0x01
-	mov	r6,a
-	cjne	a,#0x01,00218$
-00218$:
+	mov	r5,a
+	cjne	a,#0x01,00263$
+00263$:
 	clr	a
 	rlc	a
-	mov	r6,a
+	mov	r5,a
 	add	a,#0xff
 	mov	_P1_7,c
-	C$fb_rollo10.c$247$1$1 ==.
-;	..\fb_rollo10.c:247: } while(1);
-	ljmp	00147$
 	C$fb_rollo10.c$248$1$1 ==.
+;	..\fb_rollo10.c:248: } while(1);
+	ljmp	00167$
+	C$fb_rollo10.c$249$1$1 ==.
 	XG$main$0$0 ==.
 	ret
 	.area CSEG    (CODE)

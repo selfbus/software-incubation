@@ -1,7 +1,7 @@
                               1 ;--------------------------------------------------------
                               2 ; File Created by SDCC : free open source ANSI-C Compiler
                               3 ; Version 3.1.0 #7066 (Nov 22 2011) (MINGW32)
-                              4 ; This file was generated Thu Nov 22 19:35:53 2012
+                              4 ; This file was generated Sun Apr 14 12:17:07 2013
                               5 ;--------------------------------------------------------
                               6 	.module fb_rollo10
                               7 	.optsdcc -mmcs51 --model-small
@@ -517,9 +517,9 @@
    0004                     517 	.ds	7
    000B 32                  518 	reti
    000C                     519 	.ds	7
-   0013 02 0E 29            520 	ljmp	_X1_int
+   0013 02 0E 7D            520 	ljmp	_X1_int
    0016                     521 	.ds	5
-   001B 02 0E 59            522 	ljmp	_T1_int
+   001B 02 0E AD            522 	ljmp	_T1_int
                             523 ;--------------------------------------------------------
                             524 ; global & static initialisations
                             525 ;--------------------------------------------------------
@@ -551,17 +551,17 @@
                             551 ;------------------------------------------------------------
                             552 ;Allocation info for local variables in function 'main'
                             553 ;------------------------------------------------------------
-                            554 ;n                         Allocated to registers r6 
-                            555 ;cmd                       Allocated to registers 
+                            554 ;n                         Allocated to registers r5 
+                            555 ;cmd                       Allocated to registers r5 
                             556 ;tasterpegel               Allocated to registers r7 
-                            557 ;cal                       Allocated to registers 
+                            557 ;cal                       Allocated to registers r6 
                             558 ;rm_count                  Allocated to registers 
                             559 ;wduf                      Allocated to registers b1 
                             560 ;tastergetoggelt           Allocated to registers b0 
                             561 ;------------------------------------------------------------
                     0000    562 	G$main$0$0 ==.
-                    0000    563 	C$fb_rollo10.c$43$0$0 ==.
-                            564 ;	..\fb_rollo10.c:43: void main(void)
+                    0000    563 	C$fb_rollo10.c$44$0$0 ==.
+                            564 ;	..\fb_rollo10.c:44: void main(void)
                             565 ;	-----------------------------------------
                             566 ;	 function main
                             567 ;	-----------------------------------------
@@ -574,355 +574,461 @@
                     0002    574 	ar2 = 0x02
                     0001    575 	ar1 = 0x01
                     0000    576 	ar0 = 0x00
-                    0000    577 	C$fb_rollo10.c$45$1$0 ==.
-                            578 ;	..\fb_rollo10.c:45: unsigned char n,cmd,tasterpegel=0;
+                    0000    577 	C$fb_rollo10.c$46$1$0 ==.
+                            578 ;	..\fb_rollo10.c:46: unsigned char n,cmd,tasterpegel=0;
    007F 7F 00               579 	mov	r7,#0x00
-                    0002    580 	C$fb_rollo10.c$53$1$0 ==.
-                            581 ;	..\fb_rollo10.c:53: __bit wduf,tastergetoggelt=0;
+                    0002    580 	C$fb_rollo10.c$54$1$0 ==.
+                            581 ;	..\fb_rollo10.c:54: __bit wduf,tastergetoggelt=0;
    0081 C2 18               582 	clr	b0
-                    0004    583 	C$fb_rollo10.c$54$1$1 ==.
-                            584 ;	..\fb_rollo10.c:54: wduf=WDCON&0x02;
+                    0004    583 	C$fb_rollo10.c$55$1$1 ==.
+                            584 ;	..\fb_rollo10.c:55: wduf=WDCON&0x02;
    0083 E5 A7               585 	mov	a,_WDCON
    0085 03                  586 	rr	a
    0086 54 01               587 	anl	a,#0x01
    0088 24 FF               588 	add	a,#0xff
    008A 92 19               589 	mov	b1,c
-                    000D    590 	C$fb_rollo10.c$55$1$1 ==.
-                            591 ;	..\fb_rollo10.c:55: restart_hw();							// Hardware zuruecksetzen
+                    000D    590 	C$fb_rollo10.c$56$1$1 ==.
+                            591 ;	..\fb_rollo10.c:56: restart_hw();							// Hardware zuruecksetzen
    008C C0 07               592 	push	ar7
    008E C0 23               593 	push	bits
-   0090 12 17 66            594 	lcall	_restart_hw
+   0090 12 17 BE            594 	lcall	_restart_hw
    0093 D0 23               595 	pop	bits
    0095 D0 07               596 	pop	ar7
-                    0018    597 	C$fb_rollo10.c$58$1$1 ==.
-                            598 ;	..\fb_rollo10.c:58: TASTER=1;
+                    0018    597 	C$fb_rollo10.c$59$1$1 ==.
+                            598 ;	..\fb_rollo10.c:59: TASTER=1;
    0097 D2 97               599 	setb	_P1_7
-                    001A    600 	C$fb_rollo10.c$59$1$1 ==.
-                            601 ;	..\fb_rollo10.c:59: if(!TASTER && wduf)cal=0;
-   0099 20 97 03            602 	jb	_P1_7,00102$
-   009C 20 19 05            603 	jb	b1,00103$
-   009F                     604 00102$:
-                    0020    605 	C$fb_rollo10.c$60$1$1 ==.
-                            606 ;	..\fb_rollo10.c:60: else cal=trimsave;
-   009F 90 1B FF            607 	mov	dptr,#_main_trimsave_1_1
-   00A2 E4                  608 	clr	a
-   00A3 93                  609 	movc	a,@a+dptr
-   00A4                     610 00103$:
-                    0025    611 	C$fb_rollo10.c$61$1$1 ==.
-                            612 ;	..\fb_rollo10.c:61: TRIM = (TRIM+trimsave);
-   00A4 90 1B FF            613 	mov	dptr,#_main_trimsave_1_1
-   00A7 E4                  614 	clr	a
-   00A8 93                  615 	movc	a,@a+dptr
-   00A9 AD 96               616 	mov	r5,_TRIM
-   00AB 2D                  617 	add	a,r5
-   00AC FE                  618 	mov	r6,a
-   00AD 8E 96               619 	mov	_TRIM,r6
-                    0030    620 	C$fb_rollo10.c$62$1$1 ==.
-                            621 ;	..\fb_rollo10.c:62: TRIM &= 0x3F;//oberen 2 bits ausblenden
-   00AF 53 96 3F            622 	anl	_TRIM,#0x3F
-                    0033    623 	C$fb_rollo10.c$67$1$1 ==.
-                            624 ;	..\fb_rollo10.c:67: if (!wduf){// BUS return verzögerung nur wenn nicht watchdog underflow
-   00B2 20 19 21            625 	jb	b1,00109$
-                    0036    626 	C$fb_rollo10.c$68$1$1 ==.
-                            627 ;	..\fb_rollo10.c:68: for (n=0;n<50;n++) {		// Warten bis Bus stabil
-   00B5 7E 00               628 	mov	r6,#0x00
-   00B7                     629 00150$:
-   00B7 BE 32 00            630 	cjne	r6,#0x32,00192$
-   00BA                     631 00192$:
-   00BA 50 1A               632 	jnc	00109$
-                    003D    633 	C$fb_rollo10.c$69$3$3 ==.
-                            634 ;	..\fb_rollo10.c:69: TR0=0;					// Timer 0 anhalten
-   00BC C2 8C               635 	clr	_TCON_4
-                    003F    636 	C$fb_rollo10.c$70$3$3 ==.
-                            637 ;	..\fb_rollo10.c:70: TH0=eeprom[ADDRTAB+1];	// Timer 0 setzen mit phys. Adr. damit Geräte unterschiedlich beginnen zu senden
-   00BE 90 1D 17            638 	mov	dptr,#(_eeprom + 0x0017)
-   00C1 E4                  639 	clr	a
-   00C2 93                  640 	movc	a,@a+dptr
-   00C3 F5 8C               641 	mov	_TH0,a
-                    0046    642 	C$fb_rollo10.c$71$3$3 ==.
-                            643 ;	..\fb_rollo10.c:71: TL0=eeprom[ADDRTAB+2];
-   00C5 90 1D 18            644 	mov	dptr,#(_eeprom + 0x0018)
-   00C8 E4                  645 	clr	a
-   00C9 93                  646 	movc	a,@a+dptr
-   00CA F5 8A               647 	mov	_TL0,a
-                    004D    648 	C$fb_rollo10.c$72$3$3 ==.
-                            649 ;	..\fb_rollo10.c:72: TF0=0;					// Überlauf-Flag zurücksetzen
-   00CC C2 8D               650 	clr	_TCON_5
-                    004F    651 	C$fb_rollo10.c$73$3$3 ==.
-                            652 ;	..\fb_rollo10.c:73: TR0=1;					// Timer 0 starten
-   00CE D2 8C               653 	setb	_TCON_4
-                    0051    654 	C$fb_rollo10.c$74$3$3 ==.
-                            655 ;	..\fb_rollo10.c:74: while(!TF0);
-   00D0                     656 00105$:
-   00D0 30 8D FD            657 	jnb	_TCON_5,00105$
-                    0054    658 	C$fb_rollo10.c$68$2$2 ==.
-                            659 ;	..\fb_rollo10.c:68: for (n=0;n<50;n++) {		// Warten bis Bus stabil
-   00D3 0E                  660 	inc	r6
-   00D4 80 E1               661 	sjmp	00150$
-   00D6                     662 00109$:
-                    0057    663 	C$fb_rollo10.c$77$1$1 ==.
-                            664 ;	..\fb_rollo10.c:77: WATCHDOG_INIT
-   00D6 75 C1 FF            665 	mov	_WDL,#0xFF
-   00D9 C2 AF               666 	clr	_IEN0_7
-   00DB 75 A7 E5            667 	mov	_WDCON,#0xE5
-   00DE 75 C2 A5            668 	mov	_WFEED1,#0xA5
-   00E1 75 C3 5A            669 	mov	_WFEED2,#0x5A
-   00E4 D2 AF               670 	setb	_IEN0_7
-                    0067    671 	C$fb_rollo10.c$78$1$1 ==.
-                            672 ;	..\fb_rollo10.c:78: WATCHDOG_START
-   00E6 C2 AF               673 	clr	_IEN0_7
-   00E8 43 A7 04            674 	orl	_WDCON,#0x04
-   00EB 75 C2 A5            675 	mov	_WFEED1,#0xA5
-   00EE 75 C3 5A            676 	mov	_WFEED2,#0x5A
-   00F1 D2 AF               677 	setb	_IEN0_7
-                    0074    678 	C$fb_rollo10.c$79$1$1 ==.
-                            679 ;	..\fb_rollo10.c:79: restart_app();							// Anwendungsspezifische Einstellungen zuruecksetzen
-   00F3 C0 07               680 	push	ar7
-   00F5 C0 23               681 	push	bits
-   00F7 12 0D 9C            682 	lcall	_restart_app
-   00FA D0 23               683 	pop	bits
-   00FC D0 07               684 	pop	ar7
-                    007F    685 	C$fb_rollo10.c$80$1$1 ==.
-                            686 ;	..\fb_rollo10.c:80: if(!wduf)bus_return();							// Aktionen bei Busspannungswiederkehr
-   00FE 20 19 0B            687 	jb	b1,00111$
-   0101 C0 07               688 	push	ar7
-   0103 C0 23               689 	push	bits
-   0105 12 0C F9            690 	lcall	_bus_return
-   0108 D0 23               691 	pop	bits
-   010A D0 07               692 	pop	ar7
-   010C                     693 00111$:
-                    008D    694 	C$fb_rollo10.c$82$1$1 ==.
-                            695 ;	..\fb_rollo10.c:82: BRGCON&=0xFE;	// Baudrate Generator stoppen
-   010C 53 BD FE            696 	anl	_BRGCON,#0xFE
-                    0090    697 	C$fb_rollo10.c$83$1$1 ==.
-                            698 ;	..\fb_rollo10.c:83: P1M1&=0xFC;		// RX und TX auf bidirectional setzen
-   010F 53 91 FC            699 	anl	_P1M1,#0xFC
-                    0093    700 	C$fb_rollo10.c$84$1$1 ==.
-                            701 ;	..\fb_rollo10.c:84: P1M2&=0xFC;
-   0112 53 92 FC            702 	anl	_P1M2,#0xFC
-                    0096    703 	C$fb_rollo10.c$85$1$1 ==.
-                            704 ;	..\fb_rollo10.c:85: SCON=0x50;		// Mode 1, receive enable
-   0115 75 98 50            705 	mov	_SCON,#0x50
-                    0099    706 	C$fb_rollo10.c$86$1$1 ==.
-                            707 ;	..\fb_rollo10.c:86: SSTAT|=0xE0;	// TI wird am Ende des Stopbits gesetzt und Interrupt nur bei RX und double TX buffer an
-   0118 43 BA E0            708 	orl	_SSTAT,#0xE0
-                    009C    709 	C$fb_rollo10.c$87$1$1 ==.
-                            710 ;	..\fb_rollo10.c:87: BRGCON|=0x02;	// Baudrate Generator verwenden aber noch gestoppt
-   011B 43 BD 02            711 	orl	_BRGCON,#0x02
-                    009F    712 	C$fb_rollo10.c$88$1$1 ==.
-                            713 ;	..\fb_rollo10.c:88: BRGR1=0x00;	// Baudrate = cclk/((BRGR1,BRGR0)+16)
-   011E 75 BF 00            714 	mov	_BRGR1,#0x00
-                    00A2    715 	C$fb_rollo10.c$89$1$1 ==.
-                            716 ;	..\fb_rollo10.c:89: BRGR0=0x30;	// für 115200 0030 nehmen, autocal: 600bd= 0x2FF0
-   0121 75 BE 30            717 	mov	_BRGR0,#0x30
-                    00A5    718 	C$fb_rollo10.c$90$1$1 ==.
-                            719 ;	..\fb_rollo10.c:90: BRGCON|=0x01;	// Baudrate Generator starten
-   0124 43 BD 01            720 	orl	_BRGCON,#0x01
-                    00A8    721 	C$fb_rollo10.c$91$1$1 ==.
-                            722 ;	..\fb_rollo10.c:91: SBUF=0x55;
-   0127 75 99 55            723 	mov	_SBUF,#0x55
-                    00AB    724 	C$fb_rollo10.c$92$1$1 ==.
-                            725 ;	..\fb_rollo10.c:92: do  {
-   012A                     726 00147$:
-                    00AB    727 	C$fb_rollo10.c$93$2$4 ==.
-                            728 ;	..\fb_rollo10.c:93: WATCHDOG_FEED
-   012A C2 AF               729 	clr	_IEN0_7
-   012C 75 C2 A5            730 	mov	_WFEED1,#0xA5
-   012F 75 C3 5A            731 	mov	_WFEED2,#0x5A
-   0132 D2 AF               732 	setb	_IEN0_7
-                    00B5    733 	C$fb_rollo10.c$95$2$4 ==.
-                            734 ;	..\fb_rollo10.c:95: if(APPLICATION_RUN) {	// nur wenn run-mode gesetzt
-   0134 90 1D 0D            735 	mov	dptr,#(_eeprom + 0x000d)
-   0137 E4                  736 	clr	a
-   0138 93                  737 	movc	a,@a+dptr
-   0139 FE                  738 	mov	r6,a
-   013A BE FF 70            739 	cjne	r6,#0xFF,00125$
-   013D 20 11 6D            740 	jb	_connected,00125$
-   0140 E5 7B               741 	mov	a,_status60
-   0142 20 E0 68            742 	jb	acc.0,00125$
-                    00C6    743 	C$fb_rollo10.c$99$3$5 ==.
-                            744 ;	..\fb_rollo10.c:99: */			if(RTCCON>=0x80) delay_timer();	// Realtime clock Ueberlauf
-   0145 74 80               745 	mov	a,#0x100 - 0x80
-   0147 25 D1               746 	add	a,_RTCCON
-   0149 50 0B               747 	jnc	00113$
-   014B C0 07               748 	push	ar7
-   014D C0 23               749 	push	bits
-   014F 12 09 3E            750 	lcall	_delay_timer
-   0152 D0 23               751 	pop	bits
-   0154 D0 07               752 	pop	ar7
-   0156                     753 00113$:
-                    00D7    754 	C$fb_rollo10.c$101$3$5 ==.
-                            755 ;	..\fb_rollo10.c:101: if(TF0 && (TMOD & 0x0F)==0x01) {	// Vollstrom für Relais ausschalten und wieder PWM ein
-   0156 30 8D 1F            756 	jnb	_TCON_5,00115$
-   0159 74 0F               757 	mov	a,#0x0F
-   015B 55 89               758 	anl	a,_TMOD
-   015D FE                  759 	mov	r6,a
-   015E BE 01 17            760 	cjne	r6,#0x01,00115$
-                    00E2    761 	C$fb_rollo10.c$103$4$6 ==.
-                            762 ;	..\fb_rollo10.c:103: TMOD=(TMOD & 0xF0) + 2;			// Timer 0 als PWM
-   0161 74 F0               763 	mov	a,#0xF0
-   0163 55 89               764 	anl	a,_TMOD
-   0165 24 02               765 	add	a,#0x02
-   0167 F5 89               766 	mov	_TMOD,a
-                    00EA    767 	C$fb_rollo10.c$104$4$6 ==.
-                            768 ;	..\fb_rollo10.c:104: TAMOD=0x01;
-   0169 75 8F 01            769 	mov	_TAMOD,#0x01
-                    00ED    770 	C$fb_rollo10.c$105$4$6 ==.
-                            771 ;	..\fb_rollo10.c:105: TH0=DUTY;
-   016C 75 8C 50            772 	mov	_TH0,#0x50
-                    00F0    773 	C$fb_rollo10.c$107$4$6 ==.
-                            774 ;	..\fb_rollo10.c:107: TF0=0;
-   016F C2 8D               775 	clr	_TCON_5
-                    00F2    776 	C$fb_rollo10.c$109$4$6 ==.
-                            777 ;	..\fb_rollo10.c:109: AUXR1|=0x10;	// PWM von Timer 0 auf Pin ausgeben
-   0171 43 A2 10            778 	orl	_AUXR1,#0x10
-                    00F5    779 	C$fb_rollo10.c$111$4$6 ==.
-                            780 ;	..\fb_rollo10.c:111: PWM=1;			// PWM Pin muss auf 1 gesetzt werden, damit PWM geht !!!
-   0174 D2 92               781 	setb	_P1_2
-                    00F7    782 	C$fb_rollo10.c$113$4$6 ==.
-                            783 ;	..\fb_rollo10.c:113: TR0=1;
-   0176 D2 8C               784 	setb	_TCON_4
-   0178                     785 00115$:
-                    00F9    786 	C$fb_rollo10.c$120$3$5 ==.
-                            787 ;	..\fb_rollo10.c:120: if (portchanged)port_schalten();	// Ausgänge schalten
-   0178 30 00 0B            788 	jnb	_portchanged,00118$
-   017B C0 07               789 	push	ar7
-   017D C0 23               790 	push	bits
-   017F 12 0C 7B            791 	lcall	_port_schalten
-   0182 D0 23               792 	pop	bits
-   0184 D0 07               793 	pop	ar7
-   0186                     794 00118$:
-                    0107    795 	C$fb_rollo10.c$149$3$5 ==.
-                            796 ;	..\fb_rollo10.c:149: if (fb_state==0 && (TH1<0XC0) && (!wait_for_ack)&& blocked!=blockedsave) {
-   0186 E5 77               797 	mov	a,_fb_state
-   0188 70 23               798 	jnz	00125$
-   018A 74 40               799 	mov	a,#0x100 - 0xC0
-   018C 25 8D               800 	add	a,_TH1
-   018E 40 1D               801 	jc	00125$
-   0190 20 0D 1A            802 	jb	_wait_for_ack,00125$
-   0193 90 1B FD            803 	mov	dptr,#_main_blockedsave_1_1
-   0196 E4                  804 	clr	a
-   0197 93                  805 	movc	a,@a+dptr
-   0198 FE                  806 	mov	r6,a
-   0199 B5 0F 02            807 	cjne	a,_blocked,00208$
-   019C 80 0F               808 	sjmp	00125$
-   019E                     809 00208$:
-                    011F    810 	C$fb_rollo10.c$150$4$7 ==.
-                            811 ;	..\fb_rollo10.c:150: START_WRITECYCLE;
-   019E 75 E4 00            812 	mov	_FMCON,#0x00
-                    0122    813 	C$fb_rollo10.c$151$4$7 ==.
-                            814 ;	..\fb_rollo10.c:151: FMADRH= 0x1B;		
-   01A1 75 E7 1B            815 	mov	_FMADRH,#0x1B
-                    0125    816 	C$fb_rollo10.c$152$4$7 ==.
-                            817 ;	..\fb_rollo10.c:152: FMADRL= 0xFD; 
-   01A4 75 E6 FD            818 	mov	_FMADRL,#0xFD
-                    0128    819 	C$fb_rollo10.c$153$4$7 ==.
-                            820 ;	..\fb_rollo10.c:153: FMDATA= blocked;
-   01A7 85 0F E5            821 	mov	_FMDATA,_blocked
-                    012B    822 	C$fb_rollo10.c$154$4$7 ==.
-                            823 ;	..\fb_rollo10.c:154: STOP_WRITECYCLE;
-   01AA 75 E4 68            824 	mov	_FMCON,#0x68
-   01AD                     825 00125$:
-                    012E    826 	C$fb_rollo10.c$161$2$4 ==.
-                            827 ;	..\fb_rollo10.c:161: if (tel_arrived ) {//|| tel_sent
-                    012E    828 	C$fb_rollo10.c$162$3$8 ==.
-                            829 ;	..\fb_rollo10.c:162: tel_arrived=0;
-   01AD 10 09 02            830 	jbc	_tel_arrived,00209$
-   01B0 80 0F               831 	sjmp	00129$
-   01B2                     832 00209$:
-                    0133    833 	C$fb_rollo10.c$163$3$8 ==.
-                            834 ;	..\fb_rollo10.c:163: tel_sent=0;
-   01B2 C2 0A               835 	clr	_tel_sent
-                    0135    836 	C$fb_rollo10.c$164$3$8 ==.
-                            837 ;	..\fb_rollo10.c:164: process_tel();
-   01B4 C0 07               838 	push	ar7
-   01B6 C0 23               839 	push	bits
-   01B8 12 14 99            840 	lcall	_process_tel
-   01BB D0 23               841 	pop	bits
-   01BD D0 07               842 	pop	ar7
-   01BF 80 0A               843 	sjmp	00130$
-   01C1                     844 00129$:
-                    0142    845 	C$fb_rollo10.c$167$3$4 ==.
-                            846 ;	..\fb_rollo10.c:167: for(n=0;n<100;n++);	// falls Hauptroutine keine Zeit verbraucht, der PROG LED etwas Zeit geben, damit sie auch leuchten kann
-   01C1 7E 64               847 	mov	r6,#0x64
-   01C3                     848 00156$:
-   01C3 8E 05               849 	mov	ar5,r6
-   01C5 1D                  850 	dec	r5
-   01C6 8D 06               851 	mov	ar6,r5
-   01C8 EE                  852 	mov	a,r6
-   01C9 70 F8               853 	jnz	00156$
-   01CB                     854 00130$:
-                    014C    855 	C$fb_rollo10.c$170$2$4 ==.
-                            856 ;	..\fb_rollo10.c:170: BREAKPOINT
-   01CB 30 98 0E            857 	jnb	_SCON_0,00135$
-   01CE                     858 00131$:
-   01CE 10 99 02            859 	jbc	_SCON_1,00212$
-   01D1 80 FB               860 	sjmp	00131$
-   01D3                     861 00212$:
-   01D3 E5 99               862 	mov	a,_SBUF
-   01D5 24 00               863 	add	a,#_RAM
-   01D7 F9                  864 	mov	r1,a
-   01D8 87 99               865 	mov	_SBUF,@r1
-   01DA C2 98               866 	clr	_SCON_0
-   01DC                     867 00135$:
-                    015D    868 	C$fb_rollo10.c$234$2$4 ==.
-                            869 ;	..\fb_rollo10.c:234: TASTER=1;				// Pin als Eingang schalten um Taster abzufragen
-   01DC D2 97               870 	setb	_P1_7
-                    015F    871 	C$fb_rollo10.c$235$2$4 ==.
-                            872 ;	..\fb_rollo10.c:235: if(!TASTER){ // Taster gedrückt
-   01DE 20 97 12            873 	jb	_P1_7,00145$
-                    0162    874 	C$fb_rollo10.c$236$3$11 ==.
-                            875 ;	..\fb_rollo10.c:236: if(tasterpegel<255)	tasterpegel++;
-   01E1 BF FF 00            876 	cjne	r7,#0xFF,00214$
-   01E4                     877 00214$:
-   01E4 50 03               878 	jnc	00139$
-   01E6 0F                  879 	inc	r7
-   01E7 80 12               880 	sjmp	00146$
-   01E9                     881 00139$:
-                    016A    882 	C$fb_rollo10.c$238$4$12 ==.
-                            883 ;	..\fb_rollo10.c:238: if(!tastergetoggelt)status60^=0x81;	// Prog-Bit und Parity-Bit im system_state toggeln
-   01E9 20 18 03            884 	jb	b0,00137$
-   01EC 63 7B 81            885 	xrl	_status60,#0x81
-   01EF                     886 00137$:
-                    0170    887 	C$fb_rollo10.c$239$4$12 ==.
-                            888 ;	..\fb_rollo10.c:239: tastergetoggelt=1;
-   01EF D2 18               889 	setb	b0
-   01F1 80 08               890 	sjmp	00146$
-   01F3                     891 00145$:
-                    0174    892 	C$fb_rollo10.c$243$3$13 ==.
-                            893 ;	..\fb_rollo10.c:243: if(tasterpegel>0) tasterpegel--;
-   01F3 EF                  894 	mov	a,r7
-   01F4 60 03               895 	jz	00142$
-   01F6 1F                  896 	dec	r7
-   01F7 80 02               897 	sjmp	00146$
-   01F9                     898 00142$:
-                    017A    899 	C$fb_rollo10.c$244$3$13 ==.
-                            900 ;	..\fb_rollo10.c:244: else tastergetoggelt=0;
-   01F9 C2 18               901 	clr	b0
-   01FB                     902 00146$:
-                    017C    903 	C$fb_rollo10.c$246$2$4 ==.
-                            904 ;	..\fb_rollo10.c:246: TASTER=!(status60 & 0x01);	// LED entsprechend Prog-Bit schalten (low=LED an)
-   01FB E5 7B               905 	mov	a,_status60
-   01FD 54 01               906 	anl	a,#0x01
-   01FF FE                  907 	mov	r6,a
-   0200 B4 01 00            908 	cjne	a,#0x01,00218$
-   0203                     909 00218$:
-   0203 E4                  910 	clr	a
-   0204 33                  911 	rlc	a
-   0205 FE                  912 	mov	r6,a
-   0206 24 FF               913 	add	a,#0xff
-   0208 92 97               914 	mov	_P1_7,c
-                    018B    915 	C$fb_rollo10.c$247$1$1 ==.
-                            916 ;	..\fb_rollo10.c:247: } while(1);
-   020A 02 01 2A            917 	ljmp	00147$
-                    018E    918 	C$fb_rollo10.c$248$1$1 ==.
-                    018E    919 	XG$main$0$0 ==.
-   020D 22                  920 	ret
-                            921 	.area CSEG    (CODE)
-                            922 	.area CONST   (CODE)
-                    1BFF    923 Lfb_rollo10.main$trimsave$1$1 == 0x1bff
-                    1BFF    924 _main_trimsave_1_1	=	0x1bff
-                    1BFD    925 Lfb_rollo10.main$blockedsave$1$1 == 0x1bfd
-                    1BFD    926 _main_blockedsave_1_1	=	0x1bfd
-                            927 	.area XINIT   (CODE)
-                            928 	.area CABS    (ABS,CODE)
+                    001A    600 	C$fb_rollo10.c$60$1$1 ==.
+                            601 ;	..\fb_rollo10.c:60: if(!TASTER && wduf)cal=0;
+   0099 20 97 07            602 	jb	_P1_7,00102$
+   009C 30 19 04            603 	jnb	b1,00102$
+   009F 7E 00               604 	mov	r6,#0x00
+   00A1 80 07               605 	sjmp	00103$
+   00A3                     606 00102$:
+                    0024    607 	C$fb_rollo10.c$61$1$1 ==.
+                            608 ;	..\fb_rollo10.c:61: else cal=trimsave;
+   00A3 90 1B FF            609 	mov	dptr,#_main_trimsave_1_1
+   00A6 E4                  610 	clr	a
+   00A7 93                  611 	movc	a,@a+dptr
+   00A8 FD                  612 	mov	r5,a
+   00A9 FE                  613 	mov	r6,a
+   00AA                     614 00103$:
+                    002B    615 	C$fb_rollo10.c$62$1$1 ==.
+                            616 ;	..\fb_rollo10.c:62: TRIM = (TRIM+trimsave);
+   00AA 90 1B FF            617 	mov	dptr,#_main_trimsave_1_1
+   00AD E4                  618 	clr	a
+   00AE 93                  619 	movc	a,@a+dptr
+   00AF AC 96               620 	mov	r4,_TRIM
+   00B1 2C                  621 	add	a,r4
+   00B2 FD                  622 	mov	r5,a
+   00B3 8D 96               623 	mov	_TRIM,r5
+                    0036    624 	C$fb_rollo10.c$63$1$1 ==.
+                            625 ;	..\fb_rollo10.c:63: TRIM &= 0x3F;//oberen 2 bits ausblenden
+   00B5 53 96 3F            626 	anl	_TRIM,#0x3F
+                    0039    627 	C$fb_rollo10.c$68$1$1 ==.
+                            628 ;	..\fb_rollo10.c:68: if (!wduf){// BUS return verzögerung nur wenn nicht watchdog underflow
+   00B8 20 19 21            629 	jb	b1,00109$
+                    003C    630 	C$fb_rollo10.c$69$1$1 ==.
+                            631 ;	..\fb_rollo10.c:69: for (n=0;n<50;n++) {		// Warten bis Bus stabil
+   00BB 7D 00               632 	mov	r5,#0x00
+   00BD                     633 00170$:
+   00BD BD 32 00            634 	cjne	r5,#0x32,00221$
+   00C0                     635 00221$:
+   00C0 50 1A               636 	jnc	00109$
+                    0043    637 	C$fb_rollo10.c$70$3$3 ==.
+                            638 ;	..\fb_rollo10.c:70: TR0=0;					// Timer 0 anhalten
+   00C2 C2 8C               639 	clr	_TCON_4
+                    0045    640 	C$fb_rollo10.c$71$3$3 ==.
+                            641 ;	..\fb_rollo10.c:71: TH0=eeprom[ADDRTAB+1];	// Timer 0 setzen mit phys. Adr. damit Geräte unterschiedlich beginnen zu senden
+   00C4 90 1D 17            642 	mov	dptr,#(_eeprom + 0x0017)
+   00C7 E4                  643 	clr	a
+   00C8 93                  644 	movc	a,@a+dptr
+   00C9 F5 8C               645 	mov	_TH0,a
+                    004C    646 	C$fb_rollo10.c$72$3$3 ==.
+                            647 ;	..\fb_rollo10.c:72: TL0=eeprom[ADDRTAB+2];
+   00CB 90 1D 18            648 	mov	dptr,#(_eeprom + 0x0018)
+   00CE E4                  649 	clr	a
+   00CF 93                  650 	movc	a,@a+dptr
+   00D0 F5 8A               651 	mov	_TL0,a
+                    0053    652 	C$fb_rollo10.c$73$3$3 ==.
+                            653 ;	..\fb_rollo10.c:73: TF0=0;					// Überlauf-Flag zurücksetzen
+   00D2 C2 8D               654 	clr	_TCON_5
+                    0055    655 	C$fb_rollo10.c$74$3$3 ==.
+                            656 ;	..\fb_rollo10.c:74: TR0=1;					// Timer 0 starten
+   00D4 D2 8C               657 	setb	_TCON_4
+                    0057    658 	C$fb_rollo10.c$75$3$3 ==.
+                            659 ;	..\fb_rollo10.c:75: while(!TF0);
+   00D6                     660 00105$:
+   00D6 30 8D FD            661 	jnb	_TCON_5,00105$
+                    005A    662 	C$fb_rollo10.c$69$2$2 ==.
+                            663 ;	..\fb_rollo10.c:69: for (n=0;n<50;n++) {		// Warten bis Bus stabil
+   00D9 0D                  664 	inc	r5
+   00DA 80 E1               665 	sjmp	00170$
+   00DC                     666 00109$:
+                    005D    667 	C$fb_rollo10.c$78$1$1 ==.
+                            668 ;	..\fb_rollo10.c:78: WATCHDOG_INIT
+   00DC 75 C1 FF            669 	mov	_WDL,#0xFF
+   00DF C2 AF               670 	clr	_IEN0_7
+   00E1 75 A7 E5            671 	mov	_WDCON,#0xE5
+   00E4 75 C2 A5            672 	mov	_WFEED1,#0xA5
+   00E7 75 C3 5A            673 	mov	_WFEED2,#0x5A
+   00EA D2 AF               674 	setb	_IEN0_7
+                    006D    675 	C$fb_rollo10.c$79$1$1 ==.
+                            676 ;	..\fb_rollo10.c:79: WATCHDOG_START
+   00EC C2 AF               677 	clr	_IEN0_7
+   00EE 43 A7 04            678 	orl	_WDCON,#0x04
+   00F1 75 C2 A5            679 	mov	_WFEED1,#0xA5
+   00F4 75 C3 5A            680 	mov	_WFEED2,#0x5A
+   00F7 D2 AF               681 	setb	_IEN0_7
+                    007A    682 	C$fb_rollo10.c$80$1$1 ==.
+                            683 ;	..\fb_rollo10.c:80: restart_app();							// Anwendungsspezifische Einstellungen zuruecksetzen
+   00F9 C0 07               684 	push	ar7
+   00FB C0 06               685 	push	ar6
+   00FD C0 23               686 	push	bits
+   00FF 12 0D F0            687 	lcall	_restart_app
+   0102 D0 23               688 	pop	bits
+   0104 D0 06               689 	pop	ar6
+   0106 D0 07               690 	pop	ar7
+                    0089    691 	C$fb_rollo10.c$81$1$1 ==.
+                            692 ;	..\fb_rollo10.c:81: if(!wduf)bus_return();							// Aktionen bei Busspannungswiederkehr
+   0108 20 19 0F            693 	jb	b1,00111$
+   010B C0 07               694 	push	ar7
+   010D C0 06               695 	push	ar6
+   010F C0 23               696 	push	bits
+   0111 12 0D 4D            697 	lcall	_bus_return
+   0114 D0 23               698 	pop	bits
+   0116 D0 06               699 	pop	ar6
+   0118 D0 07               700 	pop	ar7
+   011A                     701 00111$:
+                    009B    702 	C$fb_rollo10.c$83$1$1 ==.
+                            703 ;	..\fb_rollo10.c:83: BRGCON&=0xFE;	// Baudrate Generator stoppen
+   011A 53 BD FE            704 	anl	_BRGCON,#0xFE
+                    009E    705 	C$fb_rollo10.c$84$1$1 ==.
+                            706 ;	..\fb_rollo10.c:84: P1M1&=0xFC;		// RX und TX auf bidirectional setzen
+   011D 53 91 FC            707 	anl	_P1M1,#0xFC
+                    00A1    708 	C$fb_rollo10.c$85$1$1 ==.
+                            709 ;	..\fb_rollo10.c:85: P1M2&=0xFC;
+   0120 53 92 FC            710 	anl	_P1M2,#0xFC
+                    00A4    711 	C$fb_rollo10.c$86$1$1 ==.
+                            712 ;	..\fb_rollo10.c:86: SCON=0x50;		// Mode 1, receive enable
+   0123 75 98 50            713 	mov	_SCON,#0x50
+                    00A7    714 	C$fb_rollo10.c$87$1$1 ==.
+                            715 ;	..\fb_rollo10.c:87: SSTAT|=0xE0;	// TI wird am Ende des Stopbits gesetzt und Interrupt nur bei RX und double TX buffer an
+   0126 43 BA E0            716 	orl	_SSTAT,#0xE0
+                    00AA    717 	C$fb_rollo10.c$88$1$1 ==.
+                            718 ;	..\fb_rollo10.c:88: BRGCON|=0x02;	// Baudrate Generator verwenden aber noch gestoppt
+   0129 43 BD 02            719 	orl	_BRGCON,#0x02
+                    00AD    720 	C$fb_rollo10.c$89$1$1 ==.
+                            721 ;	..\fb_rollo10.c:89: BRGR1=0x2F;	// Baudrate = cclk/((BRGR1,BRGR0)+16)
+   012C 75 BF 2F            722 	mov	_BRGR1,#0x2F
+                    00B0    723 	C$fb_rollo10.c$90$1$1 ==.
+                            724 ;	..\fb_rollo10.c:90: BRGR0=0xF0;	// für 115200 0030 nehmen, autocal: 600bd= 0x2FF0
+   012F 75 BE F0            725 	mov	_BRGR0,#0xF0
+                    00B3    726 	C$fb_rollo10.c$91$1$1 ==.
+                            727 ;	..\fb_rollo10.c:91: BRGCON|=0x01;	// Baudrate Generator starten
+   0132 43 BD 01            728 	orl	_BRGCON,#0x01
+                    00B6    729 	C$fb_rollo10.c$92$1$1 ==.
+                            730 ;	..\fb_rollo10.c:92: SBUF=0x55;
+   0135 75 99 55            731 	mov	_SBUF,#0x55
+                    00B9    732 	C$fb_rollo10.c$93$1$1 ==.
+                            733 ;	..\fb_rollo10.c:93: do  {
+   0138                     734 00167$:
+                    00B9    735 	C$fb_rollo10.c$94$2$4 ==.
+                            736 ;	..\fb_rollo10.c:94: WATCHDOG_FEED
+   0138 C2 AF               737 	clr	_IEN0_7
+   013A 75 C2 A5            738 	mov	_WFEED1,#0xA5
+   013D 75 C3 5A            739 	mov	_WFEED2,#0x5A
+   0140 D2 AF               740 	setb	_IEN0_7
+                    00C3    741 	C$fb_rollo10.c$96$2$4 ==.
+                            742 ;	..\fb_rollo10.c:96: if(APPLICATION_RUN) {	// nur wenn run-mode gesetzt
+   0142 90 1D 0D            743 	mov	dptr,#(_eeprom + 0x000d)
+   0145 E4                  744 	clr	a
+   0146 93                  745 	movc	a,@a+dptr
+   0147 FD                  746 	mov	r5,a
+   0148 BD FF 78            747 	cjne	r5,#0xFF,00125$
+   014B 20 11 75            748 	jb	_connected,00125$
+   014E E5 7B               749 	mov	a,_status60
+   0150 20 E0 70            750 	jb	acc.0,00125$
+                    00D4    751 	C$fb_rollo10.c$100$3$5 ==.
+                            752 ;	..\fb_rollo10.c:100: */			if(RTCCON>=0x80) delay_timer();	// Realtime clock Ueberlauf
+   0153 74 80               753 	mov	a,#0x100 - 0x80
+   0155 25 D1               754 	add	a,_RTCCON
+   0157 50 0F               755 	jnc	00113$
+   0159 C0 07               756 	push	ar7
+   015B C0 06               757 	push	ar6
+   015D C0 23               758 	push	bits
+   015F 12 09 96            759 	lcall	_delay_timer
+   0162 D0 23               760 	pop	bits
+   0164 D0 06               761 	pop	ar6
+   0166 D0 07               762 	pop	ar7
+   0168                     763 00113$:
+                    00E9    764 	C$fb_rollo10.c$102$3$5 ==.
+                            765 ;	..\fb_rollo10.c:102: if(TF0 && (TMOD & 0x0F)==0x01) {	// Vollstrom für Relais ausschalten und wieder PWM ein
+   0168 30 8D 1F            766 	jnb	_TCON_5,00115$
+   016B 74 0F               767 	mov	a,#0x0F
+   016D 55 89               768 	anl	a,_TMOD
+   016F FD                  769 	mov	r5,a
+   0170 BD 01 17            770 	cjne	r5,#0x01,00115$
+                    00F4    771 	C$fb_rollo10.c$104$4$6 ==.
+                            772 ;	..\fb_rollo10.c:104: TMOD=(TMOD & 0xF0) + 2;			// Timer 0 als PWM
+   0173 74 F0               773 	mov	a,#0xF0
+   0175 55 89               774 	anl	a,_TMOD
+   0177 24 02               775 	add	a,#0x02
+   0179 F5 89               776 	mov	_TMOD,a
+                    00FC    777 	C$fb_rollo10.c$105$4$6 ==.
+                            778 ;	..\fb_rollo10.c:105: TAMOD=0x01;
+   017B 75 8F 01            779 	mov	_TAMOD,#0x01
+                    00FF    780 	C$fb_rollo10.c$106$4$6 ==.
+                            781 ;	..\fb_rollo10.c:106: TH0=DUTY;
+   017E 75 8C 50            782 	mov	_TH0,#0x50
+                    0102    783 	C$fb_rollo10.c$108$4$6 ==.
+                            784 ;	..\fb_rollo10.c:108: TF0=0;
+   0181 C2 8D               785 	clr	_TCON_5
+                    0104    786 	C$fb_rollo10.c$110$4$6 ==.
+                            787 ;	..\fb_rollo10.c:110: AUXR1|=0x10;	// PWM von Timer 0 auf Pin ausgeben
+   0183 43 A2 10            788 	orl	_AUXR1,#0x10
+                    0107    789 	C$fb_rollo10.c$112$4$6 ==.
+                            790 ;	..\fb_rollo10.c:112: PWM=1;			// PWM Pin muss auf 1 gesetzt werden, damit PWM geht !!!
+   0186 D2 92               791 	setb	_P1_2
+                    0109    792 	C$fb_rollo10.c$114$4$6 ==.
+                            793 ;	..\fb_rollo10.c:114: TR0=1;
+   0188 D2 8C               794 	setb	_TCON_4
+   018A                     795 00115$:
+                    010B    796 	C$fb_rollo10.c$121$3$5 ==.
+                            797 ;	..\fb_rollo10.c:121: if (portchanged)port_schalten();	// Ausgänge schalten
+   018A 30 00 0F            798 	jnb	_portchanged,00118$
+   018D C0 07               799 	push	ar7
+   018F C0 06               800 	push	ar6
+   0191 C0 23               801 	push	bits
+   0193 12 0C CF            802 	lcall	_port_schalten
+   0196 D0 23               803 	pop	bits
+   0198 D0 06               804 	pop	ar6
+   019A D0 07               805 	pop	ar7
+   019C                     806 00118$:
+                    011D    807 	C$fb_rollo10.c$150$3$5 ==.
+                            808 ;	..\fb_rollo10.c:150: if (fb_state==0 && (TH1<0XC0) && (!wait_for_ack)&& blocked!=blockedsave) {
+   019C E5 77               809 	mov	a,_fb_state
+   019E 70 23               810 	jnz	00125$
+   01A0 74 40               811 	mov	a,#0x100 - 0xC0
+   01A2 25 8D               812 	add	a,_TH1
+   01A4 40 1D               813 	jc	00125$
+   01A6 20 0D 1A            814 	jb	_wait_for_ack,00125$
+   01A9 90 1B FD            815 	mov	dptr,#_main_blockedsave_1_1
+   01AC E4                  816 	clr	a
+   01AD 93                  817 	movc	a,@a+dptr
+   01AE FD                  818 	mov	r5,a
+   01AF B5 0F 02            819 	cjne	a,_blocked,00237$
+   01B2 80 0F               820 	sjmp	00125$
+   01B4                     821 00237$:
+                    0135    822 	C$fb_rollo10.c$151$4$7 ==.
+                            823 ;	..\fb_rollo10.c:151: START_WRITECYCLE;
+   01B4 75 E4 00            824 	mov	_FMCON,#0x00
+                    0138    825 	C$fb_rollo10.c$152$4$7 ==.
+                            826 ;	..\fb_rollo10.c:152: FMADRH= 0x1B;		
+   01B7 75 E7 1B            827 	mov	_FMADRH,#0x1B
+                    013B    828 	C$fb_rollo10.c$153$4$7 ==.
+                            829 ;	..\fb_rollo10.c:153: FMADRL= 0xFD; 
+   01BA 75 E6 FD            830 	mov	_FMADRL,#0xFD
+                    013E    831 	C$fb_rollo10.c$154$4$7 ==.
+                            832 ;	..\fb_rollo10.c:154: FMDATA= blocked;
+   01BD 85 0F E5            833 	mov	_FMDATA,_blocked
+                    0141    834 	C$fb_rollo10.c$155$4$7 ==.
+                            835 ;	..\fb_rollo10.c:155: STOP_WRITECYCLE;
+   01C0 75 E4 68            836 	mov	_FMCON,#0x68
+   01C3                     837 00125$:
+                    0144    838 	C$fb_rollo10.c$162$2$4 ==.
+                            839 ;	..\fb_rollo10.c:162: if (tel_arrived ) {//|| tel_sent
+                    0144    840 	C$fb_rollo10.c$163$3$8 ==.
+                            841 ;	..\fb_rollo10.c:163: tel_arrived=0;
+   01C3 10 09 02            842 	jbc	_tel_arrived,00238$
+   01C6 80 13               843 	sjmp	00129$
+   01C8                     844 00238$:
+                    0149    845 	C$fb_rollo10.c$164$3$8 ==.
+                            846 ;	..\fb_rollo10.c:164: tel_sent=0;
+   01C8 C2 0A               847 	clr	_tel_sent
+                    014B    848 	C$fb_rollo10.c$165$3$8 ==.
+                            849 ;	..\fb_rollo10.c:165: process_tel();
+   01CA C0 07               850 	push	ar7
+   01CC C0 06               851 	push	ar6
+   01CE C0 23               852 	push	bits
+   01D0 12 14 ED            853 	lcall	_process_tel
+   01D3 D0 23               854 	pop	bits
+   01D5 D0 06               855 	pop	ar6
+   01D7 D0 07               856 	pop	ar7
+   01D9 80 0A               857 	sjmp	00130$
+   01DB                     858 00129$:
+                    015C    859 	C$fb_rollo10.c$168$3$4 ==.
+                            860 ;	..\fb_rollo10.c:168: for(n=0;n<100;n++);	// falls Hauptroutine keine Zeit verbraucht, der PROG LED etwas Zeit geben, damit sie auch leuchten kann
+   01DB 7D 64               861 	mov	r5,#0x64
+   01DD                     862 00176$:
+   01DD 8D 04               863 	mov	ar4,r5
+   01DF 1C                  864 	dec	r4
+   01E0 8C 05               865 	mov	ar5,r4
+   01E2 ED                  866 	mov	a,r5
+   01E3 70 F8               867 	jnz	00176$
+   01E5                     868 00130$:
+                    0166    869 	C$fb_rollo10.c$174$2$4 ==.
+                            870 ;	..\fb_rollo10.c:174: if (RI){
+                    0166    871 	C$fb_rollo10.c$175$3$10 ==.
+                            872 ;	..\fb_rollo10.c:175: RI=0;
+   01E5 10 98 02            873 	jbc	_SCON_0,00240$
+   01E8 80 4A               874 	sjmp	00155$
+   01EA                     875 00240$:
+                    016B    876 	C$fb_rollo10.c$176$3$10 ==.
+                            877 ;	..\fb_rollo10.c:176: cmd=SBUF;
+   01EA AD 99               878 	mov	r5,_SBUF
+                    016D    879 	C$fb_rollo10.c$177$3$10 ==.
+                            880 ;	..\fb_rollo10.c:177: if(cmd=='c'){
+   01EC BD 63 08            881 	cjne	r5,#0x63,00135$
+                    0170    882 	C$fb_rollo10.c$178$4$11 ==.
+                            883 ;	..\fb_rollo10.c:178: while(!TI);
+   01EF                     884 00131$:
+                    0170    885 	C$fb_rollo10.c$179$4$11 ==.
+                            886 ;	..\fb_rollo10.c:179: TI=0;
+   01EF 10 99 02            887 	jbc	_SCON_1,00243$
+   01F2 80 FB               888 	sjmp	00131$
+   01F4                     889 00243$:
+                    0175    890 	C$fb_rollo10.c$180$4$11 ==.
+                            891 ;	..\fb_rollo10.c:180: SBUF=0x55;
+   01F4 75 99 55            892 	mov	_SBUF,#0x55
+   01F7                     893 00135$:
+                    0178    894 	C$fb_rollo10.c$182$3$10 ==.
+                            895 ;	..\fb_rollo10.c:182: if(cmd=='+'){
+   01F7 BD 2B 03            896 	cjne	r5,#0x2B,00137$
+                    017B    897 	C$fb_rollo10.c$183$4$12 ==.
+                            898 ;	..\fb_rollo10.c:183: TRIM--;
+   01FA 15 96               899 	dec	_TRIM
+                    017D    900 	C$fb_rollo10.c$184$4$12 ==.
+                            901 ;	..\fb_rollo10.c:184: cal--;
+   01FC 1E                  902 	dec	r6
+   01FD                     903 00137$:
+                    017E    904 	C$fb_rollo10.c$186$3$10 ==.
+                            905 ;	..\fb_rollo10.c:186: if(cmd=='-'){
+   01FD BD 2D 03            906 	cjne	r5,#0x2D,00139$
+                    0181    907 	C$fb_rollo10.c$187$4$13 ==.
+                            908 ;	..\fb_rollo10.c:187: TRIM++;
+   0200 05 96               909 	inc	_TRIM
+                    0183    910 	C$fb_rollo10.c$188$4$13 ==.
+                            911 ;	..\fb_rollo10.c:188: cal++;
+   0202 0E                  912 	inc	r6
+   0203                     913 00139$:
+                    0184    914 	C$fb_rollo10.c$190$3$10 ==.
+                            915 ;	..\fb_rollo10.c:190: if(cmd=='w'){
+   0203 BD 77 12            916 	cjne	r5,#0x77,00141$
+                    0187    917 	C$fb_rollo10.c$191$4$14 ==.
+                            918 ;	..\fb_rollo10.c:191: EA=0;
+   0206 C2 AF               919 	clr	_IEN0_7
+                    0189    920 	C$fb_rollo10.c$192$4$14 ==.
+                            921 ;	..\fb_rollo10.c:192: START_WRITECYCLE;	//cal an 0x1bff schreiben
+   0208 75 E4 00            922 	mov	_FMCON,#0x00
+                    018C    923 	C$fb_rollo10.c$198$4$14 ==.
+                            924 ;	..\fb_rollo10.c:198: FMADRH= 0x1B;		
+   020B 75 E7 1B            925 	mov	_FMADRH,#0x1B
+                    018F    926 	C$fb_rollo10.c$199$4$14 ==.
+                            927 ;	..\fb_rollo10.c:199: FMADRL= 0xFF; 
+   020E 75 E6 FF            928 	mov	_FMADRL,#0xFF
+                    0192    929 	C$fb_rollo10.c$201$4$14 ==.
+                            930 ;	..\fb_rollo10.c:201: FMDATA=	cal;
+   0211 8E E5               931 	mov	_FMDATA,r6
+                    0194    932 	C$fb_rollo10.c$202$4$14 ==.
+                            933 ;	..\fb_rollo10.c:202: STOP_WRITECYCLE;
+   0213 75 E4 68            934 	mov	_FMCON,#0x68
+                    0197    935 	C$fb_rollo10.c$203$4$14 ==.
+                            936 ;	..\fb_rollo10.c:203: EA=1;				//int wieder freigeben
+   0216 D2 AF               937 	setb	_IEN0_7
+   0218                     938 00141$:
+                    0199    939 	C$fb_rollo10.c$205$3$10 ==.
+                            940 ;	..\fb_rollo10.c:205: if(cmd=='p')status60^=0x81;	// Prog-Bit und Parity-Bit im system_state toggeln
+   0218 BD 70 03            941 	cjne	r5,#0x70,00143$
+   021B 63 7B 81            942 	xrl	_status60,#0x81
+   021E                     943 00143$:
+                    019F    944 	C$fb_rollo10.c$222$3$10 ==.
+                            945 ;	..\fb_rollo10.c:222: if(cmd=='v'){
+   021E BD 76 08            946 	cjne	r5,#0x76,00148$
+                    01A2    947 	C$fb_rollo10.c$223$4$15 ==.
+                            948 ;	..\fb_rollo10.c:223: while(!TI);
+   0221                     949 00144$:
+                    01A2    950 	C$fb_rollo10.c$224$4$15 ==.
+                            951 ;	..\fb_rollo10.c:224: TI=0;
+   0221 10 99 02            952 	jbc	_SCON_1,00254$
+   0224 80 FB               953 	sjmp	00144$
+   0226                     954 00254$:
+                    01A7    955 	C$fb_rollo10.c$225$4$15 ==.
+                            956 ;	..\fb_rollo10.c:225: SBUF=VERSION;
+   0226 75 99 0A            957 	mov	_SBUF,#0x0A
+   0229                     958 00148$:
+                    01AA    959 	C$fb_rollo10.c$227$3$10 ==.
+                            960 ;	..\fb_rollo10.c:227: if(cmd=='t'){
+   0229 BD 74 08            961 	cjne	r5,#0x74,00155$
+                    01AD    962 	C$fb_rollo10.c$228$4$16 ==.
+                            963 ;	..\fb_rollo10.c:228: while(!TI);
+   022C                     964 00149$:
+                    01AD    965 	C$fb_rollo10.c$229$4$16 ==.
+                            966 ;	..\fb_rollo10.c:229: TI=0;
+   022C 10 99 02            967 	jbc	_SCON_1,00257$
+   022F 80 FB               968 	sjmp	00149$
+   0231                     969 00257$:
+                    01B2    970 	C$fb_rollo10.c$230$4$16 ==.
+                            971 ;	..\fb_rollo10.c:230: SBUF=TYPE;
+   0231 75 99 00            972 	mov	_SBUF,#0x00
+   0234                     973 00155$:
+                    01B5    974 	C$fb_rollo10.c$235$2$4 ==.
+                            975 ;	..\fb_rollo10.c:235: TASTER=1;				// Pin als Eingang schalten um Taster abzufragen
+   0234 D2 97               976 	setb	_P1_7
+                    01B7    977 	C$fb_rollo10.c$236$2$4 ==.
+                            978 ;	..\fb_rollo10.c:236: if(!TASTER){ // Taster gedrückt
+   0236 20 97 12            979 	jb	_P1_7,00165$
+                    01BA    980 	C$fb_rollo10.c$237$3$17 ==.
+                            981 ;	..\fb_rollo10.c:237: if(tasterpegel<255)	tasterpegel++;
+   0239 BF FF 00            982 	cjne	r7,#0xFF,00259$
+   023C                     983 00259$:
+   023C 50 03               984 	jnc	00159$
+   023E 0F                  985 	inc	r7
+   023F 80 12               986 	sjmp	00166$
+   0241                     987 00159$:
+                    01C2    988 	C$fb_rollo10.c$239$4$18 ==.
+                            989 ;	..\fb_rollo10.c:239: if(!tastergetoggelt)status60^=0x81;	// Prog-Bit und Parity-Bit im system_state toggeln
+   0241 20 18 03            990 	jb	b0,00157$
+   0244 63 7B 81            991 	xrl	_status60,#0x81
+   0247                     992 00157$:
+                    01C8    993 	C$fb_rollo10.c$240$4$18 ==.
+                            994 ;	..\fb_rollo10.c:240: tastergetoggelt=1;
+   0247 D2 18               995 	setb	b0
+   0249 80 08               996 	sjmp	00166$
+   024B                     997 00165$:
+                    01CC    998 	C$fb_rollo10.c$244$3$19 ==.
+                            999 ;	..\fb_rollo10.c:244: if(tasterpegel>0) tasterpegel--;
+   024B EF                 1000 	mov	a,r7
+   024C 60 03              1001 	jz	00162$
+   024E 1F                 1002 	dec	r7
+   024F 80 02              1003 	sjmp	00166$
+   0251                    1004 00162$:
+                    01D2   1005 	C$fb_rollo10.c$245$3$19 ==.
+                           1006 ;	..\fb_rollo10.c:245: else tastergetoggelt=0;
+   0251 C2 18              1007 	clr	b0
+   0253                    1008 00166$:
+                    01D4   1009 	C$fb_rollo10.c$247$2$4 ==.
+                           1010 ;	..\fb_rollo10.c:247: TASTER=!(status60 & 0x01);	// LED entsprechend Prog-Bit schalten (low=LED an)
+   0253 E5 7B              1011 	mov	a,_status60
+   0255 54 01              1012 	anl	a,#0x01
+   0257 FD                 1013 	mov	r5,a
+   0258 B4 01 00           1014 	cjne	a,#0x01,00263$
+   025B                    1015 00263$:
+   025B E4                 1016 	clr	a
+   025C 33                 1017 	rlc	a
+   025D FD                 1018 	mov	r5,a
+   025E 24 FF              1019 	add	a,#0xff
+   0260 92 97              1020 	mov	_P1_7,c
+                    01E3   1021 	C$fb_rollo10.c$248$1$1 ==.
+                           1022 ;	..\fb_rollo10.c:248: } while(1);
+   0262 02 01 38           1023 	ljmp	00167$
+                    01E6   1024 	C$fb_rollo10.c$249$1$1 ==.
+                    01E6   1025 	XG$main$0$0 ==.
+   0265 22                 1026 	ret
+                           1027 	.area CSEG    (CODE)
+                           1028 	.area CONST   (CODE)
+                    1BFF   1029 Lfb_rollo10.main$trimsave$1$1 == 0x1bff
+                    1BFF   1030 _main_trimsave_1_1	=	0x1bff
+                    1BFD   1031 Lfb_rollo10.main$blockedsave$1$1 == 0x1bfd
+                    1BFD   1032 _main_blockedsave_1_1	=	0x1bfd
+                           1033 	.area XINIT   (CODE)
+                           1034 	.area CABS    (ABS,CODE)

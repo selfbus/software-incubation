@@ -513,7 +513,7 @@ void object_schalten(unsigned char objno, __bit objstate)	// Schaltet einen Ausg
 
 
 const unsigned int timerflagmask[]={0x0000,0x0000,0x0000,0x0008,0x0080,0x0800};
-void delay_timer(void)	// zählt alle 65ms die Variable Timer hoch und prüft Queue
+void delay_timer(void)	// zählt alle 8 ms die Variable Timer hoch und prüft Queue
 {
 	
 	unsigned char objno,delay_state,m;//,delay_base;
@@ -579,14 +579,14 @@ void delay_timer(void)	// zählt alle 65ms die Variable Timer hoch und prüft Queu
 					}
 					if (objno>=15){// handmode kurz/langtele + einschaltverz + ausschaltverz
 						//hand
-						if (delay_state == 0x12) timerstate[15]=0x22; // wenn ziel 2 erreicht in delrec sichern
+						if (delay_state == 0x12) timerstate[15]=0x22; // wenn ziel 2 erreicht,  sichern
 						if (delay_state == 0x01){
 							timerbase[15]=0x80 + 3;
 							timerstate[15]=0x12;
-							timercnt[15]= 20;// wenn ziel 1 erreicht in delrec sichern und restzeit fuer ziel 2 schreiben
+							timercnt[15]= 20;// wenn ziel 1 erreicht , sichern und restzeit fuer ziel 2 schreiben
 						}
 							 //2sek.langer Tastendruck setzen
-						if (delay_state == 0x04) timerstate[15]= 0x08;// wenn ziel erreicht in delrec sichern
+						if (delay_state == 0x04) timerstate[15]= 0x08;// wenn ziel erreicht , sichern
 					}
 				 portchanged=1;
 				}//ende if(deval==..
@@ -694,7 +694,7 @@ void handsteuerung(void)
 	}//ende simulation
 */
 	if((TMOD&0x0F)==0x02 && fb_state==0) {
-	ET1=0;	
+//	ET1=0;	
 	while(  (!PWM || (TL0>0x72)));// PWM scannen um "Hand"-Tasten abzufragen
 	
 		//while( TMOD==0x12 && (!PWM || (TL0>0x72)));// PWM scannen um "Hand"-Tasten abzufragen
@@ -754,10 +754,10 @@ void handsteuerung(void)
 					}
 					if (handmode){// wenn handmode aktiv...
 						if (timerstate[15]&0x02){// status der zeit=2 also abgelaufen..
-							object_schalten(((Tval&0x07)>>1)+12,(Tval&0x01==0x01));
+							object_schalten(((Tval&0x07)>>1)+12,(Tval&0x01));
 							}
 						else{
-							object_schalten(((Tval&0x07)>>1)+8,(Tval&0x01==0x01));
+							object_schalten(((Tval&0x07)>>1)+8,(Tval&0x01));
 						}	
 					}//ende if(handmode...		
 					//write_delay_record(15,0x04,timer+1875);//handbetätigung aus starten
@@ -776,7 +776,7 @@ void handsteuerung(void)
 			timercnt[15]=0;
 			sobj_update();
 		}
-		ET1=1;
+//		ET1=1;
 	  }// ende if (key_pattern...
 	}// ende if( (TMOD&0x0F)==0x02
 }//ende handsteuerung...

@@ -1,9 +1,9 @@
 M:fb_rollo10
 F:G$main$0$0({2}DF,SV:S),C,0,0,0,0,0
-S:Lfb_rollo10.main$n$1$1({1}SC:U),R,0,0,[r6]
-S:Lfb_rollo10.main$cmd$1$1({1}SC:U),R,0,0,[]
+S:Lfb_rollo10.main$n$1$1({1}SC:U),R,0,0,[r5]
+S:Lfb_rollo10.main$cmd$1$1({1}SC:U),R,0,0,[r5]
 S:Lfb_rollo10.main$tasterpegel$1$1({1}SC:U),R,0,0,[r7]
-S:Lfb_rollo10.main$cal$1$1({1}SC:S),R,0,0,[]
+S:Lfb_rollo10.main$cal$1$1({1}SC:S),R,0,0,[r6]
 S:Lfb_rollo10.main$rm_count$1$1({1}SC:U),R,0,0,[]
 S:Lfb_rollo10.main$wduf$1$1({1}SB0$1:U),R,0,0,[b1]
 S:Lfb_rollo10.main$tastergetoggelt$1$1({1}SB0$1:U),R,0,0,[b0]
@@ -14,10 +14,10 @@ S:G$fb_state$0$0({1}SC:U),E,0,0
 S:G$tx_nextwrite$0$0({1}SC:U),E,0,0
 S:G$tx_nextsend$0$0({1}SC:U),E,0,0
 S:G$status60$0$0({1}SC:U),E,0,0
-S:G$RAM$0$0({0}DA0,SC:U),E,0,0
 S:G$portbuffer$0$0({1}SC:U),E,0,0
 S:G$blocked$0$0({1}SC:U),E,0,0
 S:G$delay_toggle$0$0({1}SC:U),E,0,0
+S:G$RAM$0$0({0}DA0,SC:U),E,0,0
 S:G$interrupted$0$0({1}SB0$1:U),H,0,0
 S:G$connected$0$0({1}SB0$1:U),H,0,0
 S:G$ack$0$0({1}SB0$1:U),H,0,0

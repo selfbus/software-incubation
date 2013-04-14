@@ -4,6 +4,22 @@ Symbol Table
 
     .__.ABS.                                                    =  0000 G
     A                                                              00E0 
+ 19 A$fb_rollo10$1000                                              01CC GR
+ 19 A$fb_rollo10$1001                                              01CD GR
+ 19 A$fb_rollo10$1002                                              01CF GR
+ 19 A$fb_rollo10$1003                                              01D0 GR
+ 19 A$fb_rollo10$1007                                              01D2 GR
+ 19 A$fb_rollo10$1011                                              01D4 GR
+ 19 A$fb_rollo10$1012                                              01D6 GR
+ 19 A$fb_rollo10$1013                                              01D8 GR
+ 19 A$fb_rollo10$1014                                              01D9 GR
+ 19 A$fb_rollo10$1016                                              01DC GR
+ 19 A$fb_rollo10$1017                                              01DD GR
+ 19 A$fb_rollo10$1018                                              01DE GR
+ 19 A$fb_rollo10$1019                                              01DF GR
+ 19 A$fb_rollo10$1020                                              01E1 GR
+ 19 A$fb_rollo10$1023                                              01E3 GR
+ 19 A$fb_rollo10$1026                                              01E6 GR
  10 A$fb_rollo10$515                                               0000 GR
  10 A$fb_rollo10$516                                               0003 GR
  10 A$fb_rollo10$518                                               000B GR
@@ -27,174 +43,195 @@ Symbol Table
  19 A$fb_rollo10$599                                               0018 GR
  19 A$fb_rollo10$602                                               001A GR
  19 A$fb_rollo10$603                                               001D GR
- 19 A$fb_rollo10$607                                               0020 GR
- 19 A$fb_rollo10$608                                               0023 GR
+ 19 A$fb_rollo10$604                                               0020 GR
+ 19 A$fb_rollo10$605                                               0022 GR
  19 A$fb_rollo10$609                                               0024 GR
- 19 A$fb_rollo10$613                                               0025 GR
- 19 A$fb_rollo10$614                                               0028 GR
- 19 A$fb_rollo10$615                                               0029 GR
- 19 A$fb_rollo10$616                                               002A GR
- 19 A$fb_rollo10$617                                               002C GR
- 19 A$fb_rollo10$618                                               002D GR
- 19 A$fb_rollo10$619                                               002E GR
- 19 A$fb_rollo10$622                                               0030 GR
- 19 A$fb_rollo10$625                                               0033 GR
- 19 A$fb_rollo10$628                                               0036 GR
- 19 A$fb_rollo10$630                                               0038 GR
- 19 A$fb_rollo10$632                                               003B GR
- 19 A$fb_rollo10$635                                               003D GR
- 19 A$fb_rollo10$638                                               003F GR
- 19 A$fb_rollo10$639                                               0042 GR
- 19 A$fb_rollo10$640                                               0043 GR
- 19 A$fb_rollo10$641                                               0044 GR
- 19 A$fb_rollo10$644                                               0046 GR
- 19 A$fb_rollo10$645                                               0049 GR
- 19 A$fb_rollo10$646                                               004A GR
- 19 A$fb_rollo10$647                                               004B GR
- 19 A$fb_rollo10$650                                               004D GR
- 19 A$fb_rollo10$653                                               004F GR
- 19 A$fb_rollo10$657                                               0051 GR
- 19 A$fb_rollo10$660                                               0054 GR
- 19 A$fb_rollo10$661                                               0055 GR
- 19 A$fb_rollo10$665                                               0057 GR
- 19 A$fb_rollo10$666                                               005A GR
- 19 A$fb_rollo10$667                                               005C GR
- 19 A$fb_rollo10$668                                               005F GR
- 19 A$fb_rollo10$669                                               0062 GR
- 19 A$fb_rollo10$670                                               0065 GR
- 19 A$fb_rollo10$673                                               0067 GR
- 19 A$fb_rollo10$674                                               0069 GR
- 19 A$fb_rollo10$675                                               006C GR
- 19 A$fb_rollo10$676                                               006F GR
- 19 A$fb_rollo10$677                                               0072 GR
- 19 A$fb_rollo10$680                                               0074 GR
- 19 A$fb_rollo10$681                                               0076 GR
- 19 A$fb_rollo10$682                                               0078 GR
- 19 A$fb_rollo10$683                                               007B GR
- 19 A$fb_rollo10$684                                               007D GR
- 19 A$fb_rollo10$687                                               007F GR
- 19 A$fb_rollo10$688                                               0082 GR
- 19 A$fb_rollo10$689                                               0084 GR
- 19 A$fb_rollo10$690                                               0086 GR
- 19 A$fb_rollo10$691                                               0089 GR
- 19 A$fb_rollo10$692                                               008B GR
- 19 A$fb_rollo10$696                                               008D GR
- 19 A$fb_rollo10$699                                               0090 GR
- 19 A$fb_rollo10$702                                               0093 GR
- 19 A$fb_rollo10$705                                               0096 GR
- 19 A$fb_rollo10$708                                               0099 GR
- 19 A$fb_rollo10$711                                               009C GR
- 19 A$fb_rollo10$714                                               009F GR
- 19 A$fb_rollo10$717                                               00A2 GR
- 19 A$fb_rollo10$720                                               00A5 GR
- 19 A$fb_rollo10$723                                               00A8 GR
- 19 A$fb_rollo10$729                                               00AB GR
- 19 A$fb_rollo10$730                                               00AD GR
- 19 A$fb_rollo10$731                                               00B0 GR
- 19 A$fb_rollo10$732                                               00B3 GR
- 19 A$fb_rollo10$735                                               00B5 GR
- 19 A$fb_rollo10$736                                               00B8 GR
+ 19 A$fb_rollo10$610                                               0027 GR
+ 19 A$fb_rollo10$611                                               0028 GR
+ 19 A$fb_rollo10$612                                               0029 GR
+ 19 A$fb_rollo10$613                                               002A GR
+ 19 A$fb_rollo10$617                                               002B GR
+ 19 A$fb_rollo10$618                                               002E GR
+ 19 A$fb_rollo10$619                                               002F GR
+ 19 A$fb_rollo10$620                                               0030 GR
+ 19 A$fb_rollo10$621                                               0032 GR
+ 19 A$fb_rollo10$622                                               0033 GR
+ 19 A$fb_rollo10$623                                               0034 GR
+ 19 A$fb_rollo10$626                                               0036 GR
+ 19 A$fb_rollo10$629                                               0039 GR
+ 19 A$fb_rollo10$632                                               003C GR
+ 19 A$fb_rollo10$634                                               003E GR
+ 19 A$fb_rollo10$636                                               0041 GR
+ 19 A$fb_rollo10$639                                               0043 GR
+ 19 A$fb_rollo10$642                                               0045 GR
+ 19 A$fb_rollo10$643                                               0048 GR
+ 19 A$fb_rollo10$644                                               0049 GR
+ 19 A$fb_rollo10$645                                               004A GR
+ 19 A$fb_rollo10$648                                               004C GR
+ 19 A$fb_rollo10$649                                               004F GR
+ 19 A$fb_rollo10$650                                               0050 GR
+ 19 A$fb_rollo10$651                                               0051 GR
+ 19 A$fb_rollo10$654                                               0053 GR
+ 19 A$fb_rollo10$657                                               0055 GR
+ 19 A$fb_rollo10$661                                               0057 GR
+ 19 A$fb_rollo10$664                                               005A GR
+ 19 A$fb_rollo10$665                                               005B GR
+ 19 A$fb_rollo10$669                                               005D GR
+ 19 A$fb_rollo10$670                                               0060 GR
+ 19 A$fb_rollo10$671                                               0062 GR
+ 19 A$fb_rollo10$672                                               0065 GR
+ 19 A$fb_rollo10$673                                               0068 GR
+ 19 A$fb_rollo10$674                                               006B GR
+ 19 A$fb_rollo10$677                                               006D GR
+ 19 A$fb_rollo10$678                                               006F GR
+ 19 A$fb_rollo10$679                                               0072 GR
+ 19 A$fb_rollo10$680                                               0075 GR
+ 19 A$fb_rollo10$681                                               0078 GR
+ 19 A$fb_rollo10$684                                               007A GR
+ 19 A$fb_rollo10$685                                               007C GR
+ 19 A$fb_rollo10$686                                               007E GR
+ 19 A$fb_rollo10$687                                               0080 GR
+ 19 A$fb_rollo10$688                                               0083 GR
+ 19 A$fb_rollo10$689                                               0085 GR
+ 19 A$fb_rollo10$690                                               0087 GR
+ 19 A$fb_rollo10$693                                               0089 GR
+ 19 A$fb_rollo10$694                                               008C GR
+ 19 A$fb_rollo10$695                                               008E GR
+ 19 A$fb_rollo10$696                                               0090 GR
+ 19 A$fb_rollo10$697                                               0092 GR
+ 19 A$fb_rollo10$698                                               0095 GR
+ 19 A$fb_rollo10$699                                               0097 GR
+ 19 A$fb_rollo10$700                                               0099 GR
+ 19 A$fb_rollo10$704                                               009B GR
+ 19 A$fb_rollo10$707                                               009E GR
+ 19 A$fb_rollo10$710                                               00A1 GR
+ 19 A$fb_rollo10$713                                               00A4 GR
+ 19 A$fb_rollo10$716                                               00A7 GR
+ 19 A$fb_rollo10$719                                               00AA GR
+ 19 A$fb_rollo10$722                                               00AD GR
+ 19 A$fb_rollo10$725                                               00B0 GR
+ 19 A$fb_rollo10$728                                               00B3 GR
+ 19 A$fb_rollo10$731                                               00B6 GR
  19 A$fb_rollo10$737                                               00B9 GR
- 19 A$fb_rollo10$738                                               00BA GR
- 19 A$fb_rollo10$739                                               00BB GR
- 19 A$fb_rollo10$740                                               00BE GR
- 19 A$fb_rollo10$741                                               00C1 GR
- 19 A$fb_rollo10$742                                               00C3 GR
- 19 A$fb_rollo10$745                                               00C6 GR
+ 19 A$fb_rollo10$738                                               00BB GR
+ 19 A$fb_rollo10$739                                               00BE GR
+ 19 A$fb_rollo10$740                                               00C1 GR
+ 19 A$fb_rollo10$743                                               00C3 GR
+ 19 A$fb_rollo10$744                                               00C6 GR
+ 19 A$fb_rollo10$745                                               00C7 GR
  19 A$fb_rollo10$746                                               00C8 GR
- 19 A$fb_rollo10$747                                               00CA GR
+ 19 A$fb_rollo10$747                                               00C9 GR
  19 A$fb_rollo10$748                                               00CC GR
- 19 A$fb_rollo10$749                                               00CE GR
- 19 A$fb_rollo10$750                                               00D0 GR
- 19 A$fb_rollo10$751                                               00D3 GR
- 19 A$fb_rollo10$752                                               00D5 GR
- 19 A$fb_rollo10$756                                               00D7 GR
- 19 A$fb_rollo10$757                                               00DA GR
- 19 A$fb_rollo10$758                                               00DC GR
- 19 A$fb_rollo10$759                                               00DE GR
- 19 A$fb_rollo10$760                                               00DF GR
- 19 A$fb_rollo10$763                                               00E2 GR
- 19 A$fb_rollo10$764                                               00E4 GR
- 19 A$fb_rollo10$765                                               00E6 GR
- 19 A$fb_rollo10$766                                               00E8 GR
- 19 A$fb_rollo10$769                                               00EA GR
- 19 A$fb_rollo10$772                                               00ED GR
- 19 A$fb_rollo10$775                                               00F0 GR
- 19 A$fb_rollo10$778                                               00F2 GR
- 19 A$fb_rollo10$781                                               00F5 GR
- 19 A$fb_rollo10$784                                               00F7 GR
- 19 A$fb_rollo10$788                                               00F9 GR
- 19 A$fb_rollo10$789                                               00FC GR
- 19 A$fb_rollo10$790                                               00FE GR
- 19 A$fb_rollo10$791                                               0100 GR
- 19 A$fb_rollo10$792                                               0103 GR
- 19 A$fb_rollo10$793                                               0105 GR
- 19 A$fb_rollo10$797                                               0107 GR
- 19 A$fb_rollo10$798                                               0109 GR
- 19 A$fb_rollo10$799                                               010B GR
- 19 A$fb_rollo10$800                                               010D GR
- 19 A$fb_rollo10$801                                               010F GR
- 19 A$fb_rollo10$802                                               0111 GR
- 19 A$fb_rollo10$803                                               0114 GR
- 19 A$fb_rollo10$804                                               0117 GR
- 19 A$fb_rollo10$805                                               0118 GR
- 19 A$fb_rollo10$806                                               0119 GR
- 19 A$fb_rollo10$807                                               011A GR
- 19 A$fb_rollo10$808                                               011D GR
- 19 A$fb_rollo10$812                                               011F GR
- 19 A$fb_rollo10$815                                               0122 GR
- 19 A$fb_rollo10$818                                               0125 GR
- 19 A$fb_rollo10$821                                               0128 GR
- 19 A$fb_rollo10$824                                               012B GR
- 19 A$fb_rollo10$830                                               012E GR
- 19 A$fb_rollo10$831                                               0131 GR
- 19 A$fb_rollo10$835                                               0133 GR
- 19 A$fb_rollo10$838                                               0135 GR
- 19 A$fb_rollo10$839                                               0137 GR
- 19 A$fb_rollo10$840                                               0139 GR
- 19 A$fb_rollo10$841                                               013C GR
- 19 A$fb_rollo10$842                                               013E GR
- 19 A$fb_rollo10$843                                               0140 GR
- 19 A$fb_rollo10$847                                               0142 GR
- 19 A$fb_rollo10$849                                               0144 GR
- 19 A$fb_rollo10$850                                               0146 GR
- 19 A$fb_rollo10$851                                               0147 GR
- 19 A$fb_rollo10$852                                               0149 GR
- 19 A$fb_rollo10$853                                               014A GR
- 19 A$fb_rollo10$857                                               014C GR
- 19 A$fb_rollo10$859                                               014F GR
- 19 A$fb_rollo10$860                                               0152 GR
- 19 A$fb_rollo10$862                                               0154 GR
- 19 A$fb_rollo10$863                                               0156 GR
- 19 A$fb_rollo10$864                                               0158 GR
- 19 A$fb_rollo10$865                                               0159 GR
- 19 A$fb_rollo10$866                                               015B GR
- 19 A$fb_rollo10$870                                               015D GR
- 19 A$fb_rollo10$873                                               015F GR
- 19 A$fb_rollo10$876                                               0162 GR
- 19 A$fb_rollo10$878                                               0165 GR
- 19 A$fb_rollo10$879                                               0167 GR
- 19 A$fb_rollo10$880                                               0168 GR
- 19 A$fb_rollo10$884                                               016A GR
- 19 A$fb_rollo10$885                                               016D GR
- 19 A$fb_rollo10$889                                               0170 GR
- 19 A$fb_rollo10$890                                               0172 GR
- 19 A$fb_rollo10$894                                               0174 GR
- 19 A$fb_rollo10$895                                               0175 GR
- 19 A$fb_rollo10$896                                               0177 GR
- 19 A$fb_rollo10$897                                               0178 GR
- 19 A$fb_rollo10$901                                               017A GR
- 19 A$fb_rollo10$905                                               017C GR
+ 19 A$fb_rollo10$749                                               00CF GR
+ 19 A$fb_rollo10$750                                               00D1 GR
+ 19 A$fb_rollo10$753                                               00D4 GR
+ 19 A$fb_rollo10$754                                               00D6 GR
+ 19 A$fb_rollo10$755                                               00D8 GR
+ 19 A$fb_rollo10$756                                               00DA GR
+ 19 A$fb_rollo10$757                                               00DC GR
+ 19 A$fb_rollo10$758                                               00DE GR
+ 19 A$fb_rollo10$759                                               00E0 GR
+ 19 A$fb_rollo10$760                                               00E3 GR
+ 19 A$fb_rollo10$761                                               00E5 GR
+ 19 A$fb_rollo10$762                                               00E7 GR
+ 19 A$fb_rollo10$766                                               00E9 GR
+ 19 A$fb_rollo10$767                                               00EC GR
+ 19 A$fb_rollo10$768                                               00EE GR
+ 19 A$fb_rollo10$769                                               00F0 GR
+ 19 A$fb_rollo10$770                                               00F1 GR
+ 19 A$fb_rollo10$773                                               00F4 GR
+ 19 A$fb_rollo10$774                                               00F6 GR
+ 19 A$fb_rollo10$775                                               00F8 GR
+ 19 A$fb_rollo10$776                                               00FA GR
+ 19 A$fb_rollo10$779                                               00FC GR
+ 19 A$fb_rollo10$782                                               00FF GR
+ 19 A$fb_rollo10$785                                               0102 GR
+ 19 A$fb_rollo10$788                                               0104 GR
+ 19 A$fb_rollo10$791                                               0107 GR
+ 19 A$fb_rollo10$794                                               0109 GR
+ 19 A$fb_rollo10$798                                               010B GR
+ 19 A$fb_rollo10$799                                               010E GR
+ 19 A$fb_rollo10$800                                               0110 GR
+ 19 A$fb_rollo10$801                                               0112 GR
+ 19 A$fb_rollo10$802                                               0114 GR
+ 19 A$fb_rollo10$803                                               0117 GR
+ 19 A$fb_rollo10$804                                               0119 GR
+ 19 A$fb_rollo10$805                                               011B GR
+ 19 A$fb_rollo10$809                                               011D GR
+ 19 A$fb_rollo10$810                                               011F GR
+ 19 A$fb_rollo10$811                                               0121 GR
+ 19 A$fb_rollo10$812                                               0123 GR
+ 19 A$fb_rollo10$813                                               0125 GR
+ 19 A$fb_rollo10$814                                               0127 GR
+ 19 A$fb_rollo10$815                                               012A GR
+ 19 A$fb_rollo10$816                                               012D GR
+ 19 A$fb_rollo10$817                                               012E GR
+ 19 A$fb_rollo10$818                                               012F GR
+ 19 A$fb_rollo10$819                                               0130 GR
+ 19 A$fb_rollo10$820                                               0133 GR
+ 19 A$fb_rollo10$824                                               0135 GR
+ 19 A$fb_rollo10$827                                               0138 GR
+ 19 A$fb_rollo10$830                                               013B GR
+ 19 A$fb_rollo10$833                                               013E GR
+ 19 A$fb_rollo10$836                                               0141 GR
+ 19 A$fb_rollo10$842                                               0144 GR
+ 19 A$fb_rollo10$843                                               0147 GR
+ 19 A$fb_rollo10$847                                               0149 GR
+ 19 A$fb_rollo10$850                                               014B GR
+ 19 A$fb_rollo10$851                                               014D GR
+ 19 A$fb_rollo10$852                                               014F GR
+ 19 A$fb_rollo10$853                                               0151 GR
+ 19 A$fb_rollo10$854                                               0154 GR
+ 19 A$fb_rollo10$855                                               0156 GR
+ 19 A$fb_rollo10$856                                               0158 GR
+ 19 A$fb_rollo10$857                                               015A GR
+ 19 A$fb_rollo10$861                                               015C GR
+ 19 A$fb_rollo10$863                                               015E GR
+ 19 A$fb_rollo10$864                                               0160 GR
+ 19 A$fb_rollo10$865                                               0161 GR
+ 19 A$fb_rollo10$866                                               0163 GR
+ 19 A$fb_rollo10$867                                               0164 GR
+ 19 A$fb_rollo10$873                                               0166 GR
+ 19 A$fb_rollo10$874                                               0169 GR
+ 19 A$fb_rollo10$878                                               016B GR
+ 19 A$fb_rollo10$881                                               016D GR
+ 19 A$fb_rollo10$887                                               0170 GR
+ 19 A$fb_rollo10$888                                               0173 GR
+ 19 A$fb_rollo10$892                                               0175 GR
+ 19 A$fb_rollo10$896                                               0178 GR
+ 19 A$fb_rollo10$899                                               017B GR
+ 19 A$fb_rollo10$902                                               017D GR
  19 A$fb_rollo10$906                                               017E GR
- 19 A$fb_rollo10$907                                               0180 GR
- 19 A$fb_rollo10$908                                               0181 GR
- 19 A$fb_rollo10$910                                               0184 GR
- 19 A$fb_rollo10$911                                               0185 GR
- 19 A$fb_rollo10$912                                               0186 GR
- 19 A$fb_rollo10$913                                               0187 GR
- 19 A$fb_rollo10$914                                               0189 GR
- 19 A$fb_rollo10$917                                               018B GR
- 19 A$fb_rollo10$920                                               018E GR
+ 19 A$fb_rollo10$909                                               0181 GR
+ 19 A$fb_rollo10$912                                               0183 GR
+ 19 A$fb_rollo10$916                                               0184 GR
+ 19 A$fb_rollo10$919                                               0187 GR
+ 19 A$fb_rollo10$922                                               0189 GR
+ 19 A$fb_rollo10$925                                               018C GR
+ 19 A$fb_rollo10$928                                               018F GR
+ 19 A$fb_rollo10$931                                               0192 GR
+ 19 A$fb_rollo10$934                                               0194 GR
+ 19 A$fb_rollo10$937                                               0197 GR
+ 19 A$fb_rollo10$941                                               0199 GR
+ 19 A$fb_rollo10$942                                               019C GR
+ 19 A$fb_rollo10$946                                               019F GR
+ 19 A$fb_rollo10$952                                               01A2 GR
+ 19 A$fb_rollo10$953                                               01A5 GR
+ 19 A$fb_rollo10$957                                               01A7 GR
+ 19 A$fb_rollo10$961                                               01AA GR
+ 19 A$fb_rollo10$967                                               01AD GR
+ 19 A$fb_rollo10$968                                               01B0 GR
+ 19 A$fb_rollo10$972                                               01B2 GR
+ 19 A$fb_rollo10$976                                               01B5 GR
+ 19 A$fb_rollo10$979                                               01B7 GR
+ 19 A$fb_rollo10$982                                               01BA GR
+ 19 A$fb_rollo10$984                                               01BD GR
+ 19 A$fb_rollo10$985                                               01BF GR
+ 19 A$fb_rollo10$986                                               01C0 GR
+ 19 A$fb_rollo10$990                                               01C2 GR
+ 19 A$fb_rollo10$991                                               01C5 GR
+ 19 A$fb_rollo10$995                                               01C8 GR
+ 19 A$fb_rollo10$996                                               01CA GR
     A.0                                                            00E0 
     A.1                                                            00E1 
     A.2                                                            00E2 
@@ -222,74 +259,103 @@ Symbol Table
     B.5                                                            00F5 
     B.6                                                            00F6 
     B.7                                                            00F7 
- 19 C$fb_rollo10.c$101$3$5                                      =  00D7 GR
- 19 C$fb_rollo10.c$103$4$6                                      =  00E2 GR
- 19 C$fb_rollo10.c$104$4$6                                      =  00EA GR
- 19 C$fb_rollo10.c$105$4$6                                      =  00ED GR
- 19 C$fb_rollo10.c$107$4$6                                      =  00F0 GR
- 19 C$fb_rollo10.c$109$4$6                                      =  00F2 GR
- 19 C$fb_rollo10.c$111$4$6                                      =  00F5 GR
- 19 C$fb_rollo10.c$113$4$6                                      =  00F7 GR
- 19 C$fb_rollo10.c$120$3$5                                      =  00F9 GR
- 19 C$fb_rollo10.c$149$3$5                                      =  0107 GR
- 19 C$fb_rollo10.c$150$4$7                                      =  011F GR
- 19 C$fb_rollo10.c$151$4$7                                      =  0122 GR
- 19 C$fb_rollo10.c$152$4$7                                      =  0125 GR
- 19 C$fb_rollo10.c$153$4$7                                      =  0128 GR
- 19 C$fb_rollo10.c$154$4$7                                      =  012B GR
- 19 C$fb_rollo10.c$161$2$4                                      =  012E GR
- 19 C$fb_rollo10.c$162$3$8                                      =  012E GR
- 19 C$fb_rollo10.c$163$3$8                                      =  0133 GR
- 19 C$fb_rollo10.c$164$3$8                                      =  0135 GR
- 19 C$fb_rollo10.c$167$3$4                                      =  0142 GR
- 19 C$fb_rollo10.c$170$2$4                                      =  014C GR
- 19 C$fb_rollo10.c$234$2$4                                      =  015D GR
- 19 C$fb_rollo10.c$235$2$4                                      =  015F GR
- 19 C$fb_rollo10.c$236$3$11                                     =  0162 GR
- 19 C$fb_rollo10.c$238$4$12                                     =  016A GR
- 19 C$fb_rollo10.c$239$4$12                                     =  0170 GR
- 19 C$fb_rollo10.c$243$3$13                                     =  0174 GR
- 19 C$fb_rollo10.c$244$3$13                                     =  017A GR
- 19 C$fb_rollo10.c$246$2$4                                      =  017C GR
- 19 C$fb_rollo10.c$247$1$1                                      =  018B GR
- 19 C$fb_rollo10.c$248$1$1                                      =  018E GR
- 19 C$fb_rollo10.c$43$0$0                                       =  0000 GR
- 19 C$fb_rollo10.c$45$1$0                                       =  0000 GR
- 19 C$fb_rollo10.c$53$1$0                                       =  0002 GR
- 19 C$fb_rollo10.c$54$1$1                                       =  0004 GR
- 19 C$fb_rollo10.c$55$1$1                                       =  000D GR
- 19 C$fb_rollo10.c$58$1$1                                       =  0018 GR
- 19 C$fb_rollo10.c$59$1$1                                       =  001A GR
- 19 C$fb_rollo10.c$60$1$1                                       =  0020 GR
- 19 C$fb_rollo10.c$61$1$1                                       =  0025 GR
- 19 C$fb_rollo10.c$62$1$1                                       =  0030 GR
- 19 C$fb_rollo10.c$67$1$1                                       =  0033 GR
- 19 C$fb_rollo10.c$68$1$1                                       =  0036 GR
- 19 C$fb_rollo10.c$68$2$2                                       =  0054 GR
- 19 C$fb_rollo10.c$69$3$3                                       =  003D GR
- 19 C$fb_rollo10.c$70$3$3                                       =  003F GR
- 19 C$fb_rollo10.c$71$3$3                                       =  0046 GR
- 19 C$fb_rollo10.c$72$3$3                                       =  004D GR
- 19 C$fb_rollo10.c$73$3$3                                       =  004F GR
- 19 C$fb_rollo10.c$74$3$3                                       =  0051 GR
- 19 C$fb_rollo10.c$77$1$1                                       =  0057 GR
- 19 C$fb_rollo10.c$78$1$1                                       =  0067 GR
- 19 C$fb_rollo10.c$79$1$1                                       =  0074 GR
- 19 C$fb_rollo10.c$80$1$1                                       =  007F GR
- 19 C$fb_rollo10.c$82$1$1                                       =  008D GR
- 19 C$fb_rollo10.c$83$1$1                                       =  0090 GR
- 19 C$fb_rollo10.c$84$1$1                                       =  0093 GR
- 19 C$fb_rollo10.c$85$1$1                                       =  0096 GR
- 19 C$fb_rollo10.c$86$1$1                                       =  0099 GR
- 19 C$fb_rollo10.c$87$1$1                                       =  009C GR
- 19 C$fb_rollo10.c$88$1$1                                       =  009F GR
- 19 C$fb_rollo10.c$89$1$1                                       =  00A2 GR
- 19 C$fb_rollo10.c$90$1$1                                       =  00A5 GR
- 19 C$fb_rollo10.c$91$1$1                                       =  00A8 GR
- 19 C$fb_rollo10.c$92$1$1                                       =  00AB GR
- 19 C$fb_rollo10.c$93$2$4                                       =  00AB GR
- 19 C$fb_rollo10.c$95$2$4                                       =  00B5 GR
- 19 C$fb_rollo10.c$99$3$5                                       =  00C6 GR
+ 19 C$fb_rollo10.c$100$3$5                                      =  00D4 GR
+ 19 C$fb_rollo10.c$102$3$5                                      =  00E9 GR
+ 19 C$fb_rollo10.c$104$4$6                                      =  00F4 GR
+ 19 C$fb_rollo10.c$105$4$6                                      =  00FC GR
+ 19 C$fb_rollo10.c$106$4$6                                      =  00FF GR
+ 19 C$fb_rollo10.c$108$4$6                                      =  0102 GR
+ 19 C$fb_rollo10.c$110$4$6                                      =  0104 GR
+ 19 C$fb_rollo10.c$112$4$6                                      =  0107 GR
+ 19 C$fb_rollo10.c$114$4$6                                      =  0109 GR
+ 19 C$fb_rollo10.c$121$3$5                                      =  010B GR
+ 19 C$fb_rollo10.c$150$3$5                                      =  011D GR
+ 19 C$fb_rollo10.c$151$4$7                                      =  0135 GR
+ 19 C$fb_rollo10.c$152$4$7                                      =  0138 GR
+ 19 C$fb_rollo10.c$153$4$7                                      =  013B GR
+ 19 C$fb_rollo10.c$154$4$7                                      =  013E GR
+ 19 C$fb_rollo10.c$155$4$7                                      =  0141 GR
+ 19 C$fb_rollo10.c$162$2$4                                      =  0144 GR
+ 19 C$fb_rollo10.c$163$3$8                                      =  0144 GR
+ 19 C$fb_rollo10.c$164$3$8                                      =  0149 GR
+ 19 C$fb_rollo10.c$165$3$8                                      =  014B GR
+ 19 C$fb_rollo10.c$168$3$4                                      =  015C GR
+ 19 C$fb_rollo10.c$174$2$4                                      =  0166 GR
+ 19 C$fb_rollo10.c$175$3$10                                     =  0166 GR
+ 19 C$fb_rollo10.c$176$3$10                                     =  016B GR
+ 19 C$fb_rollo10.c$177$3$10                                     =  016D GR
+ 19 C$fb_rollo10.c$178$4$11                                     =  0170 GR
+ 19 C$fb_rollo10.c$179$4$11                                     =  0170 GR
+ 19 C$fb_rollo10.c$180$4$11                                     =  0175 GR
+ 19 C$fb_rollo10.c$182$3$10                                     =  0178 GR
+ 19 C$fb_rollo10.c$183$4$12                                     =  017B GR
+ 19 C$fb_rollo10.c$184$4$12                                     =  017D GR
+ 19 C$fb_rollo10.c$186$3$10                                     =  017E GR
+ 19 C$fb_rollo10.c$187$4$13                                     =  0181 GR
+ 19 C$fb_rollo10.c$188$4$13                                     =  0183 GR
+ 19 C$fb_rollo10.c$190$3$10                                     =  0184 GR
+ 19 C$fb_rollo10.c$191$4$14                                     =  0187 GR
+ 19 C$fb_rollo10.c$192$4$14                                     =  0189 GR
+ 19 C$fb_rollo10.c$198$4$14                                     =  018C GR
+ 19 C$fb_rollo10.c$199$4$14                                     =  018F GR
+ 19 C$fb_rollo10.c$201$4$14                                     =  0192 GR
+ 19 C$fb_rollo10.c$202$4$14                                     =  0194 GR
+ 19 C$fb_rollo10.c$203$4$14                                     =  0197 GR
+ 19 C$fb_rollo10.c$205$3$10                                     =  0199 GR
+ 19 C$fb_rollo10.c$222$3$10                                     =  019F GR
+ 19 C$fb_rollo10.c$223$4$15                                     =  01A2 GR
+ 19 C$fb_rollo10.c$224$4$15                                     =  01A2 GR
+ 19 C$fb_rollo10.c$225$4$15                                     =  01A7 GR
+ 19 C$fb_rollo10.c$227$3$10                                     =  01AA GR
+ 19 C$fb_rollo10.c$228$4$16                                     =  01AD GR
+ 19 C$fb_rollo10.c$229$4$16                                     =  01AD GR
+ 19 C$fb_rollo10.c$230$4$16                                     =  01B2 GR
+ 19 C$fb_rollo10.c$235$2$4                                      =  01B5 GR
+ 19 C$fb_rollo10.c$236$2$4                                      =  01B7 GR
+ 19 C$fb_rollo10.c$237$3$17                                     =  01BA GR
+ 19 C$fb_rollo10.c$239$4$18                                     =  01C2 GR
+ 19 C$fb_rollo10.c$240$4$18                                     =  01C8 GR
+ 19 C$fb_rollo10.c$244$3$19                                     =  01CC GR
+ 19 C$fb_rollo10.c$245$3$19                                     =  01D2 GR
+ 19 C$fb_rollo10.c$247$2$4                                      =  01D4 GR
+ 19 C$fb_rollo10.c$248$1$1                                      =  01E3 GR
+ 19 C$fb_rollo10.c$249$1$1                                      =  01E6 GR
+ 19 C$fb_rollo10.c$44$0$0                                       =  0000 GR
+ 19 C$fb_rollo10.c$46$1$0                                       =  0000 GR
+ 19 C$fb_rollo10.c$54$1$0                                       =  0002 GR
+ 19 C$fb_rollo10.c$55$1$1                                       =  0004 GR
+ 19 C$fb_rollo10.c$56$1$1                                       =  000D GR
+ 19 C$fb_rollo10.c$59$1$1                                       =  0018 GR
+ 19 C$fb_rollo10.c$60$1$1                                       =  001A GR
+ 19 C$fb_rollo10.c$61$1$1                                       =  0024 GR
+ 19 C$fb_rollo10.c$62$1$1                                       =  002B GR
+ 19 C$fb_rollo10.c$63$1$1                                       =  0036 GR
+ 19 C$fb_rollo10.c$68$1$1                                       =  0039 GR
+ 19 C$fb_rollo10.c$69$1$1                                       =  003C GR
+ 19 C$fb_rollo10.c$69$2$2                                       =  005A GR
+ 19 C$fb_rollo10.c$70$3$3                                       =  0043 GR
+ 19 C$fb_rollo10.c$71$3$3                                       =  0045 GR
+ 19 C$fb_rollo10.c$72$3$3                                       =  004C GR
+ 19 C$fb_rollo10.c$73$3$3                                       =  0053 GR
+ 19 C$fb_rollo10.c$74$3$3                                       =  0055 GR
+ 19 C$fb_rollo10.c$75$3$3                                       =  0057 GR
+ 19 C$fb_rollo10.c$78$1$1                                       =  005D GR
+ 19 C$fb_rollo10.c$79$1$1                                       =  006D GR
+ 19 C$fb_rollo10.c$80$1$1                                       =  007A GR
+ 19 C$fb_rollo10.c$81$1$1                                       =  0089 GR
+ 19 C$fb_rollo10.c$83$1$1                                       =  009B GR
+ 19 C$fb_rollo10.c$84$1$1                                       =  009E GR
+ 19 C$fb_rollo10.c$85$1$1                                       =  00A1 GR
+ 19 C$fb_rollo10.c$86$1$1                                       =  00A4 GR
+ 19 C$fb_rollo10.c$87$1$1                                       =  00A7 GR
+ 19 C$fb_rollo10.c$88$1$1                                       =  00AA GR
+ 19 C$fb_rollo10.c$89$1$1                                       =  00AD GR
+ 19 C$fb_rollo10.c$90$1$1                                       =  00B0 GR
+ 19 C$fb_rollo10.c$91$1$1                                       =  00B3 GR
+ 19 C$fb_rollo10.c$92$1$1                                       =  00B6 GR
+ 19 C$fb_rollo10.c$93$1$1                                       =  00B9 GR
+ 19 C$fb_rollo10.c$94$2$4                                       =  00B9 GR
+ 19 C$fb_rollo10.c$96$2$4                                       =  00C3 GR
     CPRL2                                                          00C8 
     CT2                                                            00C9 
     CY                                                             00D7 
@@ -577,7 +643,7 @@ Symbol Table
     TR1                                                            008E 
     TR2                                                            00CA 
     TXD                                                            00B1 
- 19 XG$main$0$0                                                 =  018E GR
+ 19 XG$main$0$0                                                 =  01E6 GR
     _ACC                                                        =  00E0 G
     _AUXR1                                                      =  00A2 G
     _B                                                          =  00F0 G
@@ -964,7 +1030,7 @@ Area Table
   16 GSINIT5                                    size    0   flags 20
   17 GSINIT                                     size    0   flags 20
   18 GSFINAL                                    size    3   flags 20
-  19 CSEG                                       size  18F   flags 20
+  19 CSEG                                       size  1E7   flags 20
   1A CONST                                      size    0   flags 20
   1B XINIT                                      size    0   flags 20
   1C CABS                                       size    0   flags 28
