@@ -276,30 +276,29 @@ void _process_msg(unsigned char* bytes, unsigned char len)
 		unsigned char subType = bytes[1];
 		__bit newAlarm;
 
-		if (subType & 0x20)   // (Alarm) Status
-		{
-			unsigned char status = bytes[2];
+		// (Alarm) Status
 
-			// Lokaler Alarm: Rauch Alarm | Temperatur Alarm | Wired Alarm
-			newAlarm = (subType & 0x10) | (status & (0x04 | 0x08));
-			send_obj_alarm(newAlarm);
-			alarmLocal = newAlarm;
+		unsigned char status = bytes[2];
 
-			// Lokaler Testalarm: (lokaler) Testalarm || Wired Testalarm
-			newAlarm = status & (0x20 | 0x40);
-			send_obj_test_alarm(newAlarm);
-			testAlarmLocal = newAlarm;
+		// Lokaler Alarm: Rauch Alarm | Temperatur Alarm | Wired Alarm
+		newAlarm = (subType & 0x10) | (status & (0x04 | 0x08));
+		send_obj_alarm(newAlarm);
+		alarmLocal = newAlarm;
 
-			// Bus Alarm
-			alarmBus = status & 0x10;
+		// Lokaler Testalarm: (lokaler) Testalarm || Wired Testalarm
+		newAlarm = status & (0x20 | 0x40);
+		send_obj_test_alarm(newAlarm);
+		testAlarmLocal = newAlarm;
 
-			// Bus Testalarm
-			testAlarmBus = status & 0x80;
+		// Bus Alarm
+		alarmBus = status & 0x10;
 
-			// Batterie schwach/leer
-			if ((status ^ errCode) & ERRCODE_BATLOW)
-				set_errcode((errCode & ~ERRCODE_BATLOW) | (status & ERRCODE_BATLOW));
-		}
+		// Bus Testalarm
+		testAlarmBus = status & 0x80;
+
+		// Batterie schwach/leer
+		if ((status ^ errCode) & ERRCODE_BATLOW)
+			set_errcode((errCode & ~ERRCODE_BATLOW) | (status & ERRCODE_BATLOW));
 
 		if (subType & 0x08)  // Taste am Rauchmelder gedrückt
 		{
@@ -601,30 +600,67 @@ void process_obj(unsigned char objno)
 
 
 /**
- * Com-Objekte bearbeiten.
+ * Com-Objekte bearbeiten, Worker Funktion.
  *
- * Com-Objekte die Daten vom Rauchmelder benötigen werden nur bearbeitet wenn
+ * Com-Objekte, die Daten vom Rauchmelder benötigen, werden nur bearbeitet wenn
  * nicht gerade auf Antwort vom Rauchmelder gewartet wird.
+ *
+ * @return 1 wenn ein Com-Objekt verarbeitet wurde, sonst 0.
  */
-void process_objs()
+unsigned char do_process_objs(unsigned char *flags)
 {
-	unsigned char mask, byteno, objno;
+	unsigned char byteno, bitno, objno, cmd, flagsByte;
 
+	for (byteno = 0; byteno < NUM_OBJ_FLAG_BYTES; ++byteno)
+	{
+		flagsByte = flags[byteno];
+		if (!flagsByte) continue;
+
+		for (bitno = 0; bitno < 8; ++bitno)
+		{
+			if (flagsByte & pow2[bitno])
+			{
+				objno = (byteno << 3) + bitno;
+				cmd = objMappingTab[objno].cmd;
+				if (!answerWait || cmd == RM_CMD_NONE || cmd == RM_CMD_INTERNAL)
+				{
+					process_obj(objno);
+					return 1;
+				}
+			}
+		}
+	}
+
+#ifdef OLD_CODE
 	for (objno = 0; objno < NUM_OBJS; ++objno)
 	{
 		byteno = objno >> 3;
 		mask = pow2[objno & 7];
 
-		if ((objReadReqFlags[byteno] & mask) || (objSendReqFlags[byteno] & mask))
+		if (flags[byteno] & mask)
 		{
 			unsigned char cmd = objMappingTab[objno].cmd;
 			if (!answerWait || cmd == RM_CMD_NONE || cmd == RM_CMD_INTERNAL)
 			{
 				process_obj(objno);
-				break;
+				return 1;
 			}
 		}
 	}
+#endif /*OLD_CODE*/
+
+	return 0;
+}
+
+/**
+ * Com-Objekte bearbeiten.
+ */
+void process_objs()
+{
+	if (do_process_objs(objReadReqFlags))
+		return;
+
+	do_process_objs(objSendReqFlags);
 }
 
 

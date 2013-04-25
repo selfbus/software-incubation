@@ -1,6 +1,16 @@
 Protokoll für die Kommunikation mit dem Rauchmelder
 ===================================================
 
+Korrekturen
+-----------
+
+2013-04-25 Korrektur 82 Status-Meldung, Byte 1 Bit 5
+
+
+
+Allgemeines
+-----------
+
 Die Kommunikation mit dem Rauchmelder ist Seriell 9600 Baud, 8N1
 
 Die Kommunikation mit dem Rauchmelder bestehen aus Strings die Hex Bytes enthalten,
@@ -216,11 +226,11 @@ CF00EF00F04A
 Wird vom Rauchmelder selbstständig gesendet.
 
 Daten:  1 Byte       : Bit 0: Unbekannt (0x01)
-                       Bit 1: Defekt Meldung in Byte #3 (0x02)
+                       Bit 1: Defekt Meldung in Byte #4 (0x02)
                        Bit 2: (0x04)
                        Bit 3: Taste gedrückt (0x08)
                        Bit 4: Rauchalarm - Bit5 ist dann auch gesetzt (0x10)
-                       Bit 5: Alarm Status Meldung in diesem Byte #1 und Byte #3 (0x20)
+                       Bit 5: 1=Batterie Betrieb, 0=Stützspannung über grüne Klemme (0x20)
                        Bit 6: (0x40)
                        Bit 7: (0x80)
         1 Byte Status: Bit 0: Batterie schwach (0x01)
@@ -253,6 +263,7 @@ Daten:  1 Byte       : Bit 0: Unbekannt (0x01)
 82 20 40 00 00 F0 - Wired Testalarm über grüne Klemme ausgelöst. Ende: 82 20 00 00 00 EC
 82 30 00 00 00 FD - Lokaler Alarm mit Harfön erzeugt
 82 20 20 00 00 EE - Lokaler Testalarm, Taste nicht gedrückt
+82 00 20 00 00 EC - Lokaler Testalarm, Taste nicht gedrückt, Stützspannung an grüner Klemme
 82 28 20 00 00 F6 - Lokaler Testalarm, Taste gedrückt
 82 20 04 00 00 F0 - Lokaler Rauchalarm, Taste nicht gedrückt
 82 20 10 00 00 ED - Wireless Alarm (Remote über Funkmodul)
