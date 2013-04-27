@@ -341,9 +341,8 @@ void read_value_req()
 {
 	unsigned char objno = find_first_objno(telegramm[3], telegramm[4]);
 
-	// TODO Nur antworten wenn READ und COM Flag gesetzt sind
-//	if ((read_objflags(objno) & 0x0C) == 0x0C)
-	if (objno < NUM_OBJS)
+	// Nur antworten wenn gültiges Com Objekt und READ und COM Flag gesetzt sind
+	if (objno < NUM_OBJS && (read_objflags(objno) & 0x0C) == 0x0C)
 	{
 		ARRAY_SET_BIT(objReadReqFlags, objno);
 	}
@@ -404,7 +403,6 @@ unsigned long read_obj_value(unsigned char objno)
 {
 	unsigned char cmd = objMappingTab[objno].cmd;
 
-//	// TODO diese Debug Ausgabe wieder entfernen
 //	DEBUG_WRITE_BYTE(objno);
 //	DEBUG_WRITE_BYTE(eeprom[COMMSTABPTR]);
 //	//DEBUG_WRITE_BYTE(eeprom[eeprom[COMMSTABPTR]+objno*3+4]); // objtype
@@ -421,6 +419,9 @@ unsigned long read_obj_value(unsigned char objno)
 		case OBJ_TALARM_BUS:
 		case OBJ_STAT_TALARM:
 			return testAlarmLocal;
+
+		case OBJ_RESET_ALARM:
+			return ignoreBusAlarm;
 
 		case OBJ_STAT_ALARM_DELAYED:
 			return delayedAlarmCounter != 0;
@@ -531,6 +532,7 @@ void write_value_req()
 
 	// Gruppenadressposition aus Gruppenadresse bestimmen
 	gapos = gapos_in_gat(telegramm[3], telegramm[4]);
+
 	if (gapos != 0xFF)
 	{
 		atp = eeprom[ASSOCTABPTR];  // Association Table Pointer
@@ -863,12 +865,12 @@ void restart_app()
 	START_WRITECYCLE;
 	WRITE_BYTE(0x01, 0x03, 0x00);	// Herstellercode 0x004C = Bosch
 	WRITE_BYTE(0x01, 0x04, 0x4C);
-	WRITE_BYTE(0x01, 0x05, 0x03);	// Devicetype 1010 (0x03F2)
-	WRITE_BYTE(0x01, 0x06, 0xF2);
-	WRITE_BYTE(0x01, 0x07, 0x21);	// Version der Applikation: 2.1
+//	WRITE_BYTE(0x01, 0x05, 0x03);	// Devicetype 1010 (0x03F2)
+//	WRITE_BYTE(0x01, 0x06, 0xF2);
+//	WRITE_BYTE(0x01, 0x07, 0x21);	// Version der Applikation: 2.1
 	WRITE_BYTE(0x01, 0x0C, 0x00);	// PORT A Direction Bit Setting
 	WRITE_BYTE(0x01, 0x0D, 0xFF);	// Run-Status (00=stop FF=run)
-	WRITE_BYTE(0x01, 0x12, 0xA0);	// COMMSTAB Pointer
+//	WRITE_BYTE(0x01, 0x12, 0xA0);	// COMMSTAB Pointer
 	STOP_WRITECYCLE;
 	EA = 1;							// Interrupts freigeben
 

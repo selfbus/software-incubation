@@ -1,4 +1,9 @@
-2013-04-01 Version 2.01beta3
+2013-04-28
+        Com Flags in read_value_req prüfen
+        Initialisierung optimiert
+        Neue fb_lib verwendet
+
+2013-04-26 Version 2.01beta3
         Bugfix: Bei angelegter Stützspannung (über grüne Klemme) wird kein Alarm mehr gemeldet.
         Beim Bearbeiten von Com Objekten werden jetzt Read-Requests bevorzugt.
 
