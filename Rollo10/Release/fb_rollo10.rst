@@ -1,7 +1,7 @@
                               1 ;--------------------------------------------------------
                               2 ; File Created by SDCC : free open source ANSI-C Compiler
                               3 ; Version 3.1.0 #7066 (Nov 22 2011) (MINGW32)
-                              4 ; This file was generated Sun Apr 14 12:17:07 2013
+                              4 ; This file was generated Sat Apr 27 17:57:21 2013
                               5 ;--------------------------------------------------------
                               6 	.module fb_rollo10
                               7 	.optsdcc -mmcs51 --model-small
@@ -591,7 +591,7 @@
                             591 ;	..\fb_rollo10.c:56: restart_hw();							// Hardware zuruecksetzen
    008C C0 07               592 	push	ar7
    008E C0 23               593 	push	bits
-   0090 12 17 BE            594 	lcall	_restart_hw
+   0090 12 17 BF            594 	lcall	_restart_hw
    0093 D0 23               595 	pop	bits
    0095 D0 07               596 	pop	ar7
                     0018    597 	C$fb_rollo10.c$59$1$1 ==.
@@ -850,7 +850,7 @@
    01CA C0 07               850 	push	ar7
    01CC C0 06               851 	push	ar6
    01CE C0 23               852 	push	bits
-   01D0 12 14 ED            853 	lcall	_process_tel
+   01D0 12 14 EE            853 	lcall	_process_tel
    01D3 D0 23               854 	pop	bits
    01D5 D0 06               855 	pop	ar6
    01D7 D0 07               856 	pop	ar7

@@ -1,7 +1,7 @@
                               1 ;--------------------------------------------------------
                               2 ; File Created by SDCC : free open source ANSI-C Compiler
                               3 ; Version 3.1.0 #7066 (Nov 22 2011) (MINGW32)
-                              4 ; This file was generated Sun Apr 14 11:31:36 2013
+                              4 ; This file was generated Sat Apr 27 17:57:21 2013
                               5 ;--------------------------------------------------------
                               6 	.module fb_app_rollo10
                               7 	.optsdcc -mmcs51 --model-small
@@ -685,7 +685,7 @@
    02AD C0 06               685 	push	ar6
    02AF C0 05               686 	push	ar5
    02B1 C0 04               687 	push	ar4
-   02B3 12 17 03            688 	lcall	_read_objflags
+   02B3 12 17 04            688 	lcall	_read_objflags
    02B6 D0 04               689 	pop	ar4
    02B8 D0 05               690 	pop	ar5
    02BA D0 06               691 	pop	ar6
@@ -761,7 +761,7 @@
                             761 ;	..\fb_app_rollo10.c:225: objno=find_first_objno(telegramm[3],telegramm[4]);	// erste Objektnummer zu empfangener GA finden
    0311 85 57 82            762 	mov	dpl,(_telegramm + 0x0003)
    0314 C0 58               763 	push	(_telegramm + 0x0004)
-   0316 12 17 19            764 	lcall	_find_first_objno
+   0316 12 17 1A            764 	lcall	_find_first_objno
    0319 AF 82               765 	mov	r7,dpl
    031B 15 81               766 	dec	sp
                     00B7    767 	C$fb_app_rollo10.c$226$1$1 ==.
@@ -779,7 +779,7 @@
                             779 ;	..\fb_app_rollo10.c:230: objflags=read_objflags(objno);		// Objekt Flags lesen
    032B 8F 82               780 	mov	dpl,r7
    032D C0 07               781 	push	ar7
-   032F 12 17 03            782 	lcall	_read_objflags
+   032F 12 17 04            782 	lcall	_read_objflags
    0332 AE 82               783 	mov	r6,dpl
    0334 D0 07               784 	pop	ar7
                     00D0    785 	C$fb_app_rollo10.c$232$2$2 ==.
@@ -789,7 +789,7 @@
    033C 74 40               789 	mov	a,#0x40
    033E 2F                  790 	add	a,r7
    033F F5 82               791 	mov	dpl,a
-   0341 12 14 BA            792 	lcall	_send_obj_value
+   0341 12 14 BB            792 	lcall	_send_obj_value
    0344                     793 00105$:
                     00DE    794 	C$fb_app_rollo10.c$234$1$1 ==.
                     00DE    795 	XG$read_value_req$0$0 ==.
@@ -1410,7 +1410,7 @@
    05F4 C0 05              1410 	push	ar5
    05F6 C0 04              1411 	push	ar4
    05F8 C0 23              1412 	push	bits
-   05FA 12 17 03           1413 	lcall	_read_objflags
+   05FA 12 17 04           1413 	lcall	_read_objflags
    05FD AB 82              1414 	mov	r3,dpl
    05FF D0 23              1415 	pop	bits
    0601 D0 04              1416 	pop	ar4
@@ -2302,7 +2302,7 @@
    09E0 EC                 2302 	mov	a,r4
    09E1 2C                 2303 	add	a,r4
    09E2 FB                 2304 	mov	r3,a
-   09E3 90 18 11           2305 	mov	dptr,#_timerflagmask
+   09E3 90 18 12           2305 	mov	dptr,#_timerflagmask
    09E6 93                 2306 	movc	a,@a+dptr
    09E7 CB                 2307 	xch	a,r3
    09E8 A3                 2308 	inc	dptr
@@ -2978,7 +2978,7 @@
    0CAA 24 24              2978 	add	a,#_timercnt
    0CAC F9                 2979 	mov	r1,a
    0CAD EE                 2980 	mov	a,r6
-   0CAE 90 18 1D           2981 	mov	dptr,#_svfaktorarray
+   0CAE 90 18 1E           2981 	mov	dptr,#_svfaktorarray
    0CB1 93                 2982 	movc	a,@a+dptr
    0CB2 FE                 2983 	mov	r6,a
    0CB3 F7                 2984 	mov	@r1,a
@@ -3433,30 +3433,30 @@
                     1BFD   3433 Ffb_app_rollo10$blockedsave$0$0 == 0x1bfd
                     1BFD   3434 _blockedsave	=	0x1bfd
                     0000   3435 G$timerflagmask$0$0 == .
-   1811                    3436 _timerflagmask:
-   1811 00 00              3437 	.byte #0x00,#0x00	; 0
-   1813 00 00              3438 	.byte #0x00,#0x00	; 0
-   1815 00 00              3439 	.byte #0x00,#0x00	; 0
-   1817 08 00              3440 	.byte #0x08,#0x00	; 8
-   1819 80 00              3441 	.byte #0x80,#0x00	; 128
-   181B 00 08              3442 	.byte #0x00,#0x08	; 2048
+   1812                    3436 _timerflagmask:
+   1812 00 00              3437 	.byte #0x00,#0x00	; 0
+   1814 00 00              3438 	.byte #0x00,#0x00	; 0
+   1816 00 00              3439 	.byte #0x00,#0x00	; 0
+   1818 08 00              3440 	.byte #0x08,#0x00	; 8
+   181A 80 00              3441 	.byte #0x80,#0x00	; 128
+   181C 00 08              3442 	.byte #0x00,#0x08	; 2048
                     000C   3443 G$svfaktorarray$0$0 == .
-   181D                    3444 _svfaktorarray:
-   181D 00                 3445 	.db #0x00	; 0
-   181E 02                 3446 	.db #0x02	; 2
-   181F 04                 3447 	.db #0x04	; 4
-   1820 06                 3448 	.db #0x06	; 6
-   1821 08                 3449 	.db #0x08	; 8
-   1822 0A                 3450 	.db #0x0A	; 10
-   1823 0C                 3451 	.db #0x0C	; 12
-   1824 0E                 3452 	.db #0x0E	; 14
-   1825 10                 3453 	.db #0x10	; 16
-   1826 12                 3454 	.db #0x12	; 18
-   1827 14                 3455 	.db #0x14	; 20
-   1828 16                 3456 	.db #0x16	; 22
-   1829 24                 3457 	.db #0x24	; 36
-   182A 48                 3458 	.db #0x48	; 72	'H'
-   182B 6D                 3459 	.db #0x6D	; 109	'm'
-   182C DA                 3460 	.db #0xDA	; 218
+   181E                    3444 _svfaktorarray:
+   181E 00                 3445 	.db #0x00	; 0
+   181F 02                 3446 	.db #0x02	; 2
+   1820 04                 3447 	.db #0x04	; 4
+   1821 06                 3448 	.db #0x06	; 6
+   1822 08                 3449 	.db #0x08	; 8
+   1823 0A                 3450 	.db #0x0A	; 10
+   1824 0C                 3451 	.db #0x0C	; 12
+   1825 0E                 3452 	.db #0x0E	; 14
+   1826 10                 3453 	.db #0x10	; 16
+   1827 12                 3454 	.db #0x12	; 18
+   1828 14                 3455 	.db #0x14	; 20
+   1829 16                 3456 	.db #0x16	; 22
+   182A 24                 3457 	.db #0x24	; 36
+   182B 48                 3458 	.db #0x48	; 72	'H'
+   182C 6D                 3459 	.db #0x6D	; 109	'm'
+   182D DA                 3460 	.db #0xDA	; 218
                            3461 	.area XINIT   (CODE)
                            3462 	.area CABS    (ABS,CODE)
