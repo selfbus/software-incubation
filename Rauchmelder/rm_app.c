@@ -13,7 +13,7 @@
 #include "rm_eeprom.h"
 
 #include <mcs51/P89LPC922.h>
-#include <fb_lpc922.h>
+#include <fb_lpc922_1.4x.h>
 
 
 // Befehle an den Rauchmelder
@@ -337,15 +337,9 @@ void _process_msg(unsigned char* bytes, unsigned char len)
 /**
  * Empfangenes read_value_request Telegramm verarbeiten.
  */
-void read_value_req()
+void read_value_req(unsigned char objno)
 {
-	unsigned char objno = find_first_objno(telegramm[3], telegramm[4]);
-
-	// Nur antworten wenn gültiges Com Objekt und READ und COM Flag gesetzt sind
-	if (objno < NUM_OBJS && (read_objflags(objno) & 0x0C) == 0x0C)
-	{
-		ARRAY_SET_BIT(objReadReqFlags, objno);
-	}
+	ARRAY_SET_BIT(objReadReqFlags, objno);
 }
 
 
@@ -487,7 +481,7 @@ unsigned long read_obj_value(unsigned char objno)
  *
  * @param objno - Nummer des betroffenen Kommunikations-Objekts
  */
-void write_value_obj(unsigned char objno)
+void write_value_req(unsigned char objno)
 {
  	if (objno == OBJ_ALARM_BUS) // Bus Alarm
 	{
@@ -520,46 +514,6 @@ void write_value_obj(unsigned char objno)
 		ignoreBusAlarm = 1;
 	}
 }
-
-
-/**
- * Empfangenes write_value_request Telegramm verarbeiten.
- * Ruft write_value_obj(objno) auf, das die eigentliche Arbeit macht.
- */
-void write_value_req()
-{
-	unsigned char objno, objflags, gapos, atp, assno, idx, gaposh;
-
-	// Gruppenadressposition aus Gruppenadresse bestimmen
-	gapos = gapos_in_gat(telegramm[3], telegramm[4]);
-
-	if (gapos != 0xFF)
-	{
-		atp = eeprom[ASSOCTABPTR];  // Association Table Pointer
-		assno = eeprom[atp];		// Erster Eintrag = Anzahl Einträge
-
-		// Schleife über alle Eintraege in der Ass-Table, denn es könnten mehrere Objekte
-		// der gleichen Gruppenadresse zugeordnet sein.
-		for (idx = 0; idx < assno; idx++)
-		{
-			gaposh = eeprom[atp + 1 + (idx * 2)];	// Erste GA-Position aus ASS Tabelle lesen
-
-			if (gapos == gaposh) // Wenn Positionsnummer übereinstimmt
-			{
-				objno = eeprom[atp + 2 + (idx * 2)];	// Objektnummer
-				objflags = read_objflags(objno);		// Objekt Flags lesen
-
-				// Wenn Kommunikation zulässig (Bit 2 = communication enable) und
-				// Schreiben zulaessig (Bit 4 = write enable)
-//				if ((objflags & 0x14) == 0x14)
-//				{
-					write_value_obj(objno);
-//				}
-			}
-		}
-	}
-}
-
 
 /**
  * Ein Com-Objekt bearbeiten.

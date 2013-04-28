@@ -7,7 +7,7 @@
  */
 
 #include <mcs51/P89LPC922.h>
-#include <fb_lpc922.h>
+#include <fb_lpc922_1.4x.h>
 
 #include "rm_app.h"
 #include "rm_com.h"
