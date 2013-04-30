@@ -17,7 +17,7 @@
 <folderInfo id="cdt.managedbuild.config.sdcc.exe.release.1623032504." name="/" resourcePath="">
 <toolChain id="cdt.managedbuild.toolchain.sdcc.exe.release.1410632725" name="SDCC Tool Chain" superClass="cdt.managedbuild.toolchain.sdcc.exe.release">
 <targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.sdcc.platform.exe.release.1827558006" name="Release Platform" osList="solaris,linux,hpux,aix,qnx,win32" superClass="cdt.managedbuild.target.sdcc.platform.exe.release"/>
-<builder buildPath="${workspace_loc:/Rollo10/Release}" id="org.eclipse.cdt.build.core.internal.builder.1238882274" superClass="org.eclipse.cdt.build.core.internal.builder"/>
+<builder buildPath="${workspace_loc:/Rollo10/Release}" id="org.eclipse.cdt.build.core.internal.builder.1238882274" keepEnvironmentInBuildfile="false" name="CDT Internal Builder" superClass="org.eclipse.cdt.build.core.internal.builder"/>
 <tool command="sdcc  -c --stack-auto --debug" id="cdt.managedbuild.tool.sdcc.c.compiler.exe.release.938932674" name="SDCC Compiler" superClass="cdt.managedbuild.tool.sdcc.c.compiler.exe.release">
 <option id="sdcc.c.compiler.option.preprocessor.nostdinc.505502001" name="Do not search system directories (-nostdinc)" superClass="sdcc.c.compiler.option.preprocessor.nostdinc"/>
 <option id="sdcc.c.compiler.option.preprocessor.preprocess.2068464098" name="Preprocess only (-E)" superClass="sdcc.c.compiler.option.preprocessor.preprocess"/>
@@ -50,10 +50,10 @@
 <option id="sdcc.c.link.option.strip.931582744" name="Omit all symbol information (-s)" superClass="sdcc.c.link.option.strip"/>
 <option id="sdcc.c.link.option.noshared.769024298" name="No shared libraries (-static)" superClass="sdcc.c.link.option.noshared"/>
 <option id="sdcc.c.link.option.libs.2058391880" name="Libraries (-l)" superClass="sdcc.c.link.option.libs" valueType="libs">
-<listOptionValue builtIn="false" value="fb_lpc922.lib"/>
+<listOptionValue builtIn="false" value="fb_lpc922_1.4x.lib"/>
 </option>
 <option id="sdcc.c.link.option.paths.913366507" name="Library search path (-L)" superClass="sdcc.c.link.option.paths" valueType="stringList">
-<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_lpc922/Release}&quot;"/>
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_lpc922/Releases}&quot;"/>
 </option>
 <option id="sdcc.c.link.option.ldflags.1260020090" name="Linker flags" superClass="sdcc.c.link.option.ldflags"/>
 <option id="sdcc.c.link.option.other.1670255330" name="Other options (-Xlinker [option])" superClass="sdcc.c.link.option.other"/>
