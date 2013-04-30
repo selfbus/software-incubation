@@ -19,7 +19,7 @@
 */
 
 #include <P89LPC922.h>
-#include "../lib_lpc922/fb_lpc922.h"
+#include "../lib_lpc922/Releases/fb_lpc922_1.4x.h"
 #include "fb_app_meldetableau24.h"
 #include "../com/debug.h"
 //#include "../com/debug.c"
@@ -63,7 +63,7 @@ void main(void)
 	BRGCON|=0x01;	// Baudrate Generator starten
 	SBUF=0x55;
 
-	
+	TASTER=0;
 	for (n=0;n<50;n++) {		// Warten bis Bus stabil
 		TR0=0;					// Timer 0 anhalten
 		TH0=eeprom[ADDRTAB+1];	// Timer 0 setzen mit phys. Adr. damit Geräte unterschiedlich beginnen zu senden

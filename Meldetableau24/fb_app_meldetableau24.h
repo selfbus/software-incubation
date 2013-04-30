@@ -50,8 +50,8 @@ extern const unsigned char bitmask_0[];
 extern const unsigned char bitmask_11[];
 
 void timer0_int(void) __interrupt (1);
-void write_value_req(void);		// Hauptroutine für Ausgänge schalten gemäß EIS 1 Protokoll (an/aus)
-void read_value_req(void);
+//void write_value_req(void);		// Hauptroutine für Ausgänge schalten gemäß EIS 1 Protokoll (an/aus)
+//void read_value_req(void);
 void delay_timer(void);		// zählt alle 130ms die Variable Timer hoch und prüft Queue
 void LED_schalten(void);	// Ausgänge schalten
 void spi_2_out(unsigned char daten);

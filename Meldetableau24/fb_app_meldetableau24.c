@@ -20,7 +20,7 @@
 
 
 #include <P89LPC922.h>
-#include "../lib_lpc922/fb_lpc922.h"
+#include "../lib_lpc922/Releases/fb_lpc922_1.4x.h"
 #include  "fb_app_meldetableau24.h"
 #include "../com/debug.h"
 
@@ -59,15 +59,15 @@ else beep_port=0;
 } // timer0_int
 
 
-void write_value_req(void)	// Objekte steuern gem‰ﬂ EIS  Protokoll (an/aus/dimm/set)
+void write_value_req(unsigned char objno)	// Objekte steuern gem‰ﬂ EIS  Protokoll (an/aus/dimm/set)
 {
-  unsigned char objno,objflags,assno,n,gaposh,valtmp;
+  unsigned char valtmp;
   //unsigned char blockstart, blockend, block_polarity;
   unsigned char obj,group;
 
   
-    gaposh=0;
 
+/*
     //gapos=gapos_in_gat(telegramm[3],telegramm[4]);	// Position der Gruppenadresse in der Adresstabelle
     if (gapos_in_gat(telegramm[3],telegramm[4])!=0xFF)					// =0xFF falls nicht vorhanden
     {
@@ -82,7 +82,7 @@ void write_value_req(void)	// Objekte steuern gem‰ﬂ EIS  Protokoll (an/aus/dimm/
           objno=eeprom[eeprom[ASSOCTABPTR]+2+(n*2)];				// Objektnummer
           objflags=read_objflags(objno);			// Objekt Flags lesen
           if (objflags & 0x14){
-          	obj=objno%8;// modulo 3 ergibt die Gruppennummer
+*/          	obj=objno%8;// modulo 3 ergibt die Gruppennummer
 	          group=objno/8;
 	          valtmp=telegramm[7]&0x01;
 	
@@ -114,12 +114,12 @@ void write_value_req(void)	// Objekte steuern gem‰ﬂ EIS  Protokoll (an/aus/dimm/
 		        	 }
 		        	 else blocked_obj=0;
 		         }
-          }// if (objflags..
-         }// ende if (gaspos in gat...
-      }// ende for(n....
+//         }// if (objflags..
+//         }// ende if (gaspos in gat...
+//      }// ende for(n....
       //if (portbuffer&0xF0 != oldportbuffer&0xF0) portchanged=1;//post f¸r port_schalten hinterlegen
       //port_schalten(portbuffer);	//Port schalten wenn sich ein Pin ge‰ndert hat
-    }
+//    }
     //owntele=0;
     //respondpattern=0;
 }
@@ -134,20 +134,9 @@ void write_value_req(void)	// Objekte steuern gem‰ﬂ EIS  Protokoll (an/aus/dimm/
 * @return
 * 
 */
-void read_value_req(void)
+void read_value_req(unsigned char objno)
 {
-	unsigned char objno, objflags;
-	unsigned int objvalue;
-	
-	objno=find_first_objno(telegramm[3],telegramm[4]);	// erste Objektnummer zu empfangener GA finden
-	if(objno!=0xFF) {	// falls Gruppenadresse nicht gefunden
-		
-		objvalue=read_obj_value(objno);		// Objektwert aus USER-RAM lesen (Standard Einstellung)
-
-		objflags=read_objflags(objno);		// Objekt Flags lesen
-		// Objekt lesen, nur wenn read enable gesetzt (Bit3) und Kommunikation zulaessig (Bit2)
-		if((objflags&0x0C)==0x0C) send_obj_value(objno+64); //send_value(0,objno,objvalue);
-    }
+  send_obj_value(objno+64); // die 64 macht ein response Telegramm daraus
 }
 
 
