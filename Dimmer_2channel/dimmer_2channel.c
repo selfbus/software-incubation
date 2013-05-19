@@ -23,7 +23,7 @@
 
 #include "../com/fb_rs232.h"
 #include  "../com/debug.h"
-
+#include "fb_i2c.h"
 
 /** 
 * The start point of the program, init all libraries, start the bus interface, the application
@@ -55,13 +55,14 @@ void main(void)
 		while(!TF0);
 	}
 	count=0;
+   i2c_ma_init();
 
 	restart_app();							// Anwendungsspezifische Einstellungen zuruecksetzen
 	bus_return();							// Aktionen bei Busspannungswiederkehr
 
 	do  {
 
-DEBUGPOINT
+//DEBUGPOINT
 		if(APPLICATION_RUN) {	// nur wenn run-mode gesetzt
 
 			// Helligkeit nachführen	
@@ -71,7 +72,7 @@ DEBUGPOINT
 //				rs_send(read_obj_value(count+6));
 //				rs_send(read_objflags(count+6));
 //				if (read_objflags(count+6)&0x40){
-					sync_blocked=1;
+//				sync_blocked=1;
 					send_obj_value(count+8);
 //				}
 			}
@@ -168,14 +169,14 @@ DEBUGPOINT
 		}// end if(runstate)
 
 		n= tx_buffer[(tx_nextsend-1)&0x07];// ist die letzte objno
-		if (tel_arrived || (n<4 && n>5 && tel_sent)) { // 
+		if (tel_arrived){// || (n<4 && n>5 && tel_sent)) { // 
 			tel_arrived=0;
 			tel_sent=0;
 			process_tel();
 			
 		}
     	
-		if ((tx_nextsend == tx_nextwrite)&& (fb_state==0))sync_blocked=0;
+//		if ((tx_nextsend == tx_nextwrite)&& (fb_state==0))sync_blocked=0;
 		
 		TASTER=1;				// Pin als Eingang schalten um Taster abzufragen
 		if(!TASTER){ // Taster gedrückt

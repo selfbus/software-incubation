@@ -23,7 +23,7 @@
 #include  "fb_app_dimmer_2channel.h"
 
 #include "../com/fb_rs232.h"
-
+#include "fb_i2c.h"
 #define ledpwm
 
 __data __at (00) RAM[];
@@ -49,16 +49,21 @@ __data __at (0x26) unsigned char schalten;
 __data __at (0x27) unsigned char rueckmelden;
 __data __at (0x28) unsigned char sperren;
 __data __at (0x08) unsigned char dimmen[2];
-__data __at	(0x0A) unsigned char dimmziel[2];
-__data __at (0x0C) unsigned char grundhelligkeit[2];
-__data __at (0x0E) unsigned char helligkeit[2];
-__data __at (0x10) unsigned char lz[2];
-__data __at (0x12) unsigned char dimmwert[2];
-__data __at (0x14) unsigned char dimmpwm[3];
-__data __at (0x17) unsigned char helligkeit_RM[2];
-__data __at (0x18) unsigned char kurzschluss;
-__data __at (0x19) unsigned char lastausfall;
+__data __at (0x0B) unsigned char dimmziel[2];
+__data __at (0x0E) unsigned char grundhelligkeit[2];
+__data __at (0x11) unsigned char helligkeit[2];// 0E
+__data __at (0x14) unsigned char lz[2];
+__data __at (0x17) unsigned char dimmwert[2];//12
+__data __at (0x1A) unsigned char dimmpwm[3];//14
+ unsigned char helligkeit_RM[2];
+ unsigned char kurzschluss;
+ unsigned char lastausfall;
 
+
+unsigned char ctaste;    //zähler für Taste welche gerade abgefragt wird
+unsigned char mtaste[8]; //merker Taste mit zähler (Tastenprllung und langer tastendruck)  1-8 =tasten
+ 
+unsigned char mk[2];
 unsigned char aushell[2];
 unsigned char timerstart[2];
 unsigned char timerstate[2];
@@ -82,7 +87,7 @@ const unsigned char bitmask_1[]={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
 const unsigned char bitmask_0[]={0xFE,0xFD,0xFB,0xF7,0xEF,0xDF,0xBF,0x7F};
 const unsigned char bitmask_11[]={11,22,44,88};
 
-__bit sync_blocked;		// Sperrung der Syncronisation
+//__bit sync_blocked;		// Sperrung der Syncronisation
 
 __bit delay_toggle;			// um nur jedes 2. Mal die delay routine auszuführen
 __bit portchanged;
@@ -153,6 +158,7 @@ $00001:	add a,#19
 #endif
 }
 
+/*
 void timer0_int  (void) __interrupt (1) {// Interrupt T0 für abschnitt zeit= 10ms/256
 	dimmcompare++;
 //  dimmtimervorteiler++;
@@ -174,32 +180,118 @@ void timer0_int  (void) __interrupt (1) {// Interrupt T0 für abschnitt zeit= 10m
 	#endif
 #endif
 } // timer0_int
+*/
+
+void timer0_int(void) __interrupt (1)         //n=nummer 0x03+8*n
+{
+
+  TL0=0x09;     // timer mit H=0xf9 L=0x09 2KHz = 0,5ms
+  TH0=0xf9;     // timer mit 0xb7 200HZ = 5ms
+
+  tastenauswertung();
+    P0_3=(dimmpwm[0])?1:0;     //LED_zeile K1
+    if(dimmpwm[0]>75) P0_2=1;
+    else P0_2=0;
+    if(dimmpwm[0]>125) P0_1=1;
+    else P0_1=0;
+    if(dimmpwm[0]>220) P0_0=1;
+    else P0_0=0;
+
+    P0_7=(dimmpwm[1])?1:0;     //LED_zeile K2
+    if(dimmpwm[1]>75) P0_6=1;
+    else P0_6=0;
+    if(dimmpwm[1]>125) P0_5=1;
+    else P0_5=0;
+    if(dimmpwm[1]>220) P0_4=1;
+    else P0_4=0;
+
+  /*if(ie<40000)                   //interwallmäsiges senden kann evetuel raus
+    ++ie;
+   else
+    {
+    i2c_send_daten(dimm_I2C[0],dimm_I2C[1]);
+    ie=0;
+    }
+	*/
+
+    if(dimmpwm[0]!=mk[0]||dimmpwm[1]!=mk[1])   //i2c übertragen
+     {
+/*      //zum Testen rs232 Ausgabe
+       rs_send_s("D=");//Dimmwert
+       rs_send_hex(dimm_I2C[0]);
+       rs_send(' ');
+       rs_send_hex(dimm_I2C[1]);
+       rs_send_s("\n");
+*/
+ //      ie=0;
+       mk[0]=dimmpwm[0];
+       mk[1]=dimmpwm[1];
+       i2c_send_daten(dimmpwm[0],dimmpwm[1]);
+     }
+}
 
 
+void tastenauswertung(void)
+{
+  unsigned char retp0=P0;//port 0 merken
+  P3_0=0;                //SCL damit i2c nicht meckert
+  P0=0;
+  if(ctaste<6)           //0 bis 5
+    ctaste++;
+  else ctaste=0;
+  P0M1=~(1<<ctaste);    // Port 0  PIN Output
+  P0M2=(1<<ctaste);
+  P0=~(1<<ctaste);      //nur eine Taste aktivieren
+  if(P1_3==0)           //abfrage Taste getrückt
+    {
+      if(mtaste[ctaste]<254)  mtaste[ctaste]++;
+      if(mtaste[ctaste]==200) //langer tastendruck
+        {
+          if(ctaste==1)
+            dimmen[0]=9;
+          if(ctaste==2)
+            dimmen[0]=1;
+          if(ctaste==5)
+            dimmen[1]=9;
+          if(ctaste==6)
+            dimmen[1]=1;
+        }
+
+     }
+  else
+    {
+      if(mtaste[ctaste]>20)
+        {
+          if(mtaste[ctaste]>20&&mtaste[ctaste]<200) //kurzer tastendruck mit Tastenprellung
+            {
+              if(ctaste==1) object_schalten(0,1);
+              if(ctaste==2) object_schalten(0,0);
+              if(ctaste==5) object_schalten(1,1);
+              if(ctaste==6) object_schalten(1,0);
+            }
+          if(mtaste[ctaste]>199) //langer tastendruck
+            if(ctaste==1||ctaste==2)
+              dimmen[0]=0;
+            if(ctaste==5||ctaste==6)
+              dimmen[1]=0;
+        }
+      mtaste[ctaste]=0;
+    }
+  P0=retp0;
+  //wieder auf eingang stellen
+  P0M1=0x00;    //ee   // Port 0  PIN 0 und 4 Output
+  P0M2=0xFF;    //11
+  P3_1=1;       //SDA damit i2c nicht meckert
+  P3_0=1;       //SCL damit i2c nicht meckert
+
+
+}
 
 void write_value_req(unsigned char objno)	// Objekte steuern gemäß EIS  Protokoll (an/aus/dimm/set)
 {
-//  unsigned char objno,objflags,assno,n,gaposh;
- 
   unsigned char obj,Dimmschritt,valtmp,tmp;
 
-  //  unsigned int ui_tmp;
-/*    gaposh=0;
-
-    //gapos=gapos_in_gat(telegramm[3],telegramm[4]);	// Position der Gruppenadresse in der Adresstabelle
-    if (gapos_in_gat(telegramm[3],telegramm[4])!=0xFF)					// =0xFF falls nicht vorhanden
-    {
-	  //atp=eeprom[ASSOCTABPTR];			// Start Association Table
-      assno=eeprom[eeprom[ASSOCTABPTR]];				// Erster Eintrag = Anzahl Einträge
-      //tel8=telegramm[8];
-      for(n=0;n<assno;n++)				// Schleife über alle Einträge in der Ass-Table, denn es könnten mehrere Objekte (Pins) der gleichen Gruppenadresse zugeordnet sein
-      {
-        gaposh=eeprom[eeprom[ASSOCTABPTR]+1+(n*2)];
-        if(gapos_in_gat(telegramm[3],telegramm[4])==gaposh)					// Wenn Positionsnummer übereinstimmt
-        {
-          objno=eeprom[eeprom[ASSOCTABPTR]+2+(n*2)];				// Objektnummer
-          objflags=read_objflags(objno);			// Objekt Flags lesen
-*/        obj=objno%2;// modulo 3 ergibt die Kanalnummer
+          obj=objno%2;// modulo 3 ergibt die Kanalnummer
           valtmp=telegramm[7]&0x0F;
 
           // Objektbehandlung:
@@ -315,14 +407,8 @@ void write_value_req(unsigned char objno)	// Objekte steuern gemäß EIS  Protokol
         	  }// ende ende Sperre
          } //   ende  sperrobjekt
           //###########################################################
-          
-//        }// ende if (gaspos_in_gat...
-//      }// ende for(n....
       if (portbuffer&0xF0 != oldportbuffer&0xF0) portchanged=1;//post für port_schalten hinterlegen
-      //port_schalten(portbuffer);	//Port schalten wenn sich ein Pin geändert hat
-//    }//ende if (gapos_in_gat
-    //owntele=0;
-    //respondpattern=0;
+
 }
 unsigned char sperrvalue(unsigned char index,unsigned char obj){
 	unsigned char retval=0;
@@ -638,49 +724,7 @@ void delay_timer(void)	// zählt alle 0,5ms die Variable Timer hoch
 		//A4=A1|A2;
 		//A4|=A3;
 
-/*	
-#ifdef HAND		//+++++++   Handbetätigung  ++++++++++
 
-	if((TMOD&0x0F)==0x02 && fb_state==0) {
-		ET1=0;
-
-
-	#ifdef MAX_PORTS_4
-		while( (TMOD&0x0F)==0x02 && ( TL0>0x72));// PWM scannen um "Hand"-Tasten abzufragen
-	#endif
-		interrupted=0;	  
-		Tasten=0;				
-
-	#ifdef MAX_PORTS_4
-		ledport=0x01;
-		for (n=0;n<4;n++) {  						
-			P0=~ledport;
-			P0_5=1;			//P0.5 auf 1, wird über Dioden und taster auf low IO gezogen.
-			if (!P0_5){
-		  		Tasten=Tasten|ledport;
-		  		objno=n;
-		  		n=3;
-		  	}
-		  	ledport=ledport<<1;
-		} 
-	#endif
-		
-		//if (interrupted==1) Tasten=Tval;  // wenn unterbrochen wurde verwerfen wir die Taste
-		REFRESH;
-		//	Tasten = Tval; // ##############  <----- Hier wird Handbetätigung quasi mit ausgeschaltet !! #########################
-		if (Tasten != Tval)  {
-			portbuffer=oldportbuffer;
-		  	ledport=Tasten&~Tval; // ledport ist hier die Hilfsvariable für steigende Flanke
-		  	if (ledport){
-		  		portbuffer^=ledport; // bei gedrückter Taste toggeln
-		  		portchanged=1;
-		  	}
-		  	Tval=Tasten;			//neue Tasten sichern
-		}
-		ET1=1;
-	}
-#endif
-*/
 
 }
 
@@ -698,7 +742,7 @@ void port_schalten(void)		// Schaltet die Ports
 	rueckmelden=schalten;
 	//sendobj|=(pattern>>4);
 	//Rückmeldung
-	sync_blocked=1;
+	//sync_blocked=1;
 	for(n=0;n<1;n++){//<3
 		if(pattern&bitmask_1[n]){
 			
@@ -714,173 +758,8 @@ void port_schalten(void)		// Schaltet die Ports
 
 	portchanged=0;					//postvariable zurücksetzen
 	oldportbuffer=portbuffer;
-/*
-#ifdef SPIBISTAB	//serielle schiebeausgang für bistabile Relaise
-		spi_2_out(sort_output(portbuffer));		// Ports schalten
-		PWM=0;
-		TF0=0;			// Timer 0 für Haltezeit Vollstrom verwenden
-		TH0=0x6f;		// 16ms (10ms=6fff)
-		TL0=0xff;
-		TMOD=(TMOD & 0xF0) +1;		// Timer 0 als 16-Bit Timer
-		TAMOD=0x00;
-		TR0=1;
-
-	rm_state=portbuffer ^ eeprom[RMINV];	// Rückmeldeobjekte setzen
-	for (n=0;n<8;n++) {	// Rückmeldung wenn ein Ausgag sich geändert hat
-		pattern=1<<n;
-		if((portbuffer&pattern)!=(oldportbuffer&pattern)) send_obj_value(n+12);
-	}
-
-	oldportbuffer=portbuffer;
-	portchanged=0;
-
-#else	// also normaler out8 oder out4
-
-	if(portbuffer & ~oldportbuffer) {	// Vollstrom nur wenn ein relais eingeschaltet wird
-		TR0=0;
-		AUXR1&=0xE9;	// PWM von Timer 0 nicht mehr auf Pin ausgeben
-
-
-		PWM=0;			// Vollstrom an
-
-		P0=portbuffer;		// Ports schalten
-		TF0=0;			// Timer 0 für Haltezeit Vollstrom verwenden
-		TH0=0x00;		// 16ms (10ms=6fff)
-		TL0=0x00;
-		TMOD=(TMOD & 0xF0) +1;		// Timer 0 als 16-Bit Timer
-		TAMOD=0x00;
-		TR0=1;
-	}
-	else P0=portbuffer;
-
-	rm_state=portbuffer ^ eeprom[RMINV];	// Rückmeldeobjekte setzen
-	for (n=0;n<8;n++) {	// Rückmeldung wenn ein Ausgag sich geändert hat
-		pattern=1<<n;
-		if((portbuffer&pattern)!=(oldportbuffer&pattern)) send_obj_value(n+12);
-	}
-
-	oldportbuffer=portbuffer;
-	portchanged=0;
-	
-#endif
-*/
-}
-
-/*
-unsigned int sort_output(unsigned char portbuffer){
-   unsigned char diff;
-   unsigned int result;
-   diff=portbuffer ^ oldportbuffer;
-   result=0;
-   // A1 
-   if (diff & 0x01){
-	   if(portbuffer & 0x01){
-		   result|=0x1000;
-	   }
-	   else{
-		   result|=0x2000;
-	   }
-   }
-
-   // A2
-   if (diff & 0x02){
-	   if(portbuffer & 0x02){
-	      result|=0x0004;
-	   }
-	   else{
-	      result|=0x0008;
-	   }
-   }
-   // A3
-   if (diff & 0x04){
-	   if(portbuffer & 0x04){
-	      result|=0x4000;
-	   }
-	   else{
-	      result|=0x8000;
-	   }
-   }
-   // A4
-   if (diff & 0x08){
-	   if(portbuffer & 0x08){
-	      result|=0x0001;
-	   }
-	   else{
-	      result|=0x0002;
-	   }
-   }
-   
-   // A5
-   if (diff & 0x10){
-	   if(portbuffer & 0x10){
-	      result|=0x0040;
-	   }
-	   else{
-	      result|=0x0080;
-	   }
-   }
-   // A6
-   if (diff & 0x20){
-   	   if(portbuffer & 0x20){
-	      result|=0x0100;
-	   }
-	   else{
-	      result|=0x0200;
-	   }
-   }
-   
-   // A7
-   if (diff & 0x40){
-	   if(portbuffer & 0x40){
-	      result|=0x0010;
-	   }
-	   else{
-	      result|=0x0020;
-	   }
-   }
-   // A8
-   if (diff & 0x80){
-	   if(portbuffer & 0x80){
-	      result|=0x0400;
-	   }
-	   else{
-	      result|=0x0800;
-	   }
-   }
-   return result;
 
 }
-*/
-/*
-void spi_2_out(unsigned int daten){
-
-   unsigned char n, unten, mitte;
-
-   unten=daten & 0xFF;
-   mitte=daten>>8;
-
-   WRITE=0;
-   CLK=0;
-   for(n=0;n<=7;n++){
-      
-
-      BOT_OUT=(unten & 0x080)>>7;
-      unten<<=1;
-      
-      MID_OUT=(mitte & 0x080)>>7;
-      mitte<<=1;
-
-      CLK=1;
-      CLK=0;
-
-   }
-
-   WRITE=1;
-
-   WRITE=0;
-
-}
-*/
 
 
 
@@ -934,41 +813,16 @@ unsigned char valtmp,bw=0;
 void restart_app(void)		// Alle Applikations-Parameter zurücksetzen
 
 {
-//	unsigned char bw,bwh,n;
-#ifdef HAND
+	
 	Tval=0x00;
-#endif
+	timer=0;			// Timer-Variable, wird alle 130ms inkrementiert
+	
+	P0M1=0xEE;            // Port 0 Modus push-pull für Ausgang nur PIN 0 und 4 Output
+	P0M2=0x11;            // nur PIN 0 und 4 Output
 	P0=0;
-	P0M1=0x00;		// Port 0 Modus push-pull für Ausgang
-
-
-	P0M2= 0xFF;
-	
- 
-//	portbuffer=eeprom[PORTSAVE];	// Verhalten nach Busspannungs-Wiederkehr
-
-//	bw=eeprom[0xF6];
-//	for(n=0;n<=3;n++) {			// Ausgänge 1-3
-//		bwh=(bw>>(2*n))&0x03; 
-//		if(bwh==0x01)  portbuffer=portbuffer & (0xFF-(0x01<<n));
-//		if(bwh==0x02)  portbuffer=portbuffer | (0x01<<n);
-//	}
-	
-
-	
-//	oldportbuffer=0; 	// auf 0 setzen, da sonst kein Vollstrom aktiviert wird
-//	portchanged=1;		// Post hinterlegen damit in delaytimer nach portschalten springt
-
-
-//	rm_state=portbuffer ^ eeprom[RMINV];	// Rückmeldeobjekte setzen
-
-
 	
 	ET0=0;			// Interrupt für Timer 0 sperren
 
-//	zf_state=0x00;		// Zustand der Zusatzfunktionen 1-4
-
-	timer=0;			// Timer-Variable, wird alle 130ms inkrementiert
  
 	RTCCON=0x60;		// RTC anhalten und Flag löschen
 	RTCH=0x00;			// reload Real Time Clock
@@ -977,29 +831,22 @@ void restart_app(void)		// Alle Applikations-Parameter zurücksetzen
 
 	
 	EA=0;						// Interrupts sperren, damit flashen nicht unterbrochen wird
-	START_WRITECYCLE
-	WRITE_BYTE(0x01,0x03,0x00)	// Herstellercode 0x0004 = Jung
-	WRITE_BYTE(0x01,0x04,0x08)
-/*
-
-#ifdef MAX_PORTS_4				// 4-fach Aktor
-	WRITE_BYTE(0x01,0x05,0x30)	// Devicetype 0x2062 = Jung Aktor 2134.16
-	WRITE_BYTE(0x01,0x06,0x18)
-#endif
-
-	WRITE_BYTE(0x01,0x07,0x01)	// Versionnumber of application programm
-*/
-	WRITE_BYTE(0x01,0x0C,0x00)	// PORT A Direction Bit Setting
-	WRITE_BYTE(0x01,0x0D,0xFF)	// Run-Status (00=stop FF=run)
-//	WRITE_BYTE(0x01,0x12,0x8A)	// COMMSTAB Pointer
-	STOP_WRITECYCLE
 	// set timer 0 autoreload 0.05ms
 	TR0=0;
-	TMOD &= 0xF0;
-	TMOD |= 0x02;// T0 autoreload
-	TH0=0x70; //für 10ms / 256
-	TL0=0x70; //für 10ms / 256  
-	TR0=1;
+    //Timer0 einstellen
+    TMOD&=0xf0;   //register für Timer 0 löschen
+    TMOD|=0x01;   // Timer 0 als 16bit, Timer 1 nicht ändern !
+    TAMOD&=0xf0;
+    TH0 = 0xff;
+    AUXR1&=~0x10;      // toggled whenever Timer0 overflows ausschalten
+    ET0=1;             // Interrupt für Timer 0 freigeben
+    TR0=1;             // Timer 0 starten
+
+
+	
+	
+	
+	
 	// prirority bits in p0 byte;bit     7     6     5    4      3    2     1     0
 	//IP0* Interrupt priority 0 B8H -          PWDRT PBO  PS/PSR PT1  PX1   PT0   PX0
 	//IP0H Interrupt priority 0 HIGH B7H -     PWDRT PBOH PSH/   PT1H PX1H  PT0H  PX0H
@@ -1016,12 +863,20 @@ void restart_app(void)		// Alle Applikations-Parameter zurücksetzen
 	IP0 &= 0xFC; //FC		F6	für flackerfrei bei 1 kanal
 	IP0 |= 0x0C; //0C		06	dto.
 #endif
-	IP0H &= 0xF5;// 
-	IP0H |= 0x05;// 		Timer 1 auf Level 2
+//	IP0H &= 0xF5;// 
+//	IP0H |= 0x05;// 		Timer 1 auf Level 2
 	TF0=0; //timer0 flag löschen
 	IT0=1;// int mode auf fallende Flanke
 	ET0=1;// timer 0 interupt freigeben	
-	EX0=1;//ext int freigeben
+//	EX0=1;//ext int freigeben
+
+	START_WRITECYCLE
+	WRITE_BYTE(0x01,0x03,0x00)	// Herstellercode 0x0008 = GIRA
+	WRITE_BYTE(0x01,0x04,0x08)
+	WRITE_BYTE(0x01,0x0C,0x00)	// PORT A Direction Bit Setting
+	WRITE_BYTE(0x01,0x0D,0xFF)	// Run-Status (00=stop FF=run)
+	STOP_WRITECYCLE
+
 	EA=1;						// Interrupts freigeben
 	
 

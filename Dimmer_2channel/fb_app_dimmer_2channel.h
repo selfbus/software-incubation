@@ -52,7 +52,7 @@
 #define WRITE		P0_2
 
 extern 	__bit portchanged;// globale variable, sie ist 1 wenn sich portbuffer geändert hat
-extern __bit sync_blocked;
+//extern __bit sync_blocked;
 __data __at (0x25) extern unsigned char portbuffer;
 __bit __at(0x2C)A1;// bitadresse 0x2C ist byteadresse 0x25_4 (portbuffer_4)
 __bit __at(0x2D)A2;
@@ -66,13 +66,13 @@ __bit __at(0x41)S_2;
 __bit __at(0x42)S_3;
 //extern __data __at (0x24) unsigned char syncval;
 extern unsigned char dimmtimervorteiler;
-extern __data __at (0x12) unsigned char dimmwert[2];
-extern __data __at (0x0A) unsigned char dimmziel[2];
-extern __data __at (0x14) unsigned char dimmpwm[3];
+extern __data __at (0x17) unsigned char dimmwert[2];
+extern __data __at (0x0B) unsigned char dimmziel[2];
+extern __data __at (0x1A) unsigned char dimmpwm[3];
 extern __data __at (0x28) unsigned char sperren;
 extern __data __at (0x24) unsigned char dimmcompare;
-extern __data __at (0x0E) unsigned char helligkeit[2];
-extern __data __at (0x17) unsigned char helligkeit_RM[2];
+extern __data __at (0x11) unsigned char helligkeit[2];
+extern  unsigned char helligkeit_RM[2];
 
 extern unsigned char aushell[2];
 
@@ -101,6 +101,7 @@ void read_dimmziel(unsigned char objno,unsigned char offset);
 unsigned long read_obj_value(unsigned char objno);	// gibt den Wert eines Objektes zurueck
 void write_obj_value(unsigned char objno,unsigned int objvalue);	// schreibt den aktuellen Wert eines Objektes ins 'USERRAM'
 void hell_stellen (unsigned char obj,unsigned char value);// stellt die Helligkeit nach Helligkeit oder Lichszene tele ein
+void tastenauswertung(void);
 unsigned char sperrvalue(unsigned char index,unsigned char obj);// holt Sperrvalue nach index
 
 #endif
