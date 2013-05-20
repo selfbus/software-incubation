@@ -101,6 +101,7 @@ void read_dimmziel(unsigned char objno,unsigned char offset);
 unsigned long read_obj_value(unsigned char objno);	// gibt den Wert eines Objektes zurueck
 void write_obj_value(unsigned char objno,unsigned int objvalue);	// schreibt den aktuellen Wert eines Objektes ins 'USERRAM'
 void hell_stellen (unsigned char obj,unsigned char value);// stellt die Helligkeit nach Helligkeit oder Lichszene tele ein
+void dimmen_obj(unsigned char obj,unsigned char value); //Dimmt nach Telgramm oder hand.
 void tastenauswertung(void);
 unsigned char sperrvalue(unsigned char index,unsigned char obj);// holt Sperrvalue nach index
 

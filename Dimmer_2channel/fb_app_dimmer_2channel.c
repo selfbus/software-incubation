@@ -159,26 +159,18 @@ $00001:	add a,#19
 }
 
 /*
+// Interrupt für direkte Ansteuerung vom Master aus
 void timer0_int  (void) __interrupt (1) {// Interrupt T0 für abschnitt zeit= 10ms/256
 	dimmcompare++;
 //  dimmtimervorteiler++;
   TF0=0;
-  // Diese variante mit festen Arraypointern ist die schnellste.
-#ifdef ledpwm 
- 	if ((dimmcompare<=dimmpwm[0]))P0_0=1;
-  	else P0_0=0;
-	#ifndef einkanal
-	  	if ((dimmcompare<=dimmpwm[1]))P0_1=1;
-		else P0_1=0;
-	#endif	 
-#else 
+  // Diese Variante mit festen Arraypointern ist die schnellste.
 	if ((dimmcompare<=dimmpwm[0]))P0_0=0;
   	else P0_0=1;
 	#ifndef einkanal
 	  	if ((dimmcompare<=dimmpwm[1]))P0_1=0;
 		else P0_1=1;
 	#endif
-#endif
 } // timer0_int
 */
 
@@ -190,19 +182,19 @@ void timer0_int(void) __interrupt (1)         //n=nummer 0x03+8*n
 
   tastenauswertung();
     P0_3=(dimmpwm[0])?1:0;     //LED_zeile K1
-    if(dimmpwm[0]>75) P0_2=1;
+    if(dimmpwm[0]>75 ) P0_2=1;
     else P0_2=0;
-    if(dimmpwm[0]>125) P0_1=1;
+    if(dimmpwm[0]>125 ) P0_1=1;
     else P0_1=0;
-    if(dimmpwm[0]>220) P0_0=1;
+    if(dimmpwm[0]>220 ) P0_0=1;
     else P0_0=0;
 
     P0_7=(dimmpwm[1])?1:0;     //LED_zeile K2
-    if(dimmpwm[1]>75) P0_6=1;
+    if(dimmpwm[1]>75 ) P0_6=1;
     else P0_6=0;
-    if(dimmpwm[1]>125) P0_5=1;
+    if(dimmpwm[1]>125 ) P0_5=1;
     else P0_5=0;
-    if(dimmpwm[1]>220) P0_4=1;
+    if(dimmpwm[1]>220 ) P0_4=1;
     else P0_4=0;
 
   /*if(ie<40000)                   //interwallmäsiges senden kann evetuel raus
@@ -216,13 +208,6 @@ void timer0_int(void) __interrupt (1)         //n=nummer 0x03+8*n
 
     if(dimmpwm[0]!=mk[0]||dimmpwm[1]!=mk[1])   //i2c übertragen
      {
-/*      //zum Testen rs232 Ausgabe
-       rs_send_s("D=");//Dimmwert
-       rs_send_hex(dimm_I2C[0]);
-       rs_send(' ');
-       rs_send_hex(dimm_I2C[1]);
-       rs_send_s("\n");
-*/
  //      ie=0;
        mk[0]=dimmpwm[0];
        mk[1]=dimmpwm[1];
@@ -238,7 +223,7 @@ void tastenauswertung(void)
   P0=0;
   if(ctaste<6)           //0 bis 5
     ctaste++;
-  else ctaste=0;
+  else ctaste=1;
   P0M1=~(1<<ctaste);    // Port 0  PIN Output
   P0M2=(1<<ctaste);
   P0=~(1<<ctaste);      //nur eine Taste aktivieren
@@ -248,13 +233,13 @@ void tastenauswertung(void)
       if(mtaste[ctaste]==200) //langer tastendruck
         {
           if(ctaste==1)
-            dimmen[0]=9;
+            dimmen_obj(0,9);
           if(ctaste==2)
-            dimmen[0]=1;
+            dimmen_obj(0,1);
           if(ctaste==5)
-            dimmen[1]=9;
+            dimmen_obj(1,9);
           if(ctaste==6)
-            dimmen[1]=1;
+            dimmen_obj(1,1);
         }
 
      }
@@ -271,9 +256,9 @@ void tastenauswertung(void)
             }
           if(mtaste[ctaste]>199) //langer tastendruck
             if(ctaste==1||ctaste==2)
-              dimmen[0]=0;
+              dimmen_obj(0,0);
             if(ctaste==5||ctaste==6)
-              dimmen[1]=0;
+              dimmen_obj(1,0);
         }
       mtaste[ctaste]=0;
     }
@@ -289,7 +274,7 @@ void tastenauswertung(void)
 
 void write_value_req(unsigned char objno)	// Objekte steuern gemäß EIS  Protokoll (an/aus/dimm/set)
 {
-  unsigned char obj,Dimmschritt,valtmp,tmp;
+  unsigned char obj,valtmp,tmp;
 
           obj=objno%2;// modulo 3 ergibt die Kanalnummer
           valtmp=telegramm[7]&0x0F;
@@ -304,48 +289,7 @@ void write_value_req(unsigned char objno)	// Objekte steuern gemäß EIS  Protokol
           if (objno>1 && objno<4)	// Objektnummer 2,3 Dimmen
           {
             write_obj_value(objno,valtmp);
-            Dimmschritt = 255>>((valtmp&0x07)-1);
-            //obj=objno-3;
-            if (valtmp&0x07){// wenn gedimmt werden soll,Zeit laden
-                if (valtmp&0x08){//aufwärts dimmen
-                	if(dimmwert[obj]<=(255-Dimmschritt)){
-                		dimmziel[obj]=dimmwert[obj]+Dimmschritt;
-                	}
-                	else dimmziel[obj]=255;
-                }
-                else{	//abwärts dimmen
-                	if(dimmwert[obj]>=(Dimmschritt + grundhelligkeit[obj])){
-                		dimmziel[obj]=dimmwert[obj] - Dimmschritt;
-                	}
-                	else dimmziel[obj]=grundhelligkeit[obj];
-                }
-            	
-            	if (!obj){// Dimmobjekt 2
-	                timerbase[0]=(eeprom[0xc6])&0x07;
-	            }
-	            else{		// Dimmobjekt 3
-		               	timerbase[1]=((eeprom[0xc6]>>4)&0x07);	
-		        }    
-	            timerstart[obj]=eeprom[0xc8+obj];
-	            
-            }
-            else{			// dimmen: stop!
-            	//valtmp hier mit Parameter laden
-            	if(!obj){// 			A1: Parameter Ausschaltfunktion holen
-            		valtmp=eeprom[0xCE]&0x0F;
-            	}
-            	else {	//A2: Parameter Ausschaltfunktion holen
-           			valtmp=eeprom[0xCE]>>4;
-            	}
-            	if((valtmp&0x08)&&(dimmziel[obj] < dimmwert[obj])){//	 schauen ob Ausschaltfunktion aktiviert
-            		if(dimmwert[obj] < eeprom[0xCB + obj]){// wenn dimmwert<parameter..
-            			timercnt[objno] = eeprom[0xCF + obj];//faktor laden
-            			timerbase[objno] = valtmp&0x07;// base laden
-            			timerstate[obj] |= 0x01;// status aus verz setzen.
-            		}//ende if(dimmwert...
-            	}// ende if((valtmp...
-            	dimmziel[obj]=dimmwert[obj];
-            }// ende bei stop!
+            dimmen_obj(obj,valtmp);
           }// ende if (objno>)..Dimmen
           //####################################################################
           // ++++ Helligkeit +++++
@@ -424,6 +368,54 @@ unsigned char sperrvalue(unsigned char index,unsigned char obj){
 	return retval;
 }
 
+
+ void dimmen_obj(unsigned char obj,unsigned char valtmp){
+	unsigned char Dimmschritt; 
+    Dimmschritt = 255>>((valtmp&0x07)-1);
+    //obj=objno-3;
+    if (valtmp&0x07){// wenn gedimmt werden soll,Zeit laden
+        if (valtmp&0x08){//aufwärts dimmen
+        	if(dimmwert[obj]<=(255-Dimmschritt)){
+        		dimmziel[obj]=dimmwert[obj]+Dimmschritt;
+        	}
+        	else dimmziel[obj]=255;
+        }
+        else{	//abwärts dimmen
+        	if(dimmwert[obj]>=(Dimmschritt + grundhelligkeit[obj])){
+        		dimmziel[obj]=dimmwert[obj] - Dimmschritt;
+        	}
+        	else dimmziel[obj]=grundhelligkeit[obj];
+        }
+    	
+    	if (!obj){// Dimmobjekt 2
+            timerbase[0]=(eeprom[0xc6])&0x07;
+        }
+        else{		// Dimmobjekt 3
+               	timerbase[1]=((eeprom[0xc6]>>4)&0x07);	
+        }    
+        timerstart[obj]=eeprom[0xc8+obj];
+        
+    }
+    else{			// dimmen: stop!
+    	//valtmp hier mit Parameter laden
+    	if(!obj){// 			A1: Parameter Ausschaltfunktion holen
+    		valtmp=eeprom[0xCE]&0x0F;
+    	}
+    	else {	//A2: Parameter Ausschaltfunktion holen
+   			valtmp=eeprom[0xCE]>>4;
+    	}
+    	if((valtmp&0x08)&&(dimmziel[obj] < dimmwert[obj])){//	 schauen ob Ausschaltfunktion aktiviert
+    		if(dimmwert[obj] < eeprom[0xCB + obj]){// wenn dimmwert<parameter..
+    			timercnt[obj+3] = eeprom[0xCF + obj];//faktor laden
+    			timerbase[obj+3] = valtmp&0x07;// base laden
+    			timerstate[obj] |= 0x01;// status aus verz setzen.
+    		}//ende if(dimmwert...
+    	}// ende if((valtmp...
+    	dimmziel[obj]=dimmwert[obj];
+    }// ende bei stop!
+
+ 
+ }
 
 void hell_stellen (unsigned char obj,unsigned char value){
     // parameter für andimmen holen
@@ -598,34 +590,10 @@ unsigned char obj;
 			else A2=0;
 		}
 	break;
-/*	case 2:
-		//A3=objstate;
-		if(objstate){
-			timerbase[2]=eeprom[0xc7]>>4;
-			timerstart[2]=eeprom[0xD5];
-			A3=1;
-			if(eeprom[0xDB]&0x08){// Zeitdimmer aktiviert
-				timerbase[5]=eeprom[0xDB]&0x07;
-				timercnt[5]=eeprom[0xDE];
-				timerstate[2]|=0x02;
-			}
-		}
-		else {
-			timerstate[2]&=0xFD;// timerstate Zeitdimmer löschen
-			timerstart[2]=eeprom[0xD9];
-			if	(timerstart[2]){
-				timerbase[2]=(eeprom[0xDB]>>4);
-				M3=1;
-			}
-			else A3=0;
-		}
-	break;
-*/	}
-	A4=A1|A2;
-//	A4|=A3;
+	}
+
 	portchanged=1;
 	//
-	//portbuffer=(A1<<0 | A2<<1 | A3<<2 | A4<<3)<<4;
 	if(objno<0x02){// Einschalten-Einschalthelligkeit
 		 if ((objstate) && ((portbuffer& bitmask_1[obj])||(!(oldportbuffer& bitmask_1[obj+4])))) {//einschalten Flanke((timerbase[objno]&0x02)|| 	
 			 read_dimmziel(objno,0xC4);		
@@ -635,9 +603,12 @@ unsigned char obj;
 		  if ((!objstate)&&(oldportbuffer & bitmask_1[obj+4])) {//ausschalten Flanke
 			  aushell[objno]=dimmwert[objno];
 			  if (timerstart[obj]){// wenn soft "AUS"
+				  dimmziel[obj]=0;// das ziel auf 0setzen
+			  }
+			  else {	// sofort aus
+				  dimmwert[obj]=0;
 				  dimmziel[obj]=0;
 			  }
-			  else dimmwert[obj]=0;// sofort aus
 		  }
 	}
 	if (objno&0x20){		// bei Bus return ist dimmziel[x] schon geladen
@@ -719,12 +690,6 @@ void delay_timer(void)	// zählt alle 0,5ms die Variable Timer hoch
 				}
 			}
 		}
-		// Summenberechnung:
-		//dimmpwm[3]=(dimmpwm[0]/3)+(dimmpwm[1]/3)+(dimmpwm[2]/3);
-		//A4=A1|A2;
-		//A4|=A3;
-
-
 
 }
 
@@ -740,10 +705,7 @@ void port_schalten(void)		// Schaltet die Ports
 	pattern=(portbuffer ^ oldportbuffer)>>4;
 	schalten=portbuffer>>4;
 	rueckmelden=schalten;
-	//sendobj|=(pattern>>4);
-	//Rückmeldung
-	//sync_blocked=1;
-	for(n=0;n<1;n++){//<3
+	for(n=0;n<=1;n++){//<3
 		if(pattern&bitmask_1[n]){
 			
 			send_obj_value(n+6);
@@ -752,9 +714,6 @@ void port_schalten(void)		// Schaltet die Ports
 			}
 
 	}
-	//Ausgänge setzen
-	P0|=(portbuffer&0xF0);		// Ports Ausgänge zuordnen
-	P0&=(portbuffer|0x0F);
 
 	portchanged=0;					//postvariable zurücksetzen
 	oldportbuffer=portbuffer;
@@ -776,7 +735,6 @@ void bus_return(void)		// Aktionen bei Busspannungswiederkehr
 			while(dimmcompare);
 		}
 	}
-	//A1=1;A2=1;A3=1;A4=1;
 	grundhelligkeit[0]=grundhelligkeit_tabelle[eeprom[0xc2]&0x07];
 	grundhelligkeit[1]=grundhelligkeit_tabelle[((eeprom[0xc2]&0x70)>>4)&0x07];
 // hier einschaltverhalten bei busreturn rein...
