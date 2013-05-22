@@ -27,8 +27,7 @@
 #define ledpwm
 
 __data __at (00) RAM[];
-__data __at (0x25)  unsigned char portbuffer;	// Zwischenspeicherung der Portzustände
-__bit __at(0x28)M1;// bitadresse 0x28 ist byteadresse 0x25_0 (portbuffer_4)
+__bit __at(0x28)M1;// bitadresse 0x28 ist byteadresse 0x25_0 (portbuffer_0)
 __bit __at(0x29)M2;
 __bit __at(0x2A)M3;
 __bit __at(0x2B)M4;
@@ -42,26 +41,27 @@ __bit __at(0x41)S_2;
 __bit __at(0x44)SM_1;// Die Sperrmerker
 __bit __at(0x45)SM_2;
 //__bit __at(0x46)SM_3;
-__bit __at(0x20)dimmcompare_0;
-__bit __at(0x21)dimmcompare_1;
+//__bit __at(0x20)dimmcompare_0;
+//__bit __at(0x21)dimmcompare_1;
 __data __at (0x24) unsigned char dimmcompare;
+__data __at (0x25) unsigned char portbuffer;	// Zwischenspeicherung der Portzustände
 __data __at (0x26) unsigned char schalten;
 __data __at (0x27) unsigned char rueckmelden;
 __data __at (0x28) unsigned char sperren;
 __data __at (0x08) unsigned char dimmen[2];
 __data __at (0x0B) unsigned char dimmziel[2];
 __data __at (0x0E) unsigned char grundhelligkeit[2];
-__data __at (0x11) unsigned char helligkeit[2];// 0E
+__data __at (0x11) unsigned char helligkeit[2];
 __data __at (0x14) unsigned char lz[2];
-__data __at (0x17) unsigned char dimmwert[2];//12
-__data __at (0x1A) unsigned char dimmpwm[3];//14
+__data __at (0x17) unsigned char dimmwert[2];
+__data __at (0x1A) unsigned char dimmpwm[3];
  unsigned char helligkeit_RM[2];
  unsigned char kurzschluss;
  unsigned char lastausfall;
 
 
 unsigned char ctaste;    //zähler für Taste welche gerade abgefragt wird
-unsigned char mtaste[8]; //merker Taste mit zähler (Tastenprllung und langer tastendruck)  1-8 =tasten
+unsigned char mtaste[8]; //merker Taste mit zähler (Tastenentprellung und langer tastendruck)  1-8 =tasten
  
 unsigned char mk[2];
 unsigned char aushell[2];
@@ -75,7 +75,7 @@ unsigned char timercnt[TIMERANZ];// speicherplatz für den timercounter und 1 sta
 unsigned int timer;		// Timer für Schaltverzögerungen, wird alle 250µs hochgezählt
 
 
-unsigned char Tval;
+//unsigned char Tval;
 
 unsigned char oldportbuffer;// Wert von portbuffer vor Änderung (war früher ...0x29)
 
@@ -125,16 +125,16 @@ void timer0_int  (void) interrupt 1 {// Interrupt T0 für soft PWM LED
   }
 }
 }
-*/
+
 // Synconisation des Netzes
-void ext0int(void) __interrupt (0){ //Interrupt ext0int für Netzsyncronisierung
-/*	unsigned syncval=dimmcompare-19;
+ void ext0int(void) __interrupt (0){ //Interrupt ext0int für Netzsyncronisierung
+	unsigned syncval=dimmcompare-19;
 	IE0=0; // flankengesteuert???
 	if (syncval>=128)syncval++;
 	else syncval--;	//A5;//A2
 	dimmcompare=syncval+19;
 	
-*/
+
 #ifdef einkanal	
 	__asm
 	mov a,_dimmcompare	;dimmcompare in den akku
@@ -157,10 +157,10 @@ $00001:	add a,#19
 		dimmcompare=61;// 19
 #endif
 }
+*/
 
-/*
 // Interrupt für direkte Ansteuerung vom Master aus
-void timer0_int  (void) __interrupt (1) {// Interrupt T0 für abschnitt zeit= 10ms/256
+/*void timer0_int  (void) __interrupt (1) {// Interrupt T0 für abschnitt zeit= 10ms/256
 	dimmcompare++;
 //  dimmtimervorteiler++;
   TF0=0;
@@ -174,7 +174,8 @@ void timer0_int  (void) __interrupt (1) {// Interrupt T0 für abschnitt zeit= 10m
 } // timer0_int
 */
 
-void timer0_int(void) __interrupt (1)         //n=nummer 0x03+8*n
+void led_taster(void)
+//void timer0_int(void) __interrupt (1)         //n=nummer 0x03+8*n
 {
 
   TL0=0x09;     // timer mit H=0xf9 L=0x09 2KHz = 0,5ms
@@ -354,6 +355,9 @@ void write_value_req(unsigned char objno)	// Objekte steuern gemäß EIS  Protokol
       if (portbuffer&0xF0 != oldportbuffer&0xF0) portchanged=1;//post für port_schalten hinterlegen
 
 }
+
+
+
 unsigned char sperrvalue(unsigned char index,unsigned char obj){
 	unsigned char retval=0;
 	// Dimmwert beginn-ende aus Dimmwerttabelle holen
@@ -632,7 +636,7 @@ void delay_timer(void)	// zählt alle 0,5ms die Variable Timer hoch
 	unsigned char Tasten=0;
 #endif
 	
-	RTCCON=0x61;		// RTC starten
+//	RTCCON=0x61;		// RTC starten
 
 	//	objno=0;
 
@@ -772,7 +776,7 @@ void restart_app(void)		// Alle Applikations-Parameter zurücksetzen
 
 {
 	
-	Tval=0x00;
+//	Tval=0x00;
 	timer=0;			// Timer-Variable, wird alle 130ms inkrementiert
 	
 	P0M1=0xEE;            // Port 0 Modus push-pull für Ausgang nur PIN 0 und 4 Output
@@ -825,7 +829,7 @@ void restart_app(void)		// Alle Applikations-Parameter zurücksetzen
 //	IP0H |= 0x05;// 		Timer 1 auf Level 2
 	TF0=0; //timer0 flag löschen
 	IT0=1;// int mode auf fallende Flanke
-	ET0=1;// timer 0 interupt freigeben	
+//	ET0=1;// timer 0 interupt freigeben	
 //	EX0=1;//ext int freigeben
 
 	START_WRITECYCLE

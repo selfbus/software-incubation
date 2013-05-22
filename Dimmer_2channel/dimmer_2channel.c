@@ -39,7 +39,7 @@ void main(void)
 	static __code signed char __at 0x1BFF trimsave;
 
 	restart_hw();							// Hardware zuruecksetzen
-	RS_INIT_600
+	RS_INIT_115200
 
 	SBUF= 0x55;
 	
@@ -62,7 +62,7 @@ void main(void)
 
 	do  {
 
-//DEBUGPOINT
+DEBUGPOINT
 		if(APPLICATION_RUN) {	// nur wenn run-mode gesetzt
 
 			// Helligkeit RM nachführen	
@@ -117,9 +117,11 @@ void main(void)
 		
 		
 		
-		
-		if(RTCCON>=0x80) delay_timer();	// Realtime clock Ereignis
-		
+		if(RTCCON&0x80){	// Realtime clock Ereignis
+			delay_timer();
+			led_taster();
+			RTCCON=0x61;
+		}
 		if (portchanged)port_schalten();	// virtuelle Ausgänge schalten
 
 		}// end if(runstate)
