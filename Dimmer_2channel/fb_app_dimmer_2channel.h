@@ -34,7 +34,8 @@
 #define	DELAYTAB	0xF9	// Start der Tabelle für Verzögerungswerte (Basis)
 
 // Adressen zum speichern von Applikations Daten
-#define TIMERANZ	6	// timeranzahl
+#define PORTSAVE	0x99	// Portzustände
+#define TIMERANZ	0x06	// timeranzahl
 
 
 
@@ -83,9 +84,10 @@ extern const unsigned char bitmask_1[];
 extern const unsigned char bitmask_0[];
 extern const unsigned char bitmask_11[];
 
-//void ext0int (void) __interrupt (0);
-//void timer0_int(void) __interrupt (1);
-void led_taster(void);
+void ext0int (void) __interrupt (0);
+void timer0_int(void) __interrupt (1);
+//void write_delay_record(unsigned char objno, unsigned char delay_status, long delay_target);	// Schreibt die Schalt-Verzoegerungswerte ins Flash
+//void clear_delay_record(unsigned char objno); // Loescht den Delay Eintrag
 //void write_value_req(void);		// Hauptroutine für Ausgänge schalten gemäß EIS 1 Protokoll (an/aus)
 //void read_value_req(void);
 void delay_timer(void);		// zählt alle 130ms die Variable Timer hoch und prüft Queue

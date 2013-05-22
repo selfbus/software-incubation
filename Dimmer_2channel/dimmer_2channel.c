@@ -24,6 +24,8 @@
 #include "../com/fb_rs232.h"
 #include  "../com/debug.h"
 #include "fb_i2c.h"
+#include"../com/watchdog.h"
+#include"../com/watchdog.c"
 
 /** 
 * The start point of the program, init all libraries, start the bus interface, the application
@@ -33,36 +35,51 @@
 */
 void main(void)
 { 
-	unsigned char n,count,send_nibble=0,pwm0=0,pwm1=0,pwm2=0,tasterpegel=0;
+	unsigned char cmd,n,count,send_nibble=0,pwm0=0,pwm1=0,pwm2=0,tasterpegel=0;
+
 	signed char cal;
-	__bit tastergetoggelt=0;
+	__bit wduf, tastergetoggelt=0;
 	static __code signed char __at 0x1BFF trimsave;
 
+	wduf=WDCON&0x02;
+
 	restart_hw();							// Hardware zuruecksetzen
-	RS_INIT_115200
+	TASTER=1;
+	if(!TASTER && wduf)cal=0;
+	else cal=trimsave;
+
+	TASTER=0;
+	TRIM = (TRIM+trimsave);
+	TRIM &= 0x3F;//oberen 2 bits ausblenden
+
+	TR0=1;
+	if (!wduf){// BUS return verzögerung nur wenn nicht watchdog underflow
+		for (n=0;n<50;n++) {		// Warten bis Bus stabil
+			TR0=0;					// Timer 0 anhalten
+			TH0=eeprom[ADDRTAB+1];	// Timer 0 setzen mit phys. Adr. damit Geräte unterschiedlich beginnen zu senden
+			TL0=eeprom[ADDRTAB+2];
+			TF0=0;					// Überlauf-Flag zurücksetzen
+			TR0=1;					// Timer 0 starten
+			while(!TF0);
+		}
+	}
+	WATCHDOG_INIT;
+	WATCHDOG_START;
+
+	RS_INIT_600
 
 	SBUF= 0x55;
 	
-	cal=trimsave;
-	TRIM = TRIM+trimsave;
-	TASTER=0;
-	for (n=0;n<50;n++) {		// Warten bis Bus stabil
-		TR0=0;					// Timer 0 anhalten
-		TH0=eeprom[ADDRTAB+1];	// Timer 0 setzen mit phys. Adr. damit Geräte unterschiedlich beginnen zu senden
-		TL0=eeprom[ADDRTAB+2];
-		TF0=0;					// Überlauf-Flag zurücksetzen
-		TR0=1;					// Timer 0 starten
-		while(!TF0);
-	}
-	count=0;
-   i2c_ma_init();
+    i2c_ma_init();
 
 	restart_app();							// Anwendungsspezifische Einstellungen zuruecksetzen
+
 	bus_return();							// Aktionen bei Busspannungswiederkehr
-
+	count=0;
 	do  {
+		WATCHDOG_FEED;
 
-DEBUGPOINT
+//DEBUGPOINT
 		if(APPLICATION_RUN) {	// nur wenn run-mode gesetzt
 
 			// Helligkeit RM nachführen	
@@ -112,20 +129,57 @@ DEBUGPOINT
 		} // ende if(TI)...
 #endif
 
-
-
 		
 		
 		
-		if(RTCCON&0x80){	// Realtime clock Ereignis
-			delay_timer();
-			led_taster();
-			RTCCON=0x61;
-		}
+		
+		if(RTCCON>=0x80) delay_timer();	// Realtime clock Ereignis
+		
 		if (portchanged)port_schalten();	// virtuelle Ausgänge schalten
 
 		}// end if(runstate)
 
+		cmd;		// Eingehendes Terminal Kommando verarbeiten...
+				if (RI){
+					RI=0;
+					cmd=SBUF;
+					if(cmd=='c'){
+						while(!TI);
+						TI=0;
+						SBUF=0x55;
+					}
+					if(cmd=='+'){
+						TRIM--;
+						cal--;
+					}
+					if(cmd=='-'){
+						TRIM++;
+						cal++;
+					}
+					if(cmd=='w'){
+						EA=0;
+						START_WRITECYCLE;	//cal an 0x1bff schreiben
+						FMADRH= 0x1B;		
+						FMADRL= 0xFF; 
+						FMDATA=	cal;
+						STOP_WRITECYCLE;
+						EA=1;				//int wieder freigeben
+					}
+					if(cmd=='p')status60^=0x81;	// Prog-Bit und Parity-Bit im system_state toggeln
+					if(cmd=='v'){
+						while(!TI);
+						TI=0;
+						SBUF=1;
+					}
+					if(cmd=='t'){
+						while(!TI);
+						TI=0;
+						SBUF=2;
+					}
+
+				}//end if(RI...
+
+		
 		n= tx_buffer[(tx_nextsend-1)&0x07];// ist die letzte objno
 		if (tel_arrived){// || (n<4 && n>5 && tel_sent)) { // 
 			tel_arrived=0;
