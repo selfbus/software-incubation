@@ -760,7 +760,7 @@ unsigned char valtmp,bw=0;
 		if(valtmp==1 )bw=grundhelligkeit[n];
 		if (valtmp>1&&valtmp<12)bw=prozentvalue[valtmp-2];
 	    if (valtmp==13&& offset==0xC4){// nur bei Einschalthelligkeit, nicht bei busreturn TODO testen
-	    	if (aushell[n]>=grundhelligkeit[n]) 	bw=aushell[n];
+	    	if (aushell[n]>=grundhelligkeit[n]) bw=aushell[n];
 	    	else bw=grundhelligkeit[n];
 	    }
 	    dimmziel[n]=bw;
