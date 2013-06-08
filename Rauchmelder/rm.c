@@ -43,7 +43,7 @@ void main(void)
 		if (APPLICATION_RUN)
 		{
 			if (RI)
-				_recv_byte();
+				rm_recv_byte();
 
 			if (RTCCON >= 0x80)
 				timer_event();

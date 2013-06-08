@@ -146,11 +146,11 @@ unsigned char infoCounter;
 unsigned char infoSendObjno;
 
 // Halbsekunden Zähler 0..119
-unsigned char halfSeconds;
+unsigned char tenthSeconds;
 
 
 // Tabelle für 1<<x, d.h. pow2[3] == 1<<3
-const unsigned char pow2[8] = { 128, 64, 32, 16, 8, 4, 2, 1 };
+const unsigned char pow2[8] = { 1, 2, 4, 8, 16, 32, 64, 128 };
 
 // Im Byte Array arr das bitno-te Bit setzen
 #define ARRAY_SET_BIT(arr, bitno) arr[bitno>>3] |= pow2[bitno & 7]
@@ -220,7 +220,7 @@ void set_errcode(unsigned char newErrCode)
  * Die empfangene Nachricht vom Rauchmelder verarbeiten.
  * Wird von _receive() aufgerufen.
  */
-void _process_msg(unsigned char* bytes, unsigned char len)
+void rm_process_msg(unsigned char* bytes, unsigned char len)
 {
 	unsigned char objno, cmd, msgType;
 	unsigned char byteno, mask;
@@ -455,8 +455,8 @@ unsigned long read_obj_value(unsigned char objno)
 			return answer_to_int(answer);
 
 		case RM_TYPE_TEMP:
-			lval = answer[0] > answer[1] ? answer[0] : answer[1];
-			lval *= 50;
+			lval = ((int) answer[0]) + answer[1];
+			lval *= 25;  // in lval sind zwei Temperaturen, daher halber Multiplikator
 			lval -= 2000;
 			return conv_dpt_9_001(lval);
 
@@ -545,10 +545,10 @@ void process_obj(unsigned char objno)
 	else
 	{
 		// Den Wert des Com-Objekts vom Rauchmelder anfordern. Der Versand erfolgt
-		// wenn die Antwort vom Rauchmelder erhalten wurde, in _process_msg().
+		// wenn die Antwort vom Rauchmelder erhalten wurde, in process_msg().
 		if (recvCount < 0)
 		{
-			_send_cmd(CmdTab[cmd]);
+			rm_send_cmd(CmdTab[cmd]);
 			answerWait = INITIAL_ANSWER_WAIT;
 		}
 	}
@@ -587,24 +587,6 @@ unsigned char do_process_objs(unsigned char *flags)
 		}
 	}
 
-#ifdef OLD_CODE
-	for (objno = 0; objno < NUM_OBJS; ++objno)
-	{
-		byteno = objno >> 3;
-		mask = pow2[objno & 7];
-
-		if (flags[byteno] & mask)
-		{
-			unsigned char cmd = objMappingTab[objno].cmd;
-			if (!answerWait || cmd == RM_CMD_NONE || cmd == RM_CMD_INTERNAL)
-			{
-				process_obj(objno);
-				return 1;
-			}
-		}
-	}
-#endif /*OLD_CODE*/
-
 	return 0;
 }
 
@@ -630,19 +612,19 @@ void process_alarm_stats()
 	if (setAlarmBus && !alarmBus)
 	{
 		// Alarm auslösen
-		_send_hexstr("030210");
+		rm_send_hexstr("030210");
 		answerWait = INITIAL_ANSWER_WAIT;
 	}
 	else if (setTestAlarmBus && !testAlarmBus)
 	{
 		// Testalarm auslösen
-		_send_hexstr("030280");
+		rm_send_hexstr("030280");
 		answerWait = INITIAL_ANSWER_WAIT;
 	}
 	else if ((!setAlarmBus && alarmBus) || (!setTestAlarmBus && testAlarmBus))
 	{
 		// Alarm und Testalarm beenden
-		_send_hexstr("030200");
+		rm_send_hexstr("030200");
 		answerWait = INITIAL_ANSWER_WAIT;
 	}
 }
@@ -658,7 +640,7 @@ void timer_event()
 	RTCL = 0x80;
 	RTCCON = 0x61;  // RTC starten
 
-	--halfSeconds;
+	--tenthSeconds;
 
 	// Wir warten auf eine Antwort vom Rauchmelder
 	if (answerWait)
@@ -679,7 +661,7 @@ void timer_event()
 	}
 
 	// Alles danach wird nur jede Sekunde gemacht
-	if (halfSeconds & 1)
+	if (tenthSeconds & 1)
 		return;
 
 	// Alarm: verzögert und zyklisch senden
@@ -723,13 +705,15 @@ void timer_event()
 		}
 	}
 
-	// Jede Sekunde ein Status Com-Objekt senden.
+	// Jede zweite Sekunde ein Status Com-Objekt senden.
 	// Aber nur senden wenn kein Alarm anliegt.
-	if (infoSendObjno && !(alarmLocal | alarmBus | testAlarmLocal | testAlarmBus))
+	if ((tenthSeconds & 3) == 0 && infoSendObjno &&
+	    !(alarmLocal | alarmBus | testAlarmLocal | testAlarmBus))
 	{
 		// Info Objekt zum Senden vormerken wenn es dafür konfiguriert ist.
-		if ((infoSendObjno >= 14 && (eeprom[CONF_INFO_14TO21] & pow2[infoSendObjno - 14])) ||
-			(infoSendObjno >= 6 && (eeprom[CONF_INFO_6TO13] & pow2[infoSendObjno - 6])))
+		// Leider sind die Bits in der VD in der falschen Reihenfolge, daher 7-x
+		if ((infoSendObjno >= 14 && (eeprom[CONF_INFO_14TO21] & pow2[7 - (infoSendObjno - 14)])) ||
+			(infoSendObjno >= 6 && (eeprom[CONF_INFO_6TO13] & pow2[7 - (infoSendObjno - 6)])))
 		{
 			ARRAY_SET_BIT(objSendReqFlags, infoSendObjno);
 		}
@@ -737,9 +721,9 @@ void timer_event()
 		--infoSendObjno;
 	}
 
-	if (!halfSeconds) // einmal pro Minute
+	if (!tenthSeconds) // einmal pro Minute
 	{
-		halfSeconds = 120;
+		tenthSeconds = 120;
 
 		// Bus Alarm ignorieren Flag rücksetzen wenn kein Alarm mehr anliegt
 		if (ignoreBusAlarm & !(alarmBus | testAlarmBus))
@@ -774,7 +758,7 @@ void restart_app()
 //	P1M2 |= (1 << 2);
 //	P1 |= (1 << 2);	  // P1.2 high
 
-	_init();
+	rm_init();
 
 	RTCH = 0x70;	// Reload Real Time Clock (1s = 0xE100; 0,5s = 0x7080; 0,25s = 0x3840)
 	RTCL = 0x80;	// (RTC ist ein down-counter mit 128 bit prescaler und osc-clock)
@@ -792,7 +776,7 @@ void restart_app()
 	noAnswerCount = 0;
 	cmdCurrent = RM_CMD_NONE;
 	recvCount = -1;
-	halfSeconds = eeprom[ADDRTAB + 2] & 127;
+	tenthSeconds = eeprom[ADDRTAB + 2] & 127;
 
 	alarmBus = 0;
 	alarmLocal = 0;
@@ -838,8 +822,8 @@ void restart_app()
 	WFEED2 = 0x5A;
 	EA = 1;
 
-	_send_byte(ACK);
-	_send_byte(ACK);
+	rm_send_byte(ACK);
+	rm_send_byte(ACK);
 
 	// TODO Alarm-Status vom Rauchmelder abfragen
 }

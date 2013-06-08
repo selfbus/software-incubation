@@ -31,7 +31,7 @@ __code unsigned const char *hexDigits = "0123456789ABCDEF";
 /**
  * Serielle Kommunikation mit dem Rauchmelder initialisieren
  */
-void _init()
+void rm_init()
 {
 	unsigned int brg = 0x02F0; // 9600 Baud
 
@@ -53,7 +53,7 @@ void _init()
 /**
  * Ein Byte an den Rauchmelder senden.
  */
-void _send_byte(unsigned char ch)
+void rm_send_byte(unsigned char ch)
 {
 	while (!TI)
 		;
@@ -66,32 +66,32 @@ void _send_byte(unsigned char ch)
 /**
  * Eine Nachricht an den Rauchmelder senden.
  */
-void _send_hexstr(unsigned char* hexstr)
+void rm_send_hexstr(unsigned char* hexstr)
 {
 	unsigned char checksum = 0;
 	unsigned char ch;
 
-	_send_byte(STX);
+	rm_send_byte(STX);
 
 	while (*hexstr)
 	{
 		ch = *hexstr;
 		checksum += ch;
-		_send_byte(ch);
+		rm_send_byte(ch);
 		++hexstr;
 	}
 
-	_send_byte(hexDigits[checksum >> 4]);
-	_send_byte(hexDigits[checksum & 15]);
+	rm_send_byte(hexDigits[checksum >> 4]);
+	rm_send_byte(hexDigits[checksum & 15]);
 
-	_send_byte(ETX);
+	rm_send_byte(ETX);
 }
 
 
 /**
  * Einen 1 Byte Befehl an den Rauchmelder senden.
  */
-void _send_cmd(unsigned char cmd)
+void rm_send_cmd(unsigned char cmd)
 {
 	unsigned char b, bytes[3];
 
@@ -102,14 +102,14 @@ void _send_cmd(unsigned char cmd)
 	bytes[1] = hexDigits[b];
 
 	bytes[2] = 0;
-	_send_hexstr(bytes);
+	rm_send_hexstr(bytes);
 }
 
 
 /**
  * Ein Byte über die Serielle vom Rauchmelder empfangen.
  */
-void _recv_byte()
+void rm_recv_byte()
 {
 	char idx;
 
@@ -129,10 +129,10 @@ void _recv_byte()
 	// Am Ende den Empfang bestätigen und die erhaltene Antwort verarbeiten
 	if (ch == ETX)
 	{
-		_send_byte(ACK);
+		rm_send_byte(ACK);
 
 		if (idx > 1)
-			_process_msg(recvBuf, idx - 1); // Verarbeitung aufrufen (ohne Prüfsumme)
+			rm_process_msg(recvBuf, idx - 1); // Verarbeitung aufrufen (ohne Prüfsumme)
 
 		recvCount = -1;
 

@@ -19,7 +19,7 @@
  * zur Verarbeitung der Nachricht aufgerufen. Diese Funktion muss aus main()
  * aufgerufen werden wenn ein Byte empfangen wurde.
  */
-extern void _recv_byte();
+extern void rm_recv_byte();
 
 /**
  * Die empfangene Nachricht vom Rauchmelder verarbeiten.
@@ -30,26 +30,26 @@ extern void _recv_byte();
  * @param bytes - die empfangene Nachricht, ohne STX, ETX, Prüfsumme.
  * @param len - die Anzahl der empfangenen Bytes
  */
-extern void _process_msg(unsigned char* bytes, unsigned char len);
+extern void rm_process_msg(unsigned char* bytes, unsigned char len);
 
 /**
  * Serielle Kommunikation mit dem Rauchmelder initialisieren
  */
-extern void _init();
+extern void rm_init();
 
 /**
  * Einen 1 Byte Befehl an den Rauchmelder senden.
  *
  * @param cmd - das Befehls-Byte.
  */
-extern void _send_cmd(unsigned char cmd);
+extern void rm_send_cmd(unsigned char cmd);
 
 /**
  * Ein Byte an den Rauchmelder senden.
  *
  * @param ch - das zu sendende Byte.
  */
-extern void _send_byte(unsigned char ch);
+extern void rm_send_byte(unsigned char ch);
 
 /**
  * Eine Nachricht an den Rauchmelder senden.
@@ -60,7 +60,7 @@ extern void _send_byte(unsigned char ch);
  *
  * @param hexstr - die zu sendenden Bytes als Hex String, mit Nullbyte am Ende
  */
-extern void _send_hexstr(unsigned char* hexstr);
+extern void rm_send_hexstr(unsigned char* hexstr);
 
 /**
  * Wenn >= 0 dann wird gerade etwas vom Rauchmelder empfangen

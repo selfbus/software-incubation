@@ -1,3 +1,6 @@
+2013-05-03
+        Das Temperatur Objekt liefert jetzt den Mittelwert der beiden Temperatur Sensoren.
+
 2013-04-28 Version 2.01beta4
         Neue fb_lib verwendet. Com Flags müssen jetzt in ETS korrekt eingestellt werden.
         Initialisierung optimiert.

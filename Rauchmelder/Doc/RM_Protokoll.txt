@@ -113,6 +113,7 @@ SEND: <ACK>
 Empfangene Werte:
 C8 01 44 01 42 0B
 C8 01 54 01 52 0D
+C8 01 53 01 51 0B
 
 
 09 - Betriebszeit
@@ -166,6 +167,8 @@ REPLY: 2 Byte Batteriespannung: 01DB
 Bat.Spannung = x * 9184 / 5000;
 Temperatur = x * 50 - 2000
 
+CC 01 E5 5C 5A 4F
+
 
 0D - Anzahl der Alarme
 ----------------------
@@ -218,6 +221,7 @@ CF0079007727
 CF007A00772F
 CF0078007827
 CF00EF00F04A
+CF00FB00E64C
 
 
 82 - Status Meldungen
