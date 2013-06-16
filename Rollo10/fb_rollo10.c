@@ -19,11 +19,11 @@
 
 
 #include <P89LPC922.h>
-#include "../lib_lpc922/fb_lpc922.h"
+#include <fb_lpc922_1.4x.h>
 #include "fb_app_rollo10.h"
 
 //#include "../com/fb_rs232.h"
-#include"../com/watchdog.h"
+#include <watchdog.h>
 
 /** 
 * The start point of the program, init all libraries, start the bus interface, the application
@@ -45,17 +45,17 @@ void main(void)
 { 
 	unsigned char n,cmd,tasterpegel=0;
 	signed char cal;
-	static __code signed char __at 0x1BFF trimsave;
+	static __code signed char __at(0x1BFF) trimsave;
 #ifdef zeroswitch
-	static __code unsigned char __at 0x1BFE phisave;
+	static __code unsigned char __at(0x1BFE) phisave;
 #endif
-	static __code unsigned char __at 0x1BFD blockedsave;
+	static __code unsigned char __at(0x1BFD) blockedsave;
 	unsigned char rm_count=0;
 	__bit wduf,tastergetoggelt=0;
 	wduf=WDCON&0x02;
 	restart_hw();							// Hardware zuruecksetzen
-// im folgendem wird der watchdof underflow abgefragt und mit gedrücktem Progtaster
-// ein resetten der cal Variable veranlasst um wieder per rs232 trimmen zu können.	
+// im folgendem wird der watchdof underflow abgefragt und mit gedrï¿½cktem Progtaster
+// ein resetten der cal Variable veranlasst um wieder per rs232 trimmen zu kï¿½nnen.
 	TASTER=1;
 	if(!TASTER && wduf)cal=0;
 	else cal=trimsave;
@@ -65,12 +65,12 @@ void main(void)
 	if(phisave<=36)	phival=phisave;
 	else phival=0;
 #endif
-	if (!wduf){// BUS return verzögerung nur wenn nicht watchdog underflow
+	if (!wduf){// BUS return verzï¿½gerung nur wenn nicht watchdog underflow
 		for (n=0;n<50;n++) {		// Warten bis Bus stabil
 			TR0=0;					// Timer 0 anhalten
-			TH0=eeprom[ADDRTAB+1];	// Timer 0 setzen mit phys. Adr. damit Geräte unterschiedlich beginnen zu senden
+			TH0=eeprom[ADDRTAB+1];	// Timer 0 setzen mit phys. Adr. damit Gerï¿½te unterschiedlich beginnen zu senden
 			TL0=eeprom[ADDRTAB+2];
-			TF0=0;					// Überlauf-Flag zurücksetzen
+			TF0=0;					// ï¿½berlauf-Flag zurï¿½cksetzen
 			TR0=1;					// Timer 0 starten
 			while(!TF0);
 		}
@@ -87,7 +87,7 @@ void main(void)
 	SSTAT|=0xE0;	// TI wird am Ende des Stopbits gesetzt und Interrupt nur bei RX und double TX buffer an
 	BRGCON|=0x02;	// Baudrate Generator verwenden aber noch gestoppt
 	BRGR1=0x2F;	// Baudrate = cclk/((BRGR1,BRGR0)+16)
-	BRGR0=0xF0;	// für 115200 0030 nehmen, autocal: 600bd= 0x2FF0
+	BRGR0=0xF0;	// fï¿½r 115200 0030 nehmen, autocal: 600bd= 0x2FF0
 	BRGCON|=0x01;	// Baudrate Generator starten
 	SBUF=0x55;
 	do  {
@@ -95,11 +95,11 @@ void main(void)
 		//hand =((eeprom[0xE5]& 0xC0)>0);
 		if(APPLICATION_RUN) {	// nur wenn run-mode gesetzt
 /*			if (eeprom[0xE5]& 0xC0){
-				if (((delay_toggle & 0x07)==0x07))handsteuerung();   // Handbetätigung nur jedes 8.mal ausführen
+				if (((delay_toggle & 0x07)==0x07))handsteuerung();   // Handbetï¿½tigung nur jedes 8.mal ausfï¿½hren
 			}
 */			if(RTCCON>=0x80) delay_timer();	// Realtime clock Ueberlauf
 #ifndef zeroswitch
-			if(TF0 && (TMOD & 0x0F)==0x01) {	// Vollstrom für Relais ausschalten und wieder PWM ein
+			if(TF0 && (TMOD & 0x0F)==0x01) {	// Vollstrom fï¿½r Relais ausschalten und wieder PWM ein
 	#ifndef SPIBISTAB
 				TMOD=(TMOD & 0xF0) + 2;			// Timer 0 als PWM
 				TAMOD=0x01;
@@ -118,7 +118,7 @@ void main(void)
 			}
 #endif
 			
-			if (portchanged)port_schalten();	// Ausgänge schalten
+			if (portchanged)port_schalten();	// Ausgï¿½nge schalten
 
 /*			// Rückmeldungen senden
 			if(rm_send) {	// wenn nichts zu senden ist keine Zeit vertrödeln
@@ -145,7 +145,7 @@ void main(void)
 			else rm_count=0;	// Immer mal wieder auf Null setzen, damit Reihenfolge von 1 bis 8 geht
 */
 
-			// portbuffer flashen, Abbruch durch ext-int wird akzeptiert und später neu probiert
+			// portbuffer flashen, Abbruch durch ext-int wird akzeptiert und spï¿½ter neu probiert
 			// T1-int wird solange abgeschaltet, 
 		if (fb_state==0 && (TH1<0XC0) && (!wait_for_ack)&& blocked!=blockedsave) {
 			START_WRITECYCLE;
@@ -233,7 +233,7 @@ void main(void)
 		}//end if(RI...
 		
 		TASTER=1;				// Pin als Eingang schalten um Taster abzufragen
-		if(!TASTER){ // Taster gedrückt
+		if(!TASTER){ // Taster gedrï¿½ckt
 			if(tasterpegel<255)	tasterpegel++;
 			else{
 				if(!tastergetoggelt)status60^=0x81;	// Prog-Bit und Parity-Bit im system_state toggeln

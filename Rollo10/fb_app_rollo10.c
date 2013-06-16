@@ -18,7 +18,7 @@
 
 
 #include <P89LPC922.h>
-#include "../lib_lpc922/fb_lpc922.h"
+#include <fb_lpc922_1.4x.h>
 #include  "fb_app_rollo10.h"
 
 
@@ -27,15 +27,15 @@ unsigned char __at 0x10 timerbase[TIMERANZ];//10-1F Speicherplatz für die Zeitba
 unsigned char  timercnt[TIMERANZ];// speicherplatz für den timercounter und 1 status bit
 unsigned char timerstate[TIMERANZ];// speicherplatz für den timercounter und 1 status bit
 
-unsigned int __at 0x09  timer;		// Timer für Schaltverzögerungen, wird alle 130us hochgezählt
+unsigned int __at 0x09  timer;		// Timer für Schaltverzögerungen, wird alle 130us hochgezï¿½hlt
 unsigned char __at 0x09 delay_toggle;			// um nur jedes 8. Mal die delay routine auszuführen
 //var überschneidung ist Absicht
 static __code unsigned char __at 0x1BFD blockedsave;
 unsigned char  Tval;
 unsigned char __at 0x0B objects_move;	// Werte der Objekte 0-7 (Ausgängsobjekte)
 unsigned char __at 0x0C objects_smove;		// Werte der Objekte 16/17 (Zusatzfunktionen 1-4)
-unsigned char __at 0x0D portbuffer;	// Zwischenspeicherung der Portzustände
-unsigned char __at 0x0E oldportbuffer;// Wert von portbuffer vor Änderung (war früher ...0x29)
+unsigned char __at 0x0D portbuffer;	// Zwischenspeicherung der Portzustï¿½nde
+unsigned char __at 0x0E oldportbuffer;// Wert von portbuffer vor änderung (war früher ...0x29)
 unsigned char __at 0x0F blocked;		// Sperrung der 4 Kanäle (1=gesperrt)
 //unsigned char logicstate;	// Zustand der Verknüpfungen pro Ausgang
 //__bit delay_toggle;			// um nur jedes 2. Mal die delay routine auszuführen
@@ -47,7 +47,7 @@ unsigned char __at 0x0F blocked;		// Sperrung der 4 Kanäle (1=gesperrt)
 unsigned char zfstate;		// Zustand der Objekte 8-11 = Zusatzfunktionen 1-4
 unsigned char oldblockvalue;//,zfout,zftyp;
 //unsigned char logicstate;	// Zustand der Verknüpfungen pro Ausgang
-//long timer;					// Timer für Schaltverzögerungen, wird alle 8 us hochgezählt
+//long timer;					// Timer für Schaltverzögerungen, wird alle 8 us hochgezï¿½hlt
 //unsigned char owntele;		// Anzahl der internen Verarbeitungen eines gesendeten Telegrammes (Rückmeldung)
 //unsigned char respondpattern;// bit wird auf 1 gesetzt wenn objekt eine rückmeldung ausgelöst hat
 unsigned char kanal[4];		// Wert des Kanalobjekts
@@ -70,38 +70,17 @@ unsigned char phival;
 #endif
 
 
-void write_value_req(void) 				// Ausgänge schalten gemäß EIS 1 Protokoll (an/aus)
+/**
+ * Empfangenes write_value_request Telegramm verarbeiten
+ *
+ * @param objno - Nummer des betroffenen Kommunikations-Objekts
+ */
+void write_value_req(unsigned char objno)
 {
-
-	  unsigned char objno,objflags,gapos,assno,n,gaposh;
+	if (objno<8 && !handmode) object_schalten(objno,telegramm[7]&0x01);	// Objektnummer 0-4 entspricht den Kanälen 1-4
 	 
-	    gaposh=0;
-
-	    gapos=gapos_in_gat(telegramm[3],telegramm[4]);	// Position der Gruppenadresse in der Adresstabelle
-	    if (gapos!=0xFF)	// =0xFF falls nicht vorhanden
-	    {
-		 // atp=eeprom[ASSOCTABPTR];			// Start Association Table
-	      assno=eeprom[ASSOCTABPTR];			// Erster Eintrag = Anzahl Einträge
-	      for(n=0;n<assno;n++)				// Schleife über alle Einträge in der Ass-Table, denn es könnten mehrere Objekte (Pins) der gleichen Gruppenadresse zugeordnet sein
-	      {
-	        gaposh=eeprom[eeprom[ASSOCTABPTR]+1+(n*2)];
-	        if(gapos==gaposh)					// Wenn Positionsnummer übereinstimmt
-	        {
-	          objno=eeprom[eeprom[ASSOCTABPTR]+2+(n*2)];				// Objektnummer
-	          objflags=read_objflags(objno);			// Objekt Flags lesen
-
-	         if (objno<8 && !handmode) object_schalten(objno,telegramm[7]&0x01);	// Objektnummer 0-4 entspricht den Kanälen 1-4
-	 
-	         if (objno>=16 && objno<=17)Sobject_schalten(objno,telegramm[7]&0x01);	// Objektnummer 16+17 entspricht den Sicherheitsfahrten 1 + 2
-
-	        	}// ende if(gapos...
-	        }// ende for(n=0;n...
-	      //rollo if (portbuffer != userram[0x29])port_schalten(portbuffer);	//Port schalten wenn sich ein Pin geändert hat
-	    }//ende if(gapos!=...
-	 //   owntele=0;
-	 //   respondpattern=0;
-	    //rs_send(blocked);
-	}//ende void write_value_request(....
+	if (objno>=16 && objno<=17)Sobject_schalten(objno,telegramm[7]&0x01);	// Objektnummer 16+17 entspricht den Sicherheitsfahrten 1 + 2
+}
 	
 /*##### vom out8 ###
  *unsigned char objno,objflags,assno,n,gaposh,zfout,zftyp, gapos;
@@ -114,9 +93,9 @@ void write_value_req(void) 				// Ausgänge schalten gemäß EIS 1 Protokoll (an/au
     if (gapos!=0xFF)					// =0xFF falls nicht vorhanden
     {
 	  //atp=eeprom[ASSOCTABPTR];			// Start Association Table
-      assno=eeprom[eeprom[ASSOCTABPTR]];				// Erster Eintrag = Anzahl Einträge
+      assno=eeprom[eeprom[ASSOCTABPTR]];				// Erster Eintrag = Anzahl Eintrï¿½ge
  
-      for(n=0;n<assno;n++)				// Schleife über alle Einträge in der Ass-Table, denn es könnten mehrere Objekte (Pins) der gleichen Gruppenadresse zugeordnet sein
+      for(n=0;n<assno;n++)				// Schleife über alle Eintrï¿½ge in der Ass-Table, denn es könnten mehrere Objekte (Pins) der gleichen Gruppenadresse zugeordnet sein
       {
         gaposh=eeprom[eeprom[ASSOCTABPTR]+1+(n*2)];
         if(gapos==gaposh)					// Wenn Positionsnummer übereinstimmt
@@ -210,31 +189,29 @@ void write_value_req(void) 				// Ausgänge schalten gemäß EIS 1 Protokoll (an/au
 }
 */
 
-/** 
-* Objektwert lesen wurde angefordert, read_value_response Telegramm zurücksenden
-*
-* 
-* @return
-* 
-*/
-void read_value_req(void)// Sendet nach Leseanfrage objektwert auf den BUS
+/**
+ * Empfangenes read_value_request Telegramm verarbeiten.
+ */
+void read_value_req(unsigned char objno)
 {
-	unsigned char objno, objflags;
+	unsigned char objflags;
 	unsigned int objvalue;
-	
-	objno=find_first_objno(telegramm[3],telegramm[4]);	// erste Objektnummer zu empfangener GA finden
-	if(objno!=0xFF) {	// falls Gruppenadresse nicht gefunden
-		
-		objvalue=read_obj_value(objno);		// Objektwert aus USER-RAM lesen (Standard Einstellung)
 
-		objflags=read_objflags(objno);		// Objekt Flags lesen
-		// Objekt lesen, nur wenn read enable gesetzt (Bit3) und Kommunikation zulaessig (Bit2)
-		if((objflags&0x0C)==0x0C) send_obj_value(objno+64); //send_value(0,objno,objvalue);
-    }
+	objvalue=read_obj_value(objno);		// Objektwert aus USER-RAM lesen (Standard Einstellung)
+	objflags=read_objflags(objno);		// Objekt Flags lesen
+
+	// Objekt lesen, nur wenn read enable gesetzt (Bit3) und Kommunikation zulaessig (Bit2)
+	if((objflags&0x0C)==0x0C) send_obj_value(objno+64); //send_value(0,objno,objvalue);
 }
 
 
-unsigned long read_obj_value(unsigned char objno) 	// gibt den Wert eines Objektes zurueck
+/**
+ * Wert eines Com-Objekts liefern.
+ *
+ * @param objno - die ID des Kommunikations-Objekts
+ * @return Den Wert des Kommunikations Objekts
+ */
+unsigned long read_obj_value(unsigned char objno)
 {
  	unsigned char ret_val=0;
 
@@ -272,17 +249,17 @@ unsigned char k,zuordnung,sobj,blockstart,blockend,action;
 	}
 	else{
 		sobj=objno-16;				//sobj ("Sicherheitsobjektnummer")ist also 0 für Sicherheit1, 1 für Si 2
-		state=!((eeprom[0xE2])& (0x40<<sobj));//Polarität
+		state=!((eeprom[0xE2])& (0x40<<sobj));//Polaritï¿½t
 
 	}
 		write_obj_value(objno & 0x1F ,val);		// Objektwert im userram speichern
 			//if (val){
-				if (state^(__bit)val) zfstate=zfstate |(0x0F<<(sobj<<2));// setzen der sicherhfahrt 1 in zfstate, xor verknüpft die polarität
+				if (state^(__bit)val) zfstate=zfstate |(0x0F<<(sobj<<2));// setzen der sicherhfahrt 1 in zfstate, xor verknüpft die polaritï¿½t
 				else {
 					zfstate=zfstate & (0xFF-(0x0F<<(sobj<<2)));//in zfstate sind für sich1 0F und sich2 F0
 					set_entriegeln(sobj + 9);// Update objekt macht refresh auf Zeit 9/10  Zyklusüberwachung
 					}
-				zuordnung=eeprom[0xF1] & zfstate;//in zuordnung jetzt eine 1 für jede sicherheit 
+				zuordnung=eeprom[0xF1] & zfstate;//in zuordnung jetzt eine 1 für jede sicherheit
 				blocked =zuordnung |((zuordnung >>4) | (zuordnung<<4)); //beide Sicherheitsergebnisse verodern..
 			//}
 			blockstart= blocked & ~oldblockvalue;//steigende Flanke der Blockade(sicherheit)
@@ -314,15 +291,14 @@ unsigned char k,zuordnung,sobj,blockstart,blockend,action;
 
 
 
-void object_schalten(unsigned char objno, __bit objstate)	// Schaltet einen Ausgang gemäß objstate und den zugörigen Parametern
+void object_schalten(unsigned char objno, __bit objstate)	// Schaltet einen Ausgang gemï¿½ï¿½ objstate und den zugï¿½rigen Parametern
 {
 
 	unsigned char port_pattern,objflags,kwin,kwout,faktor,lz_ue,tmp;
 	unsigned char delay_target,pluszeit;//,delay_onoff,
-	__bit off_disable;
+	//__bit off_disable;
 
 
-	off_disable;
 		kwin = kanal[objno & 0x03]& 0x0f;// kwin heisst KanalWertIN. Bit 0+1 Relaise status, Bit 4+5 gewünschter Relaise status
 		kwout=kwin;
 		if (objstate) write_obj_value(objno & 0x07,1);		// Objektwert im userram speichern
@@ -331,7 +307,7 @@ void object_schalten(unsigned char objno, __bit objstate)	// Schaltet einen Ausg
 		port_pattern=0x01<<(objno&0x07);//port_pattern=0x01<<(objno&0x0F)
 //		zfno=0;
 //		logicfunc=0;
-		if((port_pattern & blocked)==0 && (objflags&0x14)==0x14 ||(objno >=8)) {	// Objekt ist nicht gesperrt und Kommunikation zulässig (Bit 2 = communication enable) und Schreiben zulässig (Bit 4 = write enable)
+		if(((port_pattern & blocked)==0 && (objflags&0x14)==0x14) ||(objno >=8)) {	// Objekt ist nicht gesperrt und Kommunikation zulï¿½ssig (Bit 2 = communication enable) und Schreiben zulï¿½ssig (Bit 4 = write enable)
 		objno=objno&0x07;	// damit die bypassobjekte 8-15 wieder 0-7 sind!
 
 // Pausezeit berechnen..
@@ -497,7 +473,7 @@ void object_schalten(unsigned char objno, __bit objstate)	// Schaltet einen Ausg
 				}
 				else {
 					if(!(tmp)){
-					kwout=kwin>>4;//wenn keiene Pause Läuft, dann kanal "soll" in "ist" kopieren
+					kwout=kwin>>4;//wenn keiene Pause Lï¿½uft, dann kanal "soll" in "ist" kopieren
 				//	rs_send ('S');
 					}
 				}
@@ -513,7 +489,7 @@ void object_schalten(unsigned char objno, __bit objstate)	// Schaltet einen Ausg
 
 
 const unsigned int timerflagmask[]={0x0000,0x0000,0x0000,0x0008,0x0080,0x0800};
-void delay_timer(void)	// zählt alle 8 ms die Variable Timer hoch und prüft Queue
+void delay_timer(void)	// zï¿½hlt alle 8 ms die Variable Timer hoch und prï¿½ft Queue
 {
 	
 	unsigned char objno,delay_state,m;//,delay_base;
@@ -531,7 +507,7 @@ void delay_timer(void)	// zählt alle 8 ms die Variable Timer hoch und prüft Queu
 				for(m=0;m<TIMERANZ;m++){// die timer der reihe nach checken und dec wenn laufen
 //					if (timerbase[m]==((n+2)|0x80)){// wenn die base mit der gespeicherten base übereinstimmt
 				  if(timerbase[m]& 0x80){// wenn run-bit gesetzt
-					if((timerbase[m]==0x82)||(timerflags & (timerflagmask[timerbase[m]&0x7f]))){// wenn das flag mit der gespeicherten base übereinstimmt						
+					if((timerbase[m]==0x82)||(timerflags & (timerflagmask[timerbase[m]&0x7f]))){// wenn das flag mit der gespeicherten base übereinstimmt
 						if (timercnt[m]>0x00){// wenn der counter läuft...
 							timercnt[m]=timercnt[m]-1;// den timer [m]decrementieren
 						}// end if (timercnt...
@@ -575,7 +551,7 @@ void delay_timer(void)	// zählt alle 8 ms die Variable Timer hoch und prüft Queu
 					timerbase[objno]=0;
 					timercnt[objno]=0;			//timer loeschen
 					timerstate[objno]=0;
-					if(timerstate[objno-7])timerbase[objno-7]|=0x80;// timer run-bit des zugehörigen Langzeitobjektes setzen
+					if(timerstate[objno-7])timerbase[objno-7]|=0x80;// timer run-bit des zugehï¿½rigen Langzeitobjektes setzen
 					}
 					if (objno>=15){// handmode kurz/langtele + einschaltverz + ausschaltverz
 						//hand
@@ -591,7 +567,7 @@ void delay_timer(void)	// zählt alle 8 ms die Variable Timer hoch und prüft Queu
 				 portchanged=1;
 				}//ende if(deval==..
 		//		else{// also die zeit nicht abgelaufen...
-		//#########  muss oben	if ( objno<=0x07 && ((timercnt[((objno & 0x03)+11)])>0x80)){//wenn zeit der pause läuft.. 
+		//#########  muss oben	if ( objno<=0x07 && ((timercnt[((objno & 0x03)+11)])>0x80)){//wenn zeit der pause läuft..
 		//#########  rein !!!!	write_delay_record(objno,delay_state,delval+1);//trick : wegen der pause werden die zeiten geschoben
 		//			}
 		//		}//ende else zeit abgelaufen
@@ -599,7 +575,7 @@ void delay_timer(void)	// zählt alle 8 ms die Variable Timer hoch und prüft Queu
 		}//ende for (objno=0;...
 		
 		if (eeprom[0xE5]& 0xC0){
-			handsteuerung();   // Handbetätigung nur jedes 8.mal ausführen
+			handsteuerung();   // Handbetï¿½tigung nur jedes 8.mal ausfï¿½hren
 		}
 
 		
@@ -608,14 +584,14 @@ void delay_timer(void)	// zählt alle 8 ms die Variable Timer hoch und prüft Queu
 /*	###### alt out8 
 	
 	
-#ifdef HAND		// für Handbetätigung
+#ifdef HAND		// für Handbetï¿½tigung
 //	unsigned char n;
 	unsigned char ledport;
 	unsigned char Tasten=0;
 #endif
 	
 		
-#ifdef HAND		//+++++++   Handbetätigung  ++++++++++
+#ifdef HAND		//+++++++   Handbetï¿½tigung  ++++++++++
 
 	if((TMOD&0x0F)==0x02 && fb_state==0) {
 		ET1=0;
@@ -662,12 +638,12 @@ void delay_timer(void)	// zählt alle 8 ms die Variable Timer hoch und prüft Queu
 		
 		//if (interrupted==1) Tasten=Tval;  // wenn unterbrochen wurde verwerfen wir die Taste
 		REFRESH;
-		//	Tasten = Tval; // ##############  <----- Hier wird Handbetätigung quasi mit ausgeschaltet !! #########################
+		//	Tasten = Tval; // ##############  <----- Hier wird Handbetï¿½tigung quasi mit ausgeschaltet !! #########################
 		if (Tasten != Tval)  {
 			portbuffer=oldportbuffer;
 		  	ledport=Tasten&~Tval; // ledport ist hier die Hilfsvariable für steigende Flanke
 		  	if (ledport){
-		  		portbuffer^=ledport; // bei gedrückter Taste toggeln
+		  		portbuffer^=ledport; // bei gedrï¿½ckter Taste toggeln
 		  		portchanged=1;
 		  	}
 		  	Tval=Tasten;			//neue Tasten sichern
@@ -680,7 +656,7 @@ unsigned char ledport;
 
 void handsteuerung(void)
 {
-	//#ifdef HAND		// für Handbetätigung
+	//#ifdef HAND		// für Handbetï¿½tigung
 		unsigned char n;
 		unsigned char tmph;
 		unsigned char key_pattern,Tasten;
@@ -727,7 +703,7 @@ void handsteuerung(void)
 			ledport=0;
 		
 
-			//	Tasten = Tval; // ##############  <----- Hier wird Handbetätigung quasi mit ausgeschaltet !! #########################
+			//	Tasten = Tval; // ##############  <----- Hier wird Handbetï¿½tigung quasi mit ausgeschaltet !! #########################
 			if (Tasten & 0x08 ){
 				if (!Tval ){// steigende Flanke des Tasters 
 					//????? tmph=timerstate[15];
@@ -760,7 +736,7 @@ void handsteuerung(void)
 							object_schalten(((Tval&0x07)>>1)+8,(Tval&0x01));
 						}	
 					}//ende if(handmode...		
-					//write_delay_record(15,0x04,timer+1875);//handbetätigung aus starten
+					//write_delay_record(15,0x04,timer+1875);//handbetï¿½tigung aus starten
 					timerbase[15]=0x80 + 3;//130ms
 					timerstate[15]=0x04;
 					timercnt[15]=116;//=15 Sekunden
@@ -857,7 +833,7 @@ void timer0_int(void) __interrupt(1)
 	{
 		case 0 : // Zeitverzögerung zum Einschalten setzen
 		break;
-		case 1://Einschalten und zeitverzögerung zum Ausschalten setzen
+		case 1://Einschalten und Zeitverzögerung zum Ausschalten setzen
 			schalten_state=2;
 			P0=portausgabe_on;
 			TF0=0;			// Timer 0 für Ausschaltzeitpunkt
@@ -891,7 +867,7 @@ void timer0_int(void) __interrupt(1)
 #endif
 
 
-void port_schalten(void)		// Schaltet die Ports mit PWM, DUTY ist Pulsverhältnis
+void port_schalten(void)		// Schaltet die Ports mit PWM, DUTY ist Pulsverhï¿½ltnis
 {
 	//unsigned char n, pattern;
 	unsigned char kmod;
@@ -914,8 +890,8 @@ void port_schalten(void)		// Schaltet die Ports mit PWM, DUTY ist Pulsverhältnis
 		TAMOD=0x00;
 		TR0=1;
 
-/*	rm_state=portbuffer ^ eeprom[RMINV];	// Rückmeldeobjekte setzen
-	for (n=0;n<8;n++) {	// Rückmeldung wenn ein Ausgag sich geändert hat
+/*	rm_state=portbuffer ^ eeprom[RMINV];	// Rï¿½ckmeldeobjekte setzen
+	for (n=0;n<8;n++) {	// Rï¿½ckmeldung wenn ein Ausgag sich geï¿½ndert hat
 		pattern=1<<n;
 		if((portbuffer&pattern)!=(oldportbuffer&pattern)) send_obj_value(n+12);
 	}
@@ -932,8 +908,8 @@ void port_schalten(void)		// Schaltet die Ports mit PWM, DUTY ist Pulsverhältnis
 		EX0=1;// zero U interrupt einschalten
 
 
-		rm_state=portbuffer ^ eeprom[RMINV];	// Rückmeldeobjekte setzen
-		for (n=0;n<8;n++) {	// Rückmeldung wenn ein Ausgag sich geändert hat
+		rm_state=portbuffer ^ eeprom[RMINV];	// Rï¿½ckmeldeobjekte setzen
+		for (n=0;n<8;n++) {	// Rï¿½ckmeldung wenn ein Ausgag sich geï¿½ndert hat
 			pattern=1<<n;
 			//if((portbuffer&pattern)!=(oldportbuffer&pattern)) rm_send|=pattern;		//send_obj_value(n+12);
 		}
@@ -953,8 +929,8 @@ void port_schalten(void)		// Schaltet die Ports mit PWM, DUTY ist Pulsverhältnis
 		TAMOD=0x00;
 		TR0=1;
 
-	rm_state=portbuffer ^ eeprom[RMINV];	// Rückmeldeobjekte setzen
-	for (n=0;n<8;n++) {	// Rückmeldung wenn ein Ausgag sich geändert hat
+	rm_state=portbuffer ^ eeprom[RMINV];	// Rï¿½ckmeldeobjekte setzen
+	for (n=0;n<8;n++) {	// Rï¿½ckmeldung wenn ein Ausgag sich geï¿½ndert hat
 		pattern=1<<n;
 		if((portbuffer&pattern)!=(oldportbuffer&pattern)) send_obj_value(n+12);
 	}
@@ -1114,7 +1090,7 @@ void bus_return(void)		// Aktionen bei Busspannungswiederkehr
 	unsigned char n;
 	blocked=blockedsave;		// Ausgänge gesperrt?
 	timer=0;			// Timer-Variable, wird alle 8 ms inkrementiert
-	for (n=0;n<=15;n++){// Löschen aller zeiten
+	for (n=0;n<=15;n++){// Lï¿½schen aller zeiten
 		timerstate[n]=0;
 		timerbase[n]=0;
 		timercnt[n]=0;
@@ -1131,6 +1107,7 @@ void bus_return(void)		// Aktionen bei Busspannungswiederkehr
 			object_schalten(n+12,1);
 		break;
 		default:
+		break;
 		}
 		
 	}
@@ -1138,14 +1115,14 @@ void bus_return(void)		// Aktionen bei Busspannungswiederkehr
 	oldportbuffer=0; 	// auf 0 setzen, da sonst kein Vollstrom aktiviert wird
 	portchanged=1;		// Post hinterlegen damit in delaytimer nach portschalten springt
 // nachfolgendes vorerst auskommentiert:
-	set_entriegeln(9);	// Überwachungszeit Sicherheitsfahrt
+	set_entriegeln(9);	// überwachungszeit Sicherheitsfahrt
 	set_entriegeln(10);	// dto
 
 
 }
 
 
-void restart_app(void) 		// Alle Applikations-Parameter zurücksetzen
+void restart_app(void) 		// Alle Applikations-Parameter zurï¿½cksetzen
 {
 
 	Tval=0x00;
@@ -1160,7 +1137,7 @@ void restart_app(void) 		// Alle Applikations-Parameter zurücksetzen
 #else 
 	TMOD=(TMOD & 0xF0) + 2;		// Timer 0 als PWM
 	TAMOD=0x01;
-	TH0=DUTY;		// Pulsverhältnis PWM
+	TH0=DUTY;		// Pulsverhï¿½ltnis PWM
 	AUXR1|=0x10;	// PWM von Timer 0 auf Pin ausgeben, gleichzeitig low-powermode ein (da <8MHz)
 	TR0=1;			// Timer 0 starten (PWM)
 #endif

@@ -1,10 +1,4 @@
 /*
- *      __________  ________________  __  _______
- *     / ____/ __ \/ ____/ ____/ __ )/ / / / ___/
- *    / /_  / /_/ / __/ / __/ / __  / / / /\__ \ 
- *   / __/ / _, _/ /___/ /___/ /_/ / /_/ /___/ / 
- *  /_/   /_/ |_/_____/_____/_____/\____//____/  
- *                                      
  *  Copyright (c) 2008-2011 Andreas Krebs <kubi@krebsworld.de>
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -12,12 +6,19 @@
  *  published by the Free Software Foundation.
  *
  */
-
-unsigned char __at 0x00 RAM[00]; 
-
-
 #ifndef FB_APP_OUT
 #define FB_APP_OUT
+
+
+// Damit die Eclipse Code Analyse nicht so viele Warnungen anzeigt:
+#ifndef SDCC
+# define __idata
+# define __code
+# define __at(x)
+#endif
+
+unsigned char __at(0x00) RAM[00];
+
 
 #define MAX_PORTS_8			// Anzahl Ausgänge (nur 4 oder 8 erlaubt)
 //#define HAND				// Handsteuerung aktiv (auskommentieren wenn nicht gewünscht)
@@ -55,18 +56,18 @@ DEBUG RAM[SBUF];\
 
 #define REFRESH \
 		P0= oldportbuffer;	// refresh des Portzustandes in der hal
-							// für astabile Relaise 
+							// für astabile Relaise
 // SPI Konfiguration
 #define CLK			P0_3
 #define BOT_OUT		P0_0
 #define MID_OUT		P0_1
 #define WRITE		P0_2
-extern static __code unsigned char __at 0x1BFD blockedsave;
+extern static __code unsigned char __at(0x1BFD) blockedsave;
 extern __bit handmode;
 extern 	__bit portchanged;// globale variable, sie ist 1 wenn sich portbuffer geändert hat
-extern unsigned char __at 0x0D portbuffer;
-extern unsigned char __at 0x0F blocked;
-extern unsigned char __at 0x09 delay_toggle;			// um nur jedes 2. Mal die delay routine auszuführen
+extern unsigned char __at(0x0D) portbuffer;
+extern unsigned char __at(0x0F) blocked;
+extern unsigned char __at(0x09) delay_toggle;			// um nur jedes 2. Mal die delay routine auszuführen
 //extern unsigned char rm_send;		// die von der main zu sendenden Rückmeldungen
 #ifdef zeroswitch
 extern unsigned char portausgabe_on; // einzuschaltende IO, die dann im ext 0 int übernommen werden
@@ -78,8 +79,6 @@ extern unsigned char phival;
 //void write_delay_record(unsigned char objno, unsigned char delay_status, long delay_target);	// Schreibt die Schalt-Verzoegerungswerte ins Flash
 //void clear_delay_record(unsigned char objno); // Loescht den Delay Eintrag
 void handsteuerung(void);
-void write_value_req(void) ;		// Hauptroutine für Ausgänge schalten gemäß EIS 1 Protokoll (an/aus)
-void read_value_req(void) ;
 void delay_timer(void);		// zählt alle 130ms die Variable Timer hoch und prüft Queue
 void port_schalten(void);	// Ausgänge schalten
 void object_schalten(unsigned char objno, __bit objstate);	// Objekt schalten
