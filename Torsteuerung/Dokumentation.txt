@@ -1,0 +1,30 @@
+TORSTEUERUNG
+============
+
+
+Ein- / Ausgänge
+---------------
+
+X1 - Motor Richtung auf
+     JP1#7  P0.0 LPC#1
+
+X2 - Motor Richtung zu
+     JP1#8  P0.1 LPC#20
+
+X3 - Endschalter offen
+     JP1#9  P0.2 LPC#19
+
+X4 - Endschalter zu
+     JP1#10 P0.3 LPC#18
+
+X5 - Status Lampe
+     JP1#13 P0.4
+
+X6 - 
+     JP1#14 P0.5
+
+X7 - (Ausgang Auf)
+     JP1#15 P0.6
+
+X8 - Ausgang Zu / Umschalten
+     JP1#16 P0.7
