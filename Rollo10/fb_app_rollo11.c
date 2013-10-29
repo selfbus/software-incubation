@@ -392,8 +392,15 @@ void object_schalten(unsigned char objno, __bit objstate)	// Schaltet einen Ausg
 					//delay_target=zeit(0xFB,0xFC,0xDA,objno&0x03);// zeit aus eeprom holen
 					delay_target=(eeprom[0xFB+((objno&0x03)>>1)]>>(3*(objno&0x01))&0x07) | 0x80;// zeitbasis aus eeprom holen
 					faktor = eeprom[0xDA+(objno&0x03)];
-					faktor = faktor + (faktor>>2);// +25% zeit bei langzeit 
-					pluszeit=faktor + (faktor>>5);// 3% zeit bei "auf" 
+					if(faktor<=198)// maximal 198, sonst Überlauf der unsigned char faktor
+					{
+						faktor = faktor + (faktor>>2);// +25% zeit bei langzeit 
+						pluszeit=faktor + (faktor>>5);// 3% zeit bei "auf" 
+					}
+					else{
+						faktor=255;
+						pluszeit=255;
+					}
 					lz_ue=((eeprom[0xF2]>>objno)&0x01);		//lz_ue bedeutet: langzeit unendlich
 					if (objstate==0){// --- auf ----
 						if (kwin&0x11){		//läuft bereits, also nachtriggern
