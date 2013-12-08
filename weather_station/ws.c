@@ -42,10 +42,10 @@ unsigned char __at 0x00 RAM[00]; //nur für die debug ausgabe
 
 void main(void)
 { 
-	unsigned char n,cmd,prog_button_level=0,quit_button_level=0;
+	unsigned char n,cmd,prog_button_level=0;
 	signed char cal;
 	static __code signed char __at 0x1BFF trimsave;
-	__bit prog_button_toggled=0,quit_button_toggled=0;
+	__bit prog_button_toggled=0;
 
 	restart_hw();							// Hardware zuruecksetzen
 	TASTER=0;
@@ -78,12 +78,98 @@ void main(void)
 	do  {
 		
 	//watchdog_feed();	
-		
-		if(APPLICATION_RUN) {	// nur wenn run-mode gesetzt
-			if (RTCCON &0x80){	
-	//		delay_timer();
-	//		LED_schalten();
+
+		if(stream_arrived && !TR0)
+		{
+			update();
+			stream_arrived=0;
 		}
+	 if(APPLICATION_RUN) {	// nur wenn run-mode gesetzt
+		 
+	 	if (RTCCON &0x80)
+	 	{	
+		delay_timer();
+	 	}
+
+
+//				 #########  checken der Grenzwerte ###########
+//		
+		for(n=0;n<10;n++)// n ist Nummer des Universal grenzwertes
+			
+		{	
+			unsigned char GWE= (eeprom[0xD3+(n/4)]>>shift_at_2bit[n])&0x03;//Grenzwertereignis
+			__bit polarity_param ;
+			unsigned int GW;	// Genzwert
+			unsigned char quellobj;
+			if (n&0x01)quellobj = eeprom[0xE3+(n>>1)]>>4;
+			else quellobj = eeprom[0xE3+(n>>1)]&0x0F;
+				
+			if (n<=7)GW= ((int)eeprom [0xE9+n+n]<<8 )| eeprom[0xEA+n+n];// 0-7 integer
+			else GW= eeprom[ 249-8 +n];// 8,9 char
+
+			if( eeprom[0xE1+n/8]& bitmask_1[n%8]) polarity_param = 1;// sendeparameter des Grenzwertes
+			else polarity_param = 0;
+			if(GWE & 0x01)// Überschreiten, nur vergleichen wenn aktiviert
+			{
+				if(read_obj_data(quellobj)> GW)
+				{
+					if(GWE & 0x02)// also GWE=3, bei Über und Unterschreiten
+					{
+						sendbychange(n+11,1^polarity_param);	
+					}
+					else	// GWE=1, bei Überschreiten
+					{
+						sendbychange(n+11,polarity_param);
+					}
+				}
+			}
+			if(GWE & 0x02)// Unterschreiten, nur vergleichen wenn aktiviert
+			{
+				if(read_obj_data(quellobj)< GW)
+				{
+					if(GWE & 0x01)// also GWE=3, bei Über und Unterschreiten
+					{
+						sendbychange(n+11,0^polarity_param);	
+					}
+					else
+					{
+						sendbychange(n+11,polarity_param);// GWE=2, bei Unterschreiten
+					}
+				}
+			}
+
+		}
+		for ( n=0;n<4;n++)// checken der 4 Windrichtungs-Grenzwerte
+		{
+			unsigned char GW_von = eeprom[251+n]&0x07;
+			unsigned char GW_bis = (eeprom[251+n]>>4)&0x07;
+			unsigned char wr_val;
+			unsigned char uchar_wind_angle=(unsigned char)wind_angle;
+			__bit polarity_param,match=0;
+			
+			if(eeprom[0xE2]& bitmask_1[n+4])// nur wenn aktiviert ist..
+			{
+			
+				if(eeprom[251+n]&0x08)polarity_param=1;
+				else polarity_param=0;
+	
+				if(uchar_wind_angle==14)wr_val=6;//lowbyte bei 270° WR=6
+				else if(uchar_wind_angle==59)wr_val=7;//lowbyte bei315° WR=7
+				else wr_val= uchar_wind_angle/45;
+	
+				if(GW_von<=GW_bis)// Wenn (von <= bis), dann normal zwischen von und bis auswerten
+					{
+						if((wr_val >= GW_von) && (wr_val <= GW_bis))match=1; 
+						else match=0;
+					}
+				else{	// wenn (bis < von), dann vergleiche über den Überlauf(0)
+						if((wr_val >= GW_von)||(wr_val <= GW_bis))match=1;
+						else match=0;
+					}
+				sendbychange(21+n,match^polarity_param);//
+			}
+		}
+
 
 			
 		cmd;	
@@ -129,25 +215,13 @@ void main(void)
 		}//end if(RI...
 #else		
 		DEBUGPOINT
+//		if(RI){wind_angle=SBUF;
+//		RI=0;
+//		}
 #endif
 
-		//   ###  QUIT_button ###
-		if(!QUIT){ 		// Quitt-Taster gedrückt
-			if(quit_button_level<255)	quit_button_level++;
-			else{
-				if(!quit_button_toggled && (eeprom[0xEE]&0x08)){
-					reset_obj=1;
-					erease_alarm(1);
-					if(eeprom[0xEE]&0x01)send_obj_value(26);
-				}
-				quit_button_toggled=1;
-			}
-		}
-		else {
-			if(quit_button_level>0)prog_button_level--;
-			else quit_button_toggled=0;
-		}
 
+		
 				
 		}// end if(runstate)
 		
@@ -168,7 +242,6 @@ void main(void)
 			else{
 				if(!prog_button_toggled)status60^=0x81;	// Prog-Bit und Parity-Bit im system_state toggeln
 				prog_button_toggled=1;
-				stream_arrived=0;
 			}
 		}
 		else {

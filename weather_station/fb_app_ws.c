@@ -32,34 +32,40 @@ unsigned char portbuffer;	// Zwischenspeicherung der Portzustände
 unsigned char timerbase[TIMERANZ];// Speicherplatz für die Zeitbasis und 4 status bits
 unsigned char timercnt[TIMERANZ];// speicherplatz für den timercounter und 1 status bit
 
-unsigned char led_obj[3];		
-unsigned char led_hell_obj;
-unsigned char quitted_obj[3];
-__bit zentral_alarm_obj,reset_obj,blocked_obj;
-unsigned char timer;		// Timer für Schaltverzögerungen, wird alle 100ms hochgezählt
-unsigned char blink;		//pattern das blinkt
-unsigned char led_activ;	//pattern das die LED Anzeige aktiviert/deaktiviert
-unsigned char beep_state,beep_all,hellwert;
-unsigned char t0_div,beep_req,beep_clk;
+
+
+unsigned char timer,timer_m;		// Timer für Schaltverzögerungen, wird alle 100ms hochgezählt
 
 __bit delay_toggle;			// um nur jedes 2. Mal die delay routine auszuführen
 __bit portchanged;
-unsigned char __idata __at IDATA_START stream[16];
+unsigned char __idata __at IDATA_START+21 stream[15];
 __bit stream_comming_in;
 __bit stream_arrived;
+__bit rain;
 unsigned char stream_bit_ctr;
 unsigned char stream_no;
-unsigned char T0_OV,Count;
-unsigned short Bit_Pause;
+unsigned char id_counter;
+unsigned char id[4];
+unsigned int updated_objects;
+signed int __idata __at IDATA_START temp[3];
+unsigned char __idata __at IDATA_START+6 humidity[3];
+unsigned short __idata __at IDATA_START+9 wind_speed_av;
+unsigned short __idata __at IDATA_START+11 wind_speed_max;
+unsigned short __idata __at IDATA_START+13 wind_angle;
+unsigned short __idata __at IDATA_START+15 rain_value;
+unsigned short __idata __at IDATA_START+17 rain_offset;
+unsigned char __idata __at IDATA_START+19 GW_1_8;
+unsigned char __idata __at IDATA_START+20 GW_9_16;
 const unsigned char bitmask_1[]={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
 const unsigned char bitmask_0[]={0xFE,0xFD,0xFB,0xF7,0xEF,0xDF,0xBF,0x7F};
+const unsigned char shift_at_2bit[]={0,2,4,6,0,2,4,6,0,2};
+const unsigned char objno_timerno[]={0,0,0,1,1,1,2,2,2,3};
 
 
 
 void timer0_int  (void) __interrupt (1) {// Interrupt T0 overflow streambit
 stream_bit_ctr=0;
 TR0=0;
-T0_OV++;
 } // timer0_int
 
 void EX0_int (void) __interrupt(0){
@@ -74,7 +80,7 @@ void EX0_int (void) __interrupt(0){
 		{
 			stream_comming_in = 1;
 			stream_bit_ctr=0;
-			for(n=stream_no*5;n <= ((stream_no*5)+4);n++)
+			for(n=stream_no;n <= ((stream_no)+4);n++)
 			{
 				stream[n]=0;
 			}
@@ -83,7 +89,7 @@ void EX0_int (void) __interrupt(0){
 		{
 			if (bitpause>=12902 && bitpause <=16588 )//ca 4ms = 1-bit (3,5-4,5)
 			{
-				stream[stream_no*5+(stream_bit_ctr>>3)]|=bitmask_1[(stream_bit_ctr&0x07)];	
+				stream[stream_no+(stream_bit_ctr>>3)]|=bitmask_1[(stream_bit_ctr&0x07)];	
 				stream_bit_ctr++; 
 			}
 			else if (bitpause>=5530 && bitpause <=9216 )//ca 2ms = 0-bit (1,5-2,5)
@@ -91,13 +97,13 @@ void EX0_int (void) __interrupt(0){
 				//stream[IDATA_START+(stream_bit_ctr>>2)]&=bitmask_0[stream_bit_ctr&0x03];	
 				stream_bit_ctr++; 
 			}else {
-				Bit_Pause=bitpause;
 				stream_comming_in=0; //verwerfen
+//				if(stream_no < 10)stream_no+=5;
 			}
 		}	
 		if(stream_bit_ctr==36)
 			{
-			if(stream_no < 2)stream_no++;
+			if(stream_no < 10)stream_no+=5;
 			else 
 				{
 				stream_no=0;
@@ -108,22 +114,21 @@ void EX0_int (void) __interrupt(0){
 	}
 }
 
-__bit checksume(unsigned char package_nomber)
+__bit checksume(unsigned char p_no)
 {
 	unsigned char byte_no;
 	unsigned char check=0x0F;// alle anderen Telegramme
 	unsigned char nextcheck_hi,nextcheck_lo;
 	__bit rain=0;
-	package_nomber*=5;
-	if((stream[package_nomber+1]&0x7F)==0x6C)// Regen Telegramm
+	if((stream[p_no+1]&0x76)==0x36)// Regen Telegramm
 	{
 		check=0x07;
 		rain=1;
 	}
-	for(byte_no=0;byte_no<=4;byte_no++)// die checksume der 8 Nibbles berechnen 
+	for(byte_no=p_no;byte_no<=(p_no+3);byte_no++)// die checksume der 8 Nibbles berechnen 
 	{
-		nextcheck_hi = stream[package_nomber+byte_no]>>4;
-		nextcheck_lo= stream[package_nomber+byte_no]&0x0F;
+		nextcheck_hi = stream[byte_no]>>4;
+		nextcheck_lo= stream[byte_no]&0x0F;
 		if(rain)// für Regen Telegramm
 		{
 			check+=nextcheck_hi;
@@ -135,51 +140,109 @@ __bit checksume(unsigned char package_nomber)
 			check-=nextcheck_lo;
 		}
 	}
-	if(check&0x0F == (stream[package_nomber+4])>>4)return 1;
+	if((check&0x0F) == stream[p_no+4])return 1;
 	else return 0;
 }
 
+
+void update(void)// update der Objekte nach Funk Telegramm Empfang
+{
+	unsigned char p_no,channel;
+	for(p_no=0;p_no<=10;p_no+=5)
+	{
+		if(checksume(p_no))
+		{	
+/*			channel=0;// Kanal 0-3, Kanal 4 = Fehler/ID nicht gefunden
+			for (n=0;n<=2;n++)
+			{
+				if (id[n]==stream[p_no])
+					{
+					channel=(((stream[p_no]&0x20)>>5)|((stream[p_no]&0x10)>>3))+1;// bit 5,4 ist sind die Kanalbit 0,1
+					}
+			}
+			if(channel)
+*/
+			channel=(((stream[p_no]&0x20)>>5)|((stream[p_no]&0x10)>>3));// bit 5,4 ist sind die Kanalbit 0,1
+			if(!id[channel])// wenn channel-ID leer 
+			{
+				id[channel]=stream[p_no];
+			}
+			else
+			{
+				if((GW_9_16 & 0x40) && id[channel]!= stream[p_no])// reset objekt aktiviert
+				{
+					id[channel]=stream[p_no];// channel-ID eintragen
+					GW_9_16 &= ~0x40;		// Reset objekt löschen
+				}
+			}
+			if(id[channel]==stream[p_no])
+			{
+				if((stream[p_no+1]&0x06)==0x06)// alles ausser temperatur/feuchte
+				{
+					switch(stream[p_no+1]&0x70)
+					{
+					case 0x10:
+						wind_speed_av=stream[p_no+3]*50;
+						updated_objects |= 0x40;
+					break;
+					case 0x70:
+						wind_angle=(stream[p_no+2]<<1)+(stream[p_no+1]>>7);
+						wind_speed_max=stream[p_no+3]*50;
+						updated_objects|= 0x0180;
+					break;
+					case 0x30:
+						rain_value=(((stream[p_no+3]<<8)+stream[p_no+2]))-rain_offset;
+						//rain_value=(((stream[p_no+3]<<8)+stream[p_no+2]));
+						updated_objects |= 0x200;
+					break;
+					default:
+						
+					}
+				}
+				else// temp/feuchte
+				{
+					humidity[channel-1]=((stream[p_no+3]>>4)*10)+(stream[p_no+3]&0x0F);
+					if(stream[p_no+2]& 0x80)// negative temperatur
+					{
+						temp[channel-1]=((((int)stream[p_no+2])<<4)|0xF000)|((stream[p_no+1]>>4))*10;// temperatur
+					}
+					else
+					{
+						temp[channel-1]=((((int)stream[p_no+2])<<4)+(stream[p_no+1]>>4))*10;// temperatur
+					}
+					updated_objects |= bitmask_1[channel-1];// bit 0-2
+					updated_objects|= bitmask_1[channel+2];// bit 3-5
+				}
+			}// end if (channel...
+			//else if(id_counter<=3)
+			//{
+			//	id[id_counter]=stream[p_no];
+			//	id_counter++;
+			//}
+		}// end if(checksume...
+	}// end for(p_no...
+}//end function
 
 
 void write_value_req(unsigned char objno)	// Objekte steuern gemäß EIS  Protokoll (an/aus/dimm/set)
 {
   unsigned char valtmp;
   //unsigned char blockstart, blockend, block_polarity;
-  unsigned char obj,group;
+  //unsigned char obj,group;
 
-          	obj=objno%8;// modulo 3 ergibt die Gruppennummer
-	          group=objno/8;
-	          valtmp=telegramm[7]&0x01;
-	
-		         // Objektbehandlung:
-		         if(objno<=23){ // die LED objekte..
-		        	 if(valtmp ^ ((eeprom[0xFA + group])>>obj)&0x01) {
-        				led_obj[group]|= bitmask_1[obj];// Alarmbeginn
-		        	 }
-		        	 else{ 									// Alarm Ende
-	        		 	if(!(eeprom[0xF1+group]& bitmask_1[obj])){	// wenn nicht 'speichernd'
-	        		 		led_obj[group]&= bitmask_0[obj]; 		// objekt löschen
-	        		 		quitted_obj[group]&= bitmask_0[obj];	// Quittierung löschen
-	        		 	}
-		        	 }
-		         }
-		         if(objno==24){								// helligkeitsobjekt
-		        	 led_hell_obj=telegramm[8];
-		         }
-		         if(objno==26 ){							// Rücksetzobjekt
-		        	 if (valtmp^((__bit)(eeprom[0xEE]&0x02))){	// Polarität einbeziehen
-		        		 erease_alarm(1);
-		        		 reset_obj=1;
-		        	 }
-		        	 else reset_obj=0;
-		         }
-		         if(objno==27){//sperre
-		        	 if (valtmp^((__bit)(eeprom[0xEE]&0x40))){	// Polarität einbeziehen
-		        		 blocked_obj=1;
-		        	 }
-		        	 else blocked_obj=0;
-		         }
+  	//obj=objno%8;// modulo 3 ergibt die Gruppennummer
+    // group=objno/8;
+     valtmp=telegramm[7]&0x01;
 
+	 // Objektbehandlung:
+	 if(objno==25){ // die Reset objekte..
+		 if(valtmp ) {
+			 GW_9_16 |= 0x40;
+		 }
+		 else GW_9_16 &= ~0x40;
+	 }
+     if(objno==9)write_obj_value(9,(telegramm[8]<<8)+telegramm[9]);
+     
 }
 
 
@@ -196,23 +259,45 @@ void read_value_req(unsigned char objno)
 {
   send_obj_value(objno+64); // die 64 macht ein response Telegramm daraus
 }
-
-
+int read_obj_data(unsigned char objno)
+{
+	unsigned int ret_val=0;
+	if (objno<=2)ret_val=temp[objno];
+	if(objno>=3 && objno<=5)ret_val=humidity[objno-3];
+	if(objno==6)ret_val=wind_speed_av;
+	if(objno==7)ret_val=wind_speed_max;
+	if(objno==8)ret_val=wind_angle;
+	if(objno==9)ret_val=rain_value*25;
+	if(objno==10)ret_val=rain;
+	if(objno>=11 && objno<=18)
+		{
+		if(GW_1_8 & bitmask_1[objno-11])	ret_val=1;
+		else ret_val=0;
+		}
+	if(objno>=19 && objno<=25)
+		{
+		if(GW_9_16 & bitmask_1[objno-19])ret_val=1;
+		else ret_val=0;
+		}
+	return(ret_val);
+	
+}
 unsigned long read_obj_value(unsigned char objno)	// gibt den Wert eines Objektes zurueck
 {
-	unsigned char ret_val=0,obj,group;
-	obj = objno % 8;
-	group=objno /8;
-	if(objno<=23) {
-		if((led_obj[group]^eeprom[0xFA+group])& bitmask_1[obj]) ret_val=1;
+	int returnvalue;
+	unsigned char x;
+	if(objno>=10 )
+	{
+		return (read_obj_data(objno));
 	}
-	else{
-		if(objno==24) ret_val = led_hell_obj;
-		if(objno==25) ret_val = zentral_alarm_obj^((__bit)(eeprom[0xED]&0x80));
-		if(objno==26) ret_val = reset_obj^((__bit)(eeprom[0xEE]&0x02));
-		if(objno==27) ret_val = blocked_obj^((__bit)(eeprom[0xEE]&0x40));
-	}
-	return(ret_val);
+	else if(objno==8)returnvalue=wind_angle*100;
+		else if(objno>=3 && objno<=5)// Feuchte %
+		{
+			x=humidity[objno-3];
+			returnvalue=x*2 + x/2 + x/20;
+		}
+		else returnvalue=eis5conversion(read_obj_data(objno));
+	return (long)returnvalue;
 }
 
 
@@ -221,42 +306,57 @@ void write_obj_value(unsigned char objno,unsigned int objvalue)	// schreibt den 
 unsigned char obj,group;
 	group= objno/8;
 	obj = objno % 8;
-	
-	if(objno<=23) {
-		if(objvalue==0) led_obj[group] &= bitmask_0[obj];
-		else led_obj[group] |= bitmask_1[obj];
+	if(objno==9)
+	{
+		if (!objvalue)rain_offset+=rain_value;
 	}
-	else{
-		if(objno==24) led_hell_obj = objvalue &0xff;
-		if(objno==25) zentral_alarm_obj = objvalue &0x01;
-		if(objno==26) reset_obj = objvalue &0x01;
-		
+	if (objno>=11&& objno<=18)
+	{
+		if (objvalue)GW_1_8 |= bitmask_1[objno-11];
+		else GW_1_8 &= bitmask_0[objno-11];
 	}
+	if (objno>=19&& objno<=25)
+	{
+		if (objvalue)GW_9_16 |= bitmask_1[objno-19];
+		else GW_9_16 &= bitmask_0[objno-19];
+	}
+
 }
 
 
-void erease_alarm(__bit value)//quittieren oder löschen der Alarme
+signed int eis5conversion(signed int zahl)// wandelt 32 bit var in eis5 um
 {
-	if(value){
-		led_obj[0]&= ~eeprom[0xF1];	// wenn nicht 'speichernd'
-		quitted_obj[0]&= ~eeprom[0xF1];	// wenn nicht 'speichernd'
-		led_obj[1]&= ~eeprom[0xF2];	// wenn nicht 'speichernd'
-		quitted_obj[1]&= ~eeprom[0xF2];	// wenn nicht 'speichernd'
-		led_obj[2]&= ~eeprom[0xF3];	// wenn nicht 'speichernd'
-		quitted_obj[2]&= ~eeprom[0xF3];	// wenn nicht 'speichernd'
-		
-		quitted_obj[0]|=led_obj[0];
-		quitted_obj[1]|=led_obj[1];
-		quitted_obj[2]|=led_obj[2];
-		if(!(eeprom[0xED]& 0x04)){
-			zentral_alarm_obj=1;	//Wenn nicht automatisches rücksetzen aktiviert ist
-			send_obj_value(25);		//wird beim rücksetzen das zentralalarm Obejkt zurückgesetzt
+	unsigned char exp=0;
+	if(zahl>=0)
+	{
+		while (zahl > 2047){//solange Mantisse größer 11 Bit
+			zahl=zahl>>1;// Mantisse /2
+			exp++;// und exponent um 1 erhöhen (ist ein 2^exp)
 		}
 	}
-	
+	else
+	{
+		while (zahl < -2048){//solange Mantisse größer 11 Bit
+			zahl=zahl >> 1;// Mantisse /2
+			zahl=zahl|0x8000;
+			exp++;// und exponent um 1 erhöhen (ist ein 2^exp)
+		}
+	}
+ 	return ((signed int)zahl|(exp<<11));// exponent dazu.
 }
 
+void sendbychange(unsigned char objno,unsigned char val){
+	if (val){
+			if(read_obj_data(objno)==0)write_send(objno,1);
+			}
+			else if( read_obj_data(objno))write_send(objno,0);
+}
 
+void write_send(unsigned char objno,unsigned int value){
+
+	write_obj_value(objno,(unsigned long)value);
+	while(!send_obj_value(objno));
+}
 
 void delay_timer(void)	// zählt alle 0,1s die Variable Timer hoch 
 {
@@ -266,167 +366,60 @@ void delay_timer(void)	// zählt alle 0,1s die Variable Timer hoch
 	
 	RTCCON=0x61;		// RTC starten, RUN Bit löschen
 	
-	timer++;// wird alle 0.1s aufgerufen
+	timer++;// wird alle 1s aufgerufen
 	timerflags = 1;
-	if (timer>=10){
-		timer=0;
+	if ((timer%10)==0){
 		timerflags=3;
 	}
-	if(timercnt[0])timercnt[0]--;
-	if(timerbase[1]&0x01){
-		if ((timercnt[1])&& (timerflags&0x02))timercnt[1]--;
+	if (timer==60){
+		timerflags=7;
+		timer=0;
+		timer_m++;
 	}
-	else if (timercnt[1])timercnt[1]--;
-		
-		
-		// ab Hier die aktion...
-		
-		
-			if(!timercnt[0]){	// blinken
-				if((blocked_obj)&&(eeprom[0xEE]&0x34)==0x24) blink=0xFF;
-				else blink=~blink;
-				if((blocked_obj)&&(eeprom[0xEE]&0x34)==0x34)led_activ=0;
-				else led_activ=0xFF;
-				timercnt[0]=eeprom[0xEF];
-			}
-			if(!timercnt[1]){	//beep
-				switch (eeprom[0xED]& 0x60){
-				case 0x20:
-						if(!beep_clk){
-							beep_clk=1;
-							timercnt[1]=eeprom[0xFD]; //Dauer laden
-							timerbase[1]=0;
-						}
-						else{
-							beep_clk=0;
-							timercnt[1]=eeprom[0xFE]; //Pause laden
-							timerbase[1]=1;
-						}
-					break;
-				case 0x40:	
-				case 0x60:
-					switch(beep_state){
-						case 0:
-							beep_clk=1;
-							beep_state=1;
-							timercnt[1]=eeprom[0xFD];//Dauer laden
-							timerbase[1]=0;
-						break;
-						case 1:
-							beep_state=2;
-							timercnt[1]=eeprom[0xFD];//Lücke laden
-							beep_clk=0;
-						break;
-						case 2:
-							beep_state=3;
-							timercnt[1]=eeprom[0xFD];//dauer laden
-							if((eeprom[0xED]& 0x60)==0x60) beep_clk=3;
-							else beep_clk=1;
-						break;
-						case 3:
-							beep_state=0;
-							timercnt[1]=eeprom[0xFE];//Pause laden
-							timerbase[1]=1;
-							beep_clk=0;
-						default:	
-					}
-					break;
-				default:
-						timercnt[1]=0;
-						beep_clk=0;
-				}// ende switch
-		}// ende if(!timercnt...
-		if ((led_obj[0]& ~quitted_obj[0])\
-			||(led_obj[1]& ~quitted_obj[1])\
-			||(led_obj[2]& ~quitted_obj[2]))
-			beep_all=1;
-		else beep_all=0;
-
-		if((zentral_alarm_obj||((eeprom[0xED]&0x08)&&beep_all))&&beep_clk && !((eeprom[0xEE]&0x04)&& blocked_obj)){
-			if(beep_clk&0x02)beep_req=0x08;
-			else beep_req=0x04;
-		}
-		else beep_req=0;
-		
-		hell_stellen();
-}
-
-
-
-
-void hell_stellen(void)
-{
-unsigned char duty;
-	if ((eeprom[0xED]&0x12==0x12)&&zentral_alarm_obj){
-		duty=255;	// bei Alarm Helligkeit auf 100% wen gewünscht
+	if (timer_m==60){
+		timerflags=15;
+		timer_m=0;
 	}
-	else{
-		if(!(eeprom[0xED]&0x01))duty=eeprom[0xF0];// festeingestellter helligkeitswert
-		else{	//Helligkeitsobjekt
-			if(led_hell_obj<eeprom[0xF0])duty=eeprom[0xF0];//Mindesthelligkeit
-			else duty=led_hell_obj;// oder Helligkeits objekt
-		}
-		
-	}
-	TH0=duty;
-}
+//  timerbehandlung über 4 Basen, 1sec 10 sec 1min 1 std
+	for(n=0;n<3;n++){
+		if(timerflags & 0x0001){// positive flags erzeugen und schieben
+			for(m=0;m<TIMERANZ;m++){// die timer der reihe nach checken und dec wenn laufen
+				if ((timerbase[m]& 0x03)==n){// wenn die base mit der gespeicherten base übereinstimmt
+					if (timercnt[m]>0x00){// wenn der counter läuft...
+						timercnt[m]=timercnt[m]-1;// den timer [m]decrementieren
+					}// end if (timercnt...
+					else timercnt[m]=eeprom[0xDD + m];
+				}//end if(timerbase...
+			}// end  for(m..
+		}// end if timer...
+		timerflags = timerflags>>1;
+	}//end for (n=...
 
-
-
-void LED_schalten(void)		// Schaltet die LEDs und kalkuliert den Zentral-Alarm
-{
 	
-	//LED  Ausgänge setzen
 		
-	spi_2_out(led_obj[2]& led_activ&(~eeprom[0xF9]|blink | quitted_obj[2]));
-	spi_2_out(led_obj[1]& led_activ&(~eeprom[0xF8]|blink | quitted_obj[1]));
-	spi_2_out(led_obj[0]& led_activ&(~eeprom[0xF7]|blink | quitted_obj[0]));
-//P0=led_obj[0]& led_activ&(~eeprom[0xF7]|blink | quitted_obj[0]);// debugausgabe
-
-	// Zentral Alarm kalkulieren
-	if(eeprom[0xED]&0x02 ){// Wenn zentralalarm aktiviert
-		if (((eeprom[0xF4]& led_obj[0]& ~quitted_obj[0])\
-			||(eeprom[0xF5]& led_obj[1]& ~quitted_obj[1])\
-			||(eeprom[0xF6]& led_obj[2]& ~quitted_obj[2])))//wenn jeweils aktiviert, eingetroffen und nicht quittiert...
-			{
-			if(!zentral_alarm_obj && !(blocked_obj &&((eeprom[0xEE]&0x34)>=0x14 ))){// wenn noch nicht gesetzt und nicht gesperrt...
-				zentral_alarm_obj =1;
-				send_obj_value(25);
-			}
-		}
-		else
-		{									// zentralalarm automatisch zurücknehmen wenn so parametriert
-			if(zentral_alarm_obj && eeprom[0xED]&0x04){
-				zentral_alarm_obj =0;
-				send_obj_value(25);
-			}
-		}	
-	}	
-
+	// ab Hier die aktion...
+	 //				######  checken der update flags  #####
+	 
+	 for (n=0;n<=9;n++)// die 10 Wertobjekte testen ob sie gesendet werden sollen
+	 {
+		// zyclisches senden parameter m ab 0xDA je 2 bit. T1..3 H1..3 wind-avg, wind-böe,windrichtung,regen
+		 m=(eeprom[0xDA+(n/4)]>>shift_at_2bit[n])&0x03;// m hier der zycl senden mode
+		 if (((updated_objects&(1<<n))&& (m==1 ||(m==2 && timercnt[objno_timerno[n]]==0)))||
+				 (m==3 && timercnt[objno_timerno[n]]==0))
+		 {
+			 if(send_obj_value(n))updated_objects &= ~(1<<n);// Bei erfolgreichem Eintrag in den Ringspeicher löschen
+		 }
+	 }
+	
+		
 }
 
-void spi_2_out(unsigned char daten)
-{
 
-	unsigned char n;
-		
-	WRITE=0;
-	CLK=0;
-	for(n=0;n<=7;n++){
 
-		DATAOUT=(daten & 0x080)>>7;
-		daten<<=1;
-		CLK=1;
-		CLK=1;
-		CLK=1;
-		CLK=0;
-	}
-	WRITE=1;
-	DATAOUT=0;
-	DATAOUT=0;
-	WRITE=0;
 
-}
+
+
+
 
 
 
@@ -445,17 +438,17 @@ void bus_return(void)		// Aktionen bei Busspannungswiederkehr
 void restart_app(void)		// Alle Applikations-Parameter zurücksetzen
 
 {
+	unsigned char n;
+
 	P0=0;
 	P0M1=0x00;		// Port 0 Modus push-pull für Ausgang
-	P0M2=0x7F;		//alle ausser io7 push-pull
+	P0M2=0x00;		//alle ausser io7 push-pull
  
 
 
 	
 	ET0=0;			// Interrupt für Timer 0 sperren
 
-//	zf_state=0x00;		// Zustand der Zusatzfunktionen 1-4
-//	blocked=0x00;		// Ausgänge nicht gesperrt
 	timer=0;			// Timer-Variable, wird alle 130ms inkrementiert
   
 	
@@ -464,13 +457,7 @@ void restart_app(void)		// Alle Applikations-Parameter zurücksetzen
 	WRITE_BYTE(0x01,0x03,0x00)	// Herstellercode 0x004C = Bosch
 	WRITE_BYTE(0x01,0x04,0x4C)
 
-
 				
-	//WRITE_BYTE(0x01,0x05,0x04)	// Devicetype 0x0410 = Bosch Meldetableau ID 1040
-	//WRITE_BYTE(0x01,0x06,0x10)
-
-
-	//WRITE_BYTE(0x01,0x07,0x01)	// Versionnumber of application programm
 
 	WRITE_BYTE(0x01,0x0C,0x00)	// PORT A Direction Bit Setting
 	WRITE_BYTE(0x01,0x0D,0xFF)	// Run-Status (00=stop FF=run)
@@ -501,21 +488,22 @@ void restart_app(void)		// Alle Applikations-Parameter zurücksetzen
 	EX0=1;// EX0 interrupt einschalten
 
 	EA=1;						// Interrupts freigeben
-	blink=0;					// init  pattern der Blinkanzeige
 	
 	RTCCON=0x60;		// RTC anhalten und Flag löschen
-	RTCH=0x16;			// reload Real Time Clock
-	RTCL=0x80;			//100ms laden
+	RTCH=0xE1;//16;			// reload Real Time Clock
+	RTCL=0x00;//80;		1s	//100ms laden
 	RTCCON=0x61;		// RTC starten
 
-	beep_state=0;
-	timercnt[0]=1;
-	timercnt[1]=1;
+	for(n=0;n<=3;n++)// die 4 timer basen laden
+	{
+		timerbase[n]=(eeprom[0xD8]>>shift_at_2bit[n])&0x03;
+	}
+//	timercnt[0]=1;
+//	timercnt[1]=1;
 	
-//	TR0=0;
+	TR0=0;
 	TMOD=(TMOD & 0xF0) + 9;			// Timer 0 als gate gesteuerter 16Bit counter
 	TAMOD=0x01;
-	hell_stellen();
 	TH0=0;
 	TL0=0;
 //	AUXR1|=0x10;	// PWM von Timer 0 auf Pin ausgeben
@@ -523,12 +511,10 @@ void restart_app(void)		// Alle Applikations-Parameter zurücksetzen
 	TR0=1;
 
 	
-	QUIT=1;				// Pin als Eingang schalten um Taster abzufragen
-	led_activ=0xFF;
 	
-	Count=0;
 	stream_bit_ctr=0;
 	stream_no=0;
 	stream_arrived=0;
 	
+	id_counter=0;
 }// Ende restart app

@@ -19,7 +19,7 @@
 
 // Adressen zum speichern von Applikations Daten
 #define PORTSAVE	0x99	// Portzustände
-#define TIMERANZ	0x02	// timeranzahl
+#define TIMERANZ	0x04	// timeranzahl
 
 
 
@@ -29,43 +29,39 @@
 		//P0= oldportbuffer;	// refresh des Portzustandes in der hal
 							// für astabile Relaise 
 // SPI Konfiguration
-#define CLK			P0_1
-#define DATAOUT		P0_0
-#define WRITE		P0_2
-#define beep_port	P0_6//P1_2
-#define QUIT		P0_7//P1_3
-#define IDATA_START 0xFE-16
+#define IDATA_START 0xFE-37
 extern 	__bit portchanged;// globale variable, sie ist 1 wenn sich portbuffer geändert hat
 extern unsigned char portbuffer;
 
-extern unsigned char led_obj[3];
-extern unsigned char led_hell_obj;
-extern unsigned char quitted_obj[3];
-extern __bit zentral_alarm_obj,reset_obj;
-extern unsigned char blink;
-extern unsigned char t0_div;
 
 extern const unsigned int timerflagmask[];
 extern const unsigned char bitmask_1[];
 extern const unsigned char bitmask_0[];
-extern const unsigned char bitmask_11[];
-extern unsigned char __idata __at IDATA_START stream[];
+extern const unsigned char shift_at_2bit[];
+extern unsigned char __idata __at IDATA_START+21 stream[];
 extern unsigned char stream_ptr;		
 extern unsigned char stream_bit_ctr;
 extern __bit stream_comming_in;
 extern __bit stream_arrived;
+extern unsigned int updated_objects;
+extern unsigned short __idata __at IDATA_START+13 wind_angle;
+
+
+
+
 
 void timer0_int(void) __interrupt (1);
 void EX0_int (void) __interrupt(0);
 __bit checksume(unsigned char package_nomber); // prüft die checksume,gibt 1 zurück wenn ok.
+int eis5conversion(signed int zahl);
 void delay_timer(void);		// zählt alle 130ms die Variable Timer hoch und prüft Queue
-void LED_schalten(void);	// Ausgänge schalten
-void spi_2_out(unsigned char daten);
-//unsigned int sort_output(unsigned char portbuffer);
 void bus_return(void);		// Aktionen bei Busspannungswiederkehr
 void restart_app(void);		// Alle Applikations-Parameter zurücksetzen
-unsigned long read_obj_value(unsigned char objno);	// gibt den Wert eines Objektes zurueck
+unsigned long read_obj_value(unsigned char objno);	// gibt den Wert eines Objektes konvertiert zurueck
+int read_obj_data(unsigned char objno);// gibt den Wert eines Objektes in Rohdaten zurueck
 void write_obj_value(unsigned char objno,unsigned int objvalue);	// schreibt den aktuellen Wert eines Objektes ins 'USERRAM'
-void hell_stellen (void);// stellt die Helligkeit der LEDs ein
-void erease_alarm(__bit value);
+void update(void);
+void sendbychange(unsigned char objno,unsigned char val);
+void write_send(unsigned char objno,unsigned int value);
+
 #endif
