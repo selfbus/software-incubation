@@ -25,9 +25,9 @@
 //#include "../com/debug.c"
 #include "../com/fb_rs232.h"
 #include"../com/watchdog.h"
-#include"../com/watchdog.c"
+//#include"../com/watchdog.c"
 
-#define debugmode
+//#define debugmode
 #define TYPE 0
 #define VERSION 0
 /** 
@@ -52,11 +52,11 @@ void main(void)
 	cal=trimsave;
 	TRIM = TRIM+trimsave;
 	
-//#ifndef debugmode
-//	RS_INIT_600
-//#else
+#ifndef debugmode
+	RS_INIT_600
+#else
 	RS_INIT_115200
-//#endif
+#endif
 
 	SBUF=0x55;
 
@@ -69,15 +69,16 @@ void main(void)
 		TR0=1;					// Timer 0 starten
 		while(!TF0);
 	}
-	watchdog_init();
-	watchdog_start();
+	WATCHDOG_INIT //watchdog_init();
+	WATCHDOG_START //watchdog_start();
 
 	restart_app();							// Anwendungsspezifische Einstellungen zuruecksetzen
 	bus_return();							// Aktionen bei Busspannungswiederkehr
+	keypad_init();							// keyboard interrupt initialisieren
 
 	do  {
 		
-	//watchdog_feed();	
+	WATCHDOG_FEED //watchdog_feed();	
 
 		if(stream_arrived && !TR0)
 		{
@@ -85,7 +86,7 @@ void main(void)
 			stream_arrived=0;
 		}
 	 if(APPLICATION_RUN) {	// nur wenn run-mode gesetzt
-		 
+		EKBI = 1; // wenn die aplikation  läuft keyboard int einschalten
 	 	if (RTCCON &0x80)
 	 	{	
 		delay_timer();
@@ -224,7 +225,8 @@ void main(void)
 		
 				
 		}// end if(runstate)
-		
+		else   EKBI = 0; // wenn die aplikation nicht läuft keyboard int abschalten
+	
 		
 		n= tx_buffer[(tx_nextsend-1)&0x07];//n ist die letzte objno
 		if (tel_arrived || (n==25 && tel_sent)) { // 

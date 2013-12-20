@@ -46,12 +46,22 @@ extern __bit stream_arrived;
 extern unsigned int updated_objects;
 extern unsigned short __idata __at IDATA_START+13 wind_angle;
 
+extern volatile unsigned char precounter0;
+extern volatile unsigned char precounter1;
+extern volatile unsigned char precounter2;
+extern unsigned char debugport;
+void keypad_isr  (void) __interrupt (7);
+
+
+
 
 
 
 
 void timer0_int(void) __interrupt (1);
 void EX0_int (void) __interrupt(0);
+void keypad_init(void);
+
 __bit checksume(unsigned char package_nomber); // prüft die checksume,gibt 1 zurück wenn ok.
 int eis5conversion(signed int zahl);
 void delay_timer(void);		// zählt alle 130ms die Variable Timer hoch und prüft Queue

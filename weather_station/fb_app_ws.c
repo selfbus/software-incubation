@@ -42,9 +42,10 @@ unsigned char __idata __at IDATA_START+21 stream[15];
 __bit stream_comming_in;
 __bit stream_arrived;
 __bit rain;
+unsigned long avg_tmp;
+
 unsigned char stream_bit_ctr;
 unsigned char stream_no;
-unsigned char id_counter;
 unsigned char id[4];
 unsigned int updated_objects;
 signed int __idata __at IDATA_START temp[3];
@@ -60,6 +61,48 @@ const unsigned char bitmask_1[]={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
 const unsigned char bitmask_0[]={0xFE,0xFD,0xFB,0xF7,0xEF,0xDF,0xBF,0x7F};
 const unsigned char shift_at_2bit[]={0,2,4,6,0,2,4,6,0,2};
 const unsigned char objno_timerno[]={0,0,0,1,1,1,2,2,2,3};
+
+volatile unsigned char precounter0;
+volatile unsigned char precounter1;
+volatile unsigned char precounter2;
+volatile __bit counted0;
+volatile __bit counted1;
+volatile __bit counted2;
+volatile __bit counted3;
+
+
+void keypad_isr  (void) __interrupt (7)
+{
+	unsigned char keybuffer;
+ // clear interrupt flag
+ KBCON = 0;//0xFE;
+ keybuffer=~P0;
+ if(keybuffer&0x01 && !counted0){
+	  precounter0++;
+	  counted0=1;
+ }
+ if(!(keybuffer&0x01))counted0=0;
+
+ if(keybuffer&0x02 && !counted1){
+	  precounter1++;
+	  counted1=1;
+ }
+ if(!(keybuffer&0x02))counted1=0;
+
+ if(keybuffer&0x04 && !counted2){
+	  precounter2++;
+	  counted2=1;
+ }
+ if(!(keybuffer&0x04))counted2=0;
+ 
+ if((__bit)(keybuffer&0x08) != rain ^(__bit)(eeprom[0xE2]&0x04))
+ {
+	  rain = !rain;
+	  updated_objects |=0x400;
+ }
+
+  KBPATN=~keybuffer;
+}
 
 
 
@@ -182,18 +225,26 @@ void update(void)// update der Objekte nach Funk Telegramm Empfang
 					switch(stream[p_no+1]&0x70)
 					{
 					case 0x10:
-						wind_speed_av=stream[p_no+3]*50;
-						updated_objects |= 0x40;
+						if(!(eeprom[0xD7]&0x10))
+							{
+							wind_speed_av=stream[p_no+3]*50;
+							updated_objects |= 0x40;
+							}
 					break;
 					case 0x70:
-						wind_angle=(stream[p_no+2]<<1)+(stream[p_no+1]>>7);
+						if(!(eeprom[0xD7]&0x20))
+						{
 						wind_speed_max=stream[p_no+3]*50;
+						}
+						wind_angle=(stream[p_no+2]<<1)+(stream[p_no+1]>>7);
 						updated_objects|= 0x0180;
 					break;
 					case 0x30:
+						if(!(eeprom[0xD7]&0x40))
+						{
 						rain_value=(((stream[p_no+3]<<8)+stream[p_no+2]))-rain_offset;
-						//rain_value=(((stream[p_no+3]<<8)+stream[p_no+2]));
 						updated_objects |= 0x200;
+						}
 					break;
 					default:
 						
@@ -209,6 +260,7 @@ void update(void)// update der Objekte nach Funk Telegramm Empfang
 					else
 					{
 						temp[channel-1]=((((int)stream[p_no+2])<<4)+(stream[p_no+1]>>4))*10;// temperatur
+
 					}
 					updated_objects |= bitmask_1[channel-1];// bit 0-2
 					updated_objects|= bitmask_1[channel+2];// bit 3-5
@@ -259,15 +311,51 @@ void read_value_req(unsigned char objno)
 {
   send_obj_value(objno+64); // die 64 macht ein response Telegramm daraus
 }
+
+
 int read_obj_data(unsigned char objno)
+// lesen der Objektwerte in 0,01 digits
+// bzw bitformat
+// wird von read_obj_value zum senden gelesen, sowie zum Vergleichen der Grenzwerte
 {
-	unsigned int ret_val=0;
-	if (objno<=2)ret_val=temp[objno];
+	signed int ret_val=0,tmp;
+
+	if (objno<=2)
+	{
+		ret_val= temp[objno];//°C
+		if((eeprom[0xE8]&0x20))//°K
+			ret_val=ret_val+27315;
+		if((eeprom[0xE8]&0x10))//°K
+		{
+			tmp=ret_val/5;// wir müssen erst teilen sonst >35° overflow
+			tmp=tmp*9;
+			ret_val=tmp+3200;
+		}
+	}
+	
 	if(objno>=3 && objno<=5)ret_val=humidity[objno-3];
 	if(objno==6)ret_val=wind_speed_av;
 	if(objno==7)ret_val=wind_speed_max;
+	if (objno>=6 && objno<=7)
+	{
+		if((eeprom[0xE8]&0xC0))// wenn als Einheit km/h gewählt..
+		{
+			tmp=ret_val*3;
+			ret_val=tmp+(tmp/5);// =*3,6
+		}
+		if((eeprom[0xE8]&0x80))// wenn als Einheit kn gewählt..
+		{
+			tmp=ret_val/2;
+			ret_val=tmp+(ret_val>>3);// *.5125 (korrekt 0.5144)
+		}
+		if((eeprom[0xE8]&0xC0)==0xc0)// wenn als Einheit bft gewählt..
+		{
+			ret_val=ret_val/5;//
+		}
+		
+	}
 	if(objno==8)ret_val=wind_angle;
-	if(objno==9)ret_val=rain_value*25;
+	if(objno==9) ret_val=rain_value*25;
 	if(objno==10)ret_val=rain;
 	if(objno>=11 && objno<=18)
 		{
@@ -297,7 +385,7 @@ unsigned long read_obj_value(unsigned char objno)	// gibt den Wert eines Objekte
 			returnvalue=x*2 + x/2 + x/20;
 		}
 		else returnvalue=eis5conversion(read_obj_data(objno));
-	return (long)returnvalue;
+	return returnvalue;
 }
 
 
@@ -310,6 +398,7 @@ unsigned char obj,group;
 	{
 		if (!objvalue)rain_offset+=rain_value;
 	}
+	if(objno==10)rain=objvalue;
 	if (objno>=11&& objno<=18)
 	{
 		if (objvalue)GW_1_8 |= bitmask_1[objno-11];
@@ -338,9 +427,10 @@ signed int eis5conversion(signed int zahl)// wandelt 32 bit var in eis5 um
 	{
 		while (zahl < -2048){//solange Mantisse größer 11 Bit
 			zahl=zahl >> 1;// Mantisse /2
-			zahl=zahl|0x8000;
+			zahl=zahl|0x8000;// signed bit reparieren
 			exp++;// und exponent um 1 erhöhen (ist ein 2^exp)
 		}
+		zahl=zahl & 0x87FF;
 	}
  	return ((signed int)zahl|(exp<<11));// exponent dazu.
 }
@@ -360,7 +450,7 @@ void write_send(unsigned char objno,unsigned int value){
 
 void delay_timer(void)	// zählt alle 0,1s die Variable Timer hoch 
 {
-	unsigned char objno,n,m;
+	unsigned char objno,n,m,tmp;
 	unsigned int timerflags;
 	objno;n;m;
 	
@@ -399,18 +489,64 @@ void delay_timer(void)	// zählt alle 0,1s die Variable Timer hoch
 		
 	// ab Hier die aktion...
 	 //				######  checken der update flags  #####
-	 
-	 for (n=0;n<=9;n++)// die 10 Wertobjekte testen ob sie gesendet werden sollen
-	 {
-		// zyclisches senden parameter m ab 0xDA je 2 bit. T1..3 H1..3 wind-avg, wind-böe,windrichtung,regen
-		 m=(eeprom[0xDA+(n/4)]>>shift_at_2bit[n])&0x03;// m hier der zycl senden mode
-		 if (((updated_objects&(1<<n))&& (m==1 ||(m==2 && timercnt[objno_timerno[n]]==0)))||
-				 (m==3 && timercnt[objno_timerno[n]]==0))
+	
+	for (n=0;n<=9;n++)// die 10 Wertobjekte testen ob sie gesendet werden sollen
+	{
+	// zyclisches senden parameter m ab 0xDA je 2 bit. T1..3 H1..3 wind-avg, wind-böe,windrichtung,regen
+		m=(eeprom[0xDA+(n/4)]>>shift_at_2bit[n])&0x03;// m hier der zycl senden mode
+		if (((updated_objects&(1<<n))&& (m==1 ||(m==2 && timercnt[objno_timerno[n]]==0)))||
+			 (m==3 && timercnt[objno_timerno[n]]==0))
+		{
+			if(send_obj_value(n))updated_objects &= ~(1<<n);// Bei erfolgreichem Eintrag in den Ringspeicher löschen
+		}
+	}
+	 // bearbeiten der precounter bei impulszählung
+	 // wenn precounter was gezählt hat und keine Löschanforderung besteht
+	m=eeprom[0xD9];
+	if(eeprom[0xD7]&0x10)// wenn wind_avg auf Impulszählung
+	{	// Torzeit 1 sekunden
+
+		 tmp=precounter0;
+		 precounter0=0;
+		 avg_tmp=(avg_tmp <<8)- avg_tmp;
+		 if(m)avg_tmp += ((tmp*m)<<8);// Berechnung Universal
+		 else avg_tmp += ((long)((tmp+2)*34)<<8);// Berechnung für Eltako Windmesser
+		 avg_tmp=avg_tmp>>8;
+		 wind_speed_av = (int)(avg_tmp>>8);
+	}
+
+	if(eeprom[0xD7]&0x20)// wenn wind_böe auf Impulszählung
+	{
+		 tmp=precounter1;
+		 precounter1=0;
+		 if(m)wind_speed_max =tmp*m;// Berechnung Universal
+		 else if(tmp)
+			 wind_speed_max = (tmp+2)*34;// Berechnung für Eltako Windmesser
+		 else wind_speed_max=0;
+	 }
+//  Regen
+		tmp=precounter2;
+		precounter2=0;
+		if(eeprom[0xD7]&0x40)// wenn Regenmenge auf Impulszählung
+		{ 
+//			if(m) rain_value = rain_value + (tmp *m); //kein Feld in der vd vorhanden
+//			else
+//			{
+				if ((rain_offset %5)==0)rain_value +=tmp;
+				else rain_value = rain_value +tmp+tmp;
+//			}
+		}
+
+	 // checken des Regensensors:
+	 if (eeprom[0xD7]&0x04)
+	 {	
+		 if(updated_objects & 0x400)
 		 {
-			 if(send_obj_value(n))updated_objects &= ~(1<<n);// Bei erfolgreichem Eintrag in den Ringspeicher löschen
+			 if(send_obj_value(10)){
+				 updated_objects &= ~0x400;// Bei erfolgreichem Eintrag in den Ringspeicher löschen
+			 }
 		 }
 	 }
-	
 		
 }
 
@@ -418,6 +554,23 @@ void delay_timer(void)	// zählt alle 0,1s die Variable Timer hoch
 
 
 
+void keypad_init  (void)// Eingänge 0,2 Zähler. Eingänge 1,3 Tarifumschaltung
+{
+
+  // define pattern
+  KBPATN = 0x0F;
+  // define P0 pins that trigger interrupt
+  KBMASK = 0x0F;
+  // pattern must different
+  KBCON = 0x00;
+
+  // set isr priority to 0
+  IP1 &= 0xFD;
+  IP1H &= 0xFD;
+
+  // enable keypad interrupt
+  EKBI = 1;
+}
 
 
 
@@ -440,9 +593,9 @@ void restart_app(void)		// Alle Applikations-Parameter zurücksetzen
 {
 	unsigned char n;
 
-	P0=0;
-	P0M1=0x00;		// Port 0 Modus push-pull für Ausgang
-	P0M2=0x00;		//alle ausser io7 push-pull
+	P0M1=0x00;		// Port 0 Modus 
+	P0M2=0x00;		//alle auf bidirektional
+	P0=0xFF;
  
 
 
@@ -516,5 +669,4 @@ void restart_app(void)		// Alle Applikations-Parameter zurücksetzen
 	stream_no=0;
 	stream_arrived=0;
 	
-	id_counter=0;
 }// Ende restart app
