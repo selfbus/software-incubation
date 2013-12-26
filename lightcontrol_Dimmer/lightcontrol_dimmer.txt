@@ -1,0 +1,828 @@
+Geräteübersicht
+---------------------------------
+
+Product Name ............ : Steuereinheit 3fach REG
+Serial Number ........... : 4 // 2193REG
+BCU Typ ................. : BCU 1
+Manufacturer ............ : Albrecht Jung
+Manufacturer ID ......... : 0x04
+Device Type ............. : 0x3018
+Commstab Address ........ : 0x8A
+
+
+Application Program 2039469  Steuereinheit 301801
+---------------------------------------------------------------------------------------------------
+
+0x01C2  BIT 0-2  Ausgang 1   Grundhelligkeit (Helligkeitswert = 1)\r\n(abhängig vom Leuchtmittel)
+0      Stufe 1 (Steuerspannung ca. 0,6 V)
+1      Stufe 2 (Steuerspannung ca. 1,2 V)
+2      Stufe 3 (Steuerspannung ca. 1,8 V)
+3      Stufe 4 (Steuerspannung ca. 2,4 V)
+4      Stufe 5 (Steuerspannung ca. 3,0 V)
+5      Stufe 6 (Steuerspannung ca. 3,6 V)
+6      Stufe 7 (Steuerspannung ca. 4,2 V)
+7      Stufe 8 (Steuerspannung ca. 4,8 V)
+
+0x01C2  BIT 4-6  Ausgang 2   Grundhelligkeit (Helligkeitswert = 1)\r\n(abhängig vom Leuchtmittel)
+0      Stufe 1 (Steuerspannung ca. 0,6 V)
+1      Stufe 2 (Steuerspannung ca. 1,2 V)
+2      Stufe 3 (Steuerspannung ca. 1,8 V)
+3      Stufe 4 (Steuerspannung ca. 2,4 V)
+4      Stufe 5 (Steuerspannung ca. 3,0 V)
+5      Stufe 6 (Steuerspannung ca. 3,6 V)
+6      Stufe 7 (Steuerspannung ca. 4,2 V)
+7      Stufe 8 (Steuerspannung ca. 4,8 V)
+
+0x01C3  BIT 0-2  Ausgang 3   Grundhelligkeit (Helligkeitswert = 1)\r\n(abhängig vom Leuchtmittel)
+0      Stufe 1 (Steuerspannung ca. 0,6 V)
+1      Stufe 2 (Steuerspannung ca. 1,2 V)
+2      Stufe 3 (Steuerspannung ca. 1,8 V)
+3      Stufe 4 (Steuerspannung ca. 2,4 V)
+4      Stufe 5 (Steuerspannung ca. 3,0 V)
+5      Stufe 6 (Steuerspannung ca. 3,6 V)
+6      Stufe 7 (Steuerspannung ca. 4,2 V)
+7      Stufe 8 (Steuerspannung ca. 4,8 V)
+
+0x01C3  BIT 3-3  A 1, Sperren   Funktion des Sperrobjekts
+0      nicht invertiert (sperren = 1; Freigabe = 0)
+1      invertiert (sperren = 0; Freigabe = 1)
+
+0x01C3  BIT 4-4  A 2, Sperren   Polarität des Sperrobjekts
+0      nicht invertiert (sperren = 1; Freigabe = 0)
+1      invertiert (sperren = 0; Freigabe = 1)
+
+0x01C3  BIT 5-5  A 3, Sperren   Polarität des Sperrobjekts
+0      nicht invertiert (sperren = 1; Freigabe = 0)
+1      invertiert (sperren = 0; Freigabe = 1)
+
+0x01C4  BIT 0-3  Ausgang 1   Einschalthelligkeit: Einschalten auf
+1      Grundhelligkeit
+2      10 %
+3      20 %
+4      30 %
+5      40 %
+6      50 %
+7      60 %
+8      70 %
+9      80 %
+10     90 %
+11     maximale Helligkeit
+13     Helligkeitswert vor letztem Ausschalten
+
+0x01C4  BIT 4-7  Ausgang 2   Einschalthelligkeit: Einschalten auf
+1      Grundhelligkeit
+2      10 %
+3      20 %
+4      30 %
+5      40 %
+6      50 %
+7      60 %
+8      70 %
+9      80 %
+10     90 %
+11     maximale Helligkeit
+13     Helligkeitswert vor letztem Ausschalten
+
+0x01C5  BIT 0-3  Ausgang 3   Einschalthelligkeit: Einschalten auf
+1      Grundhelligkeit
+2      10 %
+3      20 %
+4      30 %
+5      40 %
+6      50 %
+7      60 %
+8      70 %
+9      80 %
+10     90 %
+11     maximale Helligkeit
+13     Helligkeitswert vor letztem Ausschalten
+
+0x01C5  BIT 4-6  A 3, Ausschaltfunktion   Verzögerung bis zum Ausschalten  Basis
+1      0,5 ms
+2      8 ms
+3      130 ms
+4      2,1 s
+5      33 s
+
+0x01C5  BIT 7-7  Ausgang 3, Freigabe   Ausschaltfunktion ?
+0      NEIN
+1      JA
+
+0x01C6  BIT 0-2  Ausgang 1   Zeit zwischen 2 von 255 Dimmstufen Basis
+1      0,5 ms
+2      8 ms
+3      130 ms
+4      2,1 s
+5      33 s
+
+0x01C6  BIT 3-3  Ausgang 1   Verhalten beim Empfang eines Wertes
+0      Helligkeitswert andimmen
+1      Helligkeitswert anspringen
+
+0x01C6  BIT 4-6  Ausgang 2   Zeit zwischen 2 von 255 Dimmstufen Basis
+1      0,5 ms
+2      8 ms
+3      130 ms
+4      2,1 s
+5      33 s
+
+0x01C6  BIT 7-7  Ausgang 2   Verhalten beim Empfang eines Wertes
+0      Helligkeitswert andimmen
+1      Helligkeitswert anspringen
+
+0x01C7  BIT 0-2  Ausgang 3   Zeit zwischen 2 von 255 Dimmstufen Basis
+1      0,5 ms
+2      8 ms
+3      130 ms
+4      2,1 s
+5      33 s
+
+0x01C7  BIT 3-3  Ausgang 3   Verhalten beim Empfang eines Wertes
+0      Helligkeitswert andimmen
+1      Helligkeitswert anspringen
+
+0x01C7  BIT 4-6  "Soft-EIN"-Funktion ?   Soft-EIN - Zeit für eine Dimmstufe Basis
+1      0,5 ms
+2      8 ms
+3      130 ms
+4      2,1 s
+5      33 s
+
+0x01C8  BIT 0-7  Ausgang 1   Zeit zwischen 2 von 255 Dimmstufen Faktor (3...255)
+
+0x01C9  BIT 0-7  Ausgang 2   Zeit zwischen 2 von 255 Dimmstufen Faktor (3...255)
+
+0x01CA  BIT 0-7  Ausgang 3   Zeit zwischen 2 von 255 Dimmstufen Faktor (3...255)
+
+0x01CB  BIT 0-7  A 1, Ausschaltfunktion   Ausschalten bei Helligkeit kleiner als
+13     5 % (entspricht Helligkeitswert = 13)
+25     10 % (entspricht Helligkeitswert = 25)
+38     15 % (entspricht Helligkeitswert = 38)
+51     20 % (entspricht Helligkeitswert = 51)
+64     25 % (entspricht Helligkeitswert = 64)
+77     30 % (entspricht Helligkeitswert = 77)
+89     35 % (entspricht Helligkeitswert = 89)
+102    40 % (entspricht Helligkeitswert = 102)
+115    45 % (entspricht Helligkeitswert = 115)
+127    50 % (entspricht Helligkeitswert = 127)
+140    55 % (entspricht Helligkeitswert = 140)
+153    60 % (entspricht Helligkeitswert = 153)
+166    65 % (entspricht Helligkeitswert = 166)
+179    70 % (entspricht Helligkeitswert = 179)
+191    75 % (entspricht Helligkeitswert = 191)
+204    80 % (entspricht Helligkeitswert = 204)
+217    85 % (entspricht Helligkeitswert = 217)
+230    90 % (entspricht Helligkeitswert = 230)
+242    95 % (entspricht Helligkeitswert = 242)
+255    max. Helligkeit (entspricht Helligkeitswert = 255)
+
+0x01CC  BIT 0-7  A 2, Ausschaltfunktion   Ausschalten bei Helligkeit kleiner als
+13     5 % (entspricht Helligkeitswert = 13)
+25     10 % (entspricht Helligkeitswert = 25)
+38     15 % (entspricht Helligkeitswert = 38)
+51     20 % (entspricht Helligkeitswert = 51)
+64     25 % (entspricht Helligkeitswert = 64)
+77     30 % (entspricht Helligkeitswert = 77)
+89     35 % (entspricht Helligkeitswert = 89)
+102    40 % (entspricht Helligkeitswert = 102)
+115    45 % (entspricht Helligkeitswert = 115)
+127    50 % (entspricht Helligkeitswert = 127)
+140    55 % (entspricht Helligkeitswert = 140)
+153    60 % (entspricht Helligkeitswert = 153)
+166    65 % (entspricht Helligkeitswert = 166)
+179    70 % (entspricht Helligkeitswert = 179)
+191    75 % (entspricht Helligkeitswert = 191)
+204    80 % (entspricht Helligkeitswert = 204)
+217    85 % (entspricht Helligkeitswert = 217)
+230    90 % (entspricht Helligkeitswert = 230)
+242    95 % (entspricht Helligkeitswert = 242)
+255    max. Helligkeit (entspricht Helligkeitswert = 255)
+
+0x01CD  BIT 0-7  A 3, Ausschaltfunktion   Ausschalten bei Helligkeit kleiner als
+13     5 % (entspricht Helligkeitswert = 13)
+25     10 % (entspricht Helligkeitswert = 25)
+38     15 % (entspricht Helligkeitswert = 38)
+51     20 % (entspricht Helligkeitswert = 51)
+64     25 % (entspricht Helligkeitswert = 64)
+77     30 % (entspricht Helligkeitswert = 77)
+89     35 % (entspricht Helligkeitswert = 89)
+102    40 % (entspricht Helligkeitswert = 102)
+115    45 % (entspricht Helligkeitswert = 115)
+127    50 % (entspricht Helligkeitswert = 127)
+140    55 % (entspricht Helligkeitswert = 140)
+153    60 % (entspricht Helligkeitswert = 153)
+166    65 % (entspricht Helligkeitswert = 166)
+179    70 % (entspricht Helligkeitswert = 179)
+191    75 % (entspricht Helligkeitswert = 191)
+204    80 % (entspricht Helligkeitswert = 204)
+217    85 % (entspricht Helligkeitswert = 217)
+230    90 % (entspricht Helligkeitswert = 230)
+242    95 % (entspricht Helligkeitswert = 242)
+255    max. Helligkeit (entspricht Helligkeitswert = 255)
+
+0x01CE  BIT 0-2  A 1, Ausschaltfunktion   Verzögerung bis zum Ausschalten  Basis
+1      0,5 ms
+2      8 ms
+3      130 ms
+4      2,1 s
+5      33 s
+
+0x01CE  BIT 3-3  Ausgang 1, Freigabe   Ausschaltfunktion ?
+0      NEIN
+1      JA
+
+0x01CE  BIT 4-6  A 2, Ausschaltfunktion   Verzögerung bis zum Ausschalten  Basis
+1      0,5 ms
+2      8 ms
+3      130 ms
+4      2,1 s
+5      33 s
+
+0x01CE  BIT 7-7  Ausgang 2, Freigabe   Ausschaltfunktion ?
+0      NEIN
+1      JA
+
+0x01CF  BIT 0-7  A 1, Ausschaltfunktion   Verzögerung bis zum Ausschalten Faktor (3...255)
+
+0x01D0  BIT 0-7  A 2, Ausschaltfunktion   Verzögerung bis zum Ausschalten Faktor (3...255)
+
+0x01D1  BIT 0-7  A 3, Ausschaltfunktion   Verzögerung bis zum Ausschalten Faktor (3...255)
+
+0x01D2  BIT 0-2  "Soft-EIN"-Funktion ?   Soft-EIN - Zeit für eine Dimmstufe Basis
+1      0,5 ms
+2      8 ms
+3      130 ms
+4      2,1 s
+5      33 s
+
+0x01D2  BIT 4-6  "Soft-EIN"-Funktion ?   Soft-EIN - Zeit für eine Dimmstufe Basis
+1      0,5 ms
+2      8 ms
+3      130 ms
+4      2,1 s
+5      33 s
+
+0x01D3  BIT 0-7  "Soft-EIN"-Funktion ?   Soft-EIN - Zeit für eine Dimmstufe Faktor (3...255)
+
+0x01D4  BIT 0-7  "Soft-EIN"-Funktion ?   Soft-EIN - Zeit für eine Dimmstufe Faktor (3...255)
+
+0x01D5  BIT 0-7  "Soft-EIN"-Funktion ?   Soft-EIN - Zeit für eine Dimmstufe Faktor (3...255)
+
+0x01D6  BIT 0-2  "Soft-AUS"-Funktion ?   Soft-AUS - Zeit für eine Dimmstufe Basis
+1      0,5 ms
+2      8 ms
+3      130 ms
+4      2,1 s
+5      33 s
+
+0x01D6  BIT 4-6  "Soft-AUS"-Funktion ?   Soft-AUS - Zeit für eine Dimmstufe Basis
+1      0,5 ms
+2      8 ms
+3      130 ms
+4      2,1 s
+5      33 s
+
+0x01D7  BIT 0-7  "Soft-AUS"-Funktion ?   Soft-AUS - Zeit für eine Dimmstufe Faktor (3...255)
+
+0x01D8  BIT 0-7  "Soft-AUS"-Funktion ?   Soft-AUS - Zeit für eine Dimmstufe Faktor (3...255)
+
+0x01D9  BIT 0-7  "Soft-AUS"-Funktion ?   Soft-AUS - Zeit für eine Dimmstufe Faktor (3...255)
+
+0x01DA  BIT 0-2  Zeitdimmerfunktion aktivieren ?   Zeit zwischen EIN und AUS Basis
+1      0,5 ms
+2      8 ms
+3      130 ms
+4      2,1 s
+5      33 s
+
+0x01DA  BIT 3-3  A 1, Zeitfunktionen   Zeitdimmerfunktion aktivieren ?
+0      NEIN
+1      JA
+
+0x01DA  BIT 4-6  Zeitdimmerfunktion aktivieren ?   Zeit zwischen EIN und AUS Basis
+1      0,5 ms
+2      8 ms
+3      130 ms
+4      2,1 s
+5      33 s
+
+0x01DA  BIT 7-7  A 2, Zeitfunktionen   Zeitdimmerfunktion aktivieren ?
+0      NEIN
+1      JA
+
+0x01DB  BIT 0-2  Zeitdimmerfunktion aktivieren ?   Zeit zwischen EIN und AUS Basis
+1      0,5 ms
+2      8 ms
+3      130 ms
+4      2,1 s
+5      33 s
+
+0x01DB  BIT 3-3  A 3, Zeitfunktionen   Zeitdimmerfunktion aktivieren ?
+0      NEIN
+1      JA
+
+0x01DB  BIT 4-6  "Soft-AUS"-Funktion ?   Soft-AUS - Zeit für eine Dimmstufe Basis
+1      0,5 ms
+2      8 ms
+3      130 ms
+4      2,1 s
+5      33 s
+
+0x01DC  BIT 0-7  Zeitdimmerfunktion aktivieren ?   Zeit zwischen EIN und AUS Faktor (3...255)
+
+0x01DD  BIT 0-7  Zeitdimmerfunktion aktivieren ?   Zeit zwischen EIN und AUS Faktor (3...255)
+
+0x01DE  BIT 0-7  Zeitdimmerfunktion aktivieren ?   Zeit zwischen EIN und AUS Faktor (3...255)
+
+0x01DF  BIT 0-3  A 1, Sperren   Helligkeit zu Beginn der Sperrung
+0      AUS
+1      Grundhelligkeit
+2      10 %
+3      20 %
+4      30 %
+5      40 %
+6      50 %
+7      60 %
+8      70 %
+9      80 %
+10     90 %
+11     maximale Helligkeit
+12     keine Aktion
+13     Helligkeitswert vor letztem Ausschalten
+
+0x01DF  BIT 4-7  A 1, Sperren   Helligkeit am Ende der Sperrung
+0      AUS
+1      Grundhelligkeit
+2      10 %
+3      20 %
+4      30 %
+5      40 %
+6      50 %
+7      60 %
+8      70 %
+9      80 %
+10     90 %
+11     maximale Helligkeit
+12     keine Aktion
+13     Helligkeitswert vor letztem Ausschalten
+14     nachgeführter Helligkeitswert
+
+0x01E0  BIT 0-3  A 2, Sperren   Helligkeit zu Beginn der Sperrung
+0      AUS
+1      Grundhelligkeit
+2      10 %
+3      20 %
+4      30 %
+5      40 %
+6      50 %
+7      60 %
+8      70 %
+9      80 %
+10     90 %
+11     maximale Helligkeit
+12     keine Aktion
+13     Helligkeitswert vor letztem Ausschalten
+
+0x01E0  BIT 4-7  A 2, Sperren   Helligkeit am Ende der Sperrung
+0      AUS
+1      Grundhelligkeit
+2      10 %
+3      20 %
+4      30 %
+5      40 %
+6      50 %
+7      60 %
+8      70 %
+9      80 %
+10     90 %
+11     maximale Helligkeit
+12     keine Aktion
+13     Helligkeitswert vor letztem Ausschalten
+14     nachgeführter Helligkeitswert
+
+0x01E1  BIT 0-3  A 3, Sperren   Helligkeit zu Beginn der Sperrung
+0      AUS
+1      Grundhelligkeit
+2      10 %
+3      20 %
+4      30 %
+5      40 %
+6      50 %
+7      60 %
+8      70 %
+9      80 %
+10     90 %
+11     maximale Helligkeit
+12     keine Aktion
+13     Helligkeitswert vor letztem Ausschalten
+
+0x01E1  BIT 4-7  A 3, Sperren   Helligkeit am Ende der Sperrung
+0      AUS
+1      Grundhelligkeit
+2      10 %
+3      20 %
+4      30 %
+5      40 %
+6      50 %
+7      60 %
+8      70 %
+9      80 %
+10     90 %
+11     maximale Helligkeit
+12     keine Aktion
+13     Helligkeitswert vor letztem Ausschalten
+14     nachgeführter Helligkeitswert
+
+0x01E2  BIT 0-3  Ausgang 1   Verhalten bei Busspannungswiederkehr
+0      AUS
+1      Grundhelligkeit
+2      10 %
+3      20 %
+4      30 %
+5      40 %
+6      50 %
+7      60 %
+8      70 %
+9      80 %
+10     90 %
+11     maximale Helligkeit
+12     Helligkeitswert bei Busspannungsausfall
+
+0x01E2  BIT 4-7  Ausgang 2   Verhalten bei Busspannungswiederkehr
+0      AUS
+1      Grundhelligkeit
+2      10 %
+3      20 %
+4      30 %
+5      40 %
+6      50 %
+7      60 %
+8      70 %
+9      80 %
+10     90 %
+11     maximale Helligkeit
+12     Helligkeitswert bei Busspannungsausfall
+
+0x01E3  BIT 0-3  Ausgang 3   Verhalten bei Busspannungswiederkehr
+0      AUS
+1      Grundhelligkeit
+2      10 %
+3      20 %
+4      30 %
+5      40 %
+6      50 %
+7      60 %
+8      70 %
+9      80 %
+10     90 %
+11     maximale Helligkeit
+12     Helligkeitswert bei Busspannungsausfall
+
+0x01E3  BIT 4-4  A 1, Lichtszenen                    Speicherfunktion ?
+0      NEIN
+1      JA
+
+0x01E3  BIT 5-5  A 2, Lichtszenen                   Speicherfunktion ?
+0      NEIN
+1      JA
+
+0x01E3  BIT 6-6  A 3, Lichtszenen                   Speicherfunktion ?
+0      NEIN
+1      JA
+
+0x01E7  BIT 0-7  A 1, Lichtszenen                    Helligkeit bei Lichtszene 1
+0      AUS
+1      Grundhelligkeit
+25     10 %
+51     20 %
+77     30 %
+102    40 %
+127    50 %
+154    60 %
+179    70 %
+204    80 %
+230    90 %
+255    maximale Helligkeit
+
+0x01E8  BIT 0-7  A 1, Lichtszenen                    Helligkeit bei Lichtszene 2
+0      AUS
+1      Grundhelligkeit
+25     10 %
+51     20 %
+77     30 %
+102    40 %
+127    50 %
+154    60 %
+179    70 %
+204    80 %
+230    90 %
+255    maximale Helligkeit
+
+0x01E9  BIT 0-7  A 1, Lichtszenen                    Helligkeit bei Lichtszene 3
+0      AUS
+1      Grundhelligkeit
+25     10 %
+51     20 %
+77     30 %
+102    40 %
+127    50 %
+154    60 %
+179    70 %
+204    80 %
+230    90 %
+255    maximale Helligkeit
+
+0x01EA  BIT 0-7  A 1, Lichtszenen                    Helligkeit bei Lichtszene 4
+0      AUS
+1      Grundhelligkeit
+25     10 %
+51     20 %
+77     30 %
+102    40 %
+127    50 %
+154    60 %
+179    70 %
+204    80 %
+230    90 %
+255    maximale Helligkeit
+
+0x01EB  BIT 0-7  A 1, Lichtszenen                    Helligkeit bei Lichtszene 5
+0      AUS
+1      Grundhelligkeit
+25     10 %
+51     20 %
+77     30 %
+102    40 %
+127    50 %
+154    60 %
+179    70 %
+204    80 %
+230    90 %
+255    maximale Helligkeit
+
+0x01EC  BIT 0-7  A 1, Lichtszenen                    Helligkeit bei Lichtszene 6
+0      AUS
+1      Grundhelligkeit
+25     10 %
+51     20 %
+77     30 %
+102    40 %
+127    50 %
+154    60 %
+179    70 %
+204    80 %
+230    90 %
+255    maximale Helligkeit
+
+0x01ED  BIT 0-7  A 1, Lichtszenen                    Helligkeit bei Lichtszene 7
+0      AUS
+1      Grundhelligkeit
+25     10 %
+51     20 %
+77     30 %
+102    40 %
+127    50 %
+154    60 %
+179    70 %
+204    80 %
+230    90 %
+255    maximale Helligkeit
+
+0x01EE  BIT 0-7  A 1, Lichtszenen                    Helligkeit bei Lichtszene 8
+0      AUS
+1      Grundhelligkeit
+25     10 %
+51     20 %
+77     30 %
+102    40 %
+127    50 %
+154    60 %
+179    70 %
+204    80 %
+230    90 %
+255    maximale Helligkeit
+
+0x01EF  BIT 0-7  A 2, Lichtszenen                   Helligkeit bei Lichtszene 1
+0      AUS
+1      Grundhelligkeit
+25     10 %
+51     20 %
+77     30 %
+102    40 %
+127    50 %
+154    60 %
+179    70 %
+204    80 %
+230    90 %
+255    maximale Helligkeit
+
+0x01F0  BIT 0-7  A 2, Lichtszenen                   Helligkeit bei Lichtszene 2
+0      AUS
+1      Grundhelligkeit
+25     10 %
+51     20 %
+77     30 %
+102    40 %
+127    50 %
+154    60 %
+179    70 %
+204    80 %
+230    90 %
+255    maximale Helligkeit
+
+0x01F1  BIT 0-7  A 2, Lichtszenen                   Helligkeit bei Lichtszene 3
+0      AUS
+1      Grundhelligkeit
+25     10 %
+51     20 %
+77     30 %
+102    40 %
+127    50 %
+154    60 %
+179    70 %
+204    80 %
+230    90 %
+255    maximale Helligkeit
+
+0x01F2  BIT 0-7  A 2, Lichtszenen                   Helligkeit bei Lichtszene 4
+0      AUS
+1      Grundhelligkeit
+25     10 %
+51     20 %
+77     30 %
+102    40 %
+127    50 %
+154    60 %
+179    70 %
+204    80 %
+230    90 %
+255    maximale Helligkeit
+
+0x01F3  BIT 0-7  A 2, Lichtszenen                   Helligkeit bei Lichtszene 5
+0      AUS
+1      Grundhelligkeit
+25     10 %
+51     20 %
+77     30 %
+102    40 %
+127    50 %
+154    60 %
+179    70 %
+204    80 %
+230    90 %
+255    maximale Helligkeit
+
+0x01F4  BIT 0-7  A 2, Lichtszenen                   Helligkeit bei Lichtszene 6
+0      AUS
+1      Grundhelligkeit
+25     10 %
+51     20 %
+77     30 %
+102    40 %
+127    50 %
+154    60 %
+179    70 %
+204    80 %
+230    90 %
+255    maximale Helligkeit
+
+0x01F5  BIT 0-7  A 2, Lichtszenen                   Helligkeit bei Lichtszene 7
+0      AUS
+1      Grundhelligkeit
+25     10 %
+51     20 %
+77     30 %
+102    40 %
+127    50 %
+154    60 %
+179    70 %
+204    80 %
+230    90 %
+255    maximale Helligkeit
+
+0x01F6  BIT 0-7  A 2, Lichtszenen                   Helligkeit bei Lichtszene 8
+0      AUS
+1      Grundhelligkeit
+25     10 %
+51     20 %
+77     30 %
+102    40 %
+127    50 %
+154    60 %
+179    70 %
+204    80 %
+230    90 %
+255    maximale Helligkeit
+
+0x01F7  BIT 0-7  A 3, Lichtszenen                   Helligkeit bei Lichtszene 1
+0      AUS
+1      Grundhelligkeit
+25     10 %
+51     20 %
+77     30 %
+102    40 %
+127    50 %
+154    60 %
+179    70 %
+204    80 %
+230    90 %
+255    maximale Helligkeit
+
+0x01F8  BIT 0-7  A 3, Lichtszenen                   Helligkeit bei Lichtszene 2
+0      AUS
+1      Grundhelligkeit
+25     10 %
+51     20 %
+77     30 %
+102    40 %
+127    50 %
+154    60 %
+179    70 %
+204    80 %
+230    90 %
+255    maximale Helligkeit
+
+0x01F9  BIT 0-7  A 3, Lichtszenen                   Helligkeit bei Lichtszene 3
+0      AUS
+1      Grundhelligkeit
+25     10 %
+51     20 %
+77     30 %
+102    40 %
+127    50 %
+154    60 %
+179    70 %
+204    80 %
+230    90 %
+255    maximale Helligkeit
+
+0x01FA  BIT 0-7  A 3, Lichtszenen                   Helligkeit bei Lichtszene 4
+0      AUS
+1      Grundhelligkeit
+25     10 %
+51     20 %
+77     30 %
+102    40 %
+127    50 %
+154    60 %
+179    70 %
+204    80 %
+230    90 %
+255    maximale Helligkeit
+
+0x01FB  BIT 0-7  A 3, Lichtszenen                   Helligkeit bei Lichtszene 5
+0      AUS
+1      Grundhelligkeit
+25     10 %
+51     20 %
+77     30 %
+102    40 %
+127    50 %
+154    60 %
+179    70 %
+204    80 %
+230    90 %
+255    maximale Helligkeit
+
+0x01FC  BIT 0-7  A 3, Lichtszenen                   Helligkeit bei Lichtszene 6
+0      AUS
+1      Grundhelligkeit
+25     10 %
+51     20 %
+77     30 %
+102    40 %
+127    50 %
+154    60 %
+179    70 %
+204    80 %
+230    90 %
+255    maximale Helligkeit
+
+0x01FD  BIT 0-7  A 3, Lichtszenen                   Helligkeit bei Lichtszene 7
+0      AUS
+1      Grundhelligkeit
+25     10 %
+51     20 %
+77     30 %
+102    40 %
+127    50 %
+154    60 %
+179    70 %
+204    80 %
+230    90 %
+255    maximale Helligkeit
+
+0x01FE  BIT 0-7  A 3, Lichtszenen                   Helligkeit bei Lichtszene 8
+0      AUS
+1      Grundhelligkeit
+25     10 %
+51     20 %
+77     30 %
+102    40 %
+127    50 %
+154    60 %
+179    70 %
+204    80 %
+230    90 %
+255    maximale Helligkeit
+

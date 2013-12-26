@@ -60,7 +60,7 @@ unsigned char __idata __at IDATA_START+20 GW_9_16;
 const unsigned char bitmask_1[]={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
 const unsigned char bitmask_0[]={0xFE,0xFD,0xFB,0xF7,0xEF,0xDF,0xBF,0x7F};
 const unsigned char shift_at_2bit[]={0,2,4,6,0,2,4,6,0,2};
-const unsigned char objno_timerno[]={0,0,0,1,1,1,2,2,2,3};
+const unsigned char objno_timerno[]={0,0,0,1,1,1,2,2,2,3,3};
 
 volatile unsigned char precounter0;
 volatile unsigned char precounter1;
@@ -355,7 +355,11 @@ int read_obj_data(unsigned char objno)
 		
 	}
 	if(objno==8)ret_val=wind_angle;
-	if(objno==9) ret_val=rain_value*25;
+	if(objno==9)
+		{
+		if(eeprom[0xD7]&0x40)ret_val=rain_value;// wenn Regenmenge auf Impulszählung
+		else ret_val=rain_value*25;
+		}
 	if(objno==10)ret_val=rain;
 	if(objno>=11 && objno<=18)
 		{
@@ -527,21 +531,23 @@ void delay_timer(void)	// zählt alle 0,1s die Variable Timer hoch
 //  Regen
 		tmp=precounter2;
 		precounter2=0;
+		m=eeprom[0xD2];
 		if(eeprom[0xD7]&0x40)// wenn Regenmenge auf Impulszählung
 		{ 
-//			if(m) rain_value = rain_value + (tmp *m); //kein Feld in der vd vorhanden
-//			else
-//			{
-				if ((rain_offset %5)==0)rain_value +=tmp;
-				else rain_value = rain_value +tmp+tmp;
-//			}
+			if(m) rain_value = rain_value + m; //wenn ein Volumen angegeben für Alternativmessgerät
+			else
+			{								// sonst WS155 Berechnung
+			rain_value += 43;	// 5/6 * 0.5= 20.833
+//				if ((rain_offset %5)==0)rain_value +=tmp;
+//				else rain_value = rain_value +tmp+tmp;
+			}
 		}
 
 	 // checken des Regensensors:
 	 if (eeprom[0xD7]&0x04)
 	 {	
-		 if(updated_objects & 0x400)
-		 {
+		 if((updated_objects & 0x400)|| ((__bit)(eeprom[0xDC]&0x10)&& !timercnt[3]))
+		 {	// senden wenn sich geändert hat oder zyklisches senden aktiviert und Zeit abgelaufen ist
 			 if(send_obj_value(10)){
 				 updated_objects &= ~0x400;// Bei erfolgreichem Eintrag in den Ringspeicher löschen
 			 }
