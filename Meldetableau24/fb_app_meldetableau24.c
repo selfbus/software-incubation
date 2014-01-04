@@ -51,6 +51,7 @@ const unsigned char bitmask_1[]={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
 const unsigned char bitmask_0[]={0xFE,0xFD,0xFB,0xF7,0xEF,0xDF,0xBF,0x7F};
 
 
+// Version mit Schallwandler 
 
 void timer0_int  (void) __interrupt (1) {// Interrupt T0 für sound
 t0_div++;
@@ -58,6 +59,15 @@ if(t0_div & beep_req)beep_port=1;
 else beep_port=0;
 } // timer0_int
 
+
+// Version mit DC Pieper
+/*
+void timer0_int  (void) __interrupt (1) {// Interrupt T0 für sound
+t0_div++;
+if(beep_clk)beep_port=1;
+else beep_port=0;
+} // timer0_int
+*/
 
 void write_value_req(unsigned char objno)	// Objekte steuern gemäß EIS  Protokoll (an/aus/dimm/set)
 {
@@ -319,11 +329,17 @@ void LED_schalten(void)		// Schaltet die LEDs und kalkuliert den Zentral-Alarm
 {
 	
 	//LED  Ausgänge setzen
-		
+	WRITE=0;
 	spi_2_out(led_obj[2]& led_activ&(~eeprom[0xF9]|blink | quitted_obj[2]));
 	spi_2_out(led_obj[1]& led_activ&(~eeprom[0xF8]|blink | quitted_obj[1]));
 	spi_2_out(led_obj[0]& led_activ&(~eeprom[0xF7]|blink | quitted_obj[0]));
-//P0=led_obj[0]& led_activ&(~eeprom[0xF7]|blink | quitted_obj[0]);// debugausgabe
+	WRITE=1;
+	DATAOUT=0;
+	DATAOUT=0;
+	WRITE=0;
+
+	
+	//P0=led_obj[0]& led_activ&(~eeprom[0xF7]|blink | quitted_obj[0]);// debugausgabe
 
 	// Zentral Alarm kalkulieren
 	if(eeprom[0xED]&0x02 ){// Wenn zentralalarm aktiviert
@@ -352,7 +368,7 @@ void spi_2_out(unsigned char daten)
 
 	unsigned char n;
 		
-	WRITE=0;
+//	WRITE=0;
 	CLK=0;
 	for(n=0;n<=7;n++){
 
@@ -363,10 +379,10 @@ void spi_2_out(unsigned char daten)
 		CLK=1;
 		CLK=0;
 	}
-	WRITE=1;
-	DATAOUT=0;
-	DATAOUT=0;
-	WRITE=0;
+//	WRITE=1;
+//	DATAOUT=0;
+//	DATAOUT=0;
+//	WRITE=0;
 
 }
 
