@@ -52,22 +52,22 @@ const unsigned char bitmask_0[]={0xFE,0xFD,0xFB,0xF7,0xEF,0xDF,0xBF,0x7F};
 
 
 // Version mit Schallwandler 
-
+/*
 void timer0_int  (void) __interrupt (1) {// Interrupt T0 für sound
 t0_div++;
 if(t0_div & beep_req)beep_port=1;
 else beep_port=0;
 } // timer0_int
-
+*/
 
 // Version mit DC Pieper
-/*
+
 void timer0_int  (void) __interrupt (1) {// Interrupt T0 für sound
 t0_div++;
-if(beep_clk)beep_port=1;
+if(beep_req)beep_port=1;
 else beep_port=0;
 } // timer0_int
-*/
+
 
 void write_value_req(unsigned char objno)	// Objekte steuern gemäß EIS  Protokoll (an/aus/dimm/set)
 {
@@ -294,7 +294,7 @@ void delay_timer(void)	// zählt alle 0,1s die Variable Timer hoch
 			beep_all=1;
 		else beep_all=0;
 
-		if((zentral_alarm_obj||((eeprom[0xED]&0x08)&&beep_all))&&beep_clk && !((eeprom[0xEE]&0x04)&& blocked_obj)){
+		if((zentral_alarm_obj||((eeprom[0xED]&0x08)&&beep_all))&& beep_clk && !((eeprom[0xEE]&0x04)&& blocked_obj)){
 			if(beep_clk&0x02)beep_req=0x08;
 			else beep_req=0x04;
 		}
