@@ -50,23 +50,18 @@ __bit portchanged;
 const unsigned char bitmask_1[]={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
 const unsigned char bitmask_0[]={0xFE,0xFD,0xFB,0xF7,0xEF,0xDF,0xBF,0x7F};
 
-
 // Version mit Schallwandler 
-/*
 void timer0_int  (void) __interrupt (1) {// Interrupt T0 für sound
-t0_div++;
-if(t0_div & beep_req)beep_port=1;
-else beep_port=0;
+	t0_div++;
+#ifdef AC_BEEP
+	if(t0_div & beep_req)beep_port=1;
+	else beep_port=0;
+#else
+	if(beep_req)beep_port=1;
+	else beep_port=0;
+#endif
 } // timer0_int
-*/
 
-// Version mit DC Pieper
-
-void timer0_int  (void) __interrupt (1) {// Interrupt T0 für sound
-t0_div++;
-if(beep_req)beep_port=1;
-else beep_port=0;
-} // timer0_int
 
 
 void write_value_req(unsigned char objno)	// Objekte steuern gemäß EIS  Protokoll (an/aus/dimm/set)
@@ -74,26 +69,8 @@ void write_value_req(unsigned char objno)	// Objekte steuern gemäß EIS  Protokol
   unsigned char valtmp;
   //unsigned char blockstart, blockend, block_polarity;
   unsigned char obj,group;
-
-  
-
-/*
-    //gapos=gapos_in_gat(telegramm[3],telegramm[4]);	// Position der Gruppenadresse in der Adresstabelle
-    if (gapos_in_gat(telegramm[3],telegramm[4])!=0xFF)					// =0xFF falls nicht vorhanden
-    {
-	  //atp=eeprom[ASSOCTABPTR];			// Start Association Table
-      assno=eeprom[eeprom[ASSOCTABPTR]];				// Erster Eintrag = Anzahl Einträge
-      //tel8=telegramm[8];
-      for(n=0;n<assno;n++)				// Schleife über alle Einträge in der Ass-Table, denn es könnten mehrere Objekte (Pins) der gleichen Gruppenadresse zugeordnet sein
-      {
-        gaposh=eeprom[eeprom[ASSOCTABPTR]+1+(n*2)];
-        if(gapos_in_gat(telegramm[3],telegramm[4])==gaposh)					// Wenn Positionsnummer übereinstimmt
-        {
-          objno=eeprom[eeprom[ASSOCTABPTR]+2+(n*2)];				// Objektnummer
-          objflags=read_objflags(objno);			// Objekt Flags lesen
-          if (objflags & 0x14){
-*/          	obj=objno%8;// modulo 3 ergibt die Gruppennummer
-	          group=objno/8;
+          	obj=objno%8;// modulo 3 ergibt die LED-io Nummer in der Gruppe
+	          group=objno/8;// /3 ergibt die Gruppennummer
 	          valtmp=telegramm[7]&0x01;
 	
 		         // Objektbehandlung:
@@ -124,14 +101,7 @@ void write_value_req(unsigned char objno)	// Objekte steuern gemäß EIS  Protokol
 		        	 }
 		        	 else blocked_obj=0;
 		         }
-//         }// if (objflags..
-//         }// ende if (gaspos in gat...
-//      }// ende for(n....
-      //if (portbuffer&0xF0 != oldportbuffer&0xF0) portchanged=1;//post für port_schalten hinterlegen
-      //port_schalten(portbuffer);	//Port schalten wenn sich ein Pin geändert hat
-//    }
-    //owntele=0;
-    //respondpattern=0;
+
 }
 
 
@@ -288,8 +258,8 @@ void delay_timer(void)	// zählt alle 0,1s die Variable Timer hoch
 						beep_clk=0;
 				}// ende switch
 		}// ende if(!timercnt...
-		if ((led_obj[0]& ~quitted_obj[0])\
-			||(led_obj[1]& ~quitted_obj[1])\
+		if ((led_obj[0]& ~quitted_obj[0])
+			||(led_obj[1]& ~quitted_obj[1])
 			||(led_obj[2]& ~quitted_obj[2]))
 			beep_all=1;
 		else beep_all=0;

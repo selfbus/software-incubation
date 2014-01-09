@@ -25,8 +25,7 @@
 //#include "../com/debug.c"
 #include "../com/fb_rs232.h"
 #include"../com/watchdog.h"
-#include"../com/watchdog.c"
-
+//#include"../com/watchdog.c"
 
 #define TYPE 0
 #define VERSION 0
@@ -39,28 +38,19 @@
 
 unsigned char __at 0x00 RAM[00]; //nur für die debug ausgabe
 
-
 void main(void)
 { 
 	unsigned char n,cmd,prog_button_level=0,quit_button_level=0;
 	signed char cal;
 	static __code signed char __at 0x1BFF trimsave;
-	__bit prog_button_toggled=0,quit_button_toggled=0;
+	__bit prog_button_toggled=0,quit_button_pressed=0;
 
 	restart_hw();							// Hardware zuruecksetzen
 	TASTER=0;
 	cal=trimsave;
 	TRIM = TRIM+trimsave;
-	//...rs_init...(6);im folgenden direkt:
-	BRGCON&=0xFE;	// Baudrate Generator stoppen
-	P1M1&=0xFC;		// RX und TX auf bidirectional setzen
-	P1M2&=0xFC;
-	SCON=0x50;		// Mode 1, receive enable
-	SSTAT|=0xE0;	// TI wird am Ende des Stopbits gesetzt und Interrupt nur bei RX und double TX buffer an
-	BRGCON|=0x02;	// Baudrate Generator verwenden aber noch gestoppt
-	BRGR1=0x2F;	// Baudrate = cclk/((BRGR1,BRGR0)+16)
-	BRGR0=0xF0;	// für 115200 0030 nehmen, autocal: 600bd= 0x2FF0
-	BRGCON|=0x01;	// Baudrate Generator starten
+	RS_INIT_600
+
 	SBUF=0x55;
 
 	TASTER=0;
@@ -72,16 +62,15 @@ void main(void)
 		TR0=1;					// Timer 0 starten
 		while(!TF0);
 	}
-	watchdog_init();
-	watchdog_start();
+	WATCHDOG_INIT
+	WATCHDOG_START
 
 	restart_app();							// Anwendungsspezifische Einstellungen zuruecksetzen
 	bus_return();							// Aktionen bei Busspannungswiederkehr
 
 	do  {
 		//DEBUGPOINT
-		
-		watchdog_feed();	
+		WATCHDOG_FEED	
 		
 		if(APPLICATION_RUN) {	// nur wenn run-mode gesetzt
 			if (RTCCON &0x80){	
@@ -136,23 +125,24 @@ void main(void)
 
 		//   ###  QUIT_button ###
 		if(!QUIT){ 		// Quitt-Taster gedrückt
-			if(quit_button_level<255)	quit_button_level++;
+			if(quit_button_level<100)	quit_button_level++;
 			else{
-				if(!quit_button_toggled && (eeprom[0xEE]&0x08)){
-					reset_obj=1;
-					erease_alarm(1);
-					if(eeprom[0xEE]&0x01)send_obj_value(26);
+				if(!quit_button_pressed)
+				{
+						if(eeprom[0xEE]&0x08) reset_obj=1;
+						if(eeprom[0xEE]&0x80)erease_alarm(1);
+						if((eeprom[0xEE]&0x09)==9)send_obj_value(26);
 				}
-				quit_button_toggled=1;
+				quit_button_pressed=1;
 			}
 		}
 		else {
-			if(quit_button_level>0)prog_button_level--;
-			else quit_button_toggled=0;
+			if(quit_button_level>0)quit_button_level--;
+			else quit_button_pressed=0;
 		}
 
 				
-		}// end if(runstate)
+		}// end if(APLICATION_RUN)
 		
 		
 		n= tx_buffer[(tx_nextsend-1)&0x07];//n ist die letzte objno
