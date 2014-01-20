@@ -137,11 +137,9 @@ void EX0_int (void) __interrupt(0){
 			}
 			else if (bitpause>=5530 && bitpause <=9216 )//ca 2ms = 0-bit (1,5-2,5)
 			{
-				//stream[IDATA_START+(stream_bit_ctr>>2)]&=bitmask_0[stream_bit_ctr&0x03];	
 				stream_bit_ctr++; 
 			}else {
 				stream_comming_in=0; //verwerfen
-//				if(stream_no < 10)stream_no+=5;
 			}
 		}	
 		if(stream_bit_ctr==36)
@@ -382,7 +380,7 @@ unsigned long read_obj_value(unsigned char objno)	// gibt den Wert eines Objekte
 	{
 		return (read_obj_data(objno));
 	}
-	else if(objno==8)returnvalue=wind_angle*100;
+	else if(objno==8)returnvalue=wind_angle;//*100;
 		else if(objno>=3 && objno<=5)// Feuchte %
 		{
 			x=humidity[objno-3];
@@ -400,7 +398,10 @@ unsigned char obj,group;
 	obj = objno % 8;
 	if(objno==9)
 	{
-		if (!objvalue)rain_offset+=rain_value;
+		if (!objvalue){
+			rain_offset+=rain_value;
+			rain_value=0;
+		}
 	}
 	if(objno==10)rain=objvalue;
 	if (objno>=11&& objno<=18)
