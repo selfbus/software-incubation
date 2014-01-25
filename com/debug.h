@@ -17,7 +17,7 @@
 #ifndef FB_DEBUG
 #define FB_DEBUG
 extern volatile unsigned int debugadr;
-extern void EX0_int (void) __interrupt (0);
+//extern void EX0_int (void) __interrupt (0);
 extern unsigned char __at 0x00 RAM[00]; 
 
 #define BREAKADR_IN\
@@ -48,10 +48,24 @@ extern unsigned char __at 0x00 RAM[00];
 	TI=0;\
 	SBUF =
 
-#define DEBUGPOINT\
-	if(RI){ \
-DEBUG RAM[SBUF];\
-	RI=0;\
+#define DEBUG_INPUT(debugvar) \
+{	if(RI){ \
+		RI=0; \
+		debugvar=SBUF;\
+	}\
 }
 
+#define DEBUGPOINT\
+	if(RI){ \
+	RI=0;\
+	DEBUG RAM[SBUF];\
+}
+
+
+
+#define DEBUGEEPROM\
+	if(RI){ \
+	RI=0;\
+    DEBUG eeprom[SBUF];\
+}
 #endif
