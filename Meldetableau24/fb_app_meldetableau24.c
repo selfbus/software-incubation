@@ -20,7 +20,7 @@
 
 
 #include <P89LPC922.h>
-#include "../lib_lpc922/Releases/fb_lpc922_1.4x.h"
+#include "fb_lpc922_1.4x.h"
 #include  "fb_app_meldetableau24.h"
 #include "../com/debug.h"
 
