@@ -14,8 +14,9 @@
  */
 
 // Versionen:	1.00	erste Version
+//				2.00	erste Version mit Lib 1.4  -- WIP
 
-	
+
 
 #include <P89LPC922.h>
 #include <fb_lpc922_1.4x.h>
@@ -23,7 +24,8 @@
 #include "fb_app_4temp.h"
 #include "4temp_onewire.h"
 
-
+//const unsigned char bitmask_1[8] ={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
+//const unsigned char __at 0x01CE space[18];// Hier schreibt und liest die ETS !!
 
 //#define VERSION		101
 

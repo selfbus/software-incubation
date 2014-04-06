@@ -21,9 +21,11 @@
 
 
 
-long timer;			// Timer f�r Schaltverz�gerungen, wird alle 130us hochgez�hlt
-__bit delay_toggle;	// um nur jedes 2. Mal die delay routine auszuf�hren
+long timer;			// Timer für Schaltverzögerungen, wird alle 130us hochgezählt
+__bit delay_toggle;	// um nur jedes 2. Mal die delay routine auszuführen
 int temp[4],lasttemp[4],lastsendtemp[4];	// Temperaturwerte speichern
+unsigned char __at 0x08 ready_objects[8];	// Messwerte und Grenzwerte die gesendet werden können
+
 
 //unsigned char kanal;
 unsigned char zyk_senden_basis;
@@ -33,7 +35,7 @@ unsigned char sende_sofort_bus_return;
 
 /**
 * Empfangenes write_value_request Telegramm verarbeiten
-*	unbenutzt, Objekte k�nnen nicht geschrieben werden
+*	unbenutzt, Objekte können nicht geschrieben werden
 *
 * \param  void
 *
@@ -49,19 +51,27 @@ void write_value_req(unsigned char objno)
 /**
 * Empfangenes read_value_request Telegramm verarbeiten
 *
-* \param  void
+* \param  Objekt das beantwortet werden soll
 *
 * @return void
 */
 void read_value_req(unsigned char objno)	// Empfangenes read_value_request Telegramm verarbeiten
 {
 	unsigned char objflags;
-	unsigned int objvalue;
 
-//	if(objno!=0xFF) {	// falls Gruppenadresse nicht gefunden
-//		send_ack();
+		objflags=read_objflags(objno);		// Objekt Flags lesen
+		// Objekt lesen, nur wenn read enable gesetzt (Bit3) und Kommunikation zulaessig (Bit2)
+		if((objflags&0x0C)==0x0C) send_obj_value(objno+64);		//send_value(objno,objvalue);
+}
 
-		// Messwerte Objekte 0,2,4,6
+
+// Objektwert von Lib angefordert
+unsigned long read_obj_value(unsigned char objno) 	// gibt den Wert eines Objektes zurueck
+{
+	unsigned long objvalue=0;
+	//unsigned char ret_val=0;
+
+	// Messwerte Objekte 0,2,4,6
 		if((objno&0x01)==0)
 		{
 			objvalue=sendewert(objno);
@@ -69,15 +79,11 @@ void read_value_req(unsigned char objno)	// Empfangenes read_value_request Teleg
 		// Grenzwerte Objekte 1,3,5,7
 		else
 		{
-			objvalue=read_obj_value(objno);		// Objektwert aus USER-RAM lesen (Standard Einstellung)
+			objvalue=sendewert(objno);
+			//objvalue=read_obj_value(objno);		// Objektwert aus USER-RAM lesen (Standard Einstellung)
 		}
-
-		objflags=read_objflags(objno);		// Objekt Flags lesen
-		// Objekt lesen, nur wenn read enable gesetzt (Bit3) und Kommunikation zulaessig (Bit2)
-		if((objflags&0x0C)==0x0C) send_obj_value(objno+64);		//send_value(objno,objvalue);
-//    }
+	return(objvalue);
 }
-
 
 
 /**
@@ -124,7 +130,7 @@ unsigned int sendewert(unsigned char objno)
 
 
 /**
-* sucht Gruppenadresse f�r das Objekt objno uns sendet ein EIS Telegramm
+* sucht Gruppenadresse für das Objekt objno uns sendet ein EIS Telegramm
 *
 * \param  type
 * \param  objno
@@ -184,8 +190,8 @@ void send_value(unsigned char type, unsigned char objno, unsigned int sval)
 */
 
 /**
-* Senden bei Grenzwert�ber- bzw. unterschreitung
-*	�berpr�ft die Grenzwerte
+* Senden bei Grenzwertüber- bzw. unterschreitung
+*	überprüft die Grenzwerte
 *	schreibt die Objektwerte und sendet Telegramm
 *
 * \param  eingang
@@ -195,7 +201,7 @@ void send_value(unsigned char type, unsigned char objno, unsigned int sval)
 void grenzwert (unsigned char eingang)
 {
 	int schwelle1, schwelle2;
-	unsigned char reaktion, wert, objno;
+	unsigned char reaktion, objno;
 
 	objno=(eingang<<1)+1;
 
@@ -206,29 +212,19 @@ void grenzwert (unsigned char eingang)
 
 
 	//steigend
-	if ((lasttemp[eingang]<schwelle2 || sende_sofort_bus_return) && temp[eingang]>schwelle2)	// GW 2 �berschritten
+	if ((lasttemp[eingang]<schwelle2 || sende_sofort_bus_return) && temp[eingang]>schwelle2)	// GW 2 überschritten
 	{
 		if (reaktion&0x0C)
 		{
-			wert=(reaktion>>2)&0x01;
-			write_obj_value(objno,wert);
-			if(!sende_sofort_bus_return)
-			{
-				send_value(1,objno,wert);
-			}
+			ready_objects[objno]=(reaktion>>2)&0x01;
 		}
 	}
 
-	if ((lasttemp[eingang]<schwelle1 || sende_sofort_bus_return) && temp[eingang]>schwelle1)	// GW 1 �berschritten
+	if ((lasttemp[eingang]<schwelle1 || sende_sofort_bus_return) && temp[eingang]>schwelle1)	// GW 1 überschritten
 	{
 		if (reaktion&0xC0)
 		{
-			wert=(reaktion>>6)&0x01;
-			write_obj_value(objno,wert);
-			if(!sende_sofort_bus_return)
-			{
-				send_value(1,objno,wert);
-			}
+			ready_objects[objno]=(reaktion>>6)&0x01;
 		}
 	}
 
@@ -238,12 +234,7 @@ void grenzwert (unsigned char eingang)
 	{
 		if (reaktion&0x30)
 		{
-			wert=(reaktion>>4)&0x01;
-			write_obj_value(objno,wert);
-			if(!sende_sofort_bus_return)
-			{
-				send_value(1,objno,wert);
-			}
+			ready_objects[objno]=(reaktion>>4)&0x01;
 		}
 	}
 
@@ -251,12 +242,7 @@ void grenzwert (unsigned char eingang)
 	{
 		if (reaktion&0x03)
 		{
-			wert=reaktion&0x01;
-			write_obj_value(objno,wert);
-			if(!sende_sofort_bus_return)
-			{
-				send_value(1,objno,wert);
-			}
+			ready_objects[objno]=reaktion&0x01;
 		}
 	}
 
@@ -268,8 +254,8 @@ void grenzwert (unsigned char eingang)
 
 /**
 * Senden bei Messwertdifferenz
-*	�berpr�ft die Messwertdifferenz
-*	schreibt die Verz�gerungszeit ins delrec
+*	überprüft die Messwertdifferenz
+*	schreibt die Verzögerungszeit ins delrec
 *
 * \param  eingang
 *
@@ -283,8 +269,10 @@ void messwert (unsigned char eingang)
 
 	unsigned char zykval_help;
 
+	// Senden bei Messwertdifferenz
 	if (eeprom[0x65+eingang]&0x80)
 	{
+		// Senden ab x % Messwertdifferenz
 		mess_diff=180*(eeprom[0x65+eingang]&0x7F);
 
 		if (temp[eingang]<=lastsendtemp[eingang])
@@ -302,6 +290,7 @@ void messwert (unsigned char eingang)
 		{
 			if (delrec[(eingang+4)*4]==0)
 			{
+				// Sendeverzögerung bei Messwertdifferenz
 				zykval_help=(eeprom[0x69+(eingang>>1)])>>(4*(!(eingang&0x01)))&0x0F;
 
 				if (zykval_help<=5)
@@ -333,10 +322,10 @@ void messwert (unsigned char eingang)
 
 
 /**
-* z�hlt alle 130ms die Variable Timer hoch und pr�ft Queue
+* zählt alle 130ms die Variable Timer hoch und prüft Queue
 *	Zyklisch senden Messwerte und Grenzwerte
-*	Verz�gerungszeit senden Messwerte
-*	Sendeverz�gerung Messwerte bei Busspannungswiederkehr
+*	Verzögerungszeit senden Messwerte
+*	Sendeverzögerung Messwerte bei Busspannungswiederkehr
 *
 * \param  void
 *
@@ -347,13 +336,13 @@ void delay_timer(void)
 	unsigned char objno,delay_state,zyk_faktor,objno_help,n;
 	unsigned long delval,zyk_val;
 
+//	RTCCON=0x60;		// RTC anhalten und Flag löschen
+//	RTCH=0x0E;			// reload Real Time Clock
+//	RTCL=0xA0;
 
-	RTCCON=0x60;		// RTC anhalten und Flag l�schen
-	RTCH=0x0E;			// reload Real Time Clock
-	RTCL=0xA0;
 	objno=0;
 
-	if (delay_toggle) {	// RTC l�uft auf 65ms, daher nur jedes 2. mal timer erh�hen
+	if (delay_toggle) {	// RTC läuft auf 65ms, daher nur jedes 2. mal timer erhöhen
 		timer++;
 		timer&=0x00FFFFFF;
 
@@ -365,7 +354,7 @@ void delay_timer(void)
 				delval=(delval<<8)+delrec[objno*4+3];
 				if(delval==timer) {
 
-					if (objno<=3)	// Zyklisch Senden Eing�nge Messwert und Grenzwert
+					if (objno<=3)	// Zyklisch Senden Eingänge Messwert und Grenzwert
 					{
 						zyk_faktor=eeprom[0x61+objno]&0x7F;
 
@@ -377,10 +366,10 @@ void delay_timer(void)
 
 						if ((delay_state&0x80) && (sende_sofort_bus_return==0))	// Messwert zyk senden
 						{
-							send_value(1,(objno<<1),sendewert(objno<<1));
+							send_obj_value(objno);
 							if (delay_state&0x01)	// Grenzwert zyk senden
 							{
-								send_value(1,((objno<<1)+1),read_obj_value((objno<<1)+1));
+								send_obj_value((objno<<1)+1);
 							}
 						}
 					}
@@ -388,7 +377,7 @@ void delay_timer(void)
 					{
 						objno_help=objno-4;
 
-						send_value(1,(objno_help<<1),sendewert(objno_help<<1));
+						send_obj_value(objno_help<<1);
 						lastsendtemp[objno_help]=temp[objno_help];
 
 						clear_delay_record(objno);
@@ -400,7 +389,7 @@ void delay_timer(void)
 						{
 							if (delay_state&(0x40>>n))
 							{
-								send_value(1,n,sendewert(n));
+								send_obj_value(n);
 							}
 						}
 						delrec[8*4]=0;
@@ -431,13 +420,13 @@ void bus_return(void)
 
 	if (sende_sofort_bus_return&(0x80>>kanal_help))
 	{
-		send_value(1,(kanal_help),sendewert(kanal_help));
+		send_obj_value(kanal_help);
 		sende_sofort_bus_return&=0xFF-(0x80>>kanal_help);
 	}
 
 	if (sende_sofort_bus_return&(0x40>>kanal_help))
 	{
-		send_value(1,(kanal_help+1),read_obj_value(kanal_help+1));
+		send_obj_value(kanal_help+1);
 		sende_sofort_bus_return&=0xFF-(0x40>>kanal_help);
 	}
 

@@ -22,9 +22,10 @@
 # define __code
 #endif
 
-void restart_app(void);		// Alle Applikations-Parameter zur�cksetzen
-//void write_value_req(void);
-void send_value(unsigned char type, unsigned char objno, unsigned int sval);
+void restart_app(void);		// Alle Applikations-Parameter zurücksetzen
+void write_value_req(unsigned char objno);			// Routine zur Verarbeitung eingegegangener Telegramme zum Schreiben eines Objektwertes
+void read_value_req(unsigned char objno);			// Objektwerte lesen angefordert
+unsigned long read_obj_value(unsigned char objno) ;	// gibt den Wert eines Objektes zurueck
 void delay_timer(void);
 void bus_return(void);
 unsigned int sendewert(unsigned char objno);
