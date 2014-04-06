@@ -6,6 +6,7 @@
  *  /_/   /_/ |_/_____/_____/_____/\____//____/  
  *                                      
  *  Copyright (c) 2010 Jan Wegner
+ *  Copyright (c) 2014 Stefan Haller
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 2 as
@@ -35,7 +36,7 @@ void messwert (unsigned char eingang);
 
 extern long timer;						// Timer f�r Schaltverz�gerungen, wird alle 130us hochgez�hlt
 extern __bit delay_toggle;				// um nur jedes 2. Mal die delay routine auszuf�hren
-extern int temp[4],lasttemp[4],lastsendtemp[4];
+extern int __idata __at 0xFE-24 temp[4],lasttemp[4],lastsendtemp[4];
 
 extern unsigned char kanal;
 extern unsigned char zyk_senden_basis;

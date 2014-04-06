@@ -6,6 +6,7 @@
  *  /_/   /_/ |_/_____/_____/_____/\____//____/  
  *                                      
  *  Copyright (c) 2010 Jan Wegner
+ *  Copyright (c) 2014 Stefan Haller
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 2 as
@@ -23,8 +24,8 @@
 
 long timer;			// Timer für Schaltverzögerungen, wird alle 130us hochgezählt
 __bit delay_toggle;	// um nur jedes 2. Mal die delay routine auszuführen
-int temp[4],lasttemp[4],lastsendtemp[4];	// Temperaturwerte speichern
-unsigned char __at 0x08 ready_objects[8];	// Messwerte und Grenzwerte die gesendet werden können
+int __idata __at 0xFE-24 temp[4],lasttemp[4],lastsendtemp[4];	// Temperaturwerte speichern
+unsigned int __idata __at 0xFE-40 ready_objects[8];
 
 
 //unsigned char kanal;
@@ -492,23 +493,6 @@ void restart_app()		// Alle Applikations-Parameter zur�cksetzen
 	sequence=1;
 	kanal=0;
 
-	EA=0;						// Interrupts sperren, damit flashen nicht unterbrochen wird
-	START_WRITECYCLE
-	WRITE_BYTE(0x01,0x03,0x00)	// Herstellercode 0x0008 = GIRA
-	WRITE_BYTE(0x01,0x04,0x08)
-	//WRITE_BYTE(0x01,0x05,0xB0)	// Devicetype 0xB003 = GIRA Analogeingang 960 00
-	//WRITE_BYTE(0x01,0x06,0x03)
-	//WRITE_BYTE(0x01,0x07,0x01)	// Versionnumber of application programm
-	WRITE_BYTE(0x01,0x0C,0x00)	// PORT A Direction Bit Setting
-	WRITE_BYTE(0x01,0x0D,0xFF)	// Run-Status (00=stop FF=run)
-	//WRITE_BYTE(0x01,0x12,0x3A)	// COMMSTAB Pointer
-	STOP_WRITECYCLE
-	//START_WRITECYCLE;
-	//WRITE_BYTE(0x00,0x60,0x2E);	// system state: all layers active (run), not in prog mode
-	//STOP_WRITECYCLE;
-	EA=1;						// Interrupts freigeben
-
 	timer=0;			// Timer-Variable, wird alle 130ms inkrementiert
 	RTCCON=0x61; 		//RTC starten
-
 }
