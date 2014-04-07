@@ -47,7 +47,8 @@ void main(void)
 	//
 	//  Initialisierung
 	//
-	restart_hw();
+	restart_hw();				// Hardware zurücksetzen
+	TASTER=0;					// LED Ein
 
 	// Warten bis Bus stabil, nach Busspannungswiederkehr
 	for (n = 0; n < 50; n++)

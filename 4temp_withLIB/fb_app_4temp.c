@@ -70,7 +70,6 @@ void read_value_req(unsigned char objno)	// Empfangenes read_value_request Teleg
 unsigned long read_obj_value(unsigned char objno) 	// gibt den Wert eines Objektes zurueck
 {
 	unsigned long objvalue=0;
-	//unsigned char ret_val=0;
 
 	// Messwerte Objekte 0,2,4,6
 		if((objno&0x01)==0)
@@ -80,7 +79,7 @@ unsigned long read_obj_value(unsigned char objno) 	// gibt den Wert eines Objekt
 		// Grenzwerte Objekte 1,3,5,7
 		else
 		{
-			objvalue=sendewert(objno);
+			objvalue=ready_objects[objno];
 			//objvalue=read_obj_value(objno);		// Objektwert aus USER-RAM lesen (Standard Einstellung)
 		}
 	return(objvalue);
@@ -204,7 +203,7 @@ void grenzwert (unsigned char eingang)
 	int schwelle1, schwelle2;
 	unsigned char reaktion, objno;
 
-	objno=(eingang<<1)+1;
+	objno=(eingang<<1)+1;	// Objekte 1,3,5,7
 
 	reaktion=eeprom[0x6D+eingang];
 
@@ -218,6 +217,10 @@ void grenzwert (unsigned char eingang)
 		if (reaktion&0x0C)
 		{
 			ready_objects[objno]=(reaktion>>2)&0x01;
+			if(!sende_sofort_bus_return)
+			{
+				send_obj_value(objno);
+			}
 		}
 	}
 
@@ -226,6 +229,10 @@ void grenzwert (unsigned char eingang)
 		if (reaktion&0xC0)
 		{
 			ready_objects[objno]=(reaktion>>6)&0x01;
+			if(!sende_sofort_bus_return)
+			{
+				send_obj_value(objno);
+			}
 		}
 	}
 
@@ -236,6 +243,10 @@ void grenzwert (unsigned char eingang)
 		if (reaktion&0x30)
 		{
 			ready_objects[objno]=(reaktion>>4)&0x01;
+			if(!sende_sofort_bus_return)
+			{
+				send_obj_value(objno);
+			}
 		}
 	}
 
@@ -244,6 +255,10 @@ void grenzwert (unsigned char eingang)
 		if (reaktion&0x03)
 		{
 			ready_objects[objno]=reaktion&0x01;
+			if(!sende_sofort_bus_return)
+			{
+				send_obj_value(objno);
+			}
 		}
 	}
 
@@ -367,14 +382,14 @@ void delay_timer(void)
 
 						if ((delay_state&0x80) && (sende_sofort_bus_return==0))	// Messwert zyk senden
 						{
-							send_obj_value(objno);
+							send_obj_value(objno<<1);
 							if (delay_state&0x01)	// Grenzwert zyk senden
 							{
 								send_obj_value((objno<<1)+1);
 							}
 						}
 					}
-					else if (objno<=7)	// Sendeverz�gerung Eing�nge Messwerte
+					else if (objno<=7)	// Sendeverzögerung Eingänge Messwerte
 					{
 						objno_help=objno-4;
 
@@ -384,7 +399,7 @@ void delay_timer(void)
 						clear_delay_record(objno);
 					}
 
-					else	// Sendeverz�gerung Eing�nge Messwerte Busspannungswiederkehr
+					else	// Sendeverzögerung Eingänge Messwerte Busspannungswiederkehr
 					{
 						for (n=0;n<=6;n=n+2)
 						{
