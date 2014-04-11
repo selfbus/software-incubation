@@ -25,8 +25,8 @@
 long timer;			// Timer für Schaltverzögerungen, wird alle 130us hochgezählt
 __bit delay_toggle;	// um nur jedes 2. Mal die delay routine auszuführen
 int __idata __at 0xFE-24 temp[4],lasttemp[4],lastsendtemp[4];	// Temperaturwerte speichern
-unsigned int __idata __at 0xFE-40 ready_objects[8];
-
+//char __idata __at 0xFE-32 ready_objects[8];
+char grenzwerte;	// Grenzwertobjekte
 
 //unsigned char kanal;
 unsigned char zyk_senden_basis;
@@ -60,9 +60,9 @@ void read_value_req(unsigned char objno)	// Empfangenes read_value_request Teleg
 {
 	unsigned char objflags;
 
-		objflags=read_objflags(objno);		// Objekt Flags lesen
-		// Objekt lesen, nur wenn read enable gesetzt (Bit3) und Kommunikation zulaessig (Bit2)
-		if((objflags&0x0C)==0x0C) send_obj_value(objno+64);		//send_value(objno,objvalue);
+	objflags=read_objflags(objno);		// Objekt Flags lesen
+	// Objekt lesen, nur wenn read enable gesetzt (Bit3) und Kommunikation zulaessig (Bit2)
+	if((objflags&0x0C)==0x0C) send_obj_value(objno+64);
 }
 
 
@@ -73,15 +73,12 @@ unsigned long read_obj_value(unsigned char objno) 	// gibt den Wert eines Objekt
 
 	// Messwerte Objekte 0,2,4,6
 		if((objno&0x01)==0)
-		{
 			objvalue=sendewert(objno);
-		}
 		// Grenzwerte Objekte 1,3,5,7
 		else
-		{
-			objvalue=ready_objects[objno];
-			//objvalue=read_obj_value(objno);		// Objektwert aus USER-RAM lesen (Standard Einstellung)
-		}
+			//grenzwerte = 0b00110011;
+			objvalue= (grenzwerte>>objno)&0x01;
+
 	return(objvalue);
 }
 
@@ -202,67 +199,61 @@ void grenzwert (unsigned char eingang)
 {
 	int schwelle1, schwelle2;
 	unsigned char reaktion, objno;
+	unsigned char grenzwert_eingang=0;
+	__bit gw_changed=0;
 
+	// Objekt für Eingang
 	objno=(eingang<<1)+1;	// Objekte 1,3,5,7
 
+	// Reaktion und Schwellen lesen
 	reaktion=eeprom[0x6D+eingang];
-
 	schwelle1=-5500+180*(eeprom[0x71+eingang]&0x7F);
-	schwelle2=-5500+180*(eeprom[0x75+eingang]&0x7F);
+	//schwelle2=-5500+180*(eeprom[0x75+eingang]&0x7F);
+	schwelle2 = ((eeprom[0xB0] & (eeprom[0xB1]<<8)) /10);
 
 
 	//steigend
 	if ((lasttemp[eingang]<schwelle2 || sende_sofort_bus_return) && temp[eingang]>schwelle2)	// GW 2 überschritten
-	{
 		if (reaktion&0x0C)
 		{
-			ready_objects[objno]=(reaktion>>2)&0x01;
-			if(!sende_sofort_bus_return)
-			{
-				send_obj_value(objno);
-			}
+			grenzwert_eingang= (reaktion>>2)&0x01;
+			gw_changed = 1;
 		}
-	}
 
 	if ((lasttemp[eingang]<schwelle1 || sende_sofort_bus_return) && temp[eingang]>schwelle1)	// GW 1 überschritten
-	{
 		if (reaktion&0xC0)
 		{
-			ready_objects[objno]=(reaktion>>6)&0x01;
-			if(!sende_sofort_bus_return)
-			{
-				send_obj_value(objno);
-			}
+			grenzwert_eingang= (reaktion>>6)&0x01;
+			gw_changed = 1;
 		}
-	}
 
 
 	//fallend
 	if ((lasttemp[eingang]>schwelle1 || sende_sofort_bus_return) && temp[eingang]<schwelle1)	// GW 1 unterschritten
-	{
 		if (reaktion&0x30)
 		{
-			ready_objects[objno]=(reaktion>>4)&0x01;
-			if(!sende_sofort_bus_return)
-			{
-				send_obj_value(objno);
-			}
+			grenzwert_eingang= (reaktion>>4)&0x01;
+			gw_changed = 1;
 		}
-	}
 
 	if ((lasttemp[eingang]>schwelle2 || sende_sofort_bus_return) && temp[eingang]<schwelle2)	// GW 2 unterschritten
-	{
 		if (reaktion&0x03)
 		{
-			ready_objects[objno]=reaktion&0x01;
-			if(!sende_sofort_bus_return)
-			{
-				send_obj_value(objno);
-			}
+			grenzwert_eingang= reaktion&0x01;
+			gw_changed = 1;
 		}
-	}
 
+	// Grenzwert dem Eingangsobjekt zuordnen
+	if(grenzwert_eingang)
+		grenzwerte &= (1<<objno);
+	else
+		grenzwerte |= ~(1<<objno);
 
+	// Nicht senden nach Neustart
+	if(gw_changed && !sende_sofort_bus_return)
+		send_obj_value(objno);
+
+	// Aktuellen Wert speichern
 	lasttemp[eingang]=temp[eingang];
 }
 
@@ -349,6 +340,30 @@ void messwert (unsigned char eingang)
 */
 void delay_timer(void)
 {
+	/*
+	unsigned char objno,port_pattern,delay_zeit,delay_onoff,delay_base,n,m;
+	unsigned int timerflags;
+
+		objno=0;
+
+			timer++;
+			timerflags = timer&(~(timer-1));
+			for(n=0;n<16;n++){
+				if(timerflags & 0x0001){// positive flags erzeugen und schieben
+					for(m=0;m<TIMERANZ;m++){// die timer der reihe nach checken und dec wenn laufen
+						if ((timerbase[m]& 0x0F)==n){// wenn die base mit der gespeicherten base übereinstimmt
+							if (timercnt[m]>0x80){// wenn der counter läuft...
+								timercnt[m]=timercnt[m]-1;// den timer [m]decrementieren
+							}// end if (timercnt...
+						}//end if(timerbase...
+					}// end  for(m..
+				}// end if timer...
+				timerflags = timerflags>>1;
+			}//end for (n=...
+
+			// ab Hier die aktion...
+	*/
+
 	unsigned char objno,delay_state,zyk_faktor,objno_help,n;
 	unsigned long delval,zyk_val;
 
@@ -507,7 +522,21 @@ void restart_app()		// Alle Applikations-Parameter zur�cksetzen
 
 	sequence=1;
 	kanal=0;
-
 	timer=0;			// Timer-Variable, wird alle 130ms inkrementiert
+
+	EA=0;						// Interrupts sperren, damit flashen nicht unterbrochen wird
+	START_WRITECYCLE
+	WRITE_BYTE(0x01,0x03,0x00)	// Herstellercode 0x0008 = GIRA
+	WRITE_BYTE(0x01,0x04,0x08)
+	WRITE_BYTE(0x01,0x05,0xB0)	// Devicetype 0x0438 = Selfbus 1080 4temp
+	WRITE_BYTE(0x01,0x06,0x03)
+	//WRITE_BYTE(0x01,0x07,0x01)	// Versionnumber of application programm
+	WRITE_BYTE(0x01,0x0C,0x00)	// PORT A Direction Bit Setting
+	//WRITE_BYTE(0x01,0x0D,0xFF)	// Run-Status (00=stop FF=run)
+	//WRITE_BYTE(0x01,0x12,0x3A)	// COMMSTAB Pointer
+	STOP_WRITECYCLE
+	EA=1;						// Interrupts freigeben
+
+
 	RTCCON=0x61; 		//RTC starten
 }

@@ -20,29 +20,41 @@
 
 
 #include <P89LPC922.h>
+#include "debug.h"
 #include <fb_lpc922_1.4x.h>
 #include "4temp_delay.h"
 #include "fb_app_4temp.h"
 #include "4temp_onewire.h"
 
+// Setup the debug variables
+DEBUG_VARIABLES;
+
+
 const unsigned char bitmask_1[8] ={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
 //const unsigned char __at 0x01CCE space[18];// Hier schreibt und liest die ETS !!
-static __code unsigned char __at 0x1D03 manufacturer[2]={0,8};	// Herstellercode 0x0008 = GIRA
+// Geräteparameter setzen, diese können von der ETS übschrieben werden
+// Daher zusätzlich bei jedem restart_app neu schreiben
+static __code unsigned char __at 0x1D03 manufacturer[2]={0x00,0x08};	// Herstellercode 0x0008 = GIRA
+static __code unsigned char __at 0x1D05 device_type[2]={0x04, 0x38};	// 1080 Selfbus 4temp
 static __code unsigned char __at 0x1D0C port_A_direction={0};	// PORT A Direction Bit Setting
 static __code unsigned char __at 0x1D0D run_state={255};		// Run-Status (00=stop FF=run)
 
-//#define VERSION		101
 
 unsigned char __at 0x00 RAM[00];
 
 
 void main(void)
 { 
-
 	unsigned char n, tasterpegel=0;
 	__bit tastergetoggelt=0;
 
 	int th;
+	// Initialize the debugging
+		DEBUG_SETUP;
+
+		P0M1 = 0xff;
+		P0M2 = 0xff;
+
 
 	//
 	//  Initialisierung
@@ -72,6 +84,9 @@ void main(void)
 
 		if (APPLICATION_RUN)	// nur wenn run-mode gesetzt
 		{
+			// Here happens the serial communication with the PC
+				DEBUG_POINT;
+
 			if(RTCCON>=0x80) delay_timer();	// Realtime clock Ueberlauf
 
 			if (sequence==1)
