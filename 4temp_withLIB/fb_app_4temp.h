@@ -23,6 +23,9 @@
 # define __code
 #endif
 
+// Anzahl Timer
+#define TIMERANZ	0x09	// 4 Timer Messwert zyklisch, 4 Sendeverzögerung Messwertdiff, Sendeverzögerung start
+
 void restart_app(void);		// Alle Applikations-Parameter zurücksetzen
 void write_value_req(unsigned char objno);			// Routine zur Verarbeitung eingegegangener Telegramme zum Schreiben eines Objektwertes
 void read_value_req(unsigned char objno);			// Objektwerte lesen angefordert
@@ -34,9 +37,9 @@ void grenzwert (unsigned char eingang);
 void messwert (unsigned char eingang);
 
 
-extern long timer;						// Timer f�r Schaltverz�gerungen, wird alle 130us hochgez�hlt
+extern unsigned int timer;						// Timer für zyklisches senden, wird alle 130ms hochgezählt
 extern __bit delay_toggle;				// um nur jedes 2. Mal die delay routine auszuf�hren
-extern int __idata __at 0xFE-24 temp[4],lasttemp[4],lastsendtemp[4];
+extern int __idata __at (0xFE-0x08) temp[4];	// Temperaturwerte speichern
 
 extern unsigned char kanal;
 extern unsigned char zyk_senden_basis;
