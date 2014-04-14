@@ -1,10 +1,10 @@
 /*
- *      __________  ________________  __  _______
- *     / ____/ __ \/ ____/ ____/ __ )/ / / / ___/
- *    / /_  / /_/ / __/ / __/ / __  / / / /\__ \ 
- *   / __/ / _, _/ /___/ /___/ /_/ / /_/ /___/ / 
- *  /_/   /_/ |_/_____/_____/_____/\____//____/  
- *                                      
+ *    _____ ______ __   __________  __  _______ *
+ *   / ___// ____// /  / ____/ __ )/ / / / ___/ *
+ *   \__ \/ __/  / /  / /__ / __  / / / /\__ \  *
+ *  ___/ / /__  / /__/ /__// /_/ / /_/ /___/ /  *
+ * /____/_____//____/_/   /_____/\____//____/   *
+ *
  *  Copyright (c) 2010 Jan Wegner
  *  Copyright (c) 2014 Stefan Haller
  *
@@ -326,7 +326,7 @@ void delay_timer(void)
 
 				// Zeit holen und deaktivieren, Bit 7 = 0
 				//zykval_help=(eeprom[0x69+(eingang>>1)])>>(4*(!(eingang&0x01)))&0x0F;
-				if( !(objno_help & 0x01) )	// 0,2
+				if(objno_help & 0x01)	// 0,2
 				{
 					timercnt[tmr_obj] = (eeprom[0x69+(objno_help>>1)] & 0x0F);
 				}
@@ -436,7 +436,7 @@ void restart_app()		// Alle Applikations-Parameter zurücksetzen
 		// Sendeverzögerung bei Messwertdifferenz
 		//zykval_help=(eeprom[0x69+(eingang>>1)])>>(4*(!(eingang&0x01)))&0x0F;
 		// Zeit holen und deaktivieren, Bit 7 = 0
-		if( !(n & 0x01) )	// 0,2
+		if(n & 0x01)	// 0,2
 		{
 			timercnt[n+4] = (eeprom[0x69+(n>>1)] & 0x0F);
 		}
