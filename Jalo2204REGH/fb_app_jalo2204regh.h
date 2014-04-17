@@ -52,7 +52,7 @@ unsigned char __at 0x00 RAM[00];
 #define BOT_OUT		P0_0
 #define MID_OUT		P0_1
 #define WRITE		P0_2
-extern static __code unsigned char __at 0x1cca blockedsave;
+extern static __code unsigned char __at 0x1cfa blockedsave;
 extern __bit handmode;
 extern 	__bit portchanged;// globale variable, sie ist 1 wenn sich portbuffer geändert hat
 extern unsigned char __at 0x0D portbuffer;

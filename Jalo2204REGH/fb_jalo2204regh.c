@@ -19,7 +19,7 @@
 
 
 #include <P89LPC922.h>
-#include "../lib_lpc922/Releases/fb_lpc922_1.4x.h"
+#include "../lib_lpc922/Releases/fb_lpc922_1.5x.h"
 #include "fb_app_jalo2204regh.h"
 
 #include "../com/fb_rs232.h"
@@ -33,7 +33,7 @@
 *
 */
 //
-//#define debugger
+#define debugger
 
 #ifdef MAX_PORTS_8
 	#define TYPE 4 
@@ -54,11 +54,11 @@ void main(void)
 
 	unsigned char n,cmd,tasterpegel=0,mode,objval;
 	signed char cal;
-	static __code signed char __at 0x1CCC trimsave;	//0x1BFF
+	static __code signed char __at 0x1CFC trimsave;	//0x1BFF
 #ifdef zeroswitch
-	static __code unsigned char __at 0x1CCB phisave;	//0x1BFE
+	static __code unsigned char __at 0x1CFB phisave;	//0x1BFE
 #endif
-	static __code unsigned char __at 0x1CCA blockedsave;	//
+	static __code unsigned char __at 0x1CFA blockedsave;	//
 	unsigned char rm_count=0;
 	__bit wduf,tastergetoggelt=0,objbitval;
 	wduf=WDCON&0x02;
@@ -104,13 +104,13 @@ void main(void)
 				if (((delay_toggle & 0x07)==0x07))handsteuerung();   // Handbetätigung nur jedes 8.mal ausführen
 			}
 */			if(RTCCON>=0x80) delay_timer();	// Realtime clock Ueberlauf
-
-			for (n=0;n<8;n++)
+			for(n= eeprom[0xE8]&0x40? 0:4 ;n<8;n++)//parameter Jalo(1) versus Rollo(0)
 			{// Abhandlung der Positionierungsanforderungen
+			
 				objbitval=0;objval=0;
-				if((positions_req & bitmask_1[n]) && !(kanal[n&0x03]&0x33)&& !timerstate[(n&0x03)+11])
+				if(((~blocked)&positions_req & bitmask_1[n]) && !(kanal[n&0x03]&0x33)&& !timerstate[(n&0x03)+11])
 				{	
-					if(n<4)// Lamelle angefordert.. 
+					if(n<4 )// Lamelle angefordert.. 
 					{
 						objval=l_position_target[n];
 				       	mode=0x02;// in mode wird die abzuziehende Objektnummer eincodiert
@@ -118,7 +118,7 @@ void main(void)
 					else
 					{	// jalo angefordert
 						if (!j_position_target[n&0x03])// bei 0 mache eine Langzeitfahrt auf 0
-						{
+						{							//Lamelle nicht nachführen!
 		        		 mode=0x00;// in mode wird die abzuziehende Objektnummer eincodiert
 		        		 objbitval=0;
 						}
@@ -135,13 +135,17 @@ void main(void)
 			        			 objval=j_position_target[n&0x03];
 			        			 }
 						}
-						positions_req |=bitmask_1[n&0x03];
-						l_position_last[n&0x03]= l_position[n&0x03];
+						if(mode)
+						{							//nur wenn eine echte Jalosieposition gefahren wird
+						positions_req |=bitmask_1[n&0x03];// Lamellenfahrt setzen
+						l_position_last[n&0x03]= l_position[n&0x03];// merken der Lamelle
+						}
 					}
 
 				object_schalten(n,objval,mode&0x0F,objbitval);
 //				positions_req&=(~bitmask_1[n]);
 			}
+		//n++;
 		}
 
 
@@ -174,7 +178,7 @@ void main(void)
 		if (fb_state==0 && (TH1<0XC0) && (!wait_for_ack)&& blocked!=blockedsave) {
 			START_WRITECYCLE;
 			FMADRH= 0x1c;		
-			FMADRL= 0xca; 
+			FMADRL= 0xFa; 
 			FMDATA= blocked;
 			STOP_WRITECYCLE;
 		}
@@ -218,11 +222,11 @@ cmd;
 				START_WRITECYCLE;	//cal an 0x1bff schreiben
 #ifdef zeroswitch
 				FMADRH= 0x1c;		
-				FMADRL= 0xcb; 
+				FMADRL= 0xfb; 
 				FMDATA= phival;
 #else
 				FMADRH= 0x1c;		
-				FMADRL= 0xcc; 
+				FMADRL= 0xfc; 
 #endif
 				FMDATA=	cal;
 				STOP_WRITECYCLE;

@@ -18,11 +18,13 @@
 
 
 #include <P89LPC922.h>
-#include "../lib_lpc922/Releases/fb_lpc922_1.4x.h"
+#include "../lib_lpc922/Releases/fb_lpc922_1.5x.h"
 #include  "fb_app_jalo2204regh.h"
 
 unsigned char __at 0x00 RAM[00]; 
 unsigned char  positions_req;
+unsigned char __idata __at 0xFE-48 l_position_s_stored[4];
+unsigned char __idata __at 0xFE-44 j_position_s_stored[4];
 unsigned char __idata __at 0xFE-40 l_position_target[4];
 unsigned char __idata __at 0xFE-36 j_position_target[4];
 unsigned char __idata __at 0xFE-32 l_position_last[4];
@@ -46,7 +48,7 @@ const unsigned char sunlogic[]={0,18,20,30};// logic table
 unsigned int __at 0x09  timer;		// Timer für Schaltverzögerungen, wird alle 130us hochgezählt
 unsigned char __at 0x09 delay_toggle;			// um nur jedes 8. Mal die delay routine auszuführen
 //var überschneidung ist Absicht
-static __code unsigned char __at 0x1CCA blockedsave;//__at 0x1BFD
+static __code unsigned char __at 0x1CfA blockedsave;//__at 0x1BFD
 unsigned char  Tval;
 unsigned char __at 0x0B objects_move;	// Werte der Objekte 0-7 (Ausgängsobjekte)
 unsigned char __at 0x0C objects_smove;		// Werte der Objekte 16/17 (Zusatzfunktionen 1-4)
@@ -62,8 +64,8 @@ unsigned char oldblockvalue;//,zfout,zftyp;
 unsigned char kanal[4];		// Wert des Kanalobjekts
 unsigned char knr;
 
-__bit portchanged,state;
-__bit handmode;
+__bit portchanged;
+//__bit handmode;
 
 
 
@@ -130,7 +132,7 @@ unsigned long read_obj_value(unsigned char objno) 	// gibt den Wert eines Objekt
 	return(ret_val);
 }
 
-
+/*
 void write_obj_value(unsigned char objno,unsigned int objvalue)	// schreibt den aktuellen Wert eines Objektes ins 'USERRAM'
 {
 	if(objno<8) {// kurz und lanzeit
@@ -143,48 +145,67 @@ void write_obj_value(unsigned char objno,unsigned int objvalue)	// schreibt den 
 		else objects_smove |=bitmask_1[objno];//1<<objno;
 	}
 }
-
+*/
 
 //							Sicherheit 16,17; Sonne 18,19
 //									16,17..18,19			0,1
+unsigned char allgemein;
 void Sobject_schalten(unsigned char objno,unsigned char val)// Schaltet die Sicherheitsfunktionen
 {
-unsigned char k,zuordnung,sobj,blockstart,blockend,action,sunval,pos;
-blockstart;blockend;
-	
+unsigned char k,zuordnung,sobj,blockstart,blockend,action,sunval,pos,pos_restore,polarity;
+blockstart;blockend;pos_restore=0;
+	allgemein=objno;
 	if (objno >=20){		// wenn bypass aus delay timer...(16,17)+32
 		sobj=objno&0x01;	// dann sobj ausfiltern
-		state=0;				//state so setzen damit sperre aktiv wird
+		polarity=0;				//state so setzen damit sperre aktiv wird
 		val=0x01;		// dto für objektvalue
 	}
 	else {
 		sobj=objno-16;				//sobj ("Sicherheitsobjektnummer")ist also 0 für Sicherheit1, 1 für Si 2
-		state=!((eeprom[0xE2])& (0x40<<sobj));//Polarität
-
+		polarity=(~eeprom[0xE2])>>6;//Polarität
 	}
-		write_obj_value(objno & 0x1F ,val);		// Objektwert im userram speichern
-			//if (val){
-				if (state^(__bit)val) zfstate=zfstate |(0x0F<<(sobj<<2));// setzen der sicherhfahrt 1 in zfstate, xor verknüpft die polarität
-				else {
-					zfstate=zfstate & (0xFF-(0x0F<<(sobj<<2)));//in zfstate sind für sich1 0F und sich2 F0
-					set_entriegeln(sobj + 9);// Update objekt macht refresh auf Zeit 9/10  Zyklusüberwachung
+		if(val)objects_smove |= bitmask_1[sobj];//write_obj_value(objno & 0x1F ,val);		// Objektwert im userram speichern
+		else objects_smove &= ~bitmask_1[sobj];
+			if (sobj<2){
+				pos=(objects_smove & 0x03)^polarity; //polarity* die beiden sperrobjekte
+				if(~pos & (sobj+1))set_entriegeln(sobj + 9);// Update objekt macht refresh auf Zeit 9/10  Zyklusüberwachung
+				pos_restore=((~pos) &(eeprom[0xE9]>>6));// Position nachführen aktiviert?
+				for (k=0x11;k;k<<=2,pos<<=2)
+				{
+					if(pos & eeprom[0xF1])
+					{
+						blocked|=(k);
+						
 					}
-				zuordnung=eeprom[0xF1] & zfstate;//in zuordnung jetzt eine 1 für jede sicherheit 
-				blocked =zuordnung |((zuordnung >>4) | (zuordnung<<4)); //beide Sicherheitsergebnisse verodern..
-			//}
+					else
+					{
+						blocked&=(~k);
+
+					}
+				}
+
+			}
 			blockstart= blocked & ~oldblockvalue;//steigende Flanke der Blockade(sicherheit)
 			blockend= ~blocked & oldblockvalue;	//fallende Flanke der Blockade(sicherheit)
-
-			if (!handmode){
+			
+//			if (!handmode){
 			oldblockvalue=blocked;
 
 			for (k=0;k<=3;k++){		//für die 4 Kanäle die Sicherheitsfuntionen schalten
 				action=0;
 				if(blockstart & 0x01){
 					action=(eeprom[0xF0]>>(k<<1))&0x03;
+					l_position_s_stored[k]=l_position_target[k];
+					j_position_s_stored[k]=j_position_target[k];
 				}// ende if(blockstart
 				if(blockend & 0x01){
-					action=(eeprom[0xEF]>>(k<<1))&0x03;
+					if(pos_restore)
+					{// Position nachführen
+						l_position_target[k]=l_position_s_stored[k];
+						j_position_target[k]=j_position_s_stored[k];
+						positions_req|=bitmask_1[k];
+					}
+					else action=(eeprom[0xEF]>>(k<<1))&0x03;
 				}
 				if(action){
 						object_schalten(k+12,0,0,action>>1);
@@ -192,7 +213,7 @@ blockstart;blockend;
 				blockend=blockend>>1;
 				blockstart=blockstart>>1;
 			
-				if(sobj>=2)
+				if(sobj>=2 && !(bitmask_1[k]& blocked))
 				{	
 					zuordnung=(eeprom[0xF3]>>7)|((eeprom[0xF4]>>6)&0x02);// polaritätsbits holen
 					sunval=((objects_smove&0x0C)>>2)^zuordnung;// sunval bilden
@@ -210,14 +231,15 @@ blockstart;blockend;
 					}
 					else 
 					{
-						if((eeprom[0xF7+k])&0x80)
+						if((eeprom[0xF7+k])&0x80)// nach Sonnenfkt ende Position nachführen
 						{
 							j_position_target[k]=j_position_stored[k];
 							l_position_target[k]=l_position_stored[k];
 						}
-						sunval=eeprom[0xFB+k]&0xC0;
-						if(sunval==0x40)j_position_target[k]=0;
-						if(sunval==0x80)j_position_target[k]=255;	
+						sunval=eeprom[0xFB+k]&0xC0;// Parameter Aktion nach Sonnenfkt - Ende, wenn nicht nachführen
+						if(sunval==0x40)j_position_target[k]=0;		//aus
+						if(sunval==0x80)j_position_target[k]=255;	// ab
+						if(sunval==0x80)timercnt[k+4]&=0x80;		//Langzeit stop
 					}
 					positions_req|=(bitmask_1[k+4]|bitmask_1[k]);
 
@@ -225,7 +247,7 @@ blockstart;blockend;
 			
 			}// ende for(k=0;k...
 			
-		}//ende if !handmode
+//		}//ende if !handmode
 }//ende Sobject_schalten
 
 
@@ -241,11 +263,9 @@ void object_schalten(unsigned char objno,unsigned char value, unsigned char mode
 	off_disable;
 		kwin = kanal[objno & 0x03]& 0x0f;// kwin heisst KanalWertIN. Bit 0+1 Relaise status, Bit 4+5 gewünschter Relaise status
 		kwout=kwin;
-		if (objstate) write_obj_value(objno & 0x07,1);		// Objektwert im userram speichern
-		else write_obj_value(objno & 0x07,0);
-
-		port_pattern=0x01<<(objno&0x07);//port_pattern=0x01<<(objno&0x0F)
-
+		port_pattern=bitmask_1[objno&0x07];//done. port_pattern=0x01<<(objno&0x0F)
+		if (objstate) objects_move|=port_pattern;//write_obj_value(objno & 0x07,1);		// Objektwert im userram speichern
+		else objects_move&=(~port_pattern);//write_obj_value(objno & 0x07,0);
 		if((port_pattern & blocked)==0  ||(objno >=16)) {	// Sperre behandeln
 		objno=objno&0x07;	// damit die bypassobjekte 8-15 wieder 0-7 sind!
 
@@ -426,7 +446,6 @@ unsigned int calculate_position(unsigned char kanal)
 	base=base&0x07;				// basis maskieren  //
 	if (base>=3)l_laufzeit=((unsigned int)(eeprom[0xDE + n])* basefaktor[base]);
 	else l_laufzeit=(unsigned int)eeprom[0xDE + n]>>2;
-//	allgemein=l_laufzeit;
 	if(kanal<4)// Lamellenposition berechnen
     {
 		l_position[n]= ((((unsigned int)l_position_int[n])<<8)-l_position_int[n])/l_laufzeit;
@@ -702,12 +721,13 @@ while( (TMOD&0x0F)==0x02 && ( TL0>0x72));// PWM scannen um "Hand"-Tasten abzufra
 }//ende handsteuerung...
 */
 
-
+/*
 void sobj_update(void)
 {
 	Sobject_schalten(16,read_obj_value(16)&0x01);
 	Sobject_schalten(17,read_obj_value(17)&0x01);
 }
+*/
 void set_pause(unsigned char objnr,unsigned char Pstate)// setzt die Pausezeit und traegt Pstate in timerstate[ ] ein
 {
 	unsigned char pause,pauseobj;
@@ -1073,7 +1093,7 @@ void restart_app(void) 		// Alle Applikations-Parameter zurücksetzen
 {
 
 	Tval=0x00;
-	handmode=0;
+//	handmode=0;
 
 	P0=0;
 	P0M1=0x00;		// Port 0 Modus push-pull für Ausgang
