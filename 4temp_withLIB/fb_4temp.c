@@ -1,10 +1,10 @@
 /*
- *      __________  ________________  __  _______
- *     / ____/ __ \/ ____/ ____/ __ )/ / / / ___/
- *    / /_  / /_/ / __/ / __/ / __  / / / /\__ \ 
- *   / __/ / _, _/ /___/ /___/ /_/ / /_/ /___/ / 
- *  /_/   /_/ |_/_____/_____/_____/\____//____/  
- *                                      
+ *    _____ ______ __   __________  __  _______ *
+ *   / ___// ____// /  / ____/ __ )/ / / / ___/ *
+ *   \__ \/ __/  / /  / /__ / __  / / / /\__ \  *
+ *  ___/ / /__  / /__/ /__// /_/ / /_/ /___/ /  *
+ * /____/_____//____/_/   /_____/\____//____/   *
+ *
  *  Copyright (c) 2010 Jan Wegner
  *  Copyright (c) 2014 Stefan Haller
  *
@@ -22,7 +22,6 @@
 #include <P89LPC922.h>
 #include "debug.h"
 #include <fb_lpc922_1.4x.h>
-#include "4temp_delay.h"
 #include "fb_app_4temp.h"
 #include "4temp_onewire.h"
 
@@ -31,16 +30,13 @@ DEBUG_VARIABLES;
 
 
 const unsigned char bitmask_1[8] ={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
-//const unsigned char __at 0x01CCE space[18];// Hier schreibt und liest die ETS !!
 // Geräteparameter setzen, diese können von der ETS übschrieben werden
 // Daher zusätzlich bei jedem restart_app neu schreiben
-static __code unsigned char __at 0x1D03 manufacturer[2]={0x00,0x08};	// Herstellercode 0x0008 = GIRA
-static __code unsigned char __at 0x1D05 device_type[2]={0x04, 0x38};	// 1080 Selfbus 4temp
-static __code unsigned char __at 0x1D0C port_A_direction={0};	// PORT A Direction Bit Setting
-static __code unsigned char __at 0x1D0D run_state={255};		// Run-Status (00=stop FF=run)
+//static __code unsigned char __at 0x1D03 manufacturer[2]={0x00,0x08};	// Herstellercode 0x0008 = GIRA
+//static __code unsigned char __at 0x1D05 device_type[2]={0x04, 0x38};	// 1080 Selfbus 4temp
+//static __code unsigned char __at 0x1D0C port_A_direction={0};	// PORT A Direction Bit Setting
+//static __code unsigned char __at 0x1D0D run_state={255};		// Run-Status (00=stop FF=run)
 
-
-unsigned char __at 0x00 RAM[00];
 
 
 void main(void)
@@ -51,14 +47,12 @@ void main(void)
 	int th;
 	// Initialize the debugging
 		DEBUG_SETUP;
-
 		P0M1 = 0xff;
 		P0M2 = 0xff;
 
-
-	//
-	//  Initialisierung
-	//
+	// ***************************************************************************
+	// Initialisierung
+	// ***************************************************************************
 	restart_hw();				// Hardware zurücksetzen
 	TASTER=0;					// LED Ein
 
@@ -75,18 +69,16 @@ void main(void)
 	}
 	restart_app();
 
+
+	// ***************************************************************************
+	// Hauptschleife
+	// ***************************************************************************
 	do  {
-
-		// ***************************************************************************
-		// Hauptschleife
-		// ***************************************************************************
-
+		// Here happens the serial communication with the PC
+			DEBUG_POINT;
 
 		if (APPLICATION_RUN)	// nur wenn run-mode gesetzt
 		{
-			// Here happens the serial communication with the PC
-				DEBUG_POINT;
-
 			if(RTCCON>=0x80) delay_timer();	// Realtime clock Ueberlauf
 
 			if (sequence==1)
@@ -103,7 +95,7 @@ void main(void)
 			{
 				interrupted=0;
 
-				// Temperatur einlesen + �bergabe Sensortyp
+				// Temperatur einlesen + Übergabe Sensortyp
 				th=read_temp(  ((eeprom[0x6B+(kanal>>1)])>>(((~kanal)&0x01)<<2))&0x0F  );
 
 				if (!interrupted)
@@ -118,9 +110,7 @@ void main(void)
 
 					// Buswiederkehr bearbeiten
 					if (sende_sofort_bus_return)
-					{
 						bus_return();
-					}
 
 					sequence=1;
 
@@ -150,7 +140,7 @@ void main(void)
 		// Prog Taster und LED bedienen
 		TASTER=1;			// Pin als Eingang schalten um Taster abzufragen
 			if(!TASTER){ 	// Taster gedrückt
-				if(tasterpegel<255)	tasterpegel++;
+				if(tasterpegel<127)	tasterpegel++;
 				else{
 					if(!tastergetoggelt)status60^=0x81;	// Prog-Bit und Parity-Bit im system_state toggeln
 					tastergetoggelt=1;
