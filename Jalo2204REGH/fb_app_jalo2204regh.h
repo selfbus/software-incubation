@@ -52,7 +52,7 @@ unsigned char __at 0x00 RAM[00];
 #define BOT_OUT		P0_0
 #define MID_OUT		P0_1
 #define WRITE		P0_2
-extern static __code unsigned char __at 0x1cfa blockedsave;
+extern static __code unsigned char __at 0x1CFA blockedsave;
 extern __bit handmode;
 extern 	__bit portchanged;// globale variable, sie ist 1 wenn sich portbuffer geändert hat
 extern unsigned char __at 0x0D portbuffer;
@@ -60,9 +60,10 @@ extern unsigned char __at 0x0F blocked;
 extern unsigned char __at 0x09 delay_toggle;
 extern unsigned char __at 0x10 timerbase[TIMERANZ];
 extern unsigned char timerstate[TIMERANZ];
+extern unsigned char timercnt[TIMERANZ];
 extern unsigned char kanal[4];		// Wert des Kanalobjekts
 extern unsigned char  positions_req;
-
+extern unsigned char drive_priority;
 extern unsigned char __idata __at 0xFE-40 l_position_target[4];
 extern unsigned char __idata __at 0xFE-36 j_position_target[4];
 extern unsigned char __idata __at 0xFE-32 l_position_last[4];

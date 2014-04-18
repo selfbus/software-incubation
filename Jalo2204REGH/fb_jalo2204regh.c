@@ -108,43 +108,50 @@ void main(void)
 			{// Abhandlung der Positionierungsanforderungen
 			
 				objbitval=0;objval=0;
-				if(((~blocked)&positions_req & bitmask_1[n]) && !(kanal[n&0x03]&0x33)&& !timerstate[(n&0x03)+11])
-				{	
-					if(n<4 )// Lamelle angefordert.. 
+				if(((~blocked)&positions_req & bitmask_1[n]) )
+				{
+					if((!timerstate[(n&0x03)+11])&& !(kanal[n&0x03]&0x33))
 					{
-						objval=l_position_target[n];
-				       	mode=0x02;// in mode wird die abzuziehende Objektnummer eincodiert
-					}
-					else
-					{	// jalo angefordert
-						if (!j_position_target[n&0x03])// bei 0 mache eine Langzeitfahrt auf 0
-						{							//Lamelle nicht nachführen!
-		        		 mode=0x00;// in mode wird die abzuziehende Objektnummer eincodiert
-		        		 objbitval=0;
-						}
-						else 
+						if(n<4 )// Lamelle angefordert.. 
 						{
-			        		 objbitval=1;
-			        		 if (j_position_target[n&0x03]==255)// bei 255 mache eine Langzeitfahrt auf 1
-			        		 {
-			        			 mode=0x00;// in mode wird die abzuziehende Objektnummer eincodiert
-			        		 }
-			        		 else
-			        			 {
-			        			 mode=0x01;
-			        			 objval=j_position_target[n&0x03];
-			        			 }
+							objval=l_position_target[n];
+					       	mode=0x02;// in mode wird die abzuziehende Objektnummer eincodiert
 						}
-						if(mode)
-						{							//nur wenn eine echte Jalosieposition gefahren wird
-						positions_req |=bitmask_1[n&0x03];// Lamellenfahrt setzen
-						l_position_last[n&0x03]= l_position[n&0x03];// merken der Lamelle
-						}
-					}
+						else
+						{	// jalo angefordert
+							if (!j_position_target[n&0x03])// bei 0 mache eine Langzeitfahrt auf 0
+							{							//Lamelle nicht nachführen!
+			        		 mode=0x00;// in mode wird die abzuziehende Objektnummer eincodiert
+			        		 objbitval=0;
+							}
+							else 
+							{
+				        		 objbitval=1;
+				        		 if (j_position_target[n&0x03]==255)// bei 255 mache eine Langzeitfahrt auf 1
+				        		 {
+				        			 mode=0x00;// in mode wird die abzuziehende Objektnummer eincodiert
+				        		 }
+				        		 else
+				        			 {
+				        			 mode=0x01;
+				        			 objval=j_position_target[n&0x03];
+				        			 }
+							}
+							if(mode)
+							{							//nur wenn eine echte Jalosieposition gefahren wird
+							positions_req |=bitmask_1[n&0x03];// Lamellenfahrt setzen
+							l_position_last[n&0x03]= l_position[n&0x03];// merken der Lamelle
+							}
+						}// ende else if lamelle angefordert
+						object_schalten(n,objval,mode&0x0F,objbitval);
 
-				object_schalten(n,objval,mode&0x0F,objbitval);
-//				positions_req&=(~bitmask_1[n]);
-			}
+					}//ende if ! timerstate
+					else if (drive_priority & 0x40)// Priorität auf Sonne-> stoppen.
+					{
+						timercnt[n]=0;
+						timercnt[n+4]=0;
+					}
+				}
 		//n++;
 		}
 
