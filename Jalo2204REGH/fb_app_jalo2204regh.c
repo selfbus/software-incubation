@@ -43,9 +43,17 @@ unsigned char  timercnt[TIMERANZ];// speicherplatz für den timercounter und 1 st
 unsigned char timerstate[TIMERANZ];// speicherplatz für den timercounter und 1 status bit
 const unsigned char bitmask_1[8] ={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
 const unsigned char drivetime_add_div[16] ={255,200,100,67,50,33,25,20,17,14,13,11,10,8,6,3};
-//const unsigned int basefaktor[]={1,1,1,16,256,4096};
+const unsigned char shift_count[]={0,3,0,3};
 const unsigned char basefaktor[]={1,1,1,4,64,128};
 const unsigned char sunlogic[]={0,18,20,30};// logic table
+/*				|	&	S2	S1	X
+SUNval		00	0	0	0	0	0
+SUNval		01	1	0	0	1	0
+SUNval		10	1	0	1	0	0
+SUNval		11	1	1	1	1	0
+	
+*/	
+
 unsigned int __at 0x09  timer;		// Timer für Schaltverzögerungen, wird alle 130us hochgezählt
 unsigned char __at 0x09 delay_toggle;			// um nur jedes 8. Mal die delay routine auszuführen
 //var überschneidung ist Absicht
@@ -211,14 +219,15 @@ blockstart;blockend;pos_restore=0;
 				}// ende if(action.. // (blockend...
 				blockend=blockend>>1;
 				blockstart=blockstart>>1;
-			
+
 				if(sobj>=2 && !(bitmask_1[k]& blocked))
 				{	
 					polarity=(eeprom[0xF3]>>7)|((eeprom[0xF4]>>6)&0x02);// polaritätsbits holen
-					sunval=((objects_smove&0x0C)>>2)^polarity;// sunval bilden
-					zuordnung=(eeprom[0xE2+(k >>1)]>>((k&0x01)+(k&0x01)+(k&0x01))&0x07);// zuordnung holen
+					sunval=((objects_smove&0x0C)>>2)^(polarity^0x03);// sunval bilden
+					zuordnung=(eeprom[0xE2+(k >>1)]>>(shift_count[k]))&0x07;// zuordnung holen
 					action=bitmask_1[zuordnung]& sunlogic[sunval];// action mit logiktabelle bilden
 					pos=eeprom[0xF3+k];
+					
 					if(action)// Jalousie und Lamelle nach Sonne Positionieren
 					{
 						pos=pos&0x7F;
@@ -231,14 +240,18 @@ blockstart;blockend;pos_restore=0;
 					else 
 					{
 						if((eeprom[0xF7+k])&0x80)// nach Sonnenfkt ende Position nachführen
+							
 						{
 							j_position_target[k]=j_position_stored[k];
 							l_position_target[k]=l_position_stored[k];
 						}
+						else
+						{
 						sunval=eeprom[0xFB+k]&0xC0;// Parameter Aktion nach Sonnenfkt - Ende, wenn nicht nachführen
-						if(sunval==0x40)j_position_target[k]=0;		//aus
+						if(sunval==0x40)j_position_target[k]=0;		//auf
 						if(sunval==0x80)j_position_target[k]=255;	// ab
 						if(sunval==0x80)timercnt[k+4]=0;		//Langzeit stop
+						}
 					}
 					positions_req|=(bitmask_1[k+4]|bitmask_1[k]);
 
@@ -274,7 +287,7 @@ void object_schalten(unsigned char objno,unsigned char value, unsigned char mode
 			if (objno<0x04){			//+++++ kurzzeitobjekt +++++
 				if(!mode)
 				{
-				delay_target = (eeprom[0xE8+(objno>>1)]>>(3*(objno&0x01))&0x07)|0x80;// zeitbasis aus eeprom holen
+				delay_target = (eeprom[0xE8+(objno>>1)]>>(shift_count[(objno)])&0x07)|0x80;// zeitbasis aus eeprom holen
 				faktor=eeprom[0xEA+objno];// faktor holen um dann auf 0 zu prüfen
 				}
 				else
@@ -336,7 +349,7 @@ void object_schalten(unsigned char objno,unsigned char value, unsigned char mode
 			else{				//++++++ Langzeitobjekt +++++++
 					//delay_target=zeit(0xFB,0xFC,0xDA,objno&0x03);// zeit aus eeprom holen
 
-					delay_target=(eeprom[0xFB+((objno&0x03)>>1)]>>(3*(objno&0x01))&0x07) | 0x80;// zeitbasis aus eeprom holen
+					delay_target=((eeprom[0xFB+((objno&0x03)>>1)]>>(shift_count[objno&0x01]))&0x07) | 0x80;// zeitbasis aus eeprom holen
 					tmp = eeprom[0xDA+(objno&0x03)];//  fahrzeit-faktor
 					
 					if(!mode)
@@ -552,6 +565,7 @@ void delay_timer(void)	// zählt alle 8 ms die Variable Timer hoch und prüft Queu
 							kanal[objno&0x03]=0x00;
 						}
 						else kanal[objno&0x03]|=kanal[objno&0x03]<<4;
+						
 						timerstate[objno]=0;
 					    set_pause(objno,(delay_state));// einsch. verz "pause" für eventuelle Fahrt in gegenrichtung
 					    if(objno>=4 && positions_req & bitmask_1[objno])
@@ -565,10 +579,6 @@ void delay_timer(void)	// zählt alle 8 ms die Variable Timer hoch und prüft Queu
 					    	 positions_req&=(~bitmask_1[objno]);
 					    						   
 					    }
-/*					    if(objno>=4)send_obj_value((objno&0x03)+4);							//in Pause-state sichern
-					    calculate_position(objno); // Position der Lamelle kalkulieren
-					    while(!send_obj_value((objno&0x03)+12));// und senden
-*/					    
 					}
 					if (objno==9 ){	//Sicherheit 1
 						if (delay_state == 0x01){
