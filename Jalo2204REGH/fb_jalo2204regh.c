@@ -33,7 +33,8 @@
 *
 */
 //
-#define debugger
+
+//#define debugger
 
 #ifdef MAX_PORTS_8
 	#define TYPE 4 

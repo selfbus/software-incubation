@@ -281,7 +281,11 @@ void object_schalten(unsigned char objno,unsigned char value, unsigned char mode
 		if((port_pattern & blocked)==0  ||(objno >=16)) {	// Sperre behandeln
 		objno=objno&0x07;	// damit die bypassobjekte 8-15 wieder 0-7 sind!
 
-		
+		if(!mode)
+		{
+			positions_req &= (~bitmask_1[(objno&0x03)+4]);//bei step oder mov: Jolo-pos-Anford. löschen
+			positions_req &= (~bitmask_1[(objno&0x03)]);//bei step oder mov: Jolo-pos-Anford. löschen
+		}
 // Pausezeit berechnen..
 
 			if (objno<0x04){			//+++++ kurzzeitobjekt +++++
@@ -313,15 +317,17 @@ void object_schalten(unsigned char objno,unsigned char value, unsigned char mode
 				if(pluszeit<faktor)pluszeit=255;
 				if(faktor){
 					if (kwin&0x33){					// wenn faehrt,dann stop
-						  set_pause(objno,kwin&0x03);
+						  if(timerstate[objno])tmp=0;// wenn kurzzeit aktiv
+						  else tmp=4;					//wenn langzeit aktiv
+						  set_pause(objno+tmp,kwin&0x03);// pause kurz oder langzeit setzen um jalosiepos aus zugeben oder nicht.
 						  //write_delay_record((objno&0x03)+11, 0x02, timer + pause);// einsch. verz "pause" für eventuelle Faht in gegenrichtung
 						  kwout=kwin&0xCC;	// Fahrt in beide Richtungen stoppen
 						  timerbase[objno]&=0x3F;	// kurzzeit löschen
 						  timerstate[objno]=0;	// kurzzeit löschen
-						  timerbase[objno+4]&=0x3F;  // lanzeit löschen
-						  timerstate[objno+4]=0;  // lanzeit löschen
+						  timerbase[objno+4]&=0x3F;  // langzeit löschen
+						  timerstate[objno+4]=0;  // langzeit löschen
 					}
-					else if(faktor){
+					else {// if(faktor)
 						timerbase[objno]=delay_target;
 						timerstate[objno]=0x01+objstate;
 						if (objstate==0){	//----- auf -----
@@ -342,7 +348,7 @@ void object_schalten(unsigned char objno,unsigned char value, unsigned char mode
 							 // timerstate[objno]=0x02;
 						 // }
 						}//ende ab
-					}// ende if (faktor)
+					}// ende else if (faktor)
 				}// ende wenn fährt
 			}// ende kurzzeitobjekte
 			
@@ -422,7 +428,7 @@ void object_schalten(unsigned char objno,unsigned char value, unsigned char mode
 			if (objno<=7){
 				tmp=timerstate[((objno & 0x03)+11)]& 0x07;
 				//rs_send(tmp);
-				if (((tmp&0x07)<4)&& (tmp & (kwout>>4) & 0x03)){
+				if (((tmp)<4)&& (tmp & (kwout>>4) & 0x03)){
 				//	rs_send('L');
 					timerbase[(objno&0x03)+11]=0; 
 					timercnt[(objno&0x03)+11]=0;//gleiche Richtung: Pause löschen
@@ -435,7 +441,7 @@ void object_schalten(unsigned char objno,unsigned char value, unsigned char mode
 					kwout=kwout&0xF0;
 				}
 				else {
-					if(!(tmp&0x07)){
+					if(!(tmp)){
 					kwout=kwin>>4;//wenn keine Pause Läuft, dann kanal "soll" in "ist" kopieren
 				//	rs_send ('S');
 					}
@@ -757,7 +763,7 @@ void set_pause(unsigned char objnr,unsigned char Pstate)// setzt die Pausezeit u
 	break;
 	}
     calculate_position(objnr); // Position der Lamelle kalkulieren
-    if(objnr>=4)send_obj_value((objnr&0x03)+4);							//in Pause-state sichern
+    if(objnr>=4)send_obj_value((objnr&0x03)+8);							//+4  
     while(!send_obj_value((objnr&0x03)+12));// und senden
 	timercnt[pauseobj]=pause;
 	timerbase[pauseobj]= 3 | 0x80;
