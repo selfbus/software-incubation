@@ -1,9 +1,9 @@
 /*
- *    _____ ______ __   __________  __  _______ *
- *   / ___// ____// /  / ____/ __ )/ / / / ___/ *
- *   \__ \/ __/  / /  / /__ / __  / / / /\__ \  *
- *  ___/ / /__  / /__/ /__// /_/ / /_/ /___/ /  *
- * /____/_____//____/_/   /_____/\____//____/   *
+ *    _____ ______ __   __________  __  _______
+ *   / ___// ____// /  / ____/ __ )/ / / / ___/
+ *   \__ \/ __/  / /  / /__ / __  / / / /\__ \
+ *  ___/ / /__  / /__/ /__// /_/ / /_/ /___/ /
+ * /____/_____//____/_/   /_____/\____//____/
  *
  *  Copyright (c) 2010 Jan Wegner
  *  Copyright (c) 2014 Stefan Haller
@@ -14,15 +14,14 @@
  *
  */
 
-#include <P89LPC922.h>
-#include <fb_lpc922_1.4x.h>
+#include <fb_lpc922.h>
 #include "fb_app_4temp.h"
 #include "4temp_onewire.h"
 
 
 unsigned char timerbase[TIMERANZ];	// Speicherplatz für die Zeitbasis
-unsigned char timercnt[TIMERANZ];// speicherplatz für den timercounter und 1 status bit
-unsigned int timer;		// Timer für Schaltverzögerungen, wird alle 130ms hochgezählt
+unsigned char timercnt[TIMERANZ];   // speicherplatz für den timercounter und 1 status bit
+unsigned int timer;		            // Timer für Schaltverzögerungen, wird alle 130ms hochgezählt
 
 int __idata __at (0xFE-0x08) temp[4];	// Temperaturwerte speichern
 int __idata __at (0xFE-0x10) lasttemp[4];
@@ -55,6 +54,7 @@ unsigned char sende_sofort_bus_return;
 void write_value_req(unsigned char objno)
 {
 	// nix zu schreiben
+    objno;
 }
 
 
@@ -65,11 +65,11 @@ void write_value_req(unsigned char objno)
 *
 * @return void
 */
-void read_value_req(unsigned char objno)	// Empfangenes read_value_request Telegramm verarbeiten
+void read_value_req(unsigned char objno)    // Empfangenes read_value_request Telegramm verarbeiten
 {
 	unsigned char objflags;
 
-	objflags=read_objflags(objno);		// Objekt Flags lesen
+	objflags=read_objflags(objno);		    // Objekt Flags lesen
 	// Objekt lesen, nur wenn read enable gesetzt (Bit3) und Kommunikation zulaessig (Bit2)
 	if((objflags&0x0C)==0x0C) send_obj_value(objno+64);
 }
@@ -153,7 +153,7 @@ void grenzwert (unsigned char eingang)
 	grenzwert_eingang = 0;
 
 
-	eingang &= 0x03;	// Nur bis 3 erlaubt
+	eingang &= 0x03;	    // Nur bis 3 erlaubt
 	// Objekt für Eingang
 	objno=(eingang<<1)+1;	// Objekte 1,3,5,7
 
@@ -281,10 +281,10 @@ void delay_timer(void)
 		timer++;
 		timerflags = timer&(~(timer-1));
 		for(n=0;n<16;n++){
-			if(timerflags & 0x0001){// positive flags erzeugen und schieben
-				for(m=0;m<TIMERANZ;m++){// die timer der reihe nach checken und dec wenn laufen
-					if ((timerbase[m]& 0x0F)==n){// wenn die base mit der gespeicherten base übereinstimmt
-						if (timercnt[m]>0x80){// wenn der counter läuft...
+			if(timerflags & 0x0001){                // positive flags erzeugen und schieben
+				for(m=0;m<TIMERANZ;m++){            // die timer der reihe nach checken und dec wenn laufen
+					if ((timerbase[m]& 0x0F)==n){   // wenn die base mit der gespeicherten base übereinstimmt
+						if (timercnt[m]>0x80){      // wenn der counter läuft...
 							timercnt[m]=timercnt[m]-1;// den timer [m]decrementieren
 						}// end if (timercnt...
 					}//end if(timerbase...
@@ -344,7 +344,7 @@ void delay_timer(void)
 
 				for (n=0;n<=6;n+=2)
 				{
-					if (verz_start & 0x40)	// Start mit Eingang 4
+					if (verz_start & 0x40)	    // Start mit Eingang 4
 					{
 						send_obj_value(n);
 					}
@@ -403,8 +403,15 @@ void restart_app()		// Alle Applikations-Parameter zurücksetzen
 	RTCL=0xA0;
 
 	// Port Konfigurieren
+	// Port 0
 	P0M1= 0x00;
 	P0M2= 0x00;	// alle auf quasi bidirektional
+	// Port 1, nach restart_hw()!
+	P1M1 &= ~0x03;	// P1.0/TXD auf input wg. Busdown Erkennung
+	P1M2 &= ~0x03;
+	ES = 0;
+	SCON = 0;
+	SSTAT = 0;
 
 	// Zeit für Sendeverzögerung bei Busspannungswiederkehr in Timer 8 laden
 	timerbase[8] = 4;	// 2 Sekunde als Basis
@@ -456,20 +463,20 @@ void restart_app()		// Alle Applikations-Parameter zurücksetzen
 	sequence=1;
 	kanal=0;
 	timer=0;			// Timer-Variable, wird alle 130ms inkrementiert
-
-	EA=0;						// Interrupts sperren, damit flashen nicht unterbrochen wird
+/*
+	EA=0;				// Interrupts sperren, damit flashen nicht unterbrochen wird
 	START_WRITECYCLE
-	WRITE_BYTE(0x01,0x03,0x00)	// Herstellercode 0x0008 = GIRA
+	WRITE_BYTE(0x01,0x03,0x00)	    // Herstellercode 0x0008 = GIRA
 	WRITE_BYTE(0x01,0x04,0x08)
-	WRITE_BYTE(0x01,0x05,0xB0)	// Devicetype 0x0438 = Selfbus 1080 4temp
+	WRITE_BYTE(0x01,0x05,0xB0)	    // Devicetype 0x0438 = Selfbus 1080 4temp
 	WRITE_BYTE(0x01,0x06,0x03)
 	//WRITE_BYTE(0x01,0x07,0x01)	// Versionnumber of application programm
-	WRITE_BYTE(0x01,0x0C,0x00)	// PORT A Direction Bit Setting
+	WRITE_BYTE(0x01,0x0C,0x00)	    // PORT A Direction Bit Setting
 	//WRITE_BYTE(0x01,0x0D,0xFF)	// Run-Status (00=stop FF=run)
 	//WRITE_BYTE(0x01,0x12,0x3A)	// COMMSTAB Pointer
 	STOP_WRITECYCLE
-	EA=1;						// Interrupts freigeben
-
+	EA=1;				// Interrupts freigeben
+*/
 
 	RTCCON=0x61; 		//RTC starten
 }

@@ -1,10 +1,10 @@
-Funktionen 4-fach Tempsensor v2.0 BETA1
+Funktionen 4-fach Tempsensor v2.01
 
 basiert auf G**a 0960 00 Analogeingang
 Messung über 4 DS18B20/DS18S20
 
 Allgemein:
-Auslesen aller Objektzustände		untested
+Auslesen aller Objektzustände		ja
 
 Sendeformat der Messwerte:
 16Bit (EIS5)						ja

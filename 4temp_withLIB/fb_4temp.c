@@ -1,9 +1,9 @@
 /*
- *    _____ ______ __   __________  __  _______ *
- *   / ___// ____// /  / ____/ __ )/ / / / ___/ *
- *   \__ \/ __/  / /  / /__ / __  / / / /\__ \  *
- *  ___/ / /__  / /__/ /__// /_/ / /_/ /___/ /  *
- * /____/_____//____/_/   /_____/\____//____/   *
+ *    _____ ______ __   __________  __  _______
+ *   / ___// ____// /  / ____/ __ )/ / / / ___/
+ *   \__ \/ __/  / /  / /__ / __  / / / /\__ \
+ *  ___/ / /__  / /__/ /__// /_/ / /_/ /___/ /
+ * /____/_____//____/_/   /_____/\____//____/
  *
  *  Copyright (c) 2010 Jan Wegner
  *  Copyright (c) 2014 Stefan Haller
@@ -12,43 +12,46 @@
  *  it under the terms of the GNU General Public License version 2 as
  *  published by the Free Software Foundation.
  *
+ *
+ *
+ * Versionen:	1.00	erste Version
+ *				2.00	erste Version mit Lib 1.4  -- WIP
+ *				2.01	Bugfix Sensoren wurde mit Buserkennung nicht mehr gelesen
  */
 
-// Versionen:	1.00	erste Version
-//				2.00	erste Version mit Lib 1.4  -- WIP
-
-
-
-#include <P89LPC922.h>
-#include "debug.h"
-#include <fb_lpc922_1.4x.h>
+//#include "debug.h"
+#include <fb_lpc922.h>
 #include "fb_app_4temp.h"
 #include "4temp_onewire.h"
 
-// Setup the debug variables
-DEBUG_VARIABLES;
-
+#ifdef DEBUG_H_
+	// Setup the debug variables
+	DEBUG_VARIABLES;
+#endif
 
 const unsigned char bitmask_1[8] ={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
 // Geräteparameter setzen, diese können von der ETS übschrieben werden
 // Daher zusätzlich bei jedem restart_app neu schreiben
-//static __code unsigned char __at 0x1D03 manufacturer[2]={0x00,0x08};	// Herstellercode 0x0008 = GIRA
-//static __code unsigned char __at 0x1D05 device_type[2]={0x04, 0x38};	// 1080 Selfbus 4temp
-//static __code unsigned char __at 0x1D0C port_A_direction={0};	// PORT A Direction Bit Setting
-//static __code unsigned char __at 0x1D0D run_state={255};		// Run-Status (00=stop FF=run)
+static __code unsigned char __at (0x1D03) manufacturer[2]={0x00,0x08};	// Herstellercode 0x0008 = GIRA
+static __code unsigned char __at (0x1D05) device_type[2]={0x04, 0x38};	// 1080 Selfbus 4temp
+static __code unsigned char __at (0x1D0C) port_A_direction={0};			// PORT A Direction Bit Setting
+static __code unsigned char __at (0x1D0D) run_state={255};				// Run-Status (00=stop FF=run)
 
 
 
 void main(void)
-{ 
+{
 	unsigned char n, tasterpegel=0;
 	__bit tastergetoggelt=0;
 
 	int th;
+#ifdef DEBUG_H_
 	// Initialize the debugging
-		DEBUG_SETUP;
-		P0M1 = 0xff;
-		P0M2 = 0xff;
+	DEBUG_SETUP;
+#endif
+	// Port 0 all open drain
+	P0M1 = 0xff;
+	P0M2 = 0xff;
 
 	// ***************************************************************************
 	// Initialisierung
@@ -74,22 +77,24 @@ void main(void)
 	// Hauptschleife
 	// ***************************************************************************
 	do  {
+#ifdef DEBUG_H_
 		// Here happens the serial communication with the PC
-			DEBUG_POINT;
+		DEBUG_POINT;
+#endif
 
 		if (APPLICATION_RUN)	// nur wenn run-mode gesetzt
 		{
-			if(RTCCON>=0x80) delay_timer();	// Realtime clock Ueberlauf
+			if(RTCCON>=0x80) delay_timer();		// Realtime clock Ueberlauf
 
 			if (sequence==1)
 			{
 				interrupted=0;
-				start_tempconversion();				// Konvertierung starten
+				start_tempconversion();			// Konvertierung starten
 				if (!interrupted) sequence=2;
 			}
 			else if (sequence==2)
 			{
-				if (ow_read_bit()) sequence=3;		// Konvertierung abgeschlossen
+				if (ow_read_bit()) sequence=3;	// Konvertierung abgeschlossen
 			}
 			else
 			{
@@ -117,7 +122,7 @@ void main(void)
 					// Kanalumschaltung
 					kanal++;
 					kanal&=0x03;
-#ifdef multiplex					
+#ifdef multiplex
 					P0_0=kanal&0x01;
 					P0_1=(kanal>>1)&0x01;
 #endif
@@ -134,7 +139,7 @@ void main(void)
 			}
 			else
 			{
-				for(n=0;n<100;n++);	// falls Hauptroutine keine Zeit verbraucht, der PROG LED etwas Zeit geben, damit sie auch leuchten kann
+				for(n=0;n<100;n++);		// falls Hauptroutine keine Zeit verbraucht, der PROG LED etwas Zeit geben, damit sie auch leuchten kann
 			}
 
 		// Prog Taster und LED bedienen
