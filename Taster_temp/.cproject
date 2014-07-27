@@ -25,7 +25,7 @@
 								<option id="sdcc.c.compiler.option.preprocessor.undef.symbol.1953952082" name="Undefined symbols (-U)" superClass="sdcc.c.compiler.option.preprocessor.undef.symbol"/>
 								<option id="sdcc.c.compiler.option.include.paths.1596444520" name="Include paths (-I)" superClass="sdcc.c.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="/usr/share/sdcc/include/mcs51"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_lpc936}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_lpc936/Releases}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_lpc922}&quot;"/>
 								</option>
 								<option id="sdcc.c.compiler.option.warnings.syntax.1121770478" name="Check syntax only (-fsyntax-only)" superClass="sdcc.c.compiler.option.warnings.syntax"/>
@@ -54,11 +54,11 @@
 								<option id="sdcc.c.link.option.strip.1528314188" name="Omit all symbol information (-s)" superClass="sdcc.c.link.option.strip"/>
 								<option id="sdcc.c.link.option.noshared.253379151" name="No shared libraries (-static)" superClass="sdcc.c.link.option.noshared"/>
 								<option id="sdcc.c.link.option.libs.2003110465" name="Libraries (-l)" superClass="sdcc.c.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" value="fb_lpc936.lib"/>
+									<listOptionValue builtIn="false" value="fb_lpc936_1.52_dbg.lib"/>
 								</option>
 								<option id="sdcc.c.link.option.paths.1399346129" name="Library search path (-L)" superClass="sdcc.c.link.option.paths" valueType="stringList">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_lpc936/Releases}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_lpc922/Releases}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_lpc936/Release}&quot;"/>
 								</option>
 								<option id="sdcc.c.link.option.ldflags.860439716" name="Linker flags" superClass="sdcc.c.link.option.ldflags"/>
 								<option id="sdcc.c.link.option.other.452794830" name="Other options (-Xlinker [option])" superClass="sdcc.c.link.option.other"/>
