@@ -24,10 +24,10 @@
 #include "fb_app_4temp.h"
 #include "4temp_onewire.h"
 
-//#ifdef DEBUG_H_
+#ifdef DEBUG_H_
 	// Setup the debug variables
 	DEBUG_VARIABLES;
-//#endif
+#endif
 
 const unsigned char bitmask_1[8] ={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
 unsigned char sensor_type;
@@ -50,7 +50,9 @@ void main(void)
 	__bit tastergetoggelt = 0;
 	__bit new_reading = 0;
 
+#ifdef DS_SERIES
 	int th;
+#endif
 
 #ifdef DEBUG_H_
 	// Initialize the debugging
@@ -83,137 +85,135 @@ void main(void)
 	// ***************************************************************************
 	// Hauptschleife
 	// ***************************************************************************
-	do  {
+	do
+	{
 #ifdef DEBUG_H_
 		// Here happens the serial communication with the PC
 		DEBUG_POINT;
 #endif
-
 		if (APPLICATION_RUN)	// nur wenn run-mode gesetzt
 		{
-			if(RTCCON>=0x80){
-			    dht_read_delay++;
-			    delay_timer();		// Realtime clock Ueberlauf
+			if(RTCCON>=0x80)
+			{
+			  dht_read_delay++;
+			  delay_timer();		// Realtime clock Ueberlauf
 			}
 
-            // Sensortyp für aktuellen Kanal holen
+      // Sensortyp für aktuellen Kanal holen
 			sensor_type = ( ((eeprom[0x6B+(kanal>>1)])>> ((kanal&0x01)<<2)) &0x0F);
 			//sensor_type = ( ((eeprom[0x6B+(kanal>>1)])>> (((~kanal)&0x01)<<2)) &0x0F); // For old VD
 
 			switch (sensor_type)
 			{
-			default:
-			    // Kanalumschaltung wenn Sensor unbekannt
-			    kanal++;
-			    kanal&=0x03;
-			    break;
+#ifdef DS_SERIES
+			case 4: // DS Series
+			case 5: // DS Series
+			{
+				if (sequence==1)
+				{
+					interrupted=0;
+					start_tempconversion();			// Konvertierung starten
+					if (!interrupted) sequence=2;
+				}
+				else if (sequence==2 && ow_read_bit())
+				{
+					sequence=3;	// Konvertierung abgeschlossen
+				}
+				else
+				{
+					interrupted=0;
+					// Temperatur einlesen + Übergabe Sensortyp
+					th=read_temp(sensor_type &0x01);
+					if (!interrupted)
+					{
+						// Bei Sensorfehler wird letzter Messwert gehalten TODO Fehler Com-Objekt einfügen??
+						temp[kanal]=th;
+						new_reading = 1;
+					}
+				}
+			}
+			break;
+#endif
+#ifdef DHT
+			case 8: // DHT1x Series
+			case 9: // DHT2x Series
+			{
+				if(dht_read_delay >= 31) //Minimum. 2 Seconds. delay
+        {
+					if( sensor_type == 8 ) dht1x_init(kanal); //  Initialize only on DHT1x Series
 
-			// DHT Series
-			case 8:
-			    if (dht_read_delay >=31) //min 2 sec. delay
-			        dht1x_init(kanal);
-			    // no break!
-			case 9:
-                if (dht_read_delay >=31) //min 2 sec. delay
-                {
-                    // Temperatur einlesen
-                    dht_error_code = receive_1wire_dht(kanal);    // TODO: Delay timer kanal sync!!
-                    if (dht_error_code==0)
-                       if(dht_decode(sensor_type &0x01))
-                        {
-                           temp[kanal]= dht_temp;
-                           //temp[kanal+4]= dht_humid;
-                           temp[4]= dht_humid;  // Test, old VD
-                           new_reading = 1;
-                        }
-                    dht_read_delay =0;
-                }
-                break;
+					// Temperatur einlesen --> TODO: Delay timer kanal sync!!
+          if( ( dht_error_code = dht_ow_receive( kanal ) ) == 0 && dht_decode( sensor_type &0x01 ) )
+          {
+            temp[kanal]= dht_temp;  // temp[kanal+4]= dht_humid;
+            temp[4]= dht_humid;     // Test, old VD
+            new_reading = 1;
+          }
+          dht_read_delay =0;
+         }
+			}
+      break;
+#endif
 
-			// DS Series
-			case 4:
-			case 5:
-                if (sequence==1)
-                {
-                    interrupted=0;
-                    start_tempconversion();			// Konvertierung starten
-                    if (!interrupted) sequence=2;
-                }
-                else if (sequence==2)
-                {
-                    if (ow_read_bit()) sequence=3;	// Konvertierung abgeschlossen
-                }
-                else
-                {
-                    interrupted=0;
-                    // Temperatur einlesen + Übergabe Sensortyp
-                    th=read_temp(sensor_type &0x01);
-                    if (!interrupted)
-                    {
-                        // Bei Sensorfehler wird letzter Messwert gehalten TODO Fehler Com-Objekt einfügen??
-                        temp[kanal]=th;
-                        new_reading = 1;
-                    }
-                }
-                break;
+			default: // Kanalumschaltung wenn Sensor unbekannt
+				kanal++;
+				kanal&=0x03;
+			break;
+
 			}
 
 			// Neue Messwerte verarbeiten
-            if (new_reading)
-            {
-                // Grenzwerte
-                grenzwert(kanal);
+      if( new_reading )
+      {
+        // Grenzwerte
+        grenzwert(kanal);
 
-                // Messwertdifferenz
-                messwert(kanal);
+        // Messwertdifferenz
+        messwert(kanal);
 
-                // Buswiederkehr bearbeiten
-                if (sende_sofort_bus_return)
-                    bus_return();
+        // Buswiederkehr bearbeiten
+        if (sende_sofort_bus_return) bus_return();
 
-                sequence=1;
+        sequence=1;
 
-                // Kanalumschaltung
-                kanal++;
-                kanal&=0x03;
+        // Kanalumschaltung
+        kanal++;
+        kanal&=0x03;
 #ifdef multiplex
-                P0_0=kanal&0x01;
-                P0_1=(kanal>>1)&0x01;
+        P0_0=kanal&0x01;
+        P0_1=(kanal>>1)&0x01;
 #endif
-                new_reading = 0;    // Warte auf neuen Messwert
-            }
-
+        new_reading = 0;    // Warte auf neuen Messwert
+      }
 		} // end if(APPLICATION_RUN)
 
-			// Telegrammverarbeitung
-			if (tel_arrived || tel_sent)
-			{
-				tel_arrived=0;
-				tel_sent=0;
-				process_tel();
-			}
-			else
-			{
-				for(n=0;n<100;n++);		// falls Hauptroutine keine Zeit verbraucht, der PROG LED etwas Zeit geben, damit sie auch leuchten kann
-			}
+		// Telegrammverarbeitung
+		if (tel_arrived || tel_sent)
+		{
+			tel_arrived=0;
+			tel_sent=0;
+			process_tel();
+		}
+		else
+		{
+			for(n=0;n<100;n++);		// falls Hauptroutine keine Zeit verbraucht, der PROG LED etwas Zeit geben, damit sie auch leuchten kann
+		}
 
 		// Prog Taster und LED bedienen
 		TASTER=1;			// Pin als Eingang schalten um Taster abzufragen
-			if(!TASTER){ 	// Taster gedrückt
-				if(tasterpegel<127)	tasterpegel++;
-				else{
-					if(!tastergetoggelt)status60^=0x81;	// Prog-Bit und Parity-Bit im system_state toggeln
-					tastergetoggelt=1;
-				}
-			}
+		if(!TASTER)
+		{
+			// Taster gedrückt
+			if(tasterpegel<127)	tasterpegel++;
 			else {
-				if(tasterpegel>0) tasterpegel--;
-				else tastergetoggelt=0;
+				if(!tastergetoggelt)status60^=0x81;	// Prog-Bit und Parity-Bit im system_state toggeln
+				tastergetoggelt=1;
 			}
-			TASTER=!(status60 & 0x01);	// LED entsprechend Prog-Bit schalten (low=LED an)
+		} else {
+			if(tasterpegel>0) tasterpegel--;
+			else tastergetoggelt=0;
+		}
 
-		} while(1);
+		TASTER=!(status60 & 0x01);	// LED entsprechend Prog-Bit schalten (low=LED an)
+	} while(1);
 }
-
-
-
