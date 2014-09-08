@@ -41,6 +41,11 @@
  *
  * Add the debug point somewhere in your main loop.
  */
+#define DEBUG \
+	while(!TI);\
+	TI=0;\
+	SBUF =
+
 #define DEBUG_POINT { if (RI) { DEBUG_OUTPUT(__debug_ram[SBUF]); RI = 0; } }
 
 #endif /* DEBUG_H_ */

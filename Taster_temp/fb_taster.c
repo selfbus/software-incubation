@@ -20,8 +20,8 @@
 *
 * @brief The Freebus Taster Application, Firmware fuer einen 4-fach Taster mit 4 LEDs
 *		Herstellercode 0x0004 = Jung
-*		Devicetype 0x1052 = Jung Tastsensor 2092
-*		in ETS das Applikationsprogramm "Universal/Schalten 105201" auswaehlen
+*		Devicetype  = Jung Tastsensor 2094
+*		in ETS das Applikationsprogramm "Universal/Schalten " auswaehlen
 *
 * \par Changes:
 *		1.00	erste Version;
@@ -35,10 +35,10 @@
 */
 
 // Options
-#define debugmode
+//#define debugmode
 #define SENSOR_TYPE     0   // !=1 DS18B20
 
-//#define NOPROGLED //typ 0,2 Die Progled blinkt im Progmodus da sie auch Betriebs LED ist
+#define NOPROGLED //typ 0,2 Die Progled blinkt im Progmodus da sie auch Betriebs LED ist
 //#define NOPROGBUTTON	//typ 1,3 es ist kein prog Taster vorhanden sondern progmode wird durch druecken von taste 1&3 oder 2&4 aktiviert
 
 // Geräteparameter setzen, diese können von der ETS übschrieben werden
@@ -54,6 +54,8 @@
     int th;
     int temp;
 
+#include <P89LPC922.h>
+#include <fb_lpc922_1.52.h>
 
 #include "fb_app_taster.h"
 #include "watchdog.h"
@@ -85,8 +87,8 @@
 	DEBUG_VARIABLES;
 #endif
 //unsigned char __at (0x00) RAM[00];
-unsigned char object_value[12];	// wird hier deklariert um den Speicher besser auszunutzen!!!
-
+unsigned int __idata __at (0xFE-16)object_value[8];	// wird hier deklariert um den Speicher besser auszunutzen!!!
+unsigned char bitobject; // für die unteren 8 Bitobjekte
 
 /**
 * The start point of the program, init all libraries, start the bus interface, the application
@@ -94,14 +96,15 @@ unsigned char object_value[12];	// wird hier deklariert um den Speicher besser a
 *
 * @return
 */
+unsigned int solltemp;
+unsigned char spreizung;
 void main(void)
 {
-	unsigned char n,LED,cmd,tasterpegel=0;
+	unsigned char n,LED,tasterpegel=0,val=0;//
 	__bit blink, verstell, verstellt,tastergetoggelt=0;
-	signed char cal,buttonpattern=1;
-	static __code signed char __at (USERRAM_ADDR_H + 0xBF) trimsave;
-//	static __code unsigned char __at (WRITE_ADDR+ 0xBE) LED_hell;
-
+	signed char buttonpattern=1;
+//	static __code signed char __at (USERRAM_ADDR + 0xBF) trimsave;
+	static __code unsigned char __at (0x1BFE) LED_hell;
 	/*// Temperatur Sensor
 	unsigned char sequence;
     int th;
@@ -110,23 +113,26 @@ void main(void)
 	// Verions bit 6 und 7 für die varianten, bit 0-5 für die verionen (63)
 	//Varianten sind hier noprogbutton=0x040, noprogled=0x80
 	__bit wduf;
+	
 	wduf=WDCON&0x02;
+	LED;verstellt;verstell;
 
 	restart_hw();							// Hardware zuruecksetzen
 	// TODO, sequence in restart_app verschieben
 	sequence=1;
-
+/*
 #ifdef NOPROGBUTTON
 	if((((PORT & 0x0F)== 0x03) || ((PORT & 0x0F)== 0x0C)) && wduf) cal=0;
-	else cal=trimsave;
+//	else cal=trimsave;
 
 #else
 	TASTER=1;
 	if(!TASTER && wduf)cal=0;
-	else cal=trimsave;
+//	else cal=trimsave;
 #endif
 	TRIM = (TRIM+trimsave);
 	TRIM &= 0x3F;				//oberen 2 bits ausblenden
+*/	
 	WATCHDOG_INIT
 	WATCHDOG_START
 	TASTER=0;
@@ -149,7 +155,7 @@ void main(void)
 	verstellt=0;
 	// Default LED Helligkeit holen
 	//dimmwert = LED_hell;
-	dimmwert =  eeprom[0xD1];	// Neue VD setzt Defaultwert in EEPROM
+	dimmwert = 255;// eeprom[0xD1];	// Neue VD setzt Defaultwert in EEPROM
 
 	do  {
 		WATCHDOG_FEED
@@ -157,6 +163,7 @@ void main(void)
 
 		n=timer;
 		blink=((n>>5) & 0x01);
+		
 		verstell=((n>>2) & 0x01);
 
 		if (verstell==0)verstellt=0;
@@ -175,6 +182,7 @@ void main(void)
 					}
 			}
 		}
+		
 		else{	//Wenn also Modul nicht im Progmode ist..
 			//##### TASTERABFRAGE ######
 
@@ -192,7 +200,7 @@ void main(void)
 	                {
 	                    if (ow_read_bit()) sequence=3;  // Konvertierung abgeschlossen
 	                }
-	                else
+	                else if (sequence==3)
 	                {
 	                    interrupted=0;
 	                    // Temperatur einlesen + Übergabe Sensortyp
@@ -200,8 +208,44 @@ void main(void)
 	                    if (!interrupted)
 	                    {
 	                        // Bei Sensorfehler wird letzter Messwert gehalten TODO Fehler Com-Objekt einfügen??
-	                        temp=th;
-	                        sequence=1; // TODO, wenn wir hier sind haben wir einen gültigen Messwert
+	                    	if(!(th&0x8000))temp=(th-100)+eeprom[0xF1]; //nur positive Temperaturen, Offset verrechnen
+	                    	else temp=0;
+	                    	
+	                        sequence=0; // TODO, wenn wir hier sind haben wir einen gültigen Messwert
+	                        write_obj_value(9,temp);
+	                        
+	                        solltemp = ((((int)eeprom [0xE9]<<8 )| eeprom[0xEA])& 0x7FF)<<(((((int)eeprom [0xE9]<<8 )| eeprom[0xEA])& 0x7800)>>11);
+	                        spreizung = eeprom[0xED];
+	                        if (temp<solltemp)val=1;
+	                        if (temp>solltemp)val=0;
+	                        write_obj_value(4,val);
+	                        object_value[5]=eis5conversion(temp,8);
+	                        if(temp<solltemp)
+	                        	{
+	                        	if((solltemp-temp)<=spreizung)object_value[6]=((solltemp-temp)*255)/spreizung;
+	                        	else object_value[6]=255;
+	                        	}
+	                        else
+	                        	{
+	                        	object_value[6]=0;
+	                        	}
+	                        timerstate[0]= 0x10;
+	            			timerbase[0]=6; //1
+	            			switch (eeprom[LED_DURATION]) {		// dann ueber delay-timer aus
+	            			case 38:	// 0,75 sec
+	            				timercnt[0]=47;
+	            				break;
+	            			case 118:	// 2,25 sec
+	            				timercnt[0]=141;
+	            				break;
+	            			case 150:	// 3 sec
+	            				timercnt[0]=188;
+	            				break;
+	            			}
+
+	            			send_obj_value(4);
+	            			send_obj_value(13);
+	            			send_obj_value(14);
 	                    }
 	                }
 			    }
@@ -229,9 +273,9 @@ void main(void)
 					if((status60 & 0x01)==0){	//wenn ausgemacht, Dimmwert speichern
 						EA=0;
 						START_WRITECYCLE;
-						FMADRH= EEPROM_ADDR_H;    // Write to EEPROM area above USERRAM
-						//FMADRL= 0xBE;
-						FMADRL= 0xD1;
+						FMADRH= 0x1B;//EEPROM_ADDR_H;    // Write to EEPROM area above USERRAM
+						FMADRL= 0xFE;
+						//FMADRL= 0xD1;
 						FMDATA=	dimmwert;
 						STOP_WRITECYCLE;
 						EA=1;

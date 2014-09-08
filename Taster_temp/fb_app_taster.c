@@ -21,19 +21,20 @@
 * @author Andreas Krebs <kubi@krebsworld.de>
 * @date    2008
 *
-* @brief Applikation Taster, siehe fb_tester.c
+* @brief Applikation Taster, siehe fb_taster.c
 *
 *
 */
-
+#include <P89LPC922.h>
 
 #include "fb_app_taster.h"
 //#include "rc5.h"
 
+#include  "debug.h"
 
 unsigned int timer,timerflags; /// Timer fuer Schaltverzoegerungen, wird alle 130us hochgezaehlt
 __bit delay_toggle; /// um nur jedes 2. Mal die delay routine auszufuehren
-//long buttontimer[4];
+
 unsigned char button_buffer; /// Puffer fuer Taster Werte
 //unsigned char object_value[8];
 unsigned char LEDSTATE,dimmcompare,dimmwert;
@@ -104,11 +105,10 @@ void button_changed(unsigned char buttonno, __bit buttonval)
 			break;
 		}
 		if (command) {	// nur wenn EIN, UM oder AUS (0=keine Funktion)
-			//send_eis(1,buttonno,objval);		// EIS 1 Telegramm senden
 			write_obj_value(buttonno,objval);
 			send_obj_value(buttonno);
 
-			switch_led(buttonno, objval);		// LED schalten
+		switch_led(buttonno, objval);		// LED schalten
 		}
 		break;
 
@@ -172,7 +172,7 @@ void button_changed(unsigned char buttonno, __bit buttonval)
 			//send_eis(1, buttonno, ((eeprom[0xD3+(buttonno*4)]&0x10)>>4));	// Kurzzeit telegramm immer bei Drücken senden
 			write_obj_value(buttonno,((eeprom[0xD3+(buttonno*4)]&0x10)>>4));
 			send_obj_value(buttonno);
-			switch_led(buttonno,1);	// Status-LED schalten (hier nur nie,immer,betätigung)
+//codesparen			switch_led(buttonno,1);	// Status-LED schalten (hier nur nie,immer,betätigung)
 			timercnt[buttonno+4]=eeprom[0xD5+(buttonno*4)];	// Faktor Dauer
 			timerbase[buttonno+4]=(eeprom[0xD4+(buttonno*4)]&0x06)*2;// Basis Dauer zwischen kurz und langzeit
 			timerstate[buttonno+4]=((eeprom[0xD3+(buttonno*4)]&0x10)>>4)+0x30;
@@ -197,10 +197,10 @@ void button_changed(unsigned char buttonno, __bit buttonval)
 		switch ((eeprom[0xD3+(buttonno*4)]>>4)& 0x07){// Art des Wertgebers holen
 		case 0: // ++++++++ Lichtszenenabruf ohne Speicherfunktion
 			if(buttonval){
-				if ((eeprom[COMMAND+(buttonno*4)]) & 0x04) switch_led(buttonno,0);	// wenn Betuetigungsanzeige, dann gleich beim druecken einschalten
+//codesparen				if ((eeprom[COMMAND+(buttonno*4)]) & 0x04) switch_led(buttonno,0);	// wenn Betuetigungsanzeige, dann gleich beim druecken einschalten
 				write_obj_value(buttonno+8,eeprom[0xD5+(buttonno*4)]);
 				send_obj_value(buttonno+8);
-				switch_led(buttonno,0);
+//codesparen				switch_led(buttonno,0);
 			}
 			break;
 		case 1:	// ++++++++ Lichtszenenabruf mit Speicherfunktion
@@ -214,7 +214,7 @@ void button_changed(unsigned char buttonno, __bit buttonval)
 			else{// nach loslassen...
 				if (timerstate[buttonno+4]==0x50){// wenn 5 sekunden noch nicht erreicht LZ senden
 					write_obj_value(buttonno+8,eeprom[0xD5+(buttonno*4)]);
-					switch_led(buttonno,1);
+//					switch_led(buttonno,1);
 				}
 				else{ // sonst speichern
 					write_obj_value(buttonno+8,eeprom[0xD5+(buttonno*4)]|0x80);
@@ -224,11 +224,11 @@ void button_changed(unsigned char buttonno, __bit buttonval)
 				timercnt[buttonno+4]=0;
 			}
 			break;
-		case 2: // ++++++  Helligkeitswertgeber
+/*		case 2: // ++++++  Helligkeitswertgeber
 			if (buttonval){
 				write_obj_value(buttonno+8,(eeprom[0xD5+(buttonno*4)]<<8)+ eeprom[0xD6+(buttonno*4)]);
 				send_obj_value(buttonno+8);
-				switch_led(buttonno,1);
+//				switch_led(buttonno,1);
 				if(!(eeprom[0xD3+(buttonno*4)]& 0x80)){// schauen ob Verstellung freigegeben
 					timercnt[buttonno+4]=156;
 					timerbase[buttonno+4]=2; //(32ms)
@@ -246,7 +246,7 @@ void button_changed(unsigned char buttonno, __bit buttonval)
 			if (buttonval){
 				write_obj_value(buttonno+8,(eeprom[0xD5+(buttonno*4)]<<8)+ eeprom[0xD6+(buttonno*4)]);
 				send_obj_value(buttonno+8);
-				switch_led(buttonno,1);
+//				switch_led(buttonno,1);
 				if(!(eeprom[0xD3+(buttonno*4)]& 0x80)){// schauen ob Verstellung freigegeben
 					timercnt[buttonno+4]=156;
 					timerbase[buttonno+4]=2; //(32ms)
@@ -261,11 +261,11 @@ void button_changed(unsigned char buttonno, __bit buttonval)
 				timerstate[buttonno+4]=0;
 			}
 			break;
-		case 4: // ++++++   Dimmwertgeber
+*/		case 4: // ++++++   Dimmwertgeber
 			if (buttonval){
 				write_obj_value(buttonno+8,eeprom[0xD5+(buttonno*4)]);
 				send_obj_value(buttonno+8);
-				switch_led(buttonno,1);
+//codesparen				switch_led(buttonno,1);
 				if(!(eeprom[0xD3+(buttonno*4)]& 0x80)){// schauen ob Verstellung freigegeben
 					timercnt[buttonno+4]=156;
 					timerbase[buttonno+4]=2; //(32ms)
@@ -333,7 +333,7 @@ unsigned int sendewert(unsigned char objno)
 */
 
 
-/*
+
 int eis5conversion(int zahl,unsigned char Typ)
 {
 	unsigned char exp=0;
@@ -346,6 +346,7 @@ int eis5conversion(int zahl,unsigned char Typ)
 
 		wert=zahl*100;// Hier reicht uns eine 16bit int var
 	}
+	if(Typ==8)wert=zahl;
 	if (Typ==7){// wenn Dimmwert ( EIS2, also keine Fließkomma)
 		wert=zahl;
 	}
@@ -355,27 +356,50 @@ int eis5conversion(int zahl,unsigned char Typ)
 	 			exp++;// und exponent um 1 erhöhen (ist ein 2^exp)
 	 		}
 	}
- 	return (wert+(exp<<11));// exponent dazu, geht auch bei EIS2 da EXP hier 0 ist.
+ 	return (wert|(exp<<11));// exponent dazu, geht auch bei EIS2 da EXP hier 0 ist.
+}
+/*
+signed int eis5conversion(signed int zahl)// wandelt 32 bit var in eis5 um
+{
+	unsigned char exp=0;
+	if(zahl>=0)
+	{
+		while (zahl > 2047){//solange Mantisse größer 11 Bit
+			zahl=zahl>>1;// Mantisse /2
+			exp++;// und exponent um 1 erhöhen (ist ein 2^exp)
+		}
+	}
+	else
+	{
+		while (zahl < -2048){//solange Mantisse größer 11 Bit
+			zahl=zahl >> 1;// Mantisse /2
+			zahl=zahl|0x8000;// signed bit reparieren
+			exp++;// und exponent um 1 erhöhen (ist ein 2^exp)
+		}
+		zahl=zahl & 0x87FF;
+	}
+ 	return ((signed int)zahl|(exp<<11));// exponent dazu.
 }
 */
-
 
 unsigned long read_obj_value(unsigned char objno)
 {
 //	unsigned int retvalue;
-	if(objno<4)	return(object_value[objno]);
-	else if (objno == 16) return dimmwert;	// Helligkeit Status LEDs
-	else return((object_value[objno-4]<<8)+object_value[objno]);
+	if(objno<8)	return((bitobject>>objno)&0x01);
+	//else if (objno == 16) return dimmwert;	// Helligkeit Status LEDs
+	else return(object_value[objno-8]);
 
 }
 
 
 void write_obj_value(unsigned char objno, unsigned int objval)
-{objval;
-	if(objno<4)object_value[objno]=objval;
+{
+	if(objno<8){
+		if(!objval)bitobject&=(~((0x01)<<objno));
+		else bitobject|=((0x01)<<objno);
+	}
 	else {
-		object_value[objno-4]=objval>>8;
-		object_value[objno]=objval&0xFF;
+		object_value[objno-8]=objval;
 	}
 }
 
@@ -445,7 +469,7 @@ void switch_led(unsigned char ledno, __bit onoff)
 		case 3:		// LED = invertierte Statusanzeige
 			onoff=!onoff;
 			break;
-		case 4:		// LED = Betaetigungsanzeige
+/*		case 4:		// LED = Betaetigungsanzeige
 			onoff=1;	// erstmal an beim druecken der Taste
 			timerstate[ledno]= 0x10;
 			timerbase[ledno]=1;
@@ -460,7 +484,7 @@ void switch_led(unsigned char ledno, __bit onoff)
 				timercnt[ledno]=188;
 				break;
 			}
-		}
+*/		}
 		ledvar=LEDSTATE;
 		ledvar&= ~(1<<(ledno+4));	// LEDs sind an Pin 4-7
 		ledvar |= ((onoff<<(ledno+4)) | 0x0F);	// unteren 4 bits immer auf 1 lassen !!!
@@ -479,6 +503,7 @@ void timer0_int  (void) __interrupt (1) // Interrupt T0 für soft PWM LED
 } // timer0_int
 
 
+
 /**
 * zaehlt alle 8ms die Variable Timer hoch und prueft records
 *
@@ -489,13 +514,15 @@ const unsigned char tele_repeat_value[8]={63,125,188,250,25,38,50,94};	// 3Bit: 
 
 void delay_timer(void)
 {
-	unsigned char objno, delay_value,ledvar,tmp,m,n;
+	unsigned char objno, delay_value,ledvar,tmp,m,n; 
 	unsigned int i_tmp;
+	i_tmp;
 //	long delval;
 //	long duration=1;
-	RTCCON=0x60;
-	RTCH=0x00;//RTCH=0x01;
-	RTCL=0xE6;//RTCL=0xCD;
+	ledvar;
+//	RTCCON=0x60;
+//	RTCH=0x00;//RTCH=0x01;
+//	RTCL=0xE6;//RTCL=0xCD;
 	RTCCON=0x61; //	start_rtc(8) RTC neu starten mit 4ms
 // +++++++  Hier werden alle timer  gemäß ihrer basis decremntiert
 	timer++;
@@ -521,11 +548,12 @@ void delay_timer(void)
 //		if(delay_state) {			// 0x00 = delay Eintrag ist leer
 			case 0x10:
 			//	if (objno<4) {	// LED bei Betaetigungsanzeige nach eingestellter Zeit ausschalten
-					ledvar=LEDSTATE;
-					ledvar &= ~(1<<(objno+4));	// LEDs sind an Pin 4-7
-					ledvar |= 0x0F;				// unbedingt taster pins wieder auf 1
-					LEDSTATE=ledvar;
-					timerstate[objno]=0;
+			//		ledvar=LEDSTATE;
+			//		ledvar &= ~(1<<(objno+4));	// LEDs sind an Pin 4-7
+			//		ledvar |= 0x0F;				// unbedingt taster pins wieder auf 1
+			//		LEDSTATE=ledvar;
+			//		timerstate[objno]=0;
+			if(!sequence)sequence=1;		
 			break;
 			case 0x20:	// Dimmen 0xF0 -> 0xD0 | 0x20
 				timerstate[objno] |=0xD0;
@@ -567,12 +595,12 @@ void delay_timer(void)
 						timercnt[objno]=0;
 			break;
 			case 0x50: // Wertgeber Lichtszene lang drücken zum speichern
-						switch_led(objno-4,1);
+//codesparen						switch_led(objno-4,1);
 						timerstate[objno]=0x60;
 			break;
 			case 0x60:// Wertgeber Lichtszene verstellen
 			break;
-
+/*
 			case 0x70: // Wertgeber Helligkeit langdrücken
 			case 0x80: // Wertgeber Helligkeit verstellen
 				timerbase[objno]=0;
@@ -589,7 +617,7 @@ void delay_timer(void)
 					i_tmp=0x03C94;
 				}
 				else{
-					switch_led(objno-4,1);
+//codesparen					switch_led(objno-4,1);
 				}
 				write_obj_value(objno+4,i_tmp);// wir rechnen immer mit exp 2^7
 				timerstate[objno]=0x80;
@@ -611,7 +639,7 @@ void delay_timer(void)
 				i_tmp +=eeprom[0xD6+4*(objno-4)];
 				if(i_tmp>=0x0032){
 					i_tmp -= 0x32;
-					switch_led(objno-4,1);
+//codesparen					switch_led(objno-4,1);
 				}
 				else{
 					i_tmp=0x07D0;
@@ -627,7 +655,7 @@ void delay_timer(void)
 				send_obj_value(objno+4);
 
 			break;
-
+*/
 			case 0xB0: // Wertgeber Dimmer langdrücken
 			case 0xC0: // Wertgeber Dimmer verstellen
 					tmp=read_obj_value(objno+4);//
@@ -642,7 +670,7 @@ void delay_timer(void)
 						else tmp=0;
 					}
 					write_obj_value(objno+4,tmp);
-					switch_led(objno-4,1);
+//codesparen					switch_led(objno-4,1);
 					send_obj_value(objno+4);		// dimmkommando senden
 					timerstate[objno]=0xC0;
 					timercnt[objno]=tele_repeat_value[m];// 0,5/1/1,5/2 Sec.
@@ -667,7 +695,7 @@ void restart_app(void)
 	unsigned char n;
 	__bit write_ok=0;
 
-	AUXR1  |= CLKLP;
+//	AUXR1  |= CLKLP;
 
 	// Pin 0-3 fuer Taster
 	for (n=0;n<4;n++) {
@@ -706,7 +734,7 @@ void restart_app(void)
 //	WRITE_BYTE(0x00,0x60,0x2E);	// system state: all layers active (run), not in prog mode
 //	STOP_WRITECYCLE;
 
-	for (n=0;n<12;n++) write_obj_value(n,0);		// Objektwerte alle auf 0 setzen
+	for (n=0;n<15;n++) write_obj_value(n,0);		// Objektwerte alle auf 0 setzen
 
 	for (n=0;n<8;n++) timercnt[n]=0;		// delay records loeschen
 
@@ -730,8 +758,8 @@ void restart_app(void)
 	TF0=0; //timer0 flag löschen
 	EA=1;// Interrupts freigeben
 
-	P2M1 &= ~0x80;
-	P2M2 &= ~0x80; // P2.7 bidirektional
+//	P2M1 &= ~0x80;
+//	P2M2 &= ~0x80; // P2.7 bidirektional
 
 	/*
 	// RC5 doesn't seem to work with the CCU since the timer does not reset when writing to TH2, TL2

@@ -17,9 +17,9 @@
 
 #include "fb_app_taster.h"
 #include "onewire.h"
+#include <P89LPC922.h>
 
-
-#define OWDATA 	P2_7	// Data-Pin für one-wire Sensor
+#define OWDATA 	P1_1	//RXD Data-Pin für one-wire Sensor
 const unsigned char bitmask_1[8] ={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
 
 unsigned char t;
