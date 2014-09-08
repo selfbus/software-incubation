@@ -54,17 +54,13 @@
     int th;
     int temp;
 
-#include <P89LPC922.h>
-#include <fb_lpc922_1.52.h>
+
 
 #include "fb_app_taster.h"
 #include "watchdog.h"
-#ifdef debugmode
-	#include  "debug.h"
-#endif
+
 #include "fb_rs232.h"
 #include "onewire.h"
-//#include "rc5.h"
 
 
 #ifdef NOPROGBUTTON
@@ -113,7 +109,7 @@ void main(void)
 	// Verions bit 6 und 7 für die varianten, bit 0-5 für die verionen (63)
 	//Varianten sind hier noprogbutton=0x040, noprogled=0x80
 	__bit wduf;
-	
+
 	wduf=WDCON&0x02;
 	LED;verstellt;verstell;
 
@@ -132,7 +128,7 @@ void main(void)
 #endif
 	TRIM = (TRIM+trimsave);
 	TRIM &= 0x3F;				//oberen 2 bits ausblenden
-*/	
+*/
 	WATCHDOG_INIT
 	WATCHDOG_START
 	TASTER=0;
@@ -163,7 +159,7 @@ void main(void)
 
 		n=timer;
 		blink=((n>>5) & 0x01);
-		
+
 		verstell=((n>>2) & 0x01);
 
 		if (verstell==0)verstellt=0;
@@ -182,7 +178,7 @@ void main(void)
 					}
 			}
 		}
-		
+
 		else{	//Wenn also Modul nicht im Progmode ist..
 			//##### TASTERABFRAGE ######
 
@@ -210,10 +206,10 @@ void main(void)
 	                        // Bei Sensorfehler wird letzter Messwert gehalten TODO Fehler Com-Objekt einfügen??
 	                    	if(!(th&0x8000))temp=(th-100)+eeprom[0xF1]; //nur positive Temperaturen, Offset verrechnen
 	                    	else temp=0;
-	                    	
+
 	                        sequence=0; // TODO, wenn wir hier sind haben wir einen gültigen Messwert
 	                        write_obj_value(9,temp);
-	                        
+
 	                        solltemp = ((((int)eeprom [0xE9]<<8 )| eeprom[0xEA])& 0x7FF)<<(((((int)eeprom [0xE9]<<8 )| eeprom[0xEA])& 0x7800)>>11);
 	                        spreizung = eeprom[0xED];
 	                        if (temp<solltemp)val=1;

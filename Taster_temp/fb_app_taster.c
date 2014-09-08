@@ -25,12 +25,10 @@
 *
 *
 */
-#include <P89LPC922.h>
-
 #include "fb_app_taster.h"
-//#include "rc5.h"
-
-#include  "debug.h"
+#ifdef debugmode
+    #include  "debug.h"
+#endif
 
 unsigned int timer,timerflags; /// Timer fuer Schaltverzoegerungen, wird alle 130us hochgezaehlt
 __bit delay_toggle; /// um nur jedes 2. Mal die delay routine auszufuehren
@@ -514,7 +512,7 @@ const unsigned char tele_repeat_value[8]={63,125,188,250,25,38,50,94};	// 3Bit: 
 
 void delay_timer(void)
 {
-	unsigned char objno, delay_value,ledvar,tmp,m,n; 
+	unsigned char objno, delay_value,ledvar,tmp,m,n;
 	unsigned int i_tmp;
 	i_tmp;
 //	long delval;
@@ -553,7 +551,7 @@ void delay_timer(void)
 			//		ledvar |= 0x0F;				// unbedingt taster pins wieder auf 1
 			//		LEDSTATE=ledvar;
 			//		timerstate[objno]=0;
-			if(!sequence)sequence=1;		
+			if(!sequence)sequence=1;
 			break;
 			case 0x20:	// Dimmen 0xF0 -> 0xD0 | 0x20
 				timerstate[objno] |=0xD0;
