@@ -170,7 +170,7 @@ signed int read_temp(unsigned char sensortyp)
 void dht1x_init( unsigned char hw_channel)
 {
   P0 &= ~bitmask_1[hw_channel];     // Leseanvorderung DHT 1x Sensoren
-  owdelay(OWDELAY_DHT_RECEIVE);     // Pull low, min. 18ms (17ms hier, 1.3ms später) // Release in receive_1wire_dht
+  owdelay(OWDELAY_DHT_INIT);     // Pull low, min. 18ms (17ms hier, 1.3ms später) // Release in receive_1wire_dht
 }
 
 __bit dht_decode(unsigned char sensor_type)
@@ -179,7 +179,7 @@ __bit dht_decode(unsigned char sensor_type)
 
   // Calculate own checksum - Zum Senden wird an DS1820 Format angepasst
 	if( dht_data[4] == ( (dht_data[0]+dht_data[1]+dht_data[2]+dht_data[3]) &0xFF) )
-  {
+	{
 		// Calculate Humidity and Temperature and Convert into double
 		switch(sensor_type)
 		{
@@ -208,8 +208,8 @@ __bit dht_decode(unsigned char sensor_type)
    		default:
    		  bRet= 0; // CRC Error | Failure
    		break;
-    }
-  }
+		}
+	}
 	return bRet;
 }
 
@@ -232,15 +232,15 @@ unsigned char dht_ow_receive(unsigned char hw_channel)
 
   wait_count = 0; // Wait for Falling Edge, DHT response is low for 80us
   while( P0 &bitmask_1[hw_channel])
-	{
+  {
     wait_count++;
     if(wait_count > 100)
     {
-      dht_data[0] = dht_data[1] = dht_data[2] = dht_data[3] = 0; // Delete previous sample
+        dht_data[0] = dht_data[1] = dht_data[2] = dht_data[3] = 0; // Delete previous sample
 #ifdef DEBUG_H_
-      dht_data[4] = 0xFF; // Something went wrong (for debug readability only)
+        dht_data[4] = 0xFF; // Something went wrong (for debug readability only)
 #endif
-      return 1; // Error: DHT Sensor LOW Timeout
+        return 1; // Error: DHT Sensor LOW Timeout
     }
   }
 
@@ -248,14 +248,14 @@ unsigned char dht_ow_receive(unsigned char hw_channel)
   while (!(P0 &bitmask_1[hw_channel]))
   {
     wait_count++;
-		if(wait_count > 100)
-		{
-			dht_data[0] = dht_data[1] = dht_data[2] = dht_data[3] = 0; // Delete previous sample
+	if(wait_count > 100)
+	{
+		dht_data[0] = dht_data[1] = dht_data[2] = dht_data[3] = 0; // Delete previous sample
 #ifdef DEBUG_H_
-			dht_data[4] = 0xFF; // Something went wrong (for debug readability only)
+		dht_data[4] = 0xFF; // Something went wrong (for debug readability only)
 #endif
-      return 2; // Error: DHT HIGH Response Timeout
-		}
+		return 2; // Error: DHT HIGH Response Timeout
+	}
   }
 
   // Sample 40 bits, timeout after last bit ensures that sensor has ended transmission
@@ -263,42 +263,42 @@ unsigned char dht_ow_receive(unsigned char hw_channel)
   for (bit_count = 0; bit_count<40; bit_count++)
   {
 #ifdef DEBUG_H_
-P0_4 = 1;
+      P0_4 = 1;
 #endif
-    // Wait for falling edge, start of next bit
-    wait_count = 0;
-    while (P0 &bitmask_1[hw_channel])
-    {
-      wait_count++;
-      if(wait_count > 100) return 3;   // Error, "DHT Bit %d Falling Edge Timeout\n", bit_count
-    }
+      // Wait for falling edge, start of next bit
+      wait_count = 0;
+      while (P0 &bitmask_1[hw_channel])
+      {
+          wait_count++;
+          if(wait_count > 100) return 3;   // Error, "DHT Bit %d Falling Edge Timeout\n", bit_count
+      }
 #ifdef DEBUG_H_
-P0_4 = 0;
-P0_5 = 1;
+      P0_4 = 0;
+      P0_5 = 1;
 #endif
 		// Wait for rising edge, sample length. 26-28us = 0, 70us = 1
 		wait_count = 0;
-    while (!(P0 &bitmask_1[hw_channel]))
-    {
-      wait_count++;
-      if(wait_count > 100) return 4;   // Error, "DHT Bit %d Timeout\n", bit_count
-    }
+		while (!(P0 &bitmask_1[hw_channel]))
+		{
+		    wait_count++;
+		    if(wait_count > 100) return 4;   // Error, "DHT Bit %d Timeout\n", bit_count
+		}
 #ifdef DEBUG_H_
-P0_5 = 0;
+		P0_5 = 0;
 #endif
-    // Wait at least 28uS
-    for (t = 0; t < DELAY_CONST_1WIRE_DHT_MASTER_1; t++) ;
+		// Wait at least 28uS
+		for (t = 0; t < DELAY_CONST_1WIRE_DHT_MASTER_1; t++) ;
 
 #ifdef DEBUG_H_
-P0_6 = 1;
+		P0_6 = 1;
 #endif
-    // Sample current bit
-    if (P0 &bitmask_1[hw_channel])
-      dht_data[bit_count/8] |= (1<<(7-(bit_count%8)));
-    else
-      dht_data[bit_count/8] &= ~(1<<(7-(bit_count%8)));
+		// Sample current bit
+		if (P0 &bitmask_1[hw_channel])
+		    dht_data[bit_count/8] |= (1<<(7-(bit_count%8)));
+		else
+		    dht_data[bit_count/8] &= ~(1<<(7-(bit_count%8)));
 #ifdef DEBUG_H_
-P0_6 = 0;
+		P0_6 = 0;
 #endif
   }
 
@@ -310,21 +310,20 @@ P0_6 = 0;
     wait_count = 0;
     while (P0 &bitmask_1[hw_channel])
     {
-      wait_count++;
-      if(wait_count > 100)
-      {
-        //"DHT Stop detected after %d Falling Edge  ", bit_count
-        if(bit_count) return 0;   // OK, timeout during second run
-        else return 5;   // Stop pulse missing
-      }
+        wait_count++;
+        if(wait_count > 100)
+        {
+            //"DHT Stop detected after %d Falling Edge  ", bit_count
+            if(bit_count) return 0;   // OK, timeout during second run
+            else return 5;   // Stop pulse missing
+        }
     }
 
     // Wait for bus release
     while (!(P0 &bitmask_1[hw_channel]))
     {
-      wait_count++;
-      if(wait_count > 100) return 6;   // Error, "DHT Bus release %d Timeout\n", bit_count
-
+        wait_count++;
+        if(wait_count > 100) return 6;   // Error, "DHT Bus release %d Timeout\n", bit_count
     }
   }
   return 7;   // Got too many bits

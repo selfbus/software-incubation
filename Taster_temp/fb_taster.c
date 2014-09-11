@@ -38,7 +38,7 @@
 //#define debugmode
 #define SENSOR_TYPE     0   // !=1 DS18B20
 
-#define NOPROGLED //typ 0,2 Die Progled blinkt im Progmodus da sie auch Betriebs LED ist
+//#define NOPROGLED //typ 0,2 Die Progled blinkt im Progmodus da sie auch Betriebs LED ist
 //#define NOPROGBUTTON	//typ 1,3 es ist kein prog Taster vorhanden sondern progmode wird durch druecken von taste 1&3 oder 2&4 aktiviert
 
 // Geräteparameter setzen, diese können von der ETS übschrieben werden
@@ -116,19 +116,7 @@ void main(void)
 	restart_hw();							// Hardware zuruecksetzen
 	// TODO, sequence in restart_app verschieben
 	sequence=1;
-/*
-#ifdef NOPROGBUTTON
-	if((((PORT & 0x0F)== 0x03) || ((PORT & 0x0F)== 0x0C)) && wduf) cal=0;
-//	else cal=trimsave;
 
-#else
-	TASTER=1;
-	if(!TASTER && wduf)cal=0;
-//	else cal=trimsave;
-#endif
-	TRIM = (TRIM+trimsave);
-	TRIM &= 0x3F;				//oberen 2 bits ausblenden
-*/
 	WATCHDOG_INIT
 	WATCHDOG_START
 	TASTER=0;

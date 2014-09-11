@@ -518,9 +518,7 @@ void delay_timer(void)
 //	long delval;
 //	long duration=1;
 	ledvar;
-//	RTCCON=0x60;
-//	RTCH=0x00;//RTCH=0x01;
-//	RTCL=0xE6;//RTCL=0xCD;
+
 	RTCCON=0x61; //	start_rtc(8) RTC neu starten mit 4ms
 // +++++++  Hier werden alle timer  gemäß ihrer basis decremntiert
 	timer++;
@@ -726,7 +724,6 @@ void restart_app(void)
 //	WRITE_BYTE(0x01,0x07,0x01)	// Versionsnummer
 	WRITE_BYTE(0x01,0x0C,0x00)	// PORT A Direction Bit Setting
 	WRITE_BYTE(0x01,0x0D,0xFF)	// Run-Status (00=stop FF=run)
-//	WRITE_BYTE(0x01,0x12,0x9A)	// COMMSTAB Pointer
 	STOP_WRITECYCLE
 //	START_WRITECYCLE;
 //	WRITE_BYTE(0x00,0x60,0x2E);	// system state: all layers active (run), not in prog mode
@@ -759,11 +756,4 @@ void restart_app(void)
 //	P2M1 &= ~0x80;
 //	P2M2 &= ~0x80; // P2.7 bidirektional
 
-	/*
-	// RC5 doesn't seem to work with the CCU since the timer does not reset when writing to TH2, TL2
-	RC5_Init();
-	// For Debug via Logic Analyzer
-	P2M1 &= ~0x0D;
-	P2M1 &= ~0x0D;
-	*/
 }
