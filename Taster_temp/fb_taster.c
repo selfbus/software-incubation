@@ -43,10 +43,11 @@
 
 // Geräteparameter setzen, diese können von der ETS übschrieben werden
 // Daher zusätzlich bei jedem restart_app neu schreiben
-//static __code unsigned char __at (0x3903) manufacturer[2]={0x00,0x04};  // Herstellercode 0x0004 = Jung
-//static __code unsigned char __at (0x3905) device_type[2]={0x10, 0x52};  // 0x1052 = Jung Tastsensor 2092
-//static __code unsigned char __at (0x390C) port_A_direction={0};         // PORT A Direction Bit Setting
-//static __code unsigned char __at (0x390D) run_state={255};              // Run-Status (00=stop FF=run)
+//static __code unsigned char __at (EEPROM_ADDR+0x03) manufacturer[2]={0x00,0x04};  // Herstellercode 0x0004 = Jung
+//static __code unsigned char __at (EEPROM_ADDR+0x05) device_type[2]={0x10, 0x52};  // 0x1052 = Jung Tastsensor 2092
+//static __code unsigned char __at (EEPROM_ADDR0x0C) port_A_direction={0};         // PORT A Direction Bit Setting
+//static __code unsigned char __at (EEPROM_ADDR0x0D) run_state={255};              // Run-Status (00=stop FF=run)
+
 
 // DEBUG
 // Temperatur Sensor
@@ -54,26 +55,13 @@
     int th;
     int temp;
 
-    
+
 #include "fb_app_taster.h"
 #include "watchdog.h"
 
 #include "fb_rs232.h"
 #include "onewire.h"
 
-/*
-#include <P89LPC922.h>
-#include <fb_lpc922_1.52.h>
-
-#include "fb_app_taster.h"
-#include "watchdog.h"
-#ifdef debugmode
-	#include  "debug.h"
-#endif
-#include "fb_rs232.h"
-#include "onewire.h"
-//#include "rc5.h"
-*/
 
 #ifdef NOPROGBUTTON
 	#ifdef NOPROGLED
@@ -111,8 +99,7 @@ void main(void)
 	unsigned char n,LED,tasterpegel=0,val=0;//
 	__bit blink, verstell, verstellt,tastergetoggelt=0;
 	signed char buttonpattern=1;
-//	static __code signed char __at (USERRAM_ADDR + 0xBF) trimsave;
-	static __code unsigned char __at (0x1CFE) LED_hell;
+	static __code unsigned char __at (USERRAM_ADDR+0xFE ) LED_hell;
 	/*// Temperatur Sensor
 	unsigned char sequence;
     int th;
@@ -120,27 +107,15 @@ void main(void)
 */
 	// Verions bit 6 und 7 für die varianten, bit 0-5 für die verionen (63)
 	//Varianten sind hier noprogbutton=0x040, noprogled=0x80
-	__bit wduf;
-	
-	wduf=WDCON&0x02;
+//	__bit wduf;
+//
+//	wduf=WDCON&0x02;
 	LED;verstellt;verstell;
 
 	restart_hw();							// Hardware zuruecksetzen
 	// TODO, sequence in restart_app verschieben
 	sequence=1;
-/*
-#ifdef NOPROGBUTTON
-	if((((PORT & 0x0F)== 0x03) || ((PORT & 0x0F)== 0x0C)) && wduf) cal=0;
-//	else cal=trimsave;
 
-#else
-	TASTER=1;
-	if(!TASTER && wduf)cal=0;
-//	else cal=trimsave;
-#endif
-	TRIM = (TRIM+trimsave);
-	TRIM &= 0x3F;				//oberen 2 bits ausblenden
-*/	
 	WATCHDOG_INIT
 	WATCHDOG_START
 	TASTER=0;
@@ -162,8 +137,8 @@ void main(void)
 	LED=0;
 	verstellt=0;
 	// Default LED Helligkeit holen
-	//dimmwert = LED_hell;
-	dimmwert = 255;// eeprom[0xD1];	// Neue VD setzt Defaultwert in EEPROM
+	dimmwert = LED_hell;
+	//dimmwert = 255;// eeprom[0xD1];	// Neue VD setzt Defaultwert in EEPROM
 
 	do  {
 		WATCHDOG_FEED
@@ -185,7 +160,7 @@ void main(void)
 
 		n=timer;
 		blink=((n>>5) & 0x01);
-		
+
 		verstell=((n>>2) & 0x01);
 
 		if (verstell==0)verstellt=0;
@@ -204,7 +179,7 @@ void main(void)
 					}
 			}
 		}
-		
+
 		else{	//Wenn also Modul nicht im Progmode ist..
 			//##### TASTERABFRAGE ######
 
@@ -232,10 +207,10 @@ void main(void)
 	                        // Bei Sensorfehler wird letzter Messwert gehalten TODO Fehler Com-Objekt einfügen??
 	                    	if(!(th&0x8000))temp=(th-100)+eeprom[0xF1]; //nur positive Temperaturen, Offset verrechnen
 	                    	else temp=0;
-	                    	
+
 	                        sequence=0; // TODO, wenn wir hier sind haben wir einen gültigen Messwert
 	                        write_obj_value(9,temp);
-	                        
+
 	                        solltemp = ((((int)eeprom [0xE9]<<8 )| eeprom[0xEA])& 0x7FF)<<(((((int)eeprom [0xE9]<<8 )| eeprom[0xEA])& 0x7800)>>11);
 	                        spreizung = eeprom[0xED];
 	                        if (temp<solltemp)val=1;
@@ -295,9 +270,8 @@ void main(void)
 					if((status60 & 0x01)==0){	//wenn ausgemacht, Dimmwert speichern
 						EA=0;
 						START_WRITECYCLE;
-						FMADRH= 0x1C;//EEPROM_ADDR_H;    // Write to EEPROM area above USERRAM
+						FMADRH= USERRAM_ADDR_H;    // Write to EEPROM area above USERRAM
 						FMADRL= 0xFE;
-						//FMADRL= 0xD1;
 						FMDATA=	dimmwert;
 						STOP_WRITECYCLE;
 						EA=1;
@@ -319,8 +293,7 @@ void main(void)
 				if((status60 & 0x01)==0){	//wenn ausgemacht Dimmwert speichern
 					EA=0;
 					START_WRITECYCLE;
-					FMADRH= 0x1c;WRITE_ADDR+0x01;    // Write to EEPROM area above USERRAM
-					//FMADRL= 0xBE;
+					FMADRH= USERRAM_ADDR_H;    // Write to EEPROM area above USERRAM
 					FMADRL= 0xFE;
 					FMDATA=	dimmwert;
 					STOP_WRITECYCLE;
