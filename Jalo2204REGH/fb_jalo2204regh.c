@@ -18,13 +18,13 @@
 */
 
 
-#include <P89LPC922.h>
-#include "../lib_lpc922/Releases/fb_lpc922_1.5x.h"
+//#include <P89LPC922.h>
+//#include "../lib_lpc922/Releases/fb_lpc922_1.5x.h"
 #include "fb_app_jalo2204regh.h"
 
 #include "../com/fb_rs232.h"
 #include"../com/watchdog.h"
-#include "../com/debug.h"
+//#include "../com/debug.h"
 
 /** 
 * The start point of the program, init all libraries, start the bus interface, the application
@@ -54,23 +54,23 @@ void main(void)
 {
 
 	unsigned char n,cmd,tasterpegel=0,mode,objval;
-	signed char cal;
-	static __code signed char __at 0x1CFC trimsave;	//0x1BFF
+	//signed char cal;
+	//static __code signed char __at 0x1CFC trimsave;	//0x1BFF
 #ifdef zeroswitch
 	static __code unsigned char __at 0x1CFB phisave;	//0x1BFE
 #endif
-	static __code unsigned char __at 0x1CFA blockedsave;	//
+	static __code unsigned char __at 0x1CFF blockedsave;	//
 	unsigned char rm_count=0;
 	__bit wduf,tastergetoggelt=0,objbitval;
 	wduf=WDCON&0x02;
 	restart_hw();							// Hardware zuruecksetzen
 // im folgendem wird der watchdog underflow abgefragt und mit gedrücktem Progtaster
 // ein resetten der cal Variable veranlasst um wieder per rs232 trimmen zu können.	
-	TASTER=0;
-	if(!TASTER && wduf)cal=0;
-	else cal=trimsave;
-	TRIM = (TRIM+trimsave);
-	TRIM &= 0x3F;//oberen 2 bits ausblenden
+//	TASTER=0;
+//	if(!TASTER && wduf)cal=0;
+//	else cal=trimsave;
+//	TRIM = (TRIM+trimsave);
+//	TRIM &= 0x3F;//oberen 2 bits ausblenden
 #ifdef zeroswitch
 	if(phisave<=36)	phival=phisave;
 	else phival=0;
@@ -80,7 +80,7 @@ void main(void)
 		for (n=0;n<50;n++) {		// Warten bis Bus stabil
 			TR0=0;					// Timer 0 anhalten
 			TH0=eeprom[ADDRTAB+1];	// Timer 0 setzen mit phys. Adr. damit Geräte unterschiedlich beginnen zu senden
-			TL0=eeprom[ADDRTAB+2];
+			TL0=255;//eeprom[ADDRTAB+2];
 			TF0=0;					// Überlauf-Flag zurücksetzen
 			TR0=1;					// Timer 0 starten
 			while(!TF0);
@@ -186,14 +186,23 @@ void main(void)
 		if (fb_state==0 && (TH1<0XC0) && (!wait_for_ack)&& blocked!=blockedsave) {
 			START_WRITECYCLE;
 			FMADRH= 0x1c;		
-			FMADRL= 0xFa; 
+			FMADRL= 0xFF; 
 			FMDATA= blocked;
 			STOP_WRITECYCLE;
 		}
 
 		
 		}// end if(runstate...
-		
+		else if (RTCCON>=0x80 && connected)	// Realtime clock ueberlauf
+			{			// wenn connected den timeout für Unicast connect behandeln
+			RTCCON=0x61;// RTC flag löschen
+			if(connected_timeout <= 110)// 11x 520ms --> ca 6 Sekunden
+				{
+				connected_timeout ++;
+				}
+				else send_obj_value(T_DISCONNECT);// wenn timeout dann disconnect, flag und var wird in build_tel() gelöscht
+			}
+
 		// Telegrammverarbeitung..
 		if (tel_arrived ) {//|| tel_sent
 			tel_arrived=0;
