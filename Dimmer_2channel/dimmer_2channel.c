@@ -17,15 +17,15 @@
 * @author Andreas Krieger 
 * 
 */
-#include <P89LPC922.h>
-#include "../lib_lpc922/Releases/fb_lpc922_1.4x.h"
+//#include <P89LPC922.h>
+//#include "../lib_lpc922/Releases/fb_lpc922_1.4x.h"
 #include "fb_app_dimmer_2channel.h"
 
 #include "../com/fb_rs232.h"
-#include  "../com/debug.h"
+//#include  "../com/debug.h"
 #include "fb_i2c.h"
 #include"../com/watchdog.h"
-#include"../com/watchdog.c"
+//#include"../com/watchdog.c"
 
 /** 
 * The start point of the program, init all libraries, start the bus interface, the application
@@ -137,8 +137,17 @@ void main(void)
 		
 		if (portchanged)port_schalten();	// virtuelle Ausgänge schalten
 
-		}// end if(runstate)
-
+		}// end if(APPLICATION_RUN)
+		else if (RTCCON>=0x80 && connected)	// Realtime clock ueberlauf
+			{			// wenn connected den timeout für Unicast connect behandeln
+			RTCCON=0x61;// RTC flag löschen
+			if(connected_timeout <= 110)// 11x 520ms --> ca 6 Sekunden
+				{
+				connected_timeout ++;
+				}
+				else send_obj_value(T_DISCONNECT);// wenn timeout dann disconnect, flag und var wird in build_tel() gelöscht
+			}
+	
 		cmd;		// Eingehendes Terminal Kommando verarbeiten...
 				if (RI){
 					RI=0;
