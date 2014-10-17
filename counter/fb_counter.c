@@ -16,11 +16,11 @@
 
 	
 
-#include <P89LPC922.h>
-#include "../lib_lpc922/fb_lpc922.h"
+//#include <P89LPC922.h>
+//#include "../lib_lpc922/Releases/fb_lpc922_1.4x.h"
 #include "fb_app_counter.h"
 #include"../com/watchdog.h"
-#include "../com/debug.h"
+//#include "../com/debug.h"
 #ifdef IN8_2TE
 #include "../com/spi.h"
 
@@ -81,6 +81,7 @@ void main(void)
   p0h=portbuffer;
 #endif
   if(!wduf){
+	  	TASTER=0;
   // Verzögerung Busspannungswiederkehr	
 		for (n=0;n<50;n++) {		// Warten bis Bus stabil
 			TR0=0;					// Timer 0 anhalten
@@ -96,7 +97,7 @@ void main(void)
 
   if(!wduf)bus_return();			// Anwendungsspezifische Einstellungen zurücksetzen
 
-  TASTER=1;// progled/taster
+//  TASTER=1;// progled/taster
   do  {
 //		watchdog_feed();
 	    /* feed the watchdog
@@ -179,7 +180,19 @@ if(APPLICATION_RUN){
 	//if(jede sekunde...)checklevel(0,0xff);// grenzwerte für Überschreiten alle Sekunde abchecken	
 		
 	}// end if(APLIAKTION_RUN...
-	else   EKBI = 0; // wenn die aplikation nicht läuft keyboard int abschalten
+	else
+	{
+		EKBI = 0; // wenn die aplikation nicht läuft keyboard int abschalten
+		if (RTCCON>=0x80 && connected)	// Realtime clock ueberlauf
+		{			// wenn connected den timeout für Unicast connect behandeln
+		RTCCON=0x61;// RTC flag löschen
+		if(connected_timeout <= 110)// 11x 520ms --> ca 6 Sekunden
+			{
+			connected_timeout ++;
+			}
+			else send_obj_value(T_DISCONNECT);// wenn timeout dann disconnect, flag und var wird in build_tel() gelöscht
+		}
+	}
 
 	if (tel_arrived ) {//|| tel_sent 
 		tel_arrived=0;

@@ -15,6 +15,12 @@
 
 #ifndef FB_APP_IN8
 #define FB_APP_IN8
+//#define debugmode
+#ifdef LPC936
+	#include <fb_lpc936_1.53.h>
+#else
+#include <fb_lpc922_1.53.h>
+#endif
 
 
 #define USERRAMADDRH  	0x1C	// UserRam start
@@ -59,11 +65,11 @@ unsigned char operation(unsigned char pinno);
 unsigned char switch_dim(unsigned char pinno);
 int eis5conversion(unsigned long zahl);
 void delay_timer(void);
-void write_value_req(void);	
+//void write_value_req(void);	
 //void sperren(unsigned char objno,unsigned char freigabe);
 unsigned long read_obj_value(unsigned char objno);
 void write_obj_value(unsigned char objno,unsigned long objvalue);
-void read_value_req(void);
+//void read_value_req(void);
 void write_send(unsigned char objno,unsigned int objval);
 void sendbychange(unsigned char objno,unsigned char val);
 void send_counter(unsigned char obj,unsigned char ctno);
