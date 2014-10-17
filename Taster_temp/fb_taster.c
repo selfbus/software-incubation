@@ -33,6 +33,13 @@
 * 		1.05	neue LIB
 * 		1.06	Anpassung für LPC936, Lib 1.5, Cleanup
 */
+//#define LPC936
+
+#ifndef LPC936
+	#include <P89LPC922.h>
+#else
+	#include <P89LPC935_6.h>
+#endif	
 
 // Options
 //#define debugmode
@@ -40,6 +47,7 @@
 
 #define NOPROGLED //typ 0,2 Die Progled blinkt im Progmodus da sie auch Betriebs LED ist
 //#define NOPROGBUTTON	//typ 1,3 es ist kein prog Taster vorhanden sondern progmode wird durch druecken von taste 1&3 oder 2&4 aktiviert
+
 
 // Geräteparameter setzen, diese können von der ETS übschrieben werden
 // Daher zusätzlich bei jedem restart_app neu schreiben
