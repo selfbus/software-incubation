@@ -18,15 +18,21 @@
 #define FB_APP_OUT
 
 //#define debugmode
+#ifdef LPC936
+	#include <fb_lpc936_1.53.h>
+#else
+#include <fb_lpc922_1.53.h>
+#endif
 
 
 //#define IO_BISTAB
 //#define BUS_DOWN
 #define MAX_PORTS_8 		// Anzahl Ausgänge (nur 4 oder 8 erlaubt)
-//#define HAND				// Handsteuerung aktiv (auskommentieren wenn nicht gewünscht)
+#define HAND				// Handsteuerung aktiv (auskommentieren wenn nicht gewünscht)
 //#define SPIBISTAB			// Serielle Ausgabe für bistabile relaise aktivieren
 //#define panasonic
 //#define zeroswitch			// für Platine mit Nullspannungserkennung
+
 
 #ifdef zeroswitch
 	#ifndef panasonic		//OMRON
