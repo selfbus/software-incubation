@@ -15,6 +15,13 @@
 #ifndef FB_APP_LC
 #define FB_APP_LC
 
+//#define debugmode
+#ifdef LPC936
+	#include <fb_lpc936_1.53.h>
+#else
+#include <fb_lpc922_1.53.h>
+#endif
+
 // Parameter-Adressen im EEPROM
 
 // Adressen zum speichern von Applikations Daten
