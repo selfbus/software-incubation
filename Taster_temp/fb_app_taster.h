@@ -29,9 +29,9 @@
 //#define LPC936		// LPC936 anstatt LPC922
 
 #ifdef LPC936
-	#include <fb_lpc936_1.53.h>
+	#include <Releases/fb_lpc936_1.53.h>
 #else
-    #include <fb_lpc922_1.53.h>
+    #include <Releases/fb_lpc922_1.53.h>
 #endif
 
 #define POWERLED		0xCD

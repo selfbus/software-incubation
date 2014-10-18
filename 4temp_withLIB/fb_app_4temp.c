@@ -14,7 +14,6 @@
  *
  */
 
-#include <fb_lpc922.h>
 #include "fb_app_4temp.h"
 #include "4temp_onewire.h"
 
@@ -276,6 +275,10 @@ void delay_timer(void)
 	unsigned int timerflags;
 
 	tmr_obj = 0;		// Timer Objekt
+	// Reconfig because of t_connect timeout!!
+	RTCCON=0x60;        // RTC anhalten und Flag löschen
+	RTCH=0x0E;          // reload Real Time Clock, 65ms
+	RTCL=0xA0;
 	RTCCON=0x61;		// RTC starten
 
 		timer++;
@@ -398,9 +401,10 @@ void restart_app()		// Alle Applikations-Parameter zurücksetzen
 {
 	unsigned char n;
 
-	RTCCON=0x60;		// RTC anhalten und Flag löschen
-	RTCH=0x0E;			// reload Real Time Clock, 65ms
-	RTCL=0xA0;
+	// Done in delay_timer now
+	//RTCCON=0x60;		// RTC anhalten und Flag löschen
+	//RTCH=0x0E;			// reload Real Time Clock, 65ms
+	//RTCL=0xA0;
 
 	// Port Konfigurieren
 	// Port 0
@@ -478,5 +482,5 @@ void restart_app()		// Alle Applikations-Parameter zurücksetzen
 	EA=1;				// Interrupts freigeben
 */
 
-	RTCCON=0x61; 		//RTC starten
+	RTCCON=0x81; 		//RTC starten und flag setzen -> delay timer setzt RTC
 }

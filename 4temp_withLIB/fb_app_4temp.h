@@ -17,6 +17,8 @@
 #ifndef FB_APP_4temp
 #define FB_APP_4temp
 
+#include <fb_lpc922.h>
+
 // Damit die Eclipse Code Analyse nicht so viele Warnungen anzeigt:
 #ifndef SDCC
 # define __idata

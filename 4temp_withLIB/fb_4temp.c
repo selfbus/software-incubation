@@ -14,13 +14,13 @@
  *
  *
  *
- * Versionen:	1.00	erste Version
- *				2.00	erste Version mit Lib 1.4  -- WIP
- *				2.01	Bugfix Sensoren wurde mit Buserkennung nicht mehr gelesen
+ * Versionen:	1.00  erste Version
+ *				2.00  erste Version mit Lib 1.4  -- WIP
+ *				2.01  Bugfix, Sensoren wurde mit Buserkennung nicht mehr gelesen
+ *				2.02  Bugifx, Verbindung wird nach timeout abgebaut (Line-Scan)
  */
 
 //#include "debug.h"
-#include <fb_lpc922.h>
 #include "fb_app_4temp.h"
 #include "4temp_onewire.h"
 
@@ -32,10 +32,10 @@
 const unsigned char bitmask_1[8] ={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
 // Geräteparameter setzen, diese können von der ETS übschrieben werden
 // Daher zusätzlich bei jedem restart_app neu schreiben
-static __code unsigned char __at (0x1D03) manufacturer[2]={0x00,0x08};	// Herstellercode 0x0008 = GIRA
-static __code unsigned char __at (0x1D05) device_type[2]={0x04, 0x38};	// 1080 Selfbus 4temp
-static __code unsigned char __at (0x1D0C) port_A_direction={0};			// PORT A Direction Bit Setting
-static __code unsigned char __at (0x1D0D) run_state={255};				// Run-Status (00=stop FF=run)
+static __code unsigned char __at (EEPROM_ADDR + 0x03) manufacturer[2]={0x00,0x08};	// Herstellercode 0x0008 = GIRA
+static __code unsigned char __at (EEPROM_ADDR + 0x05) device_type[2]={0x04, 0x38};	// 1080 Selfbus 4temp
+static __code unsigned char __at (EEPROM_ADDR + 0x0C) port_A_direction={0};			// PORT A Direction Bit Setting
+static __code unsigned char __at (EEPROM_ADDR + 0x0D) run_state={255};				// Run-Status (00=stop FF=run)
 
 
 
@@ -81,6 +81,14 @@ void main(void)
 		// Here happens the serial communication with the PC
 		DEBUG_POINT;
 #endif
+
+		if (RTCCON>=0x80 && connected)   // Realtime clock ueberlauf und
+        {                                // wenn connected den timeout für Unicast connect behandeln
+            RTCCON=0x61;// RTC flag löschen
+            if(connected_timeout <= 110)// 11x 520ms --> ca 6 Sekunden
+                connected_timeout++;
+            else send_obj_value(T_DISCONNECT);// wenn timeout dann disconnect, flag und var wird in build_tel() gelöscht
+        }
 
 		if (APPLICATION_RUN)	// nur wenn run-mode gesetzt
 		{

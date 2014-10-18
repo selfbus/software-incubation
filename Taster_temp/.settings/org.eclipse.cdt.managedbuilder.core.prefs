@@ -1,4 +1,8 @@
 eclipse.preferences.version=1
+environment/buildEnvironmentLibrary/cdt.managedbuild.config.sdcc.exe.release.1496064976.292962440/LIBRARY_PATH/delimiter=\:
+environment/buildEnvironmentLibrary/cdt.managedbuild.config.sdcc.exe.release.1496064976.292962440/LIBRARY_PATH/operation=remove
+environment/buildEnvironmentLibrary/cdt.managedbuild.config.sdcc.exe.release.1496064976.292962440/append=true
+environment/buildEnvironmentLibrary/cdt.managedbuild.config.sdcc.exe.release.1496064976.292962440/appendContributed=true
 environment/buildEnvironmentLibrary/cdt.managedbuild.config.sdcc.exe.release.1496064976/LIBRARY_PATH/delimiter=\:
 environment/buildEnvironmentLibrary/cdt.managedbuild.config.sdcc.exe.release.1496064976/LIBRARY_PATH/operation=remove
 environment/buildEnvironmentLibrary/cdt.managedbuild.config.sdcc.exe.release.1496064976/append=true

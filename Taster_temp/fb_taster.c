@@ -32,14 +32,8 @@
 * 				trimbar über RS
 * 		1.05	neue LIB
 * 		1.06	Anpassung für LPC936, Lib 1.5, Cleanup
+*		1.07    Line-Scan Bugfix
 */
-//#define LPC936
-
-#ifndef LPC936
-	#include <P89LPC922.h>
-#else
-	#include <P89LPC935_6.h>
-#endif	
 
 // Options
 //#define debugmode
@@ -48,13 +42,12 @@
 #define NOPROGLED //typ 0,2 Die Progled blinkt im Progmodus da sie auch Betriebs LED ist
 //#define NOPROGBUTTON	//typ 1,3 es ist kein prog Taster vorhanden sondern progmode wird durch druecken von taste 1&3 oder 2&4 aktiviert
 
-
 // Geräteparameter setzen, diese können von der ETS übschrieben werden
 // Daher zusätzlich bei jedem restart_app neu schreiben
-//static __code unsigned char __at (EEPROM_ADDR+0x03) manufacturer[2]={0x00,0x04};  // Herstellercode 0x0004 = Jung
-//static __code unsigned char __at (EEPROM_ADDR+0x05) device_type[2]={0x10, 0x52};  // 0x1052 = Jung Tastsensor 2092
-//static __code unsigned char __at (EEPROM_ADDR0x0C) port_A_direction={0};         // PORT A Direction Bit Setting
-//static __code unsigned char __at (EEPROM_ADDR0x0D) run_state={255};              // Run-Status (00=stop FF=run)
+//static __code unsigned char __at (EEPROM_ADDR +0x03) manufacturer[2]={0x00,0x04};  // Herstellercode 0x0004 = Jung
+//static __code unsigned char __at (EEPROM_ADDR +0x05) device_type[2]={0x10, 0x52};  // 0x1052 = Jung Tastsensor 2092
+//static __code unsigned char __at (EEPROM_ADDR +0x0C) port_A_direction={0};         // PORT A Direction Bit Setting
+//static __code unsigned char __at (EEPROM_ADDR +0x0D) run_state={255};              // Run-Status (00=stop FF=run)
 
 
 // DEBUG
@@ -85,7 +78,7 @@
 	#endif
 #endif
 
-#define VERSION		106
+#define VERSION		107
 
 #ifdef DEBUG_H_
 	DEBUG_VARIABLES;
