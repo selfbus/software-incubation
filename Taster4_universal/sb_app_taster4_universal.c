@@ -490,19 +490,26 @@ void switch_led(unsigned char ledno, __bit onoff)
 			onoff=1;
 			break;
 		// case 2 ist Statusanzeige, onoff bleibt also unveraendert
-		case 3:		// LED = invertierte Statusanzeige
-			onoff=!onoff;
-			break;
+//		case 3:		// LED = invertierte Statusanzeige
+//			onoff=!onoff;
+//			break;
 		case 4:		// LED = Betaetigungsanzeige
 			onoff=1;	// erstmal an beim druecken der Taste
 			timerstate[ledno]= 0x10;
 			timerbase[ledno]=1;
 			timercnt[ledno]= (eeprom[LED_DURATION]>>4)*8;	// dann ueber delay-timer aus
 		break;
-		case 5:
-		onoff= (bitobject>>(ledno+4))&0x01;
+		case 5: // LED nach externen objekt
+		case 6:
+			// LED invertiert nach externen Objekt
+			onoff=(bitobject>>(ledno+4))&0x01;
 		break;
+		default:
+			break;
 		}
+		if((command&0x03)==3) onoff=!onoff;
+
+		
 		ledvar=LEDSTATE;
 		ledvar&= ~(1<<(ledno+4));	// LEDs sind an Pin 4-7
 		ledvar |= ((onoff<<(ledno+4)));	// unteren 4 bits immer auf 1 lassen !!!
