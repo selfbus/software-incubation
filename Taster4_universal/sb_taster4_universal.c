@@ -34,6 +34,13 @@
 * 		1.05	neue LIB
 * 		1.06	Anpassung fuer LPC936, Lib 1.5, Cleanup
 */
+//#define LPC936
+
+#ifndef LPC936
+	#include <P89LPC922.h>
+#else
+	#include <P89LPC935_6.h>
+#endif	
 
 // Options
 //#define debugmode
@@ -58,7 +65,7 @@ int temp;
 unsigned int solltemp;
 unsigned char spreizung;
 
-
+    
 #include "sb_app_taster4_universal.h"
 #include "watchdog.h"
 
@@ -112,7 +119,7 @@ void main(void)
 	// Verions bit 6 und 7 fuer die varianten, bit 0-5 fuer die verionen (63)
 	//Varianten sind hier noprogbutton=0x040, noprogled=0x80
 	__bit wduf;
-
+	
 	wduf=WDCON&0x02;
 	verstellt;verstell;
 
@@ -131,7 +138,7 @@ void main(void)
 #endif
 	TRIM = (TRIM+trimsave);
 	TRIM &= 0x3F;				//oberen 2 bits ausblenden
-*/
+*/	
 	WATCHDOG_INIT
 	WATCHDOG_START
 	TASTER=0;
@@ -173,7 +180,7 @@ void main(void)
 
 		n=timer;
 		blink=((n>>2) & 0x01);
-
+		
 		verstell=n & 0x01;
 
 		if (verstell==0)verstellt=0;
@@ -192,7 +199,7 @@ void main(void)
 					}
 			}
 		}
-
+		
 		else{	//Wenn also Modul nicht im Progmode ist..
 			//##### TASTERABFRAGE ######
 
@@ -221,7 +228,7 @@ void main(void)
 	                        // Bei Sensorfehler wird letzter Messwert gehalten TODO Fehler Com-Objekt einfuegen??
 	                    	if(th != 0xFFFF)temp=th + ((int)(signed char)(eeprom[0xFD]))*10; //nur positive Temperaturen, Offset verrechnen
 	                    	else temp=0;
-
+	                    	
 	                        sequence=0; // TODO, wenn wir hier sind haben wir einen gueltigen Messwert
 //	                        object_value[8]=temp;
 	                        object_value[4]=eis5conversion(temp);
@@ -257,7 +264,7 @@ void main(void)
 			val |=((~((eeprom[0xE3 + x]>>7)&0x01))|blink)<<(x+4);
 		}
 		LEDVAL=LEDSTATE & val;
-
+			
 		if (tel_arrived || tel_sent) {//
 			tel_sent=0;
 			process_tel();

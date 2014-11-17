@@ -25,6 +25,7 @@
 *
 *
 */
+#include <P89LPC922.h>
 
 #include "sb_app_taster4_universal.h"
 //#include "rc5.h"
