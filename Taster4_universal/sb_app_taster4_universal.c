@@ -445,7 +445,8 @@ void write_value_req(unsigned char objno)
 		}
 		if (objtype==7)write_obj_value(objno,telegramm[8]);
 		if (objtype==8)write_obj_value(objno,telegramm[9]+(telegramm[8]<<8));
-		if ((objno<4) && (((eeprom[0xE3+(objno*4)]>>4) & 0x07)) !=4) switch_led(objno,telegramm[7]&0x01);	// LED nur schalten, wenn nicht auf Betaetigungsanzeige parametriert
+		if ( (((eeprom[0xE3+(objno)]>>4) & 0x07)) !=4) switch_led(objno,telegramm[7]&0x01);	// LED nur schalten, wenn nicht auf Betaetigungsanzeige parametriert
+		if(objno>=4 && objno<=7)switch_led(objno-4,telegramm[7]&0x01);
 	}
 	else if (objno==13)	// Helligkeitsobjekt LEDs, (Objekte 12-15 sind unsichtbar)
 	{
@@ -777,9 +778,10 @@ void restart_app(void)
 	for (n=0;n<8;n++){
 		timercnt[n]=0;		// timer loeschen
 		timerstate[n]=0;	// timer stati loeschen
+		switch_led(n,0);	// LED's gemaess parametrierung, bei invertierter Anzeige -->ein
 	}
 
-	LEDSTATE=0;
+	//LEDSTATE=0;
 
 	// set timer 0 autoreload 0.05ms
 	TR0=0;
