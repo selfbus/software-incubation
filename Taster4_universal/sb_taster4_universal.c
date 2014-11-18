@@ -15,32 +15,16 @@
  *
  */
 /**
-* @file   fb_taster.c
-* @author Andreas Krebs <kubi@krebsworld.de>
-* @date   2009
+* @file   sb_taster4_universal.c
+* @date   2014
 *
-* @brief The Freebus Taster Application, Firmware fuer einen 4-fach Taster mit 4 LEDs
-*		Herstellercode 0x0004 = Jung
-*		Devicetype  = Jung Tastsensor 2094
-*		in ETS das Applikationsprogramm "Universal/Schalten " auswaehlen
+* @brief The Selfbus Taster Application, Firmware fuer einen 4-fach Taster mit 4 LEDs
+*		 Herstellercode 0x004C = R. Bosch
+*		 Devicetype  = SB Taster, 4-fach
 *
 * \par Changes:
 *		1.00	erste Version;
-*		1.01	eigenes Telegramm wird ausgewertet, "Affengriff" entprellt
-* 		1.02	div. bugs behoben
-* 		1.03	Fehler bei Lamellenverstellzeit (T2) behoben
-* 		1.04	LEDs dimmbar, neue backendsoft, fehlende Funktionen zugefuegt,
-* 				trimbar ueber RS
-* 		1.05	neue LIB
-* 		1.06	Anpassung fuer LPC936, Lib 1.5, Cleanup
 */
-//#define LPC936
-
-#ifndef LPC936
-	#include <P89LPC922.h>
-#else
-	#include <P89LPC935_6.h>
-#endif	
 
 // Options
 //#define debugmode
@@ -65,7 +49,7 @@ int temp;
 unsigned int solltemp;
 unsigned char spreizung;
 
-    
+
 #include "sb_app_taster4_universal.h"
 #include "watchdog.h"
 
@@ -88,7 +72,7 @@ unsigned char spreizung;
 	#endif
 #endif
 
-#define VERSION		106
+#define VERSION		100
 
 #ifdef DEBUG_H_
 	DEBUG_VARIABLES;
@@ -110,16 +94,12 @@ void main(void)
 
 	signed char buttonpattern=1;
 //	static __code signed char __at (USERRAM_ADDR + 0xBF) trimsave;
-	static __code unsigned char __at (0x1CFE) LED_hell;
-	/*// Temperatur Sensor
-	unsigned char sequence;
-    int th;
-    int temp;
-*/
+	static __code unsigned char __at (EEPROM_ADDR +0xFE) LED_hell;
+
 	// Verions bit 6 und 7 fuer die varianten, bit 0-5 fuer die verionen (63)
 	//Varianten sind hier noprogbutton=0x040, noprogled=0x80
 	__bit wduf;
-	
+
 	wduf=WDCON&0x02;
 	verstellt;verstell;
 
@@ -138,7 +118,7 @@ void main(void)
 #endif
 	TRIM = (TRIM+trimsave);
 	TRIM &= 0x3F;				//oberen 2 bits ausblenden
-*/	
+*/
 	WATCHDOG_INIT
 	WATCHDOG_START
 	TASTER=0;
@@ -156,58 +136,54 @@ void main(void)
 #endif
 
 	verstellt=0;
-	// Default LED Helligkeit holen
-	dimmwert = LED_hell;
-	//dimmwert = 255;// eeprom[0xD1];	// Neue VD setzt Defaultwert in EEPROM
+	dimmwert = LED_hell;        // Default Helligkeit aus EEPROM laden
+	object_value[5]=dimmwert;   // TODO dimmwert direkt in object_value behandeln
 
-	do  {
+	do {
 		WATCHDOG_FEED
 		if (RTCCON>=0x80)	// Realtime clock ueberlauf
-			{
-			RTCCON=0x61;// RTC flag loeschen
-			if(!connected)delay_timer();// die normal RTC Behandlung
-			else// wenn connected den timeout fuer Unicast connect behandeln
-				{
-				if(connected_timeout <= 110)// 11x 520ms --> ca 6 Sekunden
-					{
-					connected_timeout ++;
-					}
-				else send_obj_value(T_DISCONNECT);// wenn timeout dann disconnect, flag und var wird in build_tel() geloescht
-				}
-			}
-
-		//		if (RTCCON>=0x80) delay_timer();	// Realtime clock ueberlauf
+		{
+			RTCCON=0x61;    // RTC flag loeschen
+			if(!connected) delay_timer();   // die normal RTC Behandlung
+			else    // wenn connected den timeout fuer Unicast connect behandeln
+            {
+			    if(connected_timeout <= 110)    // 11x 520ms --> ca 6 Sekunden
+			        connected_timeout ++;
+			    else
+			        send_obj_value(T_DISCONNECT);// wenn timeout dann disconnect, flag und var wird in build_tel() geloescht
+            }
+		}
 
 		n=timer;
 		blink=((n>>2) & 0x01);
-		
+
 		verstell=n & 0x01;
 
 		if (verstell==0)verstellt=0;
 
-		if (status60 & 0x01){			//wenn progmode aktiv ist...
-			if ((PORT & 0x0F)==0x0E){	// Taste 1 gedrueck
-				if ((dimmwert<254) && (verstell==1)&& verstellt==0){
+		if (status60 & 0x01) {			// wenn progmode aktiv ist...
+			if ((PORT & 0x0F)==0x0E) {	// Taste 1 gedrueck
+				if ((dimmwert<254) && (verstell==1)&& verstellt==0) {
 					dimmwert++;
 					verstellt=1;
 				}
 			}
-			if ((PORT & 0x0F)==0x0D){ // Taste 2 gedrueckt
-				if ((dimmwert>1) && (verstell==1)&& verstellt==0){
+			if ((PORT & 0x0F)==0x0D) { // Taste 2 gedrueckt
+				if ((dimmwert>1) && (verstell==1)&& verstellt==0) {
 					dimmwert--;
 					verstellt=1;
-					}
+				}
 			}
 		}
-		
-		else{	//Wenn also Modul nicht im Progmode ist..
+
+		else {	//Wenn also Modul nicht im Progmode ist..
 			//##### TASTERABFRAGE ######
 
 			if(APPLICATION_RUN)	{// nur wenn im Run modus und nicht connected
 				if ((PORT & 0x0F) != button_buffer) port_changed(PORT & 0x0F);	// ein Taster wurde gedrueckt
 
 				// Temperatur verarbeiten
-				if(eeprom[0xFC]&0x80){// Temperaturmessung aktiviert
+				if(eeprom[0xFC]&0x80) {// Temperaturmessung aktiviert
 	                if (sequence==1)
 	                {
 	                    interrupted=0;
@@ -228,7 +204,7 @@ void main(void)
 	                        // Bei Sensorfehler wird letzter Messwert gehalten TODO Fehler Com-Objekt einfuegen??
 	                    	if(th != 0xFFFF)temp=th + ((int)(signed char)(eeprom[0xFD]))*10; //nur positive Temperaturen, Offset verrechnen
 	                    	else temp=0;
-	                    	
+
 	                        sequence=0; // TODO, wenn wir hier sind haben wir einen gueltigen Messwert
 //	                        object_value[8]=temp;
 	                        object_value[4]=eis5conversion(temp);
@@ -264,7 +240,7 @@ void main(void)
 			val |=((~((eeprom[0xE3 + x]>>7)&0x01))|blink)<<(x+4);
 		}
 		LEDVAL=LEDSTATE & val;
-			
+
 		if (tel_arrived || tel_sent) {//
 			tel_sent=0;
 			process_tel();
@@ -286,9 +262,8 @@ void main(void)
 					if((status60 & 0x01)==0){	//wenn ausgemacht, Dimmwert speichern
 						EA=0;
 						START_WRITECYCLE;
-						FMADRH= 0x1C;//EEPROM_ADDR_H;    // Write to EEPROM area above USERRAM
+						FMADRH= EEPROM_ADDR_H;    // Write to EEPROM area above USERRAM
 						FMADRL= 0xFE;
-						//FMADRL= 0xD1;
 						FMDATA=	dimmwert;
 						STOP_WRITECYCLE;
 						EA=1;
@@ -310,8 +285,7 @@ void main(void)
 				if((status60 & 0x01)==0){	//wenn ausgemacht Dimmwert speichern
 					EA=0;
 					START_WRITECYCLE;
-					FMADRH= 0x1c;WRITE_ADDR+0x01;    // Write to EEPROM area above USERRAM
-					//FMADRL= 0xBE;
+					FMADRH= EEPROM_ADDR_H;    // Write to EEPROM area above USERRAM
 					FMADRL= 0xFE;
 					FMDATA=	dimmwert;
 					STOP_WRITECYCLE;

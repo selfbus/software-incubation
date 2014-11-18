@@ -5,6 +5,7 @@
  *  ___/ / /__  / /__/ /__// /_/ / /_/ /___/ /  *
  * /____/_____//____/_/   /_____/\____//____/   *
  *
+ *  Copyright (c) 2014, Andreas Krieger
  *  Copyright (c) 2014, Stefan Haller
  *  Copyright (c) 2008,2009,2013 Andreas Krebs <kubi@krebsworld.de>
  *
@@ -12,20 +13,18 @@
  *  it under the terms of the GNU General Public License version 2 as
  *  published by the Free Software Foundation.
  *
- *http://de.wikibooks.org/wiki/C%2B%2B-Programmierung:_Dokumentation_mit_Doxygen
+ * http://de.wikibooks.org/wiki/C%2B%2B-Programmierung:_Dokumentation_mit_Doxygen
  * http://studiwiki.informatik.uni-stuttgart.de/Softwaretechnik/Studienprojekte/Beispiel_Styleguide
- *http://www.stack.nl/~dimitri/doxygen/commands.html
+ * http://www.stack.nl/~dimitri/doxygen/commands.html
  */
 /**
-* @file   fb_app_taster.c
-* @author Andreas Krebs <kubi@krebsworld.de>
-* @date    2008
+* @file   sb_app_taster4_universal.c
+* @date   2014
 *
-* @brief Applikation Taster, siehe fb_taster.c
+* @brief Applikation Taster
 *
 *
 */
-#include <P89LPC922.h>
 
 #include "sb_app_taster4_universal.h"
 //#include "rc5.h"
@@ -85,8 +84,8 @@ void button_changed(unsigned char buttonno, __bit buttonval)
 	__bit objval=0;
 
 	__bit SE2,SE2add;
-	
-	//Adresse Funktion Eingang: 
+
+	//Adresse Funktion Eingang:
 	switch (eeprom[FUNCTION+(buttonno)] & 0x07) {//done		// Funktion des Tasters
 
 	/*********************
@@ -102,7 +101,7 @@ void button_changed(unsigned char buttonno, __bit buttonval)
 				command = (((eeprom[COMMAND+(buttonno*4)]) >> 6) & 0x03);	// Befehl beim druecken sofort ausfuehren
 			}
 			if(SE2)
-			{		
+			{
 				command |= (eeprom[COMMAND+(buttonno*4)]& 0x0C)|0x80;	// Befehl beim druecken 2.SE, bit 7 merkt die verspaetete Ausfuehrung in delay_timer nach Ablauf der Zeit
 				//die Zeiten laden
 				timercnt[buttonno+4]=eeprom[0xE8+(buttonno*4)]>>1;	// Faktor Dauer
@@ -112,13 +111,13 @@ void button_changed(unsigned char buttonno, __bit buttonval)
 		}
 		else //Taster losgelassen
 		{
-			if(!SE2||SE2add) // wenn keine 2.SE oder zusätzlich
+			if(!SE2||SE2add) // wenn keine 2.SE oder zusaetzlich
 			{
 				command = (((eeprom[COMMAND+(buttonno*4)]) >> 4) & 0x03);		// Befehl beim loslassen 1.SE
 			}
 			if (SE2)//2. SchaltEbene
 			{
-				if((timerstate[buttonno+4]>=0xA0))// timer  abgelaufen 
+				if((timerstate[buttonno+4]>=0xA0))// timer  abgelaufen
 				{
 					command |= (((eeprom[COMMAND+(buttonno*4)]) ) & 0x03)<<2;	// Befehl beim loslassen 2.SE
 				}
@@ -146,10 +145,10 @@ void button_changed(unsigned char buttonno, __bit buttonval)
 			}
 			if ((command)&0x03) {	// nur wenn EIN, UM oder AUS (0=keine Funktion)
 				write_obj_value(buttonno+(bedienung*4),objval);
-				if(command & 0x20)timerstate[buttonno+4]|=1;// bit 7 wird zu bit 5 wegen dem >>2 
+				if(command & 0x20)timerstate[buttonno+4]|=1;// bit 7 wird zu bit 5 wegen dem >>2
 				else send_obj_value(buttonno+(bedienung*4));// wenn nicht vorgemerkt sofort senden
-				if(!bedienung)switch_led(buttonno, objval);		// LED schalten nur für die erste ebene
-	
+				if(!bedienung)switch_led(buttonno, objval);		// LED schalten nur fuer die erste ebene
+
 			}
 			command=command>>2;
 		}
@@ -248,7 +247,7 @@ void button_changed(unsigned char buttonno, __bit buttonval)
 				timercnt[buttonno+4]=(eeprom[0xEA]>>1);
 				timerbase[buttonno+4]=0; //(64ms)
 				timerstate[buttonno+4]=0x50;// Betaetigung laenger als eingestellt bei Lichtszene
-				
+
 			}
 			else{// nach loslassen...
 				if (timerstate[buttonno+4]==0x50){// wenn 5 sekunden noch nicht erreicht LZ senden
@@ -411,7 +410,6 @@ unsigned long read_obj_value(unsigned char objno)
 {
 //	unsigned int retvalue;
 	if(objno<8)	return((bitobject>>objno)&0x01);
-	//else if (objno == 16) return dimmwert;	// Helligkeit Status LEDs
 	else return(object_value[objno-8]);
 }
 
@@ -510,7 +508,7 @@ void switch_led(unsigned char ledno, __bit onoff)
 		}
 		if((command&0x03)==3) onoff=!onoff;
 
-		
+
 		ledvar=LEDSTATE;
 		ledvar&= ~(1<<(ledno+4));	// LEDs sind an Pin 4-7
 		ledvar |= ((onoff<<(ledno+4)));	// unteren 4 bits immer auf 1 lassen !!!
@@ -540,7 +538,7 @@ const unsigned char tele_repeat_value[8]={63,125,188,250,25,38,50,94};	// 3Bit: 
 
 void delay_timer(void)
 {
-	unsigned char objno, delay_value,ledvar,tmp,m,n; 
+	unsigned char objno, delay_value,ledvar,tmp,m,n;
 	unsigned int i_tmp;
 	i_tmp,tmp;
 //	long delval;
@@ -580,9 +578,9 @@ void delay_timer(void)
 					LEDSTATE=ledvar;
 					timerstate[objno]=0;
 				}
-				else// die 4 oberen für 2. Schaltebene
+				else// die 4 oberen fuer 2. Schaltebene
 				{
-					
+
 				}
 			break;
 			case 0x20:	// Dimmen 0xF0 -> 0xD0 | 0x20
@@ -715,9 +713,9 @@ void delay_timer(void)
 			}// ende switch (timerstate...
 		}// ende if(!timercnt...
 	}//ende for(objno=0....
-	if(!(timercnt[8]))// timer für zyclisches Temperaturmessen und senden
+	if(!(timercnt[8]))// timer fuer zyclisches Temperaturmessen und senden
 	{
-		if(!sequence)sequence=1;		
+		if(!sequence)sequence=1;
 	}
 }
 
