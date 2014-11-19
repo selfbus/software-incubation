@@ -16,6 +16,13 @@
 #ifndef FB_APP_d2c
 #define FB_APP_d2c
 
+//#define debugmode
+#ifdef LPC936
+	#include <fb_lpc936_1.53.h>
+#else
+#include <fb_lpc922_1.53.h>
+#endif
+
 //#define einkanal
 //#define applilpc
 #define i2c_appli

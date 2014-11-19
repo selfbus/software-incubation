@@ -39,46 +39,46 @@ unsigned char bit_count, wait_count;
 #define mow_init( mPX_X, mPre, n) \
 { \
    mPX_X=0; \
-   HW_owdelay(2500); \
+   owdelay(210); \
    mPX_X=1; \
    for(n=0;n<255;n++) mPre=mPre & mPX_X; \
 }
 
 // Byte an one-wire Gerät senden
 // LSB first
-// 1-Bit: 5us auf low dann auf high und 85us warten //260 HW, 23 SW
-// 0-Bit: 90us auf low dann auf high                //275 HW, 25 SW
+// 1-Bit: 5us auf low dann auf high und 85us warten //260
+// 0-Bit: 90us auf low dann auf high                //275
 #define mow_write( mPX_X, n, m) \
 { \
   for (n=1;n!=0;n=n<<1) { \
       if (owbyte & n) { \
           for (m=0;m<2;m++) mPX_X=0; \
               mPX_X=1; \
-              HW_owdelay(260); } \
+              owdelay(23); } \
       else { \
           mPX_X=0; \
-          HW_owdelay(275); \
+          owdelay(25); \
           mPX_X=1; } \
   } \
 }
 
-// Byte von one-wire Gerät lesen    //140 HW, 13 SW
+// Byte von one-wire Gerät lesen    //140
 #define mow_read( mPX_X, n, m, d) \
 { \
   for (n=1;n!=0;n=n<<1) { \
       for (m=0;m<2;m++) mPX_X=0; \
           mPX_X=1; \
-          HW_owdelay(1); \
+          owdelay(1); \
           if (mPX_X) d|=n; \
-          HW_owdelay(140); } \
+          owdelay(13); } \
 }
 
-// Bit von one-wire Datenleitung einlesen // HW und SW delay gleich, 1
+// Bit von one-wire Datenleitung einlesen
 #define mow_read_bit( mPX_X, m, b) \
 { \
   for (m=0;m<2;m++) mPX_X=0; \
       mPX_X=1; \
-      HW_owdelay(1); \
+      owdelay(1); \
       b=mPX_X; \
 }
 
@@ -185,7 +185,7 @@ __bit ow_read_bit(void)				// Bit von one-wire Datenleitung einlesen
       case 2: mow_read_bit( P0_2, m, b); break;
       case 3: mow_read_bit( P0_3, m, b); break;
   }
-	HW_owdelay (140);   //140 HW, 13SW
+	owdelay (13);   //140
 
 	return (b);
 }
@@ -196,8 +196,7 @@ static inline void dht1x_init(unsigned char hw_channel)
 {
     // Leseanvorderung DHT 1x Sensoren
     P0 &= ~bitmask_1[hw_channel];
-    //long_owdelay(4100);  // Pull low, min. 18ms (17ms hier, 1.3ms später)
-    HW_owdelay(63000);  // Pull low, min. 18ms (17ms hier, 1.3ms später)
+    long_owdelay(4100);  // Pull low, min. 18ms (17ms hier, 1.3ms später)
     // Release in receive_1wire_dht
 }
 
@@ -254,8 +253,7 @@ unsigned char receive_1wire_dht (unsigned char hw_channel) {
     // Leseanvorderung DHT 2x Sensoren
     // DHT1x Sensoren vorher mit dht1x_init() initialisieren
     P0 &= ~bitmask_1[hw_channel];
-    //long_owdelay(320);  // Reset pulse, 1.3ms
-    HW_owdelay(4600);  // Reset pulse, 1.3ms
+    long_owdelay(320);  // Reset pulse, 1.3ms
     P0 |= bitmask_1[hw_channel];
     //    for (t = 0; t < 1; t++)
     //   ;
@@ -416,7 +414,7 @@ signed int read_temp(unsigned char sensortyp)   // Temperatur einlesen
 }
 
 
-
+/*
 void HW_owdelay(unsigned int deltime)		// Warten, deltime = Anzahl Takte / 2 (Timer wird mit CCLK/2 betrieben)
 {								// Der Aufruf allein dauert schon ca. 12us !!!
 								// NICHT IN APP VERWENDEN !!!
@@ -429,14 +427,14 @@ void HW_owdelay(unsigned int deltime)		// Warten, deltime = Anzahl Takte / 2 (Ti
   while(!TF0);					// warten auf Timer 0
   TR0=0;
 }
+*/
 
-
-static void oowdelay(unsigned char deltime)      // Warten, deltime = Anzahl Takte / 2 (Timer wird mit CCLK/2 betrieben)
+static void owdelay(unsigned char deltime)      // Warten, deltime = Anzahl Takte / 2 (Timer wird mit CCLK/2 betrieben)
 {                               // Der Aufruf allein dauert schon ca. 12us !!!
     for(;deltime>0;deltime--) {}
 }
 
-static void olong_owdelay(unsigned int deltime)      // Warten, deltime = Anzahl Takte / 2 (Timer wird mit CCLK/2 betrieben)
+static void long_owdelay(unsigned int deltime)      // Warten, deltime = Anzahl Takte / 2 (Timer wird mit CCLK/2 betrieben)
 {                               // Der Aufruf allein dauert schon ca. 12us !!!
     for(;deltime>0;deltime--) {}
 }

@@ -15,6 +15,13 @@
 #ifndef FB_APP_LC
 #define FB_APP_LC
 
+//#define debugmode
+#ifdef LPC936
+	#include <fb_lpc936_1.53.h>
+#else
+#include <fb_lpc922_1.53.h>
+#endif
+
 //#define HAND				// Handsteuerung aktiv (auskommentieren wenn nicht gewünscht)
 #define MAX_PORTS_4			// Anzahl Ausgänge (nur 4 oder 8 erlaubt)
 //#define SPIBISTAB			// Serielle Ausgabe für bistabile relaise aktivieren
@@ -79,10 +86,8 @@ extern const unsigned char bitmask_0[];
 extern const unsigned char bitmask_11[];
 
 void timer0_int(void) __interrupt (1);
-void write_delay_record(unsigned char objno, unsigned char delay_status, long delay_target);	// Schreibt die Schalt-Verzoegerungswerte ins Flash
-void clear_delay_record(unsigned char objno); // Loescht den Delay Eintrag
-void write_value_req(void);		// Hauptroutine für Ausgänge schalten gemäß EIS 1 Protokoll (an/aus)
-void read_value_req(void);
+//void write_value_req(void);		// Hauptroutine für Ausgänge schalten gemäß EIS 1 Protokoll (an/aus)
+//void read_value_req(void);
 void delay_timer(void);		// zählt alle 130ms die Variable Timer hoch und prüft Queue
 void port_schalten(void);	// Ausgänge schalten
 void object_schalten(unsigned char objno, __bit objstate);	// Objekt schalten

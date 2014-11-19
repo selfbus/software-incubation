@@ -19,8 +19,13 @@ unsigned char __at 0x00 RAM[00];
 #ifndef FB_APP_ROLLO11
 #define FB_APP_ROLLO11
 
+#ifdef LPC936
+	#include <fb_lpc936_1.53.h>
+#else
+#include <fb_lpc922_1.53.h>
+#endif
 
-#define MAX_PORTS_4		// Anzahl Ausgänge (nur 4 oder 8 erlaubt)
+#define MAX_PORTS_8		// Anzahl Ausgänge (nur 4 oder 8 erlaubt)
 //#define HAND				// Handsteuerung aktiv (auskommentieren wenn nicht gewünscht)
 //#define SPIBISTAB			// Serielle Ausgabe für bistabile relaise aktivieren
 //#define zeroswitch			// für Platine mit Nullspannungserkennung

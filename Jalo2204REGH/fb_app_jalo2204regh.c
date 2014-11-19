@@ -17,8 +17,8 @@
 
 
 
-#include <P89LPC922.h>
-#include "../lib_lpc922/Releases/fb_lpc922_1.5x.h"
+//#include <P89LPC922.h>
+//#include "../lib_lpc922/Releases/fb_lpc922_1.5x.h"
 #include  "fb_app_jalo2204regh.h"
 #include "../com/debug.h"
 
@@ -484,8 +484,10 @@ void delay_timer(void)	// zählt alle 8 ms die Variable Timer hoch und prüft Queu
 	
 	unsigned char objno,delay_state,m,n;//
 	unsigned int timerflags;
-
-	RTCCON=0x61;		// RTC Flag löschen
+	RTCCON=0x60;		// RTC Flag löschen,timer stoppen
+	RTCH=0x01;			// reload Real Time Clock
+	RTCL=0xCD;			// 8ms
+	RTCCON=0x61;		// timer starten
 	objno=0;
 	timer++;
 		timerflags = timer&(~(timer-1));
@@ -1153,10 +1155,7 @@ void restart_app(void) 		// Alle Applikations-Parameter zurücksetzen
 	STOP_WRITECYCLE
 	EA=1;						// Interrupts freigeben
 */
-	RTCCON=0x60;		// RTC Flag löschen
-	RTCH=0x01;			// reload Real Time Clock
-	RTCL=0xCD;			// 8ms
-	RTCCON=0x61;
+	RTCCON=0x81;
 	//if(eeprom[0xE3]&0x80) priority=0;
 	//else priority=1;
 	drive_priority=(eeprom[0xE3]&0xC0);

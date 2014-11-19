@@ -18,8 +18,14 @@
 * 
 */
 
-#include <P89LPC922.h>
-#include "../lib_lpc922/Releases/fb_lpc922_1.4x.h"
+#ifndef LPC936
+	#include <P89LPC922.h>
+#else
+	#include <P89LPC935_6.h>
+#endif	
+
+//#include <P89LPC922.h>
+//#include "../lib_lpc922/Releases/fb_lpc922_1.4x.h"
 #include "fb_app_ws.h"
 #include "../com/debug.h"
 //#include "../com/debug.c"
@@ -27,7 +33,7 @@
 #include"../com/watchdog.h"
 //#include"../com/watchdog.c"
 
-//#define debugmode
+#define debugmode
 #define TYPE 0
 #define VERSION 0
 /** 
@@ -91,6 +97,16 @@ void main(void)
 	 	{	
 		delay_timer();
 	 	}
+		else if (RTCCON>=0x80 && connected)	// Realtime clock ueberlauf
+			{			// wenn connected den timeout für Unicast connect behandeln
+			RTCCON=0x61;// RTC flag löschen
+			if(connected_timeout <= 110)// 11x 520ms --> ca 6 Sekunden
+				{
+				connected_timeout ++;
+				}
+				else send_obj_value(T_DISCONNECT);// wenn timeout dann disconnect, flag und var wird in build_tel() gelöscht
+			}
+		
 
 
 //				 #########  checken der Grenzwerte ###########

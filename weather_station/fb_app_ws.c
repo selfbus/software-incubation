@@ -17,14 +17,8 @@
  */
 
 
-
-
-#include <P89LPC922.h>
-#include "../lib_lpc922/Releases/fb_lpc922_1.4x.h"
 #include  "fb_app_ws.h"
-#include "../com/debug.h"
 
-#include "../com/fb_rs232.h"
 unsigned char portbuffer;	// Zwischenspeicherung der Portzustände
 
 //unsigned char timerstart[3];
@@ -459,6 +453,9 @@ void delay_timer(void)	// zählt alle 0,1s die Variable Timer hoch
 	unsigned int timerflags;
 	objno;n;m;
 	
+	RTCCON=0x60;		// RTC anhalten und Flag löschen
+	RTCH=0xE1;//16;			// reload Real Time Clock
+	RTCL=0x00;//80;		1s	//100ms laden
 	RTCCON=0x61;		// RTC starten, RUN Bit löschen
 	
 	timer++;// wird alle 1s aufgerufen
@@ -649,10 +646,7 @@ void restart_app(void)		// Alle Applikations-Parameter zurücksetzen
 
 	EA=1;						// Interrupts freigeben
 	
-	RTCCON=0x60;		// RTC anhalten und Flag löschen
-	RTCH=0xE1;//16;			// reload Real Time Clock
-	RTCL=0x00;//80;		1s	//100ms laden
-	RTCCON=0x61;		// RTC starten
+	RTCCON=0x81;		// RTC starten und ov flag setzen
 
 	for(n=0;n<=3;n++)// die 4 timer basen laden
 	{

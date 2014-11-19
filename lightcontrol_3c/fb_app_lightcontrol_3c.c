@@ -17,8 +17,8 @@
 
 
 
-#include <P89LPC922.h>
-#include "../lib_lpc922/fb_lpc922.h"
+//#include <P89LPC922.h>
+//#include "../lib_lpc922/Releases/fb_lpc922_1.4x.h"
 #include  "fb_app_lightcontrol_3c.h"
 
 #include "../com/fb_rs232.h"
@@ -74,8 +74,8 @@ __bit delay_toggle;			// um nur jedes 2. Mal die delay routine auszuführen
 __bit portchanged;
 
 
-
-const unsigned char grundhelligkeit_tabelle[]={15,30,46,61,77,92,107,127};
+											//{15,30...
+const unsigned char grundhelligkeit_tabelle[]={00,30,46,61,77,92,107,127};
 const unsigned char prozentvalue[]={25,51,75,102,128,154,179,204,230,255};
 
 const unsigned int timerflagmask[]={0x0000,0x0000,0x0008,0x0080,0x0800,0x8000};
@@ -135,14 +135,14 @@ void timer0_int  (void) __interrupt (1) {// Interrupt T0 für soft PWM LED
 
 
 
-void write_value_req(void)	// Objekte steuern gemäß EIS  Protokoll (an/aus/dimm/set)
+void write_value_req(unsigned char objno)	// Objekte steuern gemäß EIS  Protokoll (an/aus/dimm/set)
 {
-  unsigned char objno,objflags,assno,n,gaposh,valtmp,tmp;//,zfout,zftyp;
+//  unsigned char objno,objflags,assno,n,gaposh,;//,zfout,zftyp;
   //unsigned char blockstart, blockend, block_polarity;
-  unsigned char obj,Dimmschritt;//, zf_bitpattern;
+  unsigned char obj,Dimmschritt,valtmp,tmp;//, zf_bitpattern;
 
   //  unsigned int ui_tmp;
-    gaposh=0;
+/*    gaposh=0;
 
     //gapos=gapos_in_gat(telegramm[3],telegramm[4]);	// Position der Gruppenadresse in der Adresstabelle
     if (gapos_in_gat(telegramm[3],telegramm[4])!=0xFF)					// =0xFF falls nicht vorhanden
@@ -157,7 +157,7 @@ void write_value_req(void)	// Objekte steuern gemäß EIS  Protokoll (an/aus/dimm/
         {
           objno=eeprom[eeprom[ASSOCTABPTR]+2+(n*2)];				// Objektnummer
           objflags=read_objflags(objno);			// Objekt Flags lesen
-          obj=objno%3;// modulo 3 ergibt die Kanalnummer
+*/        obj=objno%3;// modulo 3 ergibt die Kanalnummer
           valtmp=telegramm[7]&0x0F;
 
           // Objektbehandlung:
@@ -288,14 +288,15 @@ void write_value_req(void)	// Objekte steuern gemäß EIS  Protokoll (an/aus/dimm/
          } //   ende  sperrobjekt
           //###########################################################
           
-        }// ende if gaspos in gat...
-      }// ende for(n....
+//        }// ende if (gaspos_in_gat==...
+//      }// ende for(n....
       if (portbuffer&0xF0 != oldportbuffer&0xF0) portchanged=1;//post für port_schalten hinterlegen
       //port_schalten(portbuffer);	//Port schalten wenn sich ein Pin geändert hat
-    }
+//    }// ende if(gapos_in_gat())
     //owntele=0;
     //respondpattern=0;
 }
+
 unsigned char sperrvalue(unsigned char index,unsigned char obj){
 	unsigned char retval=0;
 	// Dimmwert beginn-ende aus Dimmwerttabelle holen
@@ -357,9 +358,9 @@ void hell_stellen (unsigned char obj,unsigned char value){
 * @return
 * 
 */
-void read_value_req(void)
+void read_value_req(unsigned char objno)
 {
-	unsigned char objno, objflags;
+/*	unsigned char objno, objflags;
 	unsigned int objvalue;
 	
 	objno=find_first_objno(telegramm[3],telegramm[4]);	// erste Objektnummer zu empfangener GA finden
@@ -371,6 +372,7 @@ void read_value_req(void)
 		// Objekt lesen, nur wenn read enable gesetzt (Bit3) und Kommunikation zulaessig (Bit2)
 		if((objflags&0x0C)==0x0C) send_obj_value(objno+64); //send_value(0,objno,objvalue);
     }
+*/	send_obj_value(objno+64);
 }
 
 
@@ -384,7 +386,7 @@ unsigned long read_obj_value(unsigned char objno)	// gibt den Wert eines Objekte
 	if(objno>=3 && objno<6) {
 		ret_val = dimmen[obj];
 	}
-	if(objno>=6 && objno<8) {
+	if(objno>=6 && objno<9) {
 		ret_val = helligkeit[obj];
 	}
 	if(objno>=9 && objno <12) {
@@ -412,7 +414,7 @@ unsigned char obj;
 	if(objno>=3 && objno<6) {
 		dimmen[obj]=objvalue;
 	}
-	if(objno>=6 && objno<8) {
+	if(objno>=6 && objno<9) {
 		helligkeit[obj]=objvalue;
 	}
 	if(objno>=9 && objno <12) {
@@ -523,7 +525,11 @@ unsigned char obj;
 			  if (timerstart[obj]){// wenn soft "AUS"
 				  dimmziel[obj]=0;
 			  }
-			  else dimmwert[obj]=0;// sofort aus
+			  else 
+				  {
+				  dimmwert[obj]=0;// sofort aus
+				  dimmziel[obj]=0;
+				  }
 		  }
 	}
 	if (objno&0x20){		// bei Bus return ist dimmziel[x] schon geladen
@@ -958,7 +964,7 @@ void restart_app(void)		// Alle Applikations-Parameter zurücksetzen
 */
 	WRITE_BYTE(0x01,0x0C,0x00)	// PORT A Direction Bit Setting
 	WRITE_BYTE(0x01,0x0D,0xFF)	// Run-Status (00=stop FF=run)
-	WRITE_BYTE(0x01,0x12,0x8A)	// COMMSTAB Pointer
+//	WRITE_BYTE(0x01,0x12,0x8A)	// COMMSTAB Pointer
 	STOP_WRITECYCLE
 	// set timer 0 autoreload 0.05ms
 	TR0=0;
@@ -982,6 +988,7 @@ void restart_app(void)		// Alle Applikations-Parameter zurücksetzen
 	TF0=0; //timer0 flag löschen
 	ET0=1;// timer 0 interupt freigeben	
 	EA=1;						// Interrupts freigeben
-	
+	RTCCON=0x81;				// RTC starten und OV flag setzen
+
 
 }// Ende restart app

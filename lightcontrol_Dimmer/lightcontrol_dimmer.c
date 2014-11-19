@@ -17,10 +17,10 @@
 * @author Andreas Krieger 
 * 
 */
-#include <P89LPC922.h>
-#include "../lib_lpc922/Releases/fb_lpc922_1.4x.h"
+//#include <P89LPC922.h>
+//#include "../lib_lpc922/Releases/fb_lpc922_1.4x.h"
 #include "fb_app_lightcontrol_dimmer.h"
-#include "../com/debug.h"
+//#include "../com/debug.h"
 
 #include "../com/fb_rs232.h"
 
@@ -163,6 +163,16 @@ void main(void)
 			}
 		*/
 		}// end if(runstate)
+		else if (RTCCON>=0x80 && connected)	// Realtime clock ueberlauf
+		{			// wenn connected den timeout für Unicast connect behandeln
+		RTCCON=0x61;// RTC flag löschen
+		if(connected_timeout <= 110)// 11x 520ms --> ca 6 Sekunden
+			{
+			connected_timeout ++;
+			}
+			else send_obj_value(T_DISCONNECT);// wenn timeout dann disconnect, flag und var wird in build_tel() gelöscht
+		}
+
 		n= tx_buffer[(tx_nextsend-1)&0x07];// ist die letzte objno
 		if (tel_arrived || (n<6 && n>8 && tel_sent)) { // 
 			tel_arrived=0;

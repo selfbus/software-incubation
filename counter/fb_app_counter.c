@@ -16,7 +16,7 @@
 
 
 #include <P89LPC922.h>
-#include "../lib_lpc922/fb_lpc922.h"
+#include "../lib_lpc922/Releases/fb_lpc922_1.4x.h"
 #include "../com/debug.h"
 #include "fb_app_counter.h"
 #include "../com/fb_rs232.h"
@@ -142,6 +142,9 @@ void delay_timer(void)
 
 
 
+	RTCCON=0x60;		// RTC anhalten und Flag löschen
+	RTCH=0x16;			//16 reload Real Time Clock
+	RTCL=0x80;			//80 auf 100ms
 	RTCCON=0x61;//	 RTC flag löschen
 	
 	timerflags=0x01;//setzt das niedrigste bit 0  100ms base
@@ -210,13 +213,13 @@ void delay_timer(void)
 
 
 
-void write_value_req(void)		// Objekt-Wert setzen gemäß empfangenem EIS Telegramms
+void write_value_req(unsigned char objno)		// Objekt-Wert setzen gemäß empfangenem EIS Telegramms
 {
-	unsigned char objno,objflags,gapos,atp,assno,n,gaposh,tmp=0;
-	unsigned char objtype;
+//	unsigned char objno,objflags,gapos,atp,assno,n,gaposh;
+	unsigned char objtype,tmp=0;
 	//unsigned long long_tmp;
 	if(APPLICATION_RUN){
-	    gapos=gapos_in_gat(telegramm[3],telegramm[4]);
+/*	    gapos=gapos_in_gat(telegramm[3],telegramm[4]);
 	    if (gapos!=0xFF )	
 	    {
 	    	atp=eeprom[ASSOCTABPTR];		// Association Table Pointer
@@ -227,9 +230,9 @@ void write_value_req(void)		// Objekt-Wert setzen gemäß empfangenem EIS Telegram
 	    		if(gapos==gaposh) {					// Wenn Positionsnummer übereinstimmt
 	    			objno=eeprom[atp+2+(n*2)];			// Objektnummer
 	    			objflags=read_objflags(objno);		// Objekt Flags lesen
-	    			objtype=eeprom[eeprom[COMMSTABPTR]+objno*3+4];
+*/	    			objtype=eeprom[eeprom[COMMSTABPTR]+objno+objno+objno+4];
 	   			
-	    			if((objflags&0x14)==0x14) {			// Kommunikation zulässig (Bit 2 = communication enable) + Schreiben zulässig (Bit 4 = write enable)
+//	    			if((objflags&0x14)==0x14) {			// Kommunikation zulässig (Bit 2 = communication enable) + Schreiben zulässig (Bit 4 = write enable)
 	    				if (objno<25) {					// Status der Eingangsobjekte 0-24
 	    					if (objtype<=6){
 	    						tmp=telegramm[7]& 0x3F; //bit 6+7 löschen (0x40,0x80)
@@ -255,10 +258,10 @@ void write_value_req(void)		// Objekt-Wert setzen gemäß empfangenem EIS Telegram
 		    					if(objno==23)write_obj_value(25,0);
 		    				}
 	    				}
-	    			}//ende if objflags...
-	    		}//ende if gapos...
-	    	}// ende for n=....
-	    }// ende if gapos !=0
+//	    			}//ende if objflags...
+//	    		}//ende if gapos...
+//	    	}// ende for n=....
+//	    }// ende if gapos !=0
 	}// ende if APPLIKATION
 }// end function
 
@@ -336,9 +339,9 @@ void checklevel(__bit fullcheck,unsigned char check)// vergleiche Momentanwert m
 * @return
 * 
 */
-void read_value_req(void)
+void read_value_req(unsigned char objno)
 {
-	unsigned char objno, objflags;
+/*	unsigned char objno, objflags;
 	
 	objno=find_first_objno(telegramm[3],telegramm[4]);	// erste Objektnummer zu empfangener GA finden
 	if(objno!=0xFF) {	// falls Gruppenadresse nicht gefunden
@@ -350,7 +353,8 @@ void read_value_req(void)
 		objflags=read_objflags(objno);		// Objekt Flags lesen
 		// Objekt lesen, nur wenn read enable gesetzt (Bit3) und Kommunikation zulaessig (Bit2)
 		if((objflags&0x0C)==0x0C) send_obj_value(objno+0x40);// 0x40 ist bit für response Telegramm
-    }
+    }*/
+ send_obj_value(objno+0x40);
 }
 
 
@@ -531,21 +535,18 @@ unsigned char objno;
 
   transparency=0;
 
-  RTCCON=0x60;		// RTC anhalten und Flag löschen
-  RTCH=0x16;			//16 reload Real Time Clock
-  RTCL=0x80;			//80 auf 100ms
-  RTCCON=0x61;//	START_RTC	// RTC starten
+  RTCCON=0x81;//	START_RTC	// RTC starten und  OV Flag setzen
 
   EA=0; 
   START_WRITECYCLE
   WRITE_BYTE(0x01,0x03,0x00)	// Herstellercode 00 76 = Robert Bosch
   WRITE_BYTE(0x01,0x04,76)
-  WRITE_BYTE(0x01,0x05,0x04)	// Geräte Typ (2118) 04B0h
-  WRITE_BYTE(0x01,0x06,0xB0)  // 	"	"	"
-  WRITE_BYTE(0x01,0x07,0x01)	// Versionsnummer
+  //WRITE_BYTE(0x01,0x05,0x04)	// Geräte Typ (2118) 04B0h
+  //WRITE_BYTE(0x01,0x06,0xB0)  // 	"	"	"
+  //WRITE_BYTE(0x01,0x07,0x01)	// Versionsnummer
   WRITE_BYTE(0x01,0x0C,0x00)	// PORT A Direction Bit Setting
   WRITE_BYTE(0x01,0x0D,0xFF)	// Run-Status (00=stop FF=run)
-  WRITE_BYTE(0x01,0x12,0x82)	// COMMSTAB Pointer
+  //WRITE_BYTE(0x01,0x12,0x82)	// COMMSTAB Pointer
   STOP_WRITECYCLE
 
 

@@ -17,8 +17,8 @@
 
 
 
-#include <P89LPC922.h>
-#include "../lib_lpc922/Releases/fb_lpc922_1.4x.h"
+//#include <P89LPC922.h>
+//#include "../lib_lpc922/Releases/fb_lpc922_1.4x.h"
 #include  "fb_app_rollo11.h"
 
 
@@ -75,140 +75,11 @@ void write_value_req(unsigned char objno) 				// Ausgänge schalten gemäß EIS 1 P
 
 //	  unsigned char objflags,gapos,assno,n,gaposh;
 	 
-/*	    gaposh=0;
-
-	    gapos=gapos_in_gat(telegramm[3],telegramm[4]);	// Position der Gruppenadresse in der Adresstabelle
-	    if (gapos!=0xFF)	// =0xFF falls nicht vorhanden
-	    {
-		 // atp=eeprom[ASSOCTABPTR];			// Start Association Table
-	      assno=eeprom[ASSOCTABPTR];			// Erster Eintrag = Anzahl Einträge
-	      for(n=0;n<assno;n++)				// Schleife über alle Einträge in der Ass-Table, denn es könnten mehrere Objekte (Pins) der gleichen Gruppenadresse zugeordnet sein
-	      {
-	        gaposh=eeprom[eeprom[ASSOCTABPTR]+1+(n*2)];
-	        if(gapos==gaposh)					// Wenn Positionsnummer übereinstimmt
-	        {
-	          objno=eeprom[eeprom[ASSOCTABPTR]+2+(n*2)];				// Objektnummer
-	          objflags=read_objflags(objno);			// Objekt Flags lesen
-*/
 	         if (objno<8 && !handmode) object_schalten(objno,telegramm[7]&0x01);	// Objektnummer 0-4 entspricht den Kanälen 1-4
 	 
 	         if (objno>=16 && objno<=17)Sobject_schalten(objno,telegramm[7]&0x01);	// Objektnummer 16+17 entspricht den Sicherheitsfahrten 1 + 2
-
-//	        	}// ende if(gapos...
-//	        }// ende for(n=0;n...
-	      //rollo if (portbuffer != userram[0x29])port_schalten(portbuffer);	//Port schalten wenn sich ein Pin geändert hat
-//	    }//ende if(gapos!=...
-	 //   owntele=0;
-	 //   respondpattern=0;
-	    //rs_send(blocked);
-	}//ende void write_value_request(....
-	
-/*##### vom out8 ###
- *unsigned char objno,objflags,assno,n,gaposh,zfout,zftyp, gapos;
-  unsigned char blockstart, blockend, block_polarity;
-  unsigned char obj_bitpattern, zf_bitpattern;
- 
-    gaposh=0;
-
-    gapos=gapos_in_gat(telegramm[3],telegramm[4]);	// Position der Gruppenadresse in der Adresstabelle
-    if (gapos!=0xFF)					// =0xFF falls nicht vorhanden
-    {
-	  //atp=eeprom[ASSOCTABPTR];			// Start Association Table
-      assno=eeprom[eeprom[ASSOCTABPTR]];				// Erster Eintrag = Anzahl Einträge
- 
-      for(n=0;n<assno;n++)				// Schleife über alle Einträge in der Ass-Table, denn es könnten mehrere Objekte (Pins) der gleichen Gruppenadresse zugeordnet sein
-      {
-        gaposh=eeprom[eeprom[ASSOCTABPTR]+1+(n*2)];
-        if(gapos==gaposh)					// Wenn Positionsnummer übereinstimmt
-        {
-          objno=eeprom[eeprom[ASSOCTABPTR]+2+(n*2)];				// Objektnummer
-          objflags=read_objflags(objno);			// Objekt Flags lesen
-//obj_bitpattern prüfen !!!
-          obj_bitpattern=0x01<<(objno-8);
-          
-          if (objno<8) object_schalten(objno,telegramm[7]&0x01);	// Objektnummer 0-7 entspricht den Ausgängen 1-8
-
-          if (objno>7 && objno<12)	// Objektnummer 8-11 entspricht den Zusatzfunktionen 1-4
-          {
-            write_obj_value(objno, telegramm[7]&0x01);
-            zfout=0;
-            blockstart=0;
-            blockend=0;
-            switch (objno-8)			// Zugeordneten Ausgang zu Zusatzfunktionsnr. in zfout speichern (1-8)
-            {
-              case 0x00:		
-                zfout=eeprom[FUNCASS]&0x0F;
-                blockstart=eeprom[BLOCKACT]&0x03;		// Verhalten bei Beginn der Sperrung
-                blockend=(eeprom[BLOCKACT]>>2)&0x03;	// Verhalten bei Ende der Sperrung
-              break;
-              case 0x01:
-                zfout=(eeprom[FUNCASS]&0xF0)>>4;
-                blockstart=(eeprom[BLOCKACT]>>4)&0x03;	// Verhalten bei Beginn der Sperrung
-                blockend=(eeprom[BLOCKACT]>>6)&0x03;	// Verhalten bei Ende der Sperrung
-              break;
-              case 0x02:
-                zfout=eeprom[FUNCASS+1]&0x0F;
-                blockstart=eeprom[BLOCKACT+1]&0x03;		// Verhalten bei Beginn der Sperrung
-                blockend=(eeprom[BLOCKACT+1]>>2)&0x03;	// Verhalten bei Ende der Sperrung
-              break;
-              case 0x03:
-                zfout=(eeprom[FUNCASS+1]&0xF0)>>4;
-                blockstart=(eeprom[BLOCKACT+1]>>4)&0x03;	// Verhalten bei Beginn der Sperrung
-                blockend=(eeprom[BLOCKACT+1]>>6)&0x03;		// Verhalten bei Ende der Sperrung
-            }
-            zftyp=((eeprom[FUNCTYP])>>((objno-8)*2)) & 0x03;	// Typ der Zusatzfunktion
-            zf_bitpattern=0x01<<(zfout-1);
-           
-            switch (zftyp)
-            {
-              case 0x00:			// Verknüpfung
-                switch (telegramm[7])
-                {
-                  case 0x80:
-                    logicstate=logicstate&(0xFF-zf_bitpattern);
-                  break;
-                  case 0x81:
-                    logicstate=logicstate|zf_bitpattern;
-                }
-                object_schalten(zfout-1, read_obj_value(zfout-1));	//telegramm[7]&0x01);
-              break;
-              case 0x01:			// Sperren
-            	block_polarity=eeprom[BLOCKPOL] & obj_bitpattern;
-                if (((telegramm[7]==0x80) && (block_polarity==0)) ||
-                	((telegramm[7]==0x81) && (block_polarity!=0)))
-                {	// Ende der Sperrung
-                	if((blocked & zf_bitpattern)!=0) {	// nur wenn Sperre aktiv war
-						blocked=blocked&(0xFF-zf_bitpattern);
-						if (blockend==0x01) portbuffer=portbuffer&(0xFF-zf_bitpattern);	// Bei Ende der Sperrung ausschalten
-						if (blockend==0x02) portbuffer=portbuffer|zf_bitpattern;		// Bei Ende der Sperrung einschalten
-                	}
-                }
-                  
-                if (((telegramm[7]==0x81) && (block_polarity==0)) ||
-                	((telegramm[7]==0x80) && (block_polarity!=0)))
-                {	// Beginn der Sperrung
-                	if((blocked & zf_bitpattern)==0) {	// nur wenn Sperre inaktiv war
-						blocked=blocked|zf_bitpattern;
-						if (blockstart==0x01) portbuffer=portbuffer&(0xFF-zf_bitpattern);	// Bei Beginn der Sperrung ausschalten
-						if (blockstart==0x02) portbuffer=portbuffer|zf_bitpattern;		// Bei Beginn der Sperrung einschalten
-						timercnt[zfout-1]=0;//delrec[(zfout-1)*4]=0;	// ggf. Eintrag für Schaltverzögerung löschen
-                	}
-                }
-              //port_schalten(portbuffer);
-              break;
-              //case 0x02:			// Zwangsstellung
-            }
-          }
-        }
-      }
-      if (portbuffer != oldportbuffer) portchanged=1;//post für port_schalten hinterlegen
-      //port_schalten(portbuffer);	//Port schalten wenn sich ein Pin geändert hat
-    }
-    //owntele=0;
-    //respondpattern=0;
-
 }
-*/
+
 
 /** 
 * Objektwert lesen wurde angefordert, read_value_response Telegramm zurücksenden
@@ -221,19 +92,6 @@ void write_value_req(unsigned char objno) 				// Ausgänge schalten gemäß EIS 1 P
 void read_value_req(unsigned char objno)// Sendet nach Leseanfrage objektwert auf den BUS
 {
 	send_obj_value(objno+64);
-/*	unsigned char objno, objflags;
-	unsigned int objvalue;
-	
-	objno=find_first_objno(telegramm[3],telegramm[4]);	// erste Objektnummer zu empfangener GA finden
-	if(objno!=0xFF) {	// falls Gruppenadresse nicht gefunden
-		
-		objvalue=read_obj_value(objno);		// Objektwert aus USER-RAM lesen (Standard Einstellung)
-
-		objflags=read_objflags(objno);		// Objekt Flags lesen
-		// Objekt lesen, nur wenn read enable gesetzt (Bit3) und Kommunikation zulaessig (Bit2)
-		if((objflags&0x0C)==0x0C) send_obj_value(objno+64); //send_value(0,objno,objvalue);
-    }
-*/
 }
 
 
@@ -290,9 +148,7 @@ unsigned char k,zuordnung,sobj,blockstart,blockend,action;
 			//}
 			blockstart= blocked & ~oldblockvalue;//steigende Flanke der Blockade(sicherheit)
 			blockend= ~blocked & oldblockvalue;	//fallende Flanke der Blockade(sicherheit)
-			//START_WRITECYCLE
-			//WRITE_BYTE(0x00,0x2A,blocked)		// 0xCA  blocked im userram sichern
-			//STOP_WRITECYCLE
+
 			if (!handmode){
 			oldblockvalue=blocked;
 
@@ -529,10 +385,11 @@ void delay_timer(void)	// zählt alle 8 ms die Variable Timer hoch und prüft Queu
 	unsigned char objno,delay_state,m;//,delay_base;
 	unsigned int timerflags;
 
-// unsigned char port_pattern,delay_zeit,delay_onoff;
-//	long delval;//,delay_target;
-//	bit hand;
+	RTCCON=0x60;		// RTC Flag löschen
+	RTCH=0x01;			// reload Real Time Clock
+	RTCL=0xCD;			// 8ms
 	RTCCON=0x61;		// RTC Flag löschen
+
 	objno=0;
 	timer++;
 		timerflags = timer&(~(timer-1));
@@ -548,9 +405,6 @@ void delay_timer(void)	// zählt alle 8 ms die Variable Timer hoch und prüft Queu
 					}
 				  }//end if(timerbase...
 				}// end  for(m..
-//			}// end if timer...
-//			timerflags = timerflags>>4;
-//		}//end for (n=...
 		
 		// ab Hier die aktion...
 
@@ -615,77 +469,7 @@ void delay_timer(void)	// zählt alle 8 ms die Variable Timer hoch und prüft Queu
 		
 }
 	
-/*	###### alt out8 
-	
-	
-#ifdef HAND		// für Handbetätigung
-//	unsigned char n;
-	unsigned char ledport;
-	unsigned char Tasten=0;
-#endif
-	
-		
-#ifdef HAND		//+++++++   Handbetätigung  ++++++++++
 
-	if((TMOD&0x0F)==0x02 && fb_state==0) {
-		ET1=0;
-
-		#ifdef MAX_PORTS_8
-
-		while(  (!PWM || (TL0>0x72)));// PWM scannen um "Hand"-Tasten abzufragen
-
-		#endif
-		#ifdef MAX_PORTS_4
-		while( (TMOD&0x0F)==0x02 && ( TL0>0x72));// PWM scannen um "Hand"-Tasten abzufragen
-		#endif
-
-		interrupted=0;	  
-		Tasten=0;				
-
-	#ifdef MAX_PORTS_8
-		P1_3= 1;			    //int0 auf 1, wird über Dioden und taster auf low IO gezogen.
-		ledport=0x01;
-		for (n=0;n<8;n++) {  						
-			P0=~ledport;
-		  	if (!P1_3){
-		  		Tasten=Tasten|ledport;
-		  		objno=n;
-		  		n=7;
-		  	}
-		  	ledport=ledport<<1;
-		} 
-	#endif	
-		
-	#ifdef MAX_PORTS_4
-		ledport=0x01;
-		for (n=0;n<4;n++) {  						
-			P0=~ledport;
-			P0_5=1;			//P0.5 auf 1, wird über Dioden und taster auf low IO gezogen.
-			if (!P0_5){
-		  		Tasten=Tasten|ledport;
-		  		objno=n;
-		  		n=3;
-		  	}
-		  	ledport=ledport<<1;
-		} 
-	#endif
-		
-		//if (interrupted==1) Tasten=Tval;  // wenn unterbrochen wurde verwerfen wir die Taste
-		REFRESH;
-		//	Tasten = Tval; // ##############  <----- Hier wird Handbetätigung quasi mit ausgeschaltet !! #########################
-		if (Tasten != Tval)  {
-			portbuffer=oldportbuffer;
-		  	ledport=Tasten&~Tval; // ledport ist hier die Hilfsvariable für steigende Flanke
-		  	if (ledport){
-		  		portbuffer^=ledport; // bei gedrückter Taste toggeln
-		  		portchanged=1;
-		  	}
-		  	Tval=Tasten;			//neue Tasten sichern
-		}
-		ET1=1;
-	}
-#endif
-*/
 unsigned char ledport;
 
 void handsteuerung(void)
@@ -696,13 +480,7 @@ void handsteuerung(void)
 		unsigned char key_pattern,Tasten;
 		key_pattern,tmph;
 	//#endif
-/*
-	if (RI){//simulation..
-		RI=0;
-	serbuf=SBUF;
-	//	rs_send(eeprom[SBUF]);// für sniffer
-	}//ende simulation
-*/
+
 	if((TMOD&0x0F)==0x02 && fb_state==0) {
 //	ET1=0;	
 //	while(  (!PWM || (TL0>0x72)));// PWM scannen um "Hand"-Tasten abzufragen
@@ -716,22 +494,7 @@ while(  (!PWM || (TL0>0x72)));// PWM scannen um "Hand"-Tasten abzufragen
 while( (TMOD&0x0F)==0x02 && ( TL0>0x72));// PWM scannen um "Hand"-Tasten abzufragen
 #endif
 
-		//while( TMOD==0x12 && (!PWM || (TL0>0x72)));// PWM scannen um "Hand"-Tasten abzufragen
-		//interrupted=0;	  
-		//Tasten=8;				// 
-/*		P1_3= 1;			    //int0 auf 1; wird über taster, diode, IO auf gnd gezogen.
-		ledport=0x01;
-		for (n=0;n<=7;n++){  						
-			P0=~ledport;
-		  	if (!P1_3){
-		  		Tasten=n;
-		  		n=7;
-		  	}
-		  	ledport=ledport<<1;
-		} 
-*/
-//		keyno++;
-//		keyno=keyno&0x07;
+
 #ifdef MAX_PORTS_8		
 		key_pattern=(0x01<<(delay_toggle&0x07));
 		P0 = ~key_pattern;
@@ -1223,8 +986,5 @@ void restart_app(void) 		// Alle Applikations-Parameter zurücksetzen
 	STOP_WRITECYCLE
 	EA=1;						// Interrupts freigeben
 
-	RTCCON=0x60;		// RTC Flag löschen
-	RTCH=0x01;			// reload Real Time Clock
-	RTCL=0xCD;			// 8ms
-	RTCCON=0x61;
-}
+	RTCCON=0x81;				// RTC run setzen und ov flag
+}	

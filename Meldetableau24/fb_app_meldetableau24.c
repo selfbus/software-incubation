@@ -19,10 +19,10 @@
 
 
 
-#include <P89LPC922.h>
-#include "fb_lpc922_1.4x.h"
+//#include <P89LPC922.h>
+//#include "../lib_lpc922/Releases/fb_lpc922_1.4x.h"
 #include  "fb_app_meldetableau24.h"
-#include "../com/debug.h"
+//#include "../com/debug.h"
 
 #include "../com/fb_rs232.h"
 unsigned char portbuffer;	// Zwischenspeicherung der Portzustände
@@ -185,7 +185,10 @@ void delay_timer(void)	// zählt alle 0,1s die Variable Timer hoch
 	unsigned char objno,n,m;
 	unsigned int timerflags;
 	objno;n;m;
-	
+
+	RTCCON=0x60;		// RTC anhalten und Flag löschen
+	RTCH=0x16;			// reload Real Time Clock
+	RTCL=0x80;			//100ms laden
 	RTCCON=0x61;		// RTC starten, RUN Bit löschen
 	
 	timer++;// wird alle 0.1s aufgerufen
@@ -427,10 +430,7 @@ void restart_app(void)		// Alle Applikations-Parameter zurücksetzen
 	EA=1;						// Interrupts freigeben
 	blink=0;					// init  pattern der Blinkanzeige
 	
-	RTCCON=0x60;		// RTC anhalten und Flag löschen
-	RTCH=0x16;			// reload Real Time Clock
-	RTCL=0x80;			//100ms laden
-	RTCCON=0x61;		// RTC starten
+	RTCCON=0x61;		// RTC starten und ov flag setzen
 
 	beep_state=0;
 	timercnt[0]=1;

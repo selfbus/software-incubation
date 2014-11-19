@@ -18,11 +18,11 @@
 
 
 
-#include <P89LPC922.h>
-#include "../lib_lpc922/Releases/fb_lpc922_1.4x.h"
+//#include <P89LPC922.h>
+//#include "../lib_lpc922/Releases/fb_lpc922_1.4x.h"
 #include  "fb_app_dimmer_2channel.h"
 
-#include "../com/fb_rs232.h"
+//#include "../com/fb_rs232.h"
 #include "fb_i2c.h"
 #define ledpwm
 
@@ -632,6 +632,9 @@ void delay_timer(void)	// zählt alle 0,5ms die Variable Timer hoch
 	unsigned char Tasten=0;
 #endif
 	
+	RTCCON=0x60;		// RTC anhalten und Flag löschen
+	RTCH=0x00;			// reload Real Time Clock
+	RTCL=0x1D;			//0.5ms laden
 	RTCCON=0x61;		// RTC starten
 
 	//	objno=0;
@@ -782,10 +785,7 @@ void restart_app(void)		// Alle Applikations-Parameter zurücksetzen
 	ET0=0;			// Interrupt für Timer 0 sperren
 
  
-	RTCCON=0x60;		// RTC anhalten und Flag löschen
-	RTCH=0x00;			// reload Real Time Clock
-	RTCL=0x1D;			//0.5ms laden
-	RTCCON=0x61;		// RTC starten
+	RTCCON=0x81;		// RTC starten und OV flag setzen
 
 	
 	EA=0;						// Interrupts sperren, damit flashen nicht unterbrochen wird

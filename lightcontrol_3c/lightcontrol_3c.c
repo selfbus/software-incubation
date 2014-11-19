@@ -18,8 +18,8 @@
 * 
 */
 
-#include <P89LPC922.h>
-#include "../lib_lpc922/fb_lpc922.h"
+//#include <P89LPC922.h>
+//#include "../lib_lpc922/Releases/fb_lpc922_1.4x.h"
 #include "fb_app_lightcontrol_3c.h"
 
 #include "../com/fb_rs232.h"
@@ -54,7 +54,7 @@ void main(void)
 	BRGCON|=0x01;	// Baudrate Generator starten
 	SBUF=0x55;
 
-	
+	TASTER=0;
 	for (n=0;n<50;n++) {		// Warten bis Bus stabil
 		TR0=0;					// Timer 0 anhalten
 		TH0=eeprom[ADDRTAB+1];	// Timer 0 setzen mit phys. Adr. damit Geräte unterschiedlich beginnen zu senden
@@ -69,7 +69,7 @@ void main(void)
 	bus_return();							// Aktionen bei Busspannungswiederkehr
 
 	do  {
-		if(eeprom[RUNSTATE]==0xFF) {	// nur wenn run-mode gesetzt
+		if(APPLICATION_RUN) {	// nur wenn run-mode gesetzt
 
 			// Helligkeit nachführen
 		if (dimmziel[count]==dimmwert[count]){
@@ -171,6 +171,16 @@ void main(void)
 			}
 		*/
 		}// end if(runstate)
+		else if (RTCCON>=0x80 && connected)	// Realtime clock ueberlauf
+			{			// wenn connected den timeout für Unicast connect behandeln
+			RTCCON=0x61;// RTC flag löschen
+			if(connected_timeout <= 110)// 11x 520ms --> ca 6 Sekunden
+				{
+				connected_timeout ++;
+				}
+				else send_obj_value(T_DISCONNECT);// wenn timeout dann disconnect, flag und var wird in build_tel() gelöscht
+			}
+		
 		n= tx_buffer[(tx_nextsend-1)&0x07];// ist die letzte objno
 		if (tel_arrived || (n<6 && n>8 && tel_sent)) { // 
 			tel_arrived=0;
