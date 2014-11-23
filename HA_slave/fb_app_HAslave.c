@@ -87,7 +87,7 @@ const unsigned char bitmask_1[8] ={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
 
 void write_value_req(unsigned char objno) 				// Ausgänge schalten gemäß EIS 1 Protokoll (an/aus)
 {
-
+signed int y_temp= (signed char)eeprom[0xDC+objno];
   if (objno<8)
 	  {
 	  if(telegramm[8]>0 && (!objects[objno]))
@@ -95,11 +95,14 @@ void write_value_req(unsigned char objno) 				// Ausgänge schalten gemäß EIS 1 P
 		  startup |= bitmask_1[objno];
 		  stepcounter[objno]=0;
 		  }
-	  objects[objno]=telegramm[8];    // speichern des Objektes
-	  
-	  if(eeprom[0xFC]& bitmask_1[objno])timercnt[objno+8]=eeprom[0xFE]; // wenn Überwachung aktiviert timer refreshen
-	  }
-  else objects[objno]=telegramm[7]&0x01;
+	  if((telegramm[8]+y_temp) >255)objects[objno]=255;
+	  else if ((telegramm[8]+y_temp) <0) objects[objno]=0;
+ 	  else objects[objno]= telegramm[8]+y_temp;    // speichern des Objektes
+
+ 	  if(eeprom[0xFC]& bitmask_1[objno])timercnt[objno+8]=eeprom[0xFE]; // wenn Überwachung aktiviert timer refreshen
+	  }// objno also 8 oder größer
+  else if(eeprom[0xFD]&0x10)objects[objno]=telegramm[8];// byte
+  else objects[objno]=telegramm[7]& 0x01;// 1 Bit
 
 }
 
@@ -137,7 +140,7 @@ void delay_timer(void)	// zählt alle 65ms die Variable Timer hoch und prüft Queu
 {
 	unsigned char objno,n,m;
 	unsigned int timerflags;
-	__bit changed=0;
+	__bit change,bitvalue=0;
 	
 	objno=0;
 
@@ -156,77 +159,49 @@ void delay_timer(void)	// zählt alle 65ms die Variable Timer hoch und prüft Queu
 			timerflags = timerflags>>1;
 		}//end for (n=...
 		
-		
-/*		// ab Hier die aktion...
-		if(timercnt[8]==0x80){// Lauflicht timer 8 (up)
-			timercnt[8]=eeprom[0+0xE2]|0x80;
-			if(pattern_up&0x80){// wenn letzer Ausgang an lauflicht_up_out senden
-				write_obj_value(10,1);
-				send_obj_value(10);
-			}
-			pattern_up<<=1;// schieben
-			portbuffer|=pattern_up;// in portbuffer übertragen 
-			portchanged=1;		// Änderung melden
-			for(n=0;n<8;n++){	// schauen welcher port an war
-				if(bitmask_1[n]&pattern_up){// Ausschaltzeit setzen
-					timercnt[n]=eeprom[2+0xE2]|0x80;
-					timerbase[n]=eeprom[DELAYTAB+1]>>4;
-				}
-			}
-		}
-		if(timercnt[9]==0x80){ // lauflicht timer 9 (down)
-			timercnt[9]=eeprom[1+0xE2]|0x80;
-			if(pattern_down&0x01){// wenn Ausgang 1 ein dann Lauflicht_down_out senden
-				write_obj_value(11,1);
-				send_obj_value(11);
-			}
-			pattern_down>>=1;
-			portbuffer|=pattern_down;// zuweisen
-			portchanged=1;// Änderung melden
-			for(n=0;n<8;n++){
-				if(bitmask_1[n]&pattern_down){// Ausschaltzeit setzen
-					timercnt[n]=eeprom[3+0xE2]|0x80;
-					timerbase[n]=eeprom[DELAYTAB+1]&0x0F;
-				}
-			}
-		}
-		// hier die normalen 8 step timer
-*/		for(objno=0;objno<=7;objno++) {
+		// PWM schalten
+		for(objno=0;objno<=7;objno++) {
 				if(!timercnt[objno])
 				{
-					timerbase[objno]=eeprom[0xEC+objno];
+					timerbase[objno]=eeprom[0xEC+objno]&0x0F;
 					timercnt[objno]=eeprom[0xF4+objno];
 					stepcounter[objno]++;
+					change = (eeprom[0xEC+objno]>>7)&0x01;
+					bitvalue =((portbuffer >> objno)&0x01)^change; 
 					if(!(startup & bitmask_1[objno]))// wenn nicht startup zyklus: normal schalten
 					{
-						if (stepcounter[objno]>objects[objno])portbuffer &= (~bitmask_1[objno]);	//ausschalten
-						if (stepcounter[objno]<objects[objno]) portbuffer|= bitmask_1[objno];	// einschalten
+						if (stepcounter[objno]>objects[objno])bitvalue=0;//ausschalten
+						if (stepcounter[objno]<objects[objno])bitvalue=1;//einschalten
 					}
 					else// startup aktiv
 					{
 						if(stepcounter[objno]) // in dem Falle ist startup zyklus aktiv
 						{
-							portbuffer|= bitmask_1[objno]; // immer ein
+							bitvalue=1;//portbuffer|= bitmask_1[objno]; // immer ein
 						}
 						else // Startupzyklus abgelaufen
 						{
 							startup &= (~(bitmask_1[objno])); // startup flag loeschen
 						}
 					}
+					if(bitvalue^change) portbuffer|= bitmask_1[objno];// xor Ventilart
+					else portbuffer &= (~bitmask_1[objno]);
 				}
 		}
 		// hier die 8 Überwachungstimer timer
+		m=0;
 		for(objno=0;objno<=7;objno++) {
 				if(!timercnt[objno+8]&& (eeprom[0xFC]& bitmask_1[objno]))
 				{
 					objects[objno]=eeprom[0xE4+objno]; // Ersatzstellgröße laden
-					changed=1;
+					m |= bitmask_1[objno];
 					timercnt[objno+8]=eeprom[0xFE];	// zeit neu setzen
 				}
 		}
-		if(changed)
+		if(m)
 		{
-			objects[8]=1;				// setzen des Fehler objects
+			if(eeprom[0xFD]&0x10) objects[8]|=m;		// setzen des Fehler objects Detail
+			else objects[8]|=1;						// oder Sammelobjekt
 			send_obj_value(8); // Fehler objekt senden
 		}
 		if(portbuffer!=oldportbuffer)portchanged=1;
@@ -718,25 +693,11 @@ void spi_2_out(unsigned int daten){
 
 void bus_return(void)		// Aktionen bei Busspannungswiederkehr
 {
-	unsigned char n, bw, bwh;
+	//unsigned char n, bw, bwh;
 
-	portbuffer=eeprom[PORTSAVE];	// Verhalten nach Busspannungs-Wiederkehr
+	//portbuffer=eeprom[PORTSAVE];	// Verhalten nach Busspannungs-Wiederkehr
 
-	bw=eeprom[0xF6];
-	for(n=0;n<=3;n++) {			// Ausgänge 1-4
-		bwh=(bw>>(2*n))&0x03;
-		if(bwh==0x01)  portbuffer=portbuffer & (0xFF-(0x01<<n));
-		if(bwh==0x02)  portbuffer=portbuffer | (0x01<<n);
-	}
 
-#ifdef MAX_PORTS_8
-	bw=eeprom[0xF7];
-	for(n=0;n<=3;n++) {			// Ausgänge 5-8
-		bwh=(bw>>(2*n))&0x03;
-		if(bwh==0x01)  portbuffer=portbuffer & (0xFF-(0x01<<(n+4)));
-		if(bwh==0x02)  portbuffer=portbuffer | (0x01<<(n+4));
-	}
-#endif
 
 #ifdef SPIBISTAB
 	oldportbuffer=~portbuffer; 	// auf 0 setzen, da sonst kein Vollstrom aktiviert wird
@@ -848,18 +809,19 @@ void restart_app(void) 		// Alle Applikations-Parameter zurücksetzen
 	IT0=0;// ??
 	RTCCON=0x81;
 	//EX0=1;
-	timerbase[8]=eeprom[DELAYTAB]>>4;//   basis von Obj 0 für timer 8 = patter_up.
+//	timerbase[8]=eeprom[DELAYTAB]>>4;//   basis von Obj 0 für timer 8 = patter_up.
 //	timerbase[9]=eeprom[DELAYTAB+1]&0x0F;//   basis von Obj 1 für timer 9 = pattern_down.
 	  for(n=0;n<8;n++)
 		  {
 		  objects[n]=0;    // speichern des Objektes
 		  if(eeprom[0xFC]& bitmask_1[n])
 			  {
-			  timerbase[n+8]=eeprom[0xFD];
+			  timerbase[n+8]=eeprom[0xFD]&0x0F;
 			  timercnt[n+8]=eeprom[0xFE]; // wenn Überwachung aktiviert timer refreshen
 			  }
-		  timerbase[n]=eeprom[0xEC];
+		  timerbase[n]=eeprom[0xEC]&0x0F;
 		  timercnt[n]=eeprom[0xF4];
 		  }
-	  	objects[8]=0;
+	  objects[8]=0;
+	  portbuffer=0;
 }

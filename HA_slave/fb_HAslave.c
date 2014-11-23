@@ -119,7 +119,7 @@
 		#endif
 	#endif
 #endif
-#define VERSION 37
+#define VERSION 01
 
 unsigned char __at 0x00 RAM[00]; 
 
@@ -360,6 +360,7 @@ void main(void)
 				TI=0;
 				SBUF=TYPE;
 			}
+/*			
 #ifdef MAX_PORTS_8
 			if(cmd >=49 && cmd <= 56){
 				portbuffer = portbuffer ^ (0x01<< (cmd-49));
@@ -370,7 +371,8 @@ void main(void)
 				portbuffer = portbuffer ^ (0x01<< (cmd-49));
 				port_schalten();
 			}
-#endif						
+#endif
+*/						
 		}//end if(RI...
 #else //ifndef debugmode
 DEBUGPOINT;
