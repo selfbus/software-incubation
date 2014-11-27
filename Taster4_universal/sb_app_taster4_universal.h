@@ -36,6 +36,10 @@
     #include <fb_lpc922.h>
 #endif
 
+// Include to enable debug options within the project
+#include "debug.h"
+
+
 #define POWERLED		0xCD
 #define LED_DURATION	0xE2
 #define FUNCTION		0xE3//done	// Funktion der Taster
