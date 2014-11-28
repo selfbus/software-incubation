@@ -26,20 +26,30 @@
 *		1.00	erste Version;
 */
 
+#include "sb_app_taster4_universal.h"
+#include "watchdog.h"
+
+#include "fb_rs232.h"
+#include "onewire.h"
+
 // Options
-//#define debugmode
 #define SENSOR_TYPE     0   // !=1 DS18B20
 
 #define NOPROGLED //typ 0,2 Die Progled blinkt im Progmodus da sie auch Betriebs LED ist
 //#define NOPROGBUTTON	//typ 1,3 es ist kein prog Taster vorhanden sondern progmode wird durch druecken von taste 1&3 oder 2&4 aktiviert
 
 
-// Geraeteparameter setzen, diese koennen von der ETS uebschrieben werden
-// Daher zusaetzlich bei jedem restart_app neu schreiben
-//static __code unsigned char __at (0x3903) manufacturer[2]={0x00,0x4C};  // Herstellercode 0x004C = Bosch
-//static __code unsigned char __at (0x3905) device_type[2]={0x04, 0x56};  // 0x0456 = Selfbus Taster4_universal
-//static __code unsigned char __at (0x390C) port_A_direction={0};         // PORT A Direction Bit Setting
-//static __code unsigned char __at (0x390D) run_state={255};              // Run-Status (00=stop FF=run)
+#ifndef DEBUG_H_
+// Wenn Debug aktiv ist werden die Werte in der restart_app() geschrieben damit die Konfiguration nicht
+// immer neu geschrieben werden muss.
+// Geraeteparameter setzen, diese können von der ETS uebschrieben werden wenn Schreibschutz nicht aktiv
+static __code unsigned char __at (0x3903) manufacturer[2]={0x00,0x4C};  // Herstellercode 0x004C = Bosch
+static __code unsigned char __at (0x3905) device_type[2]={0x04, 0x56};  // 0x0456 = Selfbus Taster4_universal
+static __code unsigned char __at (0x390C) port_A_direction={0};         // PORT A Direction Bit Setting
+static __code unsigned char __at (0x390D) run_state={255};              // Run-Status (00=stop FF=run)
+#endif
+
+
 
 // DEBUG
 // Temperatur Sensor
@@ -49,13 +59,6 @@ int temp;
 unsigned int solltemp;
 unsigned char spreizung;
 
-
-#include "sb_app_taster4_universal.h"
-#include "watchdog.h"
-
-#include "fb_rs232.h"
-#include "onewire.h"
-#include "debug.h"
 
 
 #ifdef NOPROGBUTTON
@@ -75,9 +78,10 @@ unsigned char spreizung;
 #define VERSION		100
 
 #ifdef DEBUG_H_
+    #warning Debug is active! UART is listening to the Debugger now!
 	DEBUG_VARIABLES;
 #endif
-//unsigned char __at (0x00) RAM[00];
+
 unsigned int __idata __at (0xFE-18)object_value[9];	// wird hier deklariert um den Speicher besser auszunutzen!!!
 unsigned char bitobject; // fuer die unteren 8 Bitobjekte
 
@@ -131,7 +135,8 @@ void main(void)
 		while(!TF0);
 	}
 	restart_app();				// Anwendungsspezifische Einstellungen zuruecksetzen
-#ifdef debugmode
+
+#ifdef DEBUG_H_
 	DEBUG_SETUP
 #endif
 
@@ -249,9 +254,10 @@ void main(void)
 			for(n=0;n<100;n++);
 		}
 
-#ifdef debugmode
+#ifdef DEBUG_H_
 		DEBUG_POINT
 #endif
+
 #ifndef NOPROGBUTTON
 		TASTER=1;				        	// Pin als Eingang schalten um Programmiertaster abzufragen
 		if(!TASTER){ // Taster gedrueckt

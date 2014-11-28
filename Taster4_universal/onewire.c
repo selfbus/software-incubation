@@ -17,14 +17,24 @@
 
 
 #include "onewire.h"
-#include <P89LPC922.h>
 
-#define OWDATA 	P1_1	//RXD Data-Pin fuer one-wire Sensor
+#ifdef LPC936
+    //#include <fb_lpc936_1.54.h>
+    #include <fb_lpc936.h>
+#else
+    //#include <fb_lpc922_1.54.h>
+    #include <fb_lpc922.h>
+#endif
+
+#define OWDATA 	P2_7	//RXD Data-Pin P1_1 fuer one-wire Sensor
 const unsigned char bitmask_1[8] ={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
 
 unsigned char t;
-
 unsigned char bit_count, wait_count;
+
+// Debug variables
+unsigned char crc;
+unsigned char crc_byte8;
 
 #define UCHAR unsigned char
 
@@ -99,12 +109,39 @@ void ow_write(unsigned char owbyte) // Byte an one-wire Geraet senden
 }
 
 
-unsigned char ow_read(void)			// Byte von one-wire Geraet lesen
+unsigned char ow_read(unsigned char byte)	// Byte von one-wire Geraet lesen
 {
   unsigned char n,m,d;
+  // CRC
+  //static unsigned char crc;
+  static unsigned char current_byte;
+  unsigned char i;
 
   d=0;
   mow_read( OWDATA, n, m, d);
+
+  // Optimized Maxim iButton 8-bit CRC calculation
+    if(byte==0)
+    {
+        crc = 0;
+        current_byte = 0;
+    }
+
+    crc = crc ^ d;
+    for (i = 0; i < 8; i++)
+    {
+        if (crc & 0x01)
+            crc = (crc >> 1) ^ 0x8C;
+        else
+            crc >>= 1;
+    }
+
+    if (byte==8)   // Check CRC
+    {
+        crc_byte8 = d; // DEBUG
+        return crc;
+    }
+
   return(d);
 }
 
@@ -142,17 +179,20 @@ signed int read_temp(unsigned char sensortyp)   // Temperatur einlesen
   	if (ow_init()) {
   		ow_write(0xCC);			// Skip-ROM command: alle parallel angeschlossenen Geraete werden angesprochen
   		ow_write(0xBE);			// read scratchpad command: Speicher einlesen
-  		lsb=ow_read();			// LSB von Temperaturwert
-  		msb=ow_read();			// MSB von Temperaturwert
+  		lsb=ow_read(0);			// LSB von Temperaturwert
+  		msb=ow_read(1);			// MSB von Temperaturwert
+  	    ow_read(2);
+        ow_read(3);
+        ow_read(4);
+        ow_read(5);
+        counts=ow_read(6);      // counts remaining
+        ow_read(7);
+        //if(ow_read(7)!=0x10)  // Needs 30byte!!??
+          //  return(-3);         // Should be always 0x10
+        if(ow_read(8))          // check CRC
+            return(-2);         // CRC Error
 
-
-		if(sensortyp==1){		// DS18S20
-			counts=ow_read();
-			counts=ow_read();
-			counts=ow_read();
-			counts=ow_read();
-			counts=ow_read();	// counts remaining
-
+		if(sensortyp==1) {		// DS18S20
 			msb&=0xF8;			// oberen 3 Bits von LSB in untere 3 von MSB
 			msb+=(lsb>>5)&0x07;
 
@@ -161,28 +201,24 @@ signed int read_temp(unsigned char sensortyp)   // Temperatur einlesen
 			lsb+=(16-counts);
 		}
 
-
 		sign=msb&0x80;
   		t2=msb*256+lsb;
   		if (sign) t2=(0xFFFF-t2)+1;
-
-
 
   		t=t2*6;
   		t2=t2>>2;
   		t=t+t2;					// hier ist t die Teperatur in 0,01°C
 
-
 		if(sensortyp==1){		// DS18S20
 			t-=25;
 		}
 
-
   		if (sign) t=-t;			// Vorzeichen
 
+  		return t;               // OK
   	}
-  	else t=0xFFFF;				// im Fehlerfall 0xFFFF zurueckmelden
-  	return (t);
+  	else
+  	    return (-1);            // im Fehlerfall -1 (0xFFFF)
 }
 
 

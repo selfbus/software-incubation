@@ -29,7 +29,6 @@
 #include "sb_app_taster4_universal.h"
 //#include "rc5.h"
 
-#include  "debug.h"
 
 unsigned int timer,timerflags; /// Timer fuer Schaltverzoegerungen, wird alle 130us hochgezaehlt
 __bit delay_toggle; /// um nur jedes 2. Mal die delay routine auszufuehren
@@ -585,6 +584,7 @@ void delay_timer(void)
 			break;
 			case 0x20:	// Dimmen 0xF0 -> 0xD0 | 0x20
 				timerstate[objno] |=0xD0;
+				// no break here
 			case 0xF0:
 				write_obj_value(objno+4,delay_value);// war objno+4
 				send_obj_value(objno+4);//war objno+4		// dimmkommando senden
@@ -755,6 +755,8 @@ void restart_app(void)
 
 	timer=0;			// Timer-Variable, wird alle 8ms inkrementiert
 
+#ifdef DEBUG_H_
+    // Werte hier schreiben anstatt per static __code wenn Debug aktiv
 	EA=0;		// Interrupts sperren
 	// Applikations-spezifische eeprom Eintraege schreiben
 	START_WRITECYCLE
@@ -764,12 +766,9 @@ void restart_app(void)
 //	WRITE_BYTE(0x01,0x06,0x52)
 //	WRITE_BYTE(0x01,0x07,0x01)	// Versionsnummer
 	WRITE_BYTE(0x01,0x0C,0x00)	// PORT A Direction Bit Setting
-	WRITE_BYTE(0x01,0x0D,0xFF)	// Run-Status (00=stop FF=run)
-//	WRITE_BYTE(0x01,0x12,0x9A)	// COMMSTAB Pointer
+//	WRITE_BYTE(0x01,0x0D,0xFF)	// Run-Status (00=stop FF=run)
 	STOP_WRITECYCLE
-//	START_WRITECYCLE;
-//	WRITE_BYTE(0x00,0x60,0x2E);	// system state: all layers active (run), not in prog mode
-//	STOP_WRITECYCLE;
+#endif
 
 	for (n=0;n<13;n++) write_obj_value(n,0);		// Objektwerte alle auf 0 setzen
 
@@ -799,8 +798,8 @@ void restart_app(void)
 	TF0=0; //timer0 flag loeschen
 	EA=1;// Interrupts freigeben
 
-//	P2M1 &= ~0x80;
-//	P2M2 &= ~0x80; // P2.7 bidirektional
+	P2M1 &= ~0x80;
+	P2M2 &= ~0x80; // P2.7 bidirektional
 
 	/*
 	// RC5 doesn't seem to work with the CCU since the timer does not reset when writing to TH2, TL2
