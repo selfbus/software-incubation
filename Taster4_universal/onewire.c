@@ -27,14 +27,18 @@
 #endif
 
 #define OWDATA 	P2_7	//RXD Data-Pin P1_1 fuer one-wire Sensor
-const unsigned char bitmask_1[8] ={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
 
 unsigned char t;
 unsigned char bit_count, wait_count;
 
-// Debug variables
-unsigned char crc;
-unsigned char crc_byte8;
+struct{
+    union{
+        unsigned char bytes[9];
+        unsigned int temp;  // Byte 0,1
+    };
+} onewire_receive;
+
+
 
 #define UCHAR unsigned char
 
@@ -109,40 +113,37 @@ void ow_write(unsigned char owbyte) // Byte an one-wire Geraet senden
 }
 
 
-unsigned char ow_read(unsigned char byte)	// Byte von one-wire Geraet lesen
+// Read specified amount of bytes
+unsigned char ow_read(unsigned char bytes)   // Byte von one-wire Geraet lesen
 {
-  unsigned char n,m,d;
-  // CRC
-  //static unsigned char crc;
-  static unsigned char current_byte;
-  unsigned char i;
+    unsigned char n,m,d;
+    // CRC
+    unsigned char crc = 0;
+    unsigned char crc_bit, i;
 
-  d=0;
-  mow_read( OWDATA, n, m, d);
-
-  // Optimized Maxim iButton 8-bit CRC calculation
-    if(byte==0)
+    for(i=0;i<bytes;i++)
     {
-        crc = 0;
-        current_byte = 0;
-    }
+        d=0;
+        // Detect an interrupt while reading a byte
+        interrupted=0;
+        mow_read( OWDATA, n, m, d);   // Get 1 Byte
+        if(interrupted)
+            return 0xFF;              // !=0 is a CRC error
 
-    crc = crc ^ d;
-    for (i = 0; i < 8; i++)
-    {
-        if (crc & 0x01)
-            crc = (crc >> 1) ^ 0x8C;
-        else
-            crc >>= 1;
+        // Optimized Maxim iButton 8-bit CRC calculation
+        crc = crc ^d;
+        for (crc_bit=0;crc_bit<8;crc_bit++)
+        {
+            if (crc &0x01)
+                crc = (crc >>1) ^0x8C;
+            else
+                crc >>= 1;
+        }
+        // Safe current byte is space
+        if(i<sizeof(onewire_receive))
+            onewire_receive.bytes[i] = d;
     }
-
-    if (byte==8)   // Check CRC
-    {
-        crc_byte8 = d; // DEBUG
-        return crc;
-    }
-
-  return(d);
+    return crc;
 }
 
 
@@ -166,31 +167,24 @@ void start_tempconversion(void)	// Temperaturmessung starten
 }
 
 
-
 signed int read_temp(unsigned char sensortyp)   // Temperatur einlesen
 {
 	unsigned char lsb,msb;
 	signed int t;
 	unsigned int t2;
 	unsigned char sign;
-	unsigned char counts;
 
 
   	if (ow_init()) {
   		ow_write(0xCC);			// Skip-ROM command: alle parallel angeschlossenen Geraete werden angesprochen
   		ow_write(0xBE);			// read scratchpad command: Speicher einlesen
-  		lsb=ow_read(0);			// LSB von Temperaturwert
-  		msb=ow_read(1);			// MSB von Temperaturwert
-  	    ow_read(2);
-        ow_read(3);
-        ow_read(4);
-        ow_read(5);
-        counts=ow_read(6);      // counts remaining
-        ow_read(7);
-        //if(ow_read(7)!=0x10)  // Needs 30byte!!??
-          //  return(-3);         // Should be always 0x10
-        if(ow_read(8))          // check CRC
-            return(-2);         // CRC Error
+
+  		if(ow_read(9) || (onewire_receive.bytes[7]!=0x10) )  // Read 9 Bytes
+            return(-6000);      // Error, indicate with -60° since it's outside the possible range
+
+        // Get local copy to save space
+        lsb=onewire_receive.bytes[0];
+        msb=onewire_receive.bytes[1];
 
 		if(sensortyp==1) {		// DS18S20
 			msb&=0xF8;			// oberen 3 Bits von LSB in untere 3 von MSB
@@ -198,7 +192,7 @@ signed int read_temp(unsigned char sensortyp)   // Temperatur einlesen
 
 			lsb=lsb<<3;			// LSB um 3 Bit nach oben verschieben
 			lsb&=0xF0;			// alles unterhalb 2^0 abschneiden
-			lsb+=(16-counts);
+			lsb+=(16-onewire_receive.bytes[6]);
 		}
 
 		sign=msb&0x80;
@@ -209,7 +203,7 @@ signed int read_temp(unsigned char sensortyp)   // Temperatur einlesen
   		t2=t2>>2;
   		t=t+t2;					// hier ist t die Teperatur in 0,01°C
 
-		if(sensortyp==1){		// DS18S20
+		if(sensortyp==1){		// DS18S20 alignment, datasheet page 3
 			t-=25;
 		}
 
@@ -218,7 +212,7 @@ signed int read_temp(unsigned char sensortyp)   // Temperatur einlesen
   		return t;               // OK
   	}
   	else
-  	    return (-1);            // im Fehlerfall -1 (0xFFFF)
+  	    return (-6100);         // im Fehlerfall -61°
 }
 
 

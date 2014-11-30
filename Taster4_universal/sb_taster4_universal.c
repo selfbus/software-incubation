@@ -201,38 +201,45 @@ void main(void)
 	                }
 	                else if (sequence==3)
 	                {
-	                    interrupted=0;
 	                    // Temperatur einlesen + uebergabe Sensortyp
 	                    th=read_temp(SENSOR_TYPE);
-	                    if (!interrupted)
-	                    {
-	                        // Bei Sensorfehler wird letzter Messwert gehalten TODO Fehler Com-Objekt einfuegen??
-	                    	if(th != 0xFFFF)temp=th + ((int)(signed char)(eeprom[0xFD]))*10; //nur positive Temperaturen, Offset verrechnen
-	                    	else temp=0;
+                        // Bei Sensorfehler wird kein Messwert mehr gesendet
+	                    // TODO Fehler Com-Objekt einfuegen??
+                        if(th >-5600)
+                        {
+                            temp=th + ((signed char)(eeprom[0xFD]))*10; //nur positive Temperaturen, Offset verrechnen
+                            object_value[4]=eis5conversion(temp);
+                            send_obj_value(12);
+                            timercnt[8]=eeprom[0xFB];
+                        }
+                        else
+                        {
+                            timercnt[8]=0x01;   // Restart after 1 second
+                        }
+                        // TODO, warum schreiben wir die base immer neu??
+                        timerbase[8]=eeprom[0xFC]&0x07; //Timer for temperature
+                        sequence=0; // wenn wir hier sind haben wir einen gueltigen Messwert, neustart durch timer
 
-	                        sequence=0; // TODO, wenn wir hier sind haben wir einen gueltigen Messwert
-//	                        object_value[8]=temp;
-	                        object_value[4]=eis5conversion(temp);
-/*	                        solltemp = (((int)eeprom [0xE9]<<8 )| eeprom[0xEA])*10;
-	                        spreizung = eeprom[0xED];
-	                        if (temp<solltemp)val=1;
-	                        if (temp>solltemp)val=0;
-	                        object_value[6]=val;
-	                        if(temp<solltemp)
-	                        	{
-	                        	if((solltemp-temp)<=spreizung)object_value[7]=((solltemp-temp)*255)/spreizung;
-	                        	else object_value[7]=255;
-	                        	}
-	                        else
-	                        	{
-	                        	object_value[7]=0;
-	                        	}
-*/	            			timerbase[8]=eeprom[0xFC]&0x07; //1
-	            			timercnt[8]=eeprom[0xFB];
-	            			send_obj_value(12);
-/*	            			send_obj_value(4);
-//	            			send_obj_value(13);
-*/	                    }// if(!interrupted..
+
+
+/*  DIES IST DER PI REGLER
+                        solltemp = (((int)eeprom [0xE9]<<8 )| eeprom[0xEA])*10;
+                        spreizung = eeprom[0xED];
+                        if (temp<solltemp)val=1;
+                        if (temp>solltemp)val=0;
+                        object_value[6]=val;
+                        if(temp<solltemp)
+                        {
+                            if((solltemp-temp)<=spreizung)object_value[7]=((solltemp-temp)*255)/spreizung;
+                            else object_value[7]=255;
+                        }
+                        else
+                        {
+                            object_value[7]=0;
+                        }
+	           			send_obj_value(4);
+	           			send_obj_value(13);
+*/
 	                }// else if(sequence==3..
 				}// if(eeprom... aktiv?
 			    }//if(APLICATION RUN??..
