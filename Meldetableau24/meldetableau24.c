@@ -28,7 +28,7 @@
 //#include"../com/watchdog.c"
 
 #define TYPE 0
-#define VERSION 0
+#define VERSION 1
 /** 
 * The start point of the program, init all libraries, start the bus interface, the application
 * and check the status of the program button.
@@ -37,6 +37,7 @@
 */
 
 unsigned char __at 0x00 RAM[00]; //nur für die debug ausgabe
+__code unsigned int __at (EEPROM_ADDR + 0x17) start_pa={0xFFFF};      // Default PA is 15.15.255
 
 void main(void)
 { 

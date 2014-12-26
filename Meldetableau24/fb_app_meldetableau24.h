@@ -17,9 +17,9 @@
 
 //#define debugmode
 #ifdef LPC936
-	#include <fb_lpc936_1.53.h>
+	#include <fb_lpc936_1.55.h>
 #else
-#include <fb_lpc922_1.53.h>
+#include <fb_lpc922_1.55.h>
 #endif
 
 // Parameter-Adressen im EEPROM
@@ -29,7 +29,7 @@
 #define TIMERANZ	0x02	// timeranzahl
 
 // Interrupteinstellung für AC Schallwandler versus DC Piepser
-#define AC_BEEP
+//#define AC_BEEP
 
 
 
