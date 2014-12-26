@@ -18,13 +18,13 @@
 */
 
 
-#include <P89LPC922.h>
-#include "../lib_lpc922/Releases/fb_lpc922_1.4x.h"
+//#include <P89LPC922.h>
+//#include "../lib_lpc922/Releases/fb_lpc922_1.4x.h"
 #include "fb_app_rollo11.h"
 
 #include "../com/fb_rs232.h"
 #include"../com/watchdog.h"
-#include "../com/debug.h"
+//#include "../com/debug.h"
 
 /** 
 * The start point of the program, init all libraries, start the bus interface, the application
@@ -33,7 +33,7 @@
 *
 */
 //
-#define debugger
+//#define debugger
 
 #ifdef MAX_PORTS_8
 	#define TYPE 4 
@@ -44,6 +44,8 @@
 
 #define VERSION 11
 unsigned char __at 0x00 RAM[00]; 
+__code unsigned int __at (EEPROM_ADDR + 0x17) start_pa={0xFFFF};      // Default PA is 15.15.255
+
 
 void main(void)
 { 
@@ -58,9 +60,9 @@ void main(void)
 	__bit wduf,tastergetoggelt=0;
 	wduf=WDCON&0x02;
 	restart_hw();							// Hardware zuruecksetzen
-// im folgendem wird der watchdof underflow abgefragt und mit gedrücktem Progtaster
+// im folgendem wird der watchdog underflow abgefragt und mit gedrücktem Progtaster
 // ein resetten der cal Variable veranlasst um wieder per rs232 trimmen zu können.	
-	TASTER=1;
+	TASTER=0;
 	if(!TASTER && wduf)cal=0;
 	else cal=trimsave;
 	TRIM = (TRIM+trimsave);
@@ -69,7 +71,7 @@ void main(void)
 	if(phisave<=36)	phival=phisave;
 	else phival=0;
 #endif
-	TASTER=0;
+	TASTER=1;
 	if (!wduf){// BUS return verzögerung nur wenn nicht watchdog underflow
 		for (n=0;n<50;n++) {		// Warten bis Bus stabil
 			TR0=0;					// Timer 0 anhalten
@@ -84,7 +86,7 @@ void main(void)
 	WATCHDOG_START
 	restart_app();							// Anwendungsspezifische Einstellungen zuruecksetzen
 	if(!wduf)bus_return();							// Aktionen bei Busspannungswiederkehr
-	RS_INIT_115200
+	RS_INIT_600
 	SBUF=0x55;
 	do  {
 		WATCHDOG_FEED
@@ -153,6 +155,15 @@ void main(void)
 
 		
 		}// end if(runstate...
+		else if (RTCCON>=0x80 && connected)	// Realtime clock ueberlauf
+			{			// wenn connected den timeout für Unicast connect behandeln
+			RTCCON=0x61;// RTC flag löschen
+			if(connected_timeout <= 110)// 11x 520ms --> ca 6 Sekunden
+				{
+				connected_timeout ++;
+				}
+				else send_obj_value(T_DISCONNECT);// wenn timeout dann disconnect, flag und var wird in build_tel() gelöscht
+			}
 		
 		// Telegrammverarbeitung..
 		if (tel_arrived ) {//|| tel_sent
@@ -164,7 +175,7 @@ void main(void)
 			for(n=0;n<100;n++);	// falls Hauptroutine keine Zeit verbraucht, der PROG LED etwas Zeit geben, damit sie auch leuchten kann
 		}
 
-DEBUGPOINT
+//DEBUGPOINT
 cmd;
 #ifndef debugger
 		// Eingehendes Terminal Kommando verarbeiten...
