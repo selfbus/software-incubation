@@ -70,6 +70,8 @@
 *   3.35	Fehler bei Rückmeldung und bei eeprom flashen behoben, neue LIB
 * 	3.36	Umstellung auf lib1.4x.
 *   3.37	Handbedienung mit zerodetection integrieren. bug RTC 8ms- 65ms gefixt
+* 	3.38	connected timeout zugefügt jetzt LIB 1.53
+*   3.39	auf LIB 1.55 initiale PA=15.15.255
  TODO 
  
 * @todo:
@@ -118,9 +120,10 @@
 		#endif
 	#endif
 #endif
-#define VERSION 37
+#define VERSION 39
 
 unsigned char __at 0x00 RAM[00]; 
+__code unsigned int __at (EEPROM_ADDR + 0x17) start_pa={0xFFFF};      // Default PA is 15.15.255
 
 
 void main(void)
