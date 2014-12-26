@@ -5,38 +5,14 @@
  *   / __/ / _, _/ /___/ /___/ /_/ / /_/ /___/ / 
  *  /_/   /_/ |_/_____/_____/_____/\____//____/  
  *                                      
- *  Copyright (c) 2008-2013 Andreas Krebs <kubi@krebsworld.de>
+ *  Copyright (c) 2014 Andreas Krieger
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 2 as
  *  published by the Free Software Foundation.
  *
  * 
- * 09.11.08	- delay_timer geht nicht mehr über flash sondern über globale variable delrec
- * 			- delay_timer auf 24bit reduziert statt 32bit
- * 			- port_schalten nur noch eimal pro telegramm für alle pins
- * 			- interrupt-steuerung bei respond() rausgenommen
- * 			- globale variablen pah, pal, rmstate entfernt
- * 			- write_obj_value aufrufe rausgenommen
- * 
- * 23.11.08 - Soft PWM während der Vollstromphase
- * 			- Handbetätigung in delay_timer eingefügt (hierzu P1.3 nötig !)
- *  
- * 01.01.09	- Soft PWM rausgenommen
- * 			- write_obj_value wieder reingenommen mit Überprüfung ob INT unterbrochen hat
- * 			- Rückmeldung bei Busspannungswiederkehr funktioniert jetzt
- * 
- * 13.02.09	- owntele ist ein zähler, wie oft ein gesendetes telegramm intern erneut verarbeitet wurde
- *
- * 12.11.09 - umgestellt auf statemachine-library
- *
- * 18.12.09 - read_obj_value und write_obj_value aus der lib entfernt und in app implementiert
- * 			  kompletter Verzicht auf userram -> alle Stati in globalen Variablen
- *
- * 15.04.10 - Fehler mit den Logigverknüpfungen behoben
- * 
- * 02.01.11 - Ausgabe auf serielle Schieberegister für bistabile Relaise via Compilerschalter
- * 
+ 
  */
  
 

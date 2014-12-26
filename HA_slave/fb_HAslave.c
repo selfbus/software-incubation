@@ -17,65 +17,6 @@
 * @author Andreas Krebs <kubi@krebsworld.de>
 * @date   Tue Jan 01 17:44:47 2009
 * 
-* @brief  The Freebus relais application to switch  up to 8 relais \n
-* Manufactorer code is 0x04 = Jung \n
-* Device type    8 out (2038.10) 0x2060 Ordernumber: 2138.10REG    or \n
-* 		4 out Devicetype 0x2062 = Jung Aktor 2134.16 
-*
-* \par Changes:
-*	2.00	erstes Programm in C für Hardware Ver. 2 \n
-*	2.01	Schaltverzögerung hinzugefügt \n
-*	2.02	Restart Fehler behoben \n
-*	2.03	Arrays korrigiert \n
-*	2.04	Bugs in bin_out behoben		\n
-*	3.01	auf 89LPC922 portiert und Bugs behoben		\n
-*	3.02	Verzögerung über RTC		behobene Bugs: Verzoegerung geht nach einiger Zeit sehr langsam \n
-*	3.03	Timer 0 für PWM		\n
-*	3.04	RX & TX Timing nochmals optimiert 	behobene Bugs: get_ack funktionierte nicht \n
-*	3.05	Zeitschaltfunktion hinzugefuegt \n
-*	3.06	Öffner-/Schliesserbetrieb und Verhalten nach Busspannungswiederkehr hinzugefügt \n
-*	3.07	Rückmeldeobjekte eingefuegt \n
-*	3.08	gat Array entfernt und durch gapos_in_gat funktion ersetzt \n
-*	3.09	Sperrobjekte hinzugefügt \n
-*	3.10	Fehler in main() behoben (kein delay!)
-*	3.11	Fehler bei Zusatzfunktionstyp behoben,  \n
-*			Fehler bei Sperrobjekten behoben, \n
-*			Relais ziehen jetzt vollen Strom auch bei Busspannungswiederkehr \n
-*	3.12	Fehler bei Sperrobjekten und Rueckmeldung im out8 behoben,  \n
-*			ausserdem ziehen Relais jetzt auch bei Busspannungswiederkehr mit vollem Strom. \n
-*	3.13	Parametrierung für alte/neue Relaisschaltung eingefügt \n
-*			Parametrierung für 4-port / 8-port hinzugefügt, damit eine Soft fï¿½r out4 und out8 \n
-*			Parametrierung für Handbetrieb zunaechst eingefügt \n
-*			read_value_request lief nicht korrekt, behoben \n
-*			Rückmeldung bei Busspannungswiederkehr funktioniert jetzt \n
-*			Warteschleife bei Busspannungswiederkehr eingefügt, wg. stabilitaet
-*	3.14	Rückmelde-Telegramm löst intern jetzt max. zwei weitere Rückmeldungen aus
-* 	3.15	Fehler mit PWM für alte Relais-Schaltung behoben
-* 	3.16	Polarität der Sperrobjegte eingebaut
-* 	3.17	Bug bei Polarität der Sperrobjekte behoben
-* 	3.18	Progmode lässt sich jetzt per ets setzen
-* 			Interrupts beim retart aus, da sonst ggf. flashen unterbrochen wird wenn int
-* 			Ausführungszustand wird in Geräteinfo angezeigt
-* 			NACK wird bei fehlerhaft empfangenem Telegramm gesendet
-* 			Handsteuerung läuft
-* 	3.19	Relais bekamen manchmal keinen Vollstrom -> behoben
-* 			Interrupts bei progmode flashen in der main() aus
-*   3.20	port_schalten() wird jetzt zentral von der main aufgerufen
-*   3.30	umgestellt auf statemachine library
-*   3.31	ein paar lokale Variablen enfernt um stack zu entlasten
-*   3.32	Funktion bei Beginn/Ende der Sperre nur wenn Sperre vorher inaktiv/aktiv war
-*   3.33	Auf lib Version 1.22 f.f. angepasst (tel_sent, rtc- und timer-funktion)
-*	3.34	Trimfunktion via RS 600bd.(c + - w) version (v) und Type (t) abrufbar. 
-			progmode(p) relaise toggeln(ziffer 1-8)
-*   3.35	Fehler bei Rückmeldung und bei eeprom flashen behoben, neue LIB
-* 	3.36	Umstellung auf lib1.4x.
-*   3.37	Handbedienung mit zerodetection integrieren. bug RTC 8ms- 65ms gefixt
-* 	3.38	connected timeout zugefügt jetzt LIB 1.53
- TODO 
- 
-* @todo:
-	- Prio beim Senden implementieren \n
-	- Zwangsstellungsobjekte implementieren \n
 */
 //#include <P89LPC922.h>
 //#include "../lib_lpc922/Releases/fb_lpc922_1.53.h"
@@ -122,6 +63,7 @@
 #define VERSION 01
 
 unsigned char __at 0x00 RAM[00]; 
+__code unsigned int __at (EEPROM_ADDR + 0x17) start_pa={0xFFFF};      // Default PA is 15.15.255
 
 
 void main(void)
