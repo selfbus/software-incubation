@@ -49,6 +49,7 @@ unsigned char __at 0x00 RAM[00];
 static __code unsigned char __at 0x1D03 manufacturer[2]={0,4};	// Herstellercode 0x0004 = Jung
 static __code unsigned char __at 0x1D0C port_A_direction={0};	// PORT A Direction Bit Setting
 static __code unsigned char __at 0x1D0D run_state={255};		// Run-Status (00=stop FF=run)
+__code unsigned int __at (EEPROM_ADDR + 0x17) start_pa={0xFFFF};      // Default PA is 15.15.255
 
 void main(void)
 {
@@ -178,8 +179,106 @@ void main(void)
 			}
 #endif
 			
-			if (portchanged)port_schalten();	// Ausgänge schalten
+//			if (portchanged)port_schalten();	// Ausgänge schalten
 
+//			void port_schalten(void)		// Schaltet die Ports mit PWM, DUTY ist Pulsverhältnis
+			if(portchanged)
+			{
+				//unsigned char n, pattern;
+				unsigned char kmod;
+				portbuffer=0;
+				if (eeprom[0xE4]& 0x80) kmod=0x01;		// bit 7 ist Kanal-mode
+				else kmod=0x03;
+				for (knr=0;knr<=0x03;knr++){
+					portbuffer=portbuffer|((kanal[knr & kmod]& 0x03)<<(knr<<1));
+					}
+					
+			#ifdef zeroswitch //### Nullspannungsschalter ###
+				
+			 #ifdef SPIBISTAB	//serielle schiebeausgang für bistabile Relaise
+					spi_2_out(sort_output(portbuffer));		// Ports schalten
+					PWM=0;
+					TF0=0;			// Timer 0 für Haltezeit Vollstrom verwenden
+					TH0=0x6f;		// 16ms (10ms=6fff)
+					TL0=0xff;
+					TMOD=(TMOD & 0xF0) +1;		// Timer 0 als 16-Bit Timer
+					TAMOD=0x00;
+					TR0=1;
+
+			/*	rm_state=portbuffer ^ eeprom[RMINV];	// Rückmeldeobjekte setzen
+				for (n=0;n<8;n++) {	// Rückmeldung wenn ein Ausgag sich geändert hat
+					pattern=1<<n;
+					if((portbuffer&pattern)!=(oldportbuffer&pattern)) send_obj_value(n+12);
+				}
+			*/
+				oldportbuffer=portbuffer;
+				portchanged=0;
+
+			 #else	// also normaler out8 oder out4 mit zeroswitch
+				if(!EX0 && !schalten_state) {	//nur wenn schaltenstate inaktiv 
+					portausgabe_on=portbuffer | oldportbuffer;
+					portausgabe_off=portbuffer;//& oldportbuffer;
+
+					IE0=0;// interrupt flipflop löschen
+					EX0=1;// zero U interrupt einschalten
+
+
+					rm_state=portbuffer ^ eeprom[RMINV];	// Rückmeldeobjekte setzen
+					for (n=0;n<8;n++) {	// Rückmeldung wenn ein Ausgag sich geändert hat
+						pattern=1<<n;
+						//if((portbuffer&pattern)!=(oldportbuffer&pattern)) rm_send|=pattern;		//send_obj_value(n+12);
+					}
+
+					oldportbuffer=portbuffer;
+					portchanged=0;
+				}
+			 #endif
+			#else // sonst normaler sporatisch schaltender out
+			#ifdef SPIBISTAB	//serielle schiebeausgang für bistabile Relaise
+					spi_2_out(sort_output(portbuffer));		// Ports schalten
+					PWM=0;
+					TF0=0;			// Timer 0 für Haltezeit Vollstrom verwenden
+					TH0=0x6f;		// 16ms (10ms=6fff)
+					TL0=0xff;
+					TMOD=(TMOD & 0xF0) +1;		// Timer 0 als 16-Bit Timer
+					TAMOD=0x00;
+					TR0=1;
+
+				rm_state=portbuffer ^ eeprom[RMINV];	// Rückmeldeobjekte setzen
+				for (n=0;n<8;n++) {	// Rückmeldung wenn ein Ausgag sich geändert hat
+					pattern=1<<n;
+					if((portbuffer&pattern)!=(oldportbuffer&pattern)) send_obj_value(n+12);
+				}
+
+				oldportbuffer=portbuffer;
+				portchanged=0;
+
+			#else	// also normaler out8 oder out4
+
+				if(portbuffer & ~oldportbuffer) {	// Vollstrom nur wenn ein relais eingeschaltet wird
+					TR0=0;
+					AUXR1&=0xE9;	// PWM von Timer 0 nicht mehr auf Pin ausgeben
+
+
+					PWM=0;			// Vollstrom an
+
+					P0=portbuffer;		// Ports schalten
+					TF0=0;			// Timer 0 für Haltezeit Vollstrom verwenden
+					TH0=0x00;		// 16ms (10ms=6fff)
+					TL0=0x00;
+					TMOD=(TMOD & 0xF0) +1;		// Timer 0 als 16-Bit Timer
+					TAMOD=0x00;
+					TR0=1;
+				}
+				else P0=portbuffer;
+
+
+				oldportbuffer=portbuffer;
+				portchanged=0;
+				
+			#endif	
+			#endif
+			}
 
 			// portbuffer flashen, Abbruch durch ext-int wird akzeptiert und später neu probiert
 			// T1-int wird solange abgeschaltet, 

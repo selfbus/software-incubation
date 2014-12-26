@@ -57,7 +57,7 @@ SUNval		11	1	1	1	1	0
 unsigned int __at 0x09  timer;		// Timer für Schaltverzögerungen, wird alle 130us hochgezählt
 unsigned char __at 0x09 delay_toggle;			// um nur jedes 8. Mal die delay routine auszuführen
 //var überschneidung ist Absicht
-static __code unsigned char __at 0x1CfA blockedsave;//__at 0x1BFD
+static __code unsigned char __at 0x1CFF blockedsave;//__at 0x1BFD
 unsigned char  Tval;
 unsigned char __at 0x0B objects_move;	// Werte der Objekte 0-7 (Ausgängsobjekte)
 unsigned char __at 0x0C objects_smove;		// Werte der Objekte 16/17 (Zusatzfunktionen 1-4)
@@ -852,7 +852,7 @@ void timer0_int(void) __interrupt(1)
 }
 #endif
 
-
+/*
 void port_schalten(void)		// Schaltet die Ports mit PWM, DUTY ist Pulsverhältnis
 {
 	//unsigned char n, pattern;
@@ -876,12 +876,12 @@ void port_schalten(void)		// Schaltet die Ports mit PWM, DUTY ist Pulsverhältnis
 		TAMOD=0x00;
 		TR0=1;
 
-/*	rm_state=portbuffer ^ eeprom[RMINV];	// Rückmeldeobjekte setzen
+	rm_state=portbuffer ^ eeprom[RMINV];	// Rückmeldeobjekte setzen
 	for (n=0;n<8;n++) {	// Rückmeldung wenn ein Ausgag sich geändert hat
 		pattern=1<<n;
 		if((portbuffer&pattern)!=(oldportbuffer&pattern)) send_obj_value(n+12);
 	}
-*/
+
 	oldportbuffer=portbuffer;
 	portchanged=0;
 
@@ -950,7 +950,7 @@ void port_schalten(void)		// Schaltet die Ports mit PWM, DUTY ist Pulsverhältnis
 #endif	
 #endif
 }
-
+*/
 /*
 unsigned int sort_output(unsigned char portbuffer){
    unsigned char diff;

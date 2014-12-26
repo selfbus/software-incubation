@@ -20,9 +20,9 @@ unsigned char __at 0x00 RAM[00];
 #define FB_APP_JALO
 
 #ifdef LPC936
-	#include <fb_lpc936_1.53.h>
+	#include <fb_lpc936_1.55.h>
 #else
-#include <fb_lpc922_1.53.h>
+#include <fb_lpc922_1.55.h>
 #endif
 
 #define MAX_PORTS_8		// Anzahl Ausgänge (nur 4 oder 8 erlaubt)
@@ -57,7 +57,7 @@ unsigned char __at 0x00 RAM[00];
 #define BOT_OUT		P0_0
 #define MID_OUT		P0_1
 #define WRITE		P0_2
-extern static __code unsigned char __at 0x1CFA blockedsave;
+extern static __code unsigned char __at 0x1CFF blockedsave;
 extern __bit handmode;
 extern 	__bit portchanged;// globale variable, sie ist 1 wenn sich portbuffer geändert hat
 extern unsigned char __at 0x0D portbuffer;
@@ -67,6 +67,8 @@ extern unsigned char __at 0x10 timerbase[TIMERANZ];
 extern unsigned char timerstate[TIMERANZ];
 extern unsigned char timercnt[TIMERANZ];
 extern unsigned char kanal[4];		// Wert des Kanalobjekts
+extern unsigned char knr;
+extern unsigned char __at 0x0E oldportbuffer;// Wert von portbuffer vor Änderung (war früher ...0x29)
 extern unsigned char  positions_req;
 extern unsigned char drive_priority;
 extern unsigned char __idata __at 0xFE-40 l_position_target[4];
