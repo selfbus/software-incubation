@@ -20,7 +20,7 @@
 //#include <P89LPC922.h>
 //#include "../lib_lpc922/Releases/fb_lpc922_1.4x.h"
 #include "fb_app_lightcontrol_dimmer.h"
-//#include "../com/debug.h"
+#include "../com/debug.h"
 
 #include "../com/fb_rs232.h"
 
@@ -31,6 +31,7 @@
 *
 */
 unsigned char __at 0x00 RAM  [00];
+__code unsigned int __at (EEPROM_ADDR + 0x17) start_pa={0xFFFF};      // Default PA is 15.15.255
 
 void main(void)
 { 
@@ -39,8 +40,12 @@ void main(void)
 	static __code signed char __at 0x1BFF trimsave;
 	__bit prog_button_toggled=0;
 	
-	restart_hw();							// Hardware zuruecksetzen
+	restart_hw();// Hardware zuruecksetzen
+#ifdef debugmode
+	RS_INIT_115200
+#else
 	RS_INIT_9600
+#endif
 	TI=1;
 	TASTER=0;
 	cal=trimsave;
@@ -61,7 +66,9 @@ void main(void)
 	bus_return();							// Aktionen bei Busspannungswiederkehr
 
 	do  {
-		//DEBUGPOINT
+#ifdef debugmode		
+		DEBUGPOINT
+#endif
 		if(APPLICATION_RUN) {	// nur wenn run-mode gesetzt
 
 			// Helligkeit nachführen	
@@ -77,6 +84,8 @@ void main(void)
 		}
 		if(count<2)count++;
 		else count=0;
+		
+#ifndef debugmode
 #ifdef applilpc		
 		if (TI){
 			switch(send_nibble){	
@@ -112,6 +121,7 @@ void main(void)
 		send_nibble++;
 			
 		} // ende if(TI)...
+#endif
 #endif
 //		if(RI){
 			
