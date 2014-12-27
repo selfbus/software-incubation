@@ -18,9 +18,9 @@
 
 //#define debugmode
 #ifdef LPC936
-	#include <fb_lpc936_1.53.h>
+	#include <fb_lpc936_1.55.h>
 #else
-#include <fb_lpc922_1.53.h>
+#include <fb_lpc922_1.55.h>
 #endif
 
 //#define einkanal
