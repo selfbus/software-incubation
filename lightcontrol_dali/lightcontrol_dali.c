@@ -30,12 +30,15 @@
 * 
 *
 */
+	__code unsigned int __at (EEPROM_ADDR + 0x17) start_pa={0xFFFF};      // Default PA is 15.15.255
+
+
 void main(void)
 { 
 	unsigned char n,count;
 	signed char cal;
 	static __code signed char __at 0x1BFF trimsave;
-	
+
 	restart_hw();							// Hardware zuruecksetzen
 	rs_init(1152);
 
