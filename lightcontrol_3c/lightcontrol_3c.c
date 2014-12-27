@@ -32,6 +32,8 @@
 * 
 *
 */
+	__code unsigned int __at (EEPROM_ADDR + 0x17) start_pa={0xFFFF};      // Default PA is 15.15.255
+
 void main(void)
 { 
 	unsigned char n,count,cmd,tasterpegel=0;
