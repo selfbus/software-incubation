@@ -29,6 +29,7 @@
 const unsigned char bitmask_1[8] ={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
 const unsigned char __at 0x01CE space[18];// Hier schreibt und liest die ETS !!
 unsigned char __at 0x00 RAM[00]; 
+__code unsigned int __at (EEPROM_ADDR + 0x17) start_pa={0xFFFF};      // Default PA is 15.15.255
 
 
 void main(void)

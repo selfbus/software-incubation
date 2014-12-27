@@ -533,7 +533,6 @@ unsigned char objno;
 	P0=0x22;	// WRITE=1 SER_IN=1
 #endif
 
-  transparency=0;
 
   RTCCON=0x81;//	START_RTC	// RTC starten und  OV Flag setzen
 
