@@ -97,16 +97,6 @@ void main(void)
 	 	{	
 		delay_timer();
 	 	}
-		else if (RTCCON>=0x80 && connected)	// Realtime clock ueberlauf
-			{			// wenn connected den timeout für Unicast connect behandeln
-			RTCCON=0x61;// RTC flag löschen
-			if(connected_timeout <= 110)// 11x 520ms --> ca 6 Sekunden
-				{
-				connected_timeout ++;
-				}
-				else send_obj_value(T_DISCONNECT);// wenn timeout dann disconnect, flag und var wird in build_tel() gelöscht
-			}
-		
 
 
 //				 #########  checken der Grenzwerte ###########
@@ -236,12 +226,22 @@ void main(void)
 //		RI=0;
 //		}
 #endif
-
-
-		
-				
 		}// end if(runstate)
-		else   EKBI = 0; // wenn die aplikation nicht läuft keyboard int abschalten
+		else
+		{
+			EKBI = 0; // wenn die aplikation nicht läuft keyboard int abschalten
+			if (RTCCON>=0x80 && connected)	// Realtime clock ueberlauf
+		
+			{			// wenn connected den timeout für Unicast connect behandeln
+			RTCCON=0x61;// RTC flag löschen
+			if(connected_timeout <= 110)// 11x 520ms --> ca 6 Sekunden
+				{
+				connected_timeout ++;
+				}
+				else send_obj_value(T_DISCONNECT);// wenn timeout dann disconnect, flag und var wird in build_tel() gelöscht
+			}
+		}
+
 	
 		
 		n= tx_buffer[(tx_nextsend-1)&0x07];//n ist die letzte objno
