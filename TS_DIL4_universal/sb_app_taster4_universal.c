@@ -758,7 +758,7 @@ void restart_app(void)
 
 	timer=0;			// Timer-Variable, wird alle 8ms inkrementiert
 
-#ifdef DEBUG_H_
+//#ifdef DEBUG_H_
     // Werte hier schreiben anstatt per static __code wenn Debug aktiv
 	EA=0;		// Interrupts sperren
 	// Applikations-spezifische eeprom Eintraege schreiben
@@ -771,7 +771,7 @@ void restart_app(void)
 	WRITE_BYTE(0x01,0x0C,0x00)	// PORT A Direction Bit Setting
 //	WRITE_BYTE(0x01,0x0D,0xFF)	// Run-Status (00=stop FF=run)
 	STOP_WRITECYCLE
-#endif
+//#endif
 
 	for (n=0;n<13;n++) write_obj_value(n,0);		// Objektwerte alle auf 0 setzen
 

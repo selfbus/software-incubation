@@ -18,7 +18,7 @@
 						<toolChain id="cdt.managedbuild.toolchain.sdcc.exe.release.1972282460" name="SDCC Tool Chain" superClass="cdt.managedbuild.toolchain.sdcc.exe.release">
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.sdcc.platform.exe.release.643091368" name="Release Platform" osList="solaris,linux,hpux,aix,qnx,win32" superClass="cdt.managedbuild.target.sdcc.platform.exe.release"/>
 							<builder buildPath="${workspace_loc:/Taster4_universal/Release}" id="org.eclipse.cdt.build.core.internal.builder.607991149" keepEnvironmentInBuildfile="false" name="CDT Internal Builder" superClass="org.eclipse.cdt.build.core.internal.builder"/>
-							<tool command="sdcc -c --stack-auto --debug" id="cdt.managedbuild.tool.sdcc.c.compiler.exe.release.801740869" name="SDCC Compiler" superClass="cdt.managedbuild.tool.sdcc.c.compiler.exe.release">
+							<tool command="sdcc -c --stack-auto" id="cdt.managedbuild.tool.sdcc.c.compiler.exe.release.801740869" name="SDCC Compiler" superClass="cdt.managedbuild.tool.sdcc.c.compiler.exe.release">
 								<option id="sdcc.c.compiler.option.preprocessor.nostdinc.1204210130" name="Do not search system directories (-nostdinc)" superClass="sdcc.c.compiler.option.preprocessor.nostdinc"/>
 								<option id="sdcc.c.compiler.option.preprocessor.preprocess.1760629653" name="Preprocess only (-E)" superClass="sdcc.c.compiler.option.preprocessor.preprocess"/>
 								<option id="sdcc.c.compiler.option.preprocessor.def.symbols.644459432" name="Defined symbols (-D)" superClass="sdcc.c.compiler.option.preprocessor.def.symbols"/>
