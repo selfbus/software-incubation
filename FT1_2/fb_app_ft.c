@@ -219,8 +219,8 @@ void ft_process_var_frame(void)
 						{
 						case 0x00:	// Read_Memory_Req
 							FT_SEND_T_DATACONNECTED_CONF
-							ft_send_Read_Memory_Res((rsin[13] & 0x0F), rsin[14],
-									rsin[15]);
+							ft_send_Read_Memory_Res((rsout[13] & 0x0F), rsout[14],
+									rsout[15]);
 							break;
 
 						case 0x80:	// Write_Memory_Req
