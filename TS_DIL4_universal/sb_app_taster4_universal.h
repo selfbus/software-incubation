@@ -37,7 +37,7 @@
 #endif
 
 // Include to enable debug options within the project
-#include "debug.h"
+//#include "debug.h"
 
 
 #define POWERLED      0xCD
