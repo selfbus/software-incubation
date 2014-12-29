@@ -43,21 +43,20 @@
 // Wenn Debug aktiv ist werden die Werte in der restart_app() geschrieben damit die Konfiguration nicht
 // immer neu geschrieben werden muss.
 // Geraeteparameter setzen, diese können von der ETS uebschrieben werden wenn Schreibschutz nicht aktiv
-static __code unsigned char __at (0x3903) manufacturer[2]={0x00,0x4C};  // Herstellercode 0x004C = Bosch
-static __code unsigned char __at (0x3905) device_type[2]={0x04, 0x56};  // 0x0456 = Selfbus Taster4_universal
-static __code unsigned char __at (0x390C) port_A_direction={0};         // PORT A Direction Bit Setting
-static __code unsigned char __at (0x390D) run_state={255};              // Run-Status (00=stop FF=run)
+__code unsigned char __at (EEPROM_ADDR +0x03) manufacturer[2]={0x00,0x4C};  // Herstellercode 0x004C = Bosch
+__code unsigned char __at (EEPROM_ADDR +0x05) device_type[2]={0x04, 0x56};  // 0x0456 = Selfbus Taster4_universal
+__code unsigned char __at (EEPROM_ADDR +0x0C) port_A_direction={0};         // PORT A Direction Bit Setting
+__code unsigned char __at (EEPROM_ADDR +0x0D) run_state={255};              // Run-Status (00=stop FF=run)
+__code unsigned int  __at (EEPROM_ADDR +0x17) start_pa={0xFFFF};            // Default PA is 15.15.255
 #endif
 
 
 
 #if defined(DS_SERIES) || defined(DHT) // Temperatur Sensor
   unsigned char sequence;
-  int iReadTemp;
 # ifdef DHT
+    unsigned char cSensorType;
     #define DHT_CHAN 1  // PX_DHT_CHAN -> PX_1
-    int iReadRH;
-    unsigned char dht_read_delay;
 #  endif
 #endif
 
@@ -99,7 +98,6 @@ void main(void)
 {
   unsigned char n,tasterpegel=0,val=0,x;//
   __bit blink, verstell, verstellt,tastergetoggelt=0;
-
   signed char buttonpattern=1;
 //  static __code signed char __at (USERRAM_ADDR + 0xBF) trimsave;
   static __code unsigned char __at (EEPROM_ADDR +0xFE) LED_hell;
@@ -155,9 +153,6 @@ void main(void)
     WATCHDOG_FEED
     if (RTCCON>=0x80)         // Realtime clock ueberlauf
     {
-#ifdef DHT
-      dht_read_delay++;
-#endif
       RTCCON=0x61;            // RTC flag loeschen
       if(!connected) { 
         delay_timer();                    // die normal RTC Behandlung
@@ -200,99 +195,92 @@ void main(void)
         if ((PORT & 0x0F) != button_buffer) { 
           port_changed(PORT & 0x0F);            // ein Taster wurde gedrueckt
         }
+
 #ifdef DS_SERIES
-        // Temperatur verarbeiten
-        if(eeprom[0xFC]&0x80 ) {                        // Temperaturmessung aktiviert
-          if(eeprom[0xFC]&0x20 == 2 /*DS_SERIES*/ ) {   // Ist Sensor type  DS_SERIES ? ( 0:DHT1x_SENSOR 1:DHT2x_SENSOR 2:DS_SERIES)
-            if (sequence==1) {
-              interrupted=0;
-              start_tempconversion();             // Konvertierung starten
-              if (!interrupted) sequence=2;
+        if(eeprom[0xFC]&0x80) { // Temperatur sensor measurement activated? ( No need sensor type  check! DS is comppiled!)
+          if (sequence==1) {
+            interrupted=0;
+            start_tempconversion();                              // Konvertierung starten
+            if (!interrupted) sequence=2;
+          }
+          else if (sequence==2) {
+            if (ow_read_bit()) sequence=3;                       // Konvertierung abgeschlossen
+          }
+          else if (sequence==3) {                                // Temperatur einlesen + uebergabe Sensortyp
+            iReadTemp=read_temp(SENSOR_TYPE);
+            // Bei Sensorfehler wird kein Messwert mehr gesendet
+            // TODO Fehler Com-Objekt einfuegen??
+            if(iReadTemp >-5600) {
+              object_value[4]=eis5conversion(iReadTemp + ((signed char)(eeprom[0xFD]))*10); //nur positive Temperaturen, Offset verrechnen
+              send_obj_value(12);
+              timercnt[8]=eeprom[0xFB];
+            } else {
+              timercnt[8]=0x01;   // Restart after 1 second
             }
-            else if (sequence==2) {
-              if (ow_read_bit()) sequence=3;      // Konvertierung abgeschlossen
+            // TODO, warum schreiben wir die base immer neu??
+            timerbase[8]=eeprom[0xFC]&0x07; //Timer for temperature
+            sequence=0; // wenn wir hier sind haben wir einen gueltigen Messwert, neustart durch timer
+            /*  // DIES IST DER PI REGLER
+            solltemp = (((int)eeprom [0xE9]<<8 )| eeprom[0xEA])*10;
+            spreizung = eeprom[0xED];
+            if (iRetTemp<solltemp) val=1;
+            if (iRetTemp>solltemp) val=0;
+            object_value[6]=val;
+            if(iRetTemp<solltemp) {
+              if((solltemp-iRetTemp)<=spreizung) { 
+                object_value[7]=((solltemp-iRetTemp)*255)/spreizung;
+              } else { 
+                object_value[7]=255;
+              }
+            } else {
+              object_value[7]=0;
             }
-            else if (sequence==3) {               // Temperatur einlesen + uebergabe Sensortyp
-              iReadTemp=read_temp(SENSOR_TYPE);
-              // Bei Sensorfehler wird kein Messwert mehr gesendet
-              // TODO Fehler Com-Objekt einfuegen??
-              if(iReadTemp >-5600) {
-                object_value[4]=eis5conversion(iReadTemp + ((signed char)(eeprom[0xFD]))*10); //nur positive Temperaturen, Offset verrechnen
-                send_obj_value(12);
-                timercnt[8]=eeprom[0xFB];
-              } else {
-                timercnt[8]=0x01;   // Restart after 1 second
-              }
-              // TODO, warum schreiben wir die base immer neu??
-              timerbase[8]=eeprom[0xFC]&0x07; //Timer for temperature
-              sequence=0; // wenn wir hier sind haben wir einen gueltigen Messwert, neustart durch timer
-
-              /*  // DIES IST DER PI REGLER
-              solltemp = (((int)eeprom [0xE9]<<8 )| eeprom[0xEA])*10;
-              spreizung = eeprom[0xED];
-              if (iRetTemp<solltemp) val=1;
-              if (iRetTemp>solltemp) val=0;
-              object_value[6]=val;
-              if(iRetTemp<solltemp) {
-                if((solltemp-iRetTemp)<=spreizung) { 
-                  object_value[7]=((solltemp-iRetTemp)*255)/spreizung;
-                } else { 
-                  object_value[7]=255;
-                }
-              } else {
-                object_value[7]=0;
-              }
-              send_obj_value(4);
-              send_obj_value(13);
-              */
-            } // else if(sequence==3..
-          } // if(eeprom... Ist Sensor type  DS_SERIES ?
-        } // if(eeprom... aktiv?
-#endif
-
+            send_obj_value(4);
+            send_obj_value(13);
+            */
+          } // else if(sequence==3 ...
+        } // if(eeprom ...
+#endif // #ifdef DS_SERIES
 #ifdef DHT
-        // Temperatur & Feuchtigkeit verarbeiten
-        if(eeprom[0xFC]&0x80)                       // Temperaturmessung aktiviert
+        // Is sensor activated?
+        // If sensor is activated, cSensorType is sense type.
+        if( (cSensorType= (eeprom[0xFC]&0x80) ? ((eeprom[0xFC]&0x10) ? DHT2x_SENSOR : DHT1x_SENSOR) :2) < 2) // Is the sensor measurement activated and is sensor type  0:DHT1x_SENSOR or 1:DHT2x_SENSOR ? ( 0:DHT1x_SENSOR 1:DHT2x_SENSOR 2:DS_SERIES )
         {
           // eeprom[0xFC]: DHT/Temp Config
-          // Bit 7 -> Sensor: ON/OFF (für beide DS oder DHT )
-          // Bit 5 -> Sensor Type: Auswahl -> 0:DHT2x_SENSOR 1:DHT1x_SENSOR 2:DS-Series
-          // Bit 4 -> Wird nicht benötigt. Bit7 reicht. Da per ifdef DS oder DHT compiliert wird.
-          // dht_humid auf com-object 14
-          // dht_humid offset auf adresse 0xFA
-          
-          if( sequence==1 && dht_read_delay >=31) //min 2 sec. delay
+          // Bit 7 -> Temperature sensor: ON/OFF for DHT and DS
+          // Bit 5 -> Relative humidity sensor: ON/OFF  for DHT 
+          // Bit 4 -> DHT sensor type: 0:DHT1x_SENSOR 1:DHT2x_SENSOR
+          if( sequence==1 ) // min 2 sec. delay
           { 
-            if( (eeprom[0xFC] & 0x20) == DHT1x_SENSOR)
+            if(cSensorType == DHT1x_SENSOR)
             {
-              dht1x_init(DHT_CHAN);                 // Initialize. Need only for DTH1x Sensor
+              dht1x_init(DHT_CHAN);               // Initialize. Need only for DTH1x Sensor
             }
-            if((eeprom[0xFC] & 0x20) == DHT1x_SENSOR || (eeprom[0xFC] & 0x20) == DHT2x_SENSOR)
+            if(dht_ow_receive(DHT_CHAN) == 0)     // Receive Temperature and Relative humidity
             {
-              if(dht_ow_receive(DHT_CHAN) == 0)     // Receive Temperature and Relative humidity
+              if(dht_decode(cSensorType))         // Decode Temperature and Relative humidity
               {
-                if(dht_decode(DHT2x_SENSOR))        // Decode Temperature and Relative humidity
+                if(dht_temp  >-5600 &&            // dht_temp   -> Temperature in C°          [min:-40 C° max:+80 C° ]
+                   dht_humid >-1      )           // dht_humid  -> Relative humidity in %RH   [min:0 %RH  max:99,9 %RH ]
                 {
-                  if( dht_temp  >-5600 &&           // dht_temp   -> Temperature in C°          [min:-40 C° max:+80 C° ]
-                      dht_humid >-1       )         // dht_humid  -> Relative humidity in %RH   [min:0 %RH  max:99,9 %RH ]
+                  object_value[4]=eis5conversion(dht_temp + ((signed char)(eeprom[0xFD]))*10); //nur positive Temperaturen, Offset verrechnen
+                  send_obj_value(12);             // send dht_temp to com-object 12 offset to adress 0xFD
+                  if(eeprom[0xFC]&0x20)
                   {
-                    object_value[4]=eis5conversion(dht_temp  + ((signed char)(eeprom[0xFD]))*10); //nur positive Temperaturen, Offset verrechnen
-                    send_obj_value(12);
-                    object_value[4]=eis5conversion(dht_humid + ((signed char)(eeprom[0xFA]))*10); //nur positive humidity, Offset verrechnen
-                    send_obj_value(14);
-                    timercnt[8]=eeprom[0xFB];
-                  } else {
-                    timercnt[8]=0x01;   // Restart after 1 second
-                  } 
+                    object_value[6]=eis5conversion(dht_humid + ((signed char)(eeprom[0xFA]))*10); //nur positive humidity, Offset verrechnen
+                    send_obj_value(14);           // send dht_humid to com-object 14 offset to adress 0xFA
+                  }
+                  timercnt[8]=eeprom[0xFB];
+                } else {
+                  timercnt[8]=0x01;               // Restart after 1 second
                 }
               }
             }
             timerbase[8]= eeprom[0xFC]&0x07; // Timer for temperature
-            dht_read_delay =0;
             sequence= 0; // to restart the timer, set here to 0
-          } // if (dht_read_delay >=31)
-        } // if(eeprom... aktiv?
-#endif
+          } // if(sequence==1...
+        } // if((cSensorType=...
+#endif // #ifdef DHT
     } //if(APLICATION RUN??..
   } // else... wenn modul nicht im progmode
   

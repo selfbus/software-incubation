@@ -74,14 +74,14 @@ void owdelay(
     __bit ow_read_bit(void);                  // Read data-bit from one-wire
     extern unsigned char onewire_receive[];   // Holds DS18x20 received data
     extern unsigned char onewire_error;       // Error code, 2Bit per sensor
-    __bit start_tempconversion(void);		    // Temperaturmessung starten
-    int read_temp(unsigned char sensortyp);	// Temperatur einlesen
+    __bit start_tempconversion(void);        // Temperaturmessung starten
+    int read_temp(unsigned char sensortyp);  // Temperatur einlesen
 # endif // #ifdef DS_SERIES
 
 # ifdef DHT
     #define DELAY_CONST_1WIRE_DHT_MASTER_1  16  // 20 = lesen approx. 15us nach Vorderkante; 16=7.5µs
-    #define DHT1x_SENSOR    1 // DHT11
-    #define DHT2x_SENSOR    0 // DHT21, DHT22
+    #define DHT1x_SENSOR    0 // DHT11
+    #define DHT2x_SENSOR    1 // DHT21, DHT22
 
     void dht1x_init(unsigned char hw_channel);
     __bit dht_decode(unsigned char sensor_type);

@@ -47,7 +47,7 @@
 								<option id="sdcc.c.compiler.category.other.stacksize.2014706425" name="Check code stack usage (--stack-size)" superClass="sdcc.c.compiler.category.other.stacksize"/>
 								<inputType id="cdt.managedbuild.tool.sdcc.c.compiler.input.1710836337" superClass="cdt.managedbuild.tool.sdcc.c.compiler.input"/>
 							</tool>
-							<tool command="sdcc --stack-auto --vc --debug" id="cdt.managedbuild.tool.sdcc.c.linker.exe.release.707397115" name="SDCC Linker" superClass="cdt.managedbuild.tool.sdcc.c.linker.exe.release">
+							<tool command="sdcc --stack-auto --vc" id="cdt.managedbuild.tool.sdcc.c.linker.exe.release.707397115" name="SDCC Linker" superClass="cdt.managedbuild.tool.sdcc.c.linker.exe.release">
 								<option id="sdcc.c.link.option.nostart.2069376479" name="Do not use standard start files (-nostartfiles)" superClass="sdcc.c.link.option.nostart"/>
 								<option id="sdcc.c.link.option.nodeflibs.1667032599" name="Do not use default libraries (-nodefaultlibs)" superClass="sdcc.c.link.option.nodeflibs"/>
 								<option id="sdcc.c.link.option.nostdlibs.1778632095" name="No startup or default libs (-nostdlib)" superClass="sdcc.c.link.option.nostdlibs"/>

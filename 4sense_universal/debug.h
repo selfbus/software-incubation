@@ -18,16 +18,16 @@
  * Must be called once in your program, e.g. in main()
  */
 #define DEBUG_SETUP { \
-	BRGCON &= 0xFE;	/* Stop the baud-rate generator */ \
-	P1M1 &= 0xFC;   /* Set RX/TX to bidirectional */ \
-	P1M2 &= 0xFC; \
-	SCON = 0x50;	/* Mode 1, receive enable */ \
-	SSTAT |= 0xE0;	/* Set TI at the end of the stop bit, interrupt for RX only and double-buffer TX */ \
-	BRGCON |= 0x02;	/* Use baud-rate generator (still stopped) */ \
-	BRGR1 = 0x00;	/* BaudRate = cclk / ((BRGR1,BRGR0) + 16) */ \
-	BRGR0 = 0x30;	/* for 115200 use 0x30, auto-cal: 600bd => 0x2FF0 */ \
-	BRGCON |= 0x01;	/* Start the baud-rate generator */ \
-	SBUF = 0x55; \
+  BRGCON &= 0xFE;  /* Stop the baud-rate generator */ \
+  P1M1 &= 0xFC;   /* Set RX/TX to bidirectional */ \
+  P1M2 &= 0xFC; \
+  SCON = 0x50;  /* Mode 1, receive enable */ \
+  SSTAT |= 0xE0;  /* Set TI at the end of the stop bit, interrupt for RX only and double-buffer TX */ \
+  BRGCON |= 0x02;  /* Use baud-rate generator (still stopped) */ \
+  BRGR1 = 0x00;  /* BaudRate = cclk / ((BRGR1,BRGR0) + 16) */ \
+  BRGR0 = 0x30;  /* for 115200 use 0x30, auto-cal: 600bd => 0x2FF0 */ \
+  BRGCON |= 0x01;  /* Start the baud-rate generator */ \
+  SBUF = 0x55; \
 }
 
 /*
@@ -42,9 +42,9 @@
  * Add the debug point somewhere in your main loop.
  */
 #define DEBUG \
-	while(!TI);\
-	TI=0;\
-	SBUF =
+  while(!TI);\
+  TI=0;\
+  SBUF =
 
 #define DEBUG_POINT { if (RI) { DEBUG_OUTPUT(__debug_ram[SBUF]); RI = 0; } }
 
