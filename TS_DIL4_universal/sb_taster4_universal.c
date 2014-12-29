@@ -261,7 +261,7 @@ void main(void)
           // dht_humid auf com-object 14
           // dht_humid offset auf adresse 0xFA
           
-          if(dht_read_delay >=31) //min 2 sec. delay
+          if( sequence==1 && dht_read_delay >=31) //min 2 sec. delay
           { 
             if( (eeprom[0xFC] & 0x20) == DHT1x_SENSOR)
             {
@@ -289,6 +289,7 @@ void main(void)
             }
             timerbase[8]= eeprom[0xFC]&0x07; // Timer for temperature
             dht_read_delay =0;
+            sequence= 0; // to restart the timer, set here to 0
           } // if (dht_read_delay >=31)
         } // if(eeprom... aktiv?
 #endif
