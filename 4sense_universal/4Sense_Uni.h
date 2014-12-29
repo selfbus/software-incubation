@@ -80,8 +80,8 @@ void owdelay(
 
 # ifdef DHT
     #define DELAY_CONST_1WIRE_DHT_MASTER_1  16  // 20 = lesen approx. 15us nach Vorderkante; 16=7.5µs
-    #define DHT1x_SENSOR    0 // DHT11
-    #define DHT2x_SENSOR    1 // DHT21, DHT22
+    #define DHT1x_SENSOR    1 // DHT11
+    #define DHT2x_SENSOR    0 // DHT21, DHT22
 
     void dht1x_init(unsigned char hw_channel);
     __bit dht_decode(unsigned char sensor_type);
