@@ -30,10 +30,14 @@
 #include "watchdog.h"
 
 #include "fb_rs232.h"
-#include "..\..\4sense_universal\4Sense_Uni.c"
 
-// Options
-#define SENSOR_TYPE     0   // !=1 DS18B20
+/***********************************************
+Include 4Sense_Universal
+***********************************************/
+//#define DHT
+#define DS_SERIES
+#include "..\..\4sense_universal\4Sense_Uni.c"
+/************************************************/
 
 #define NOPROGLED //typ 0,2 Die Progled blinkt im Progmodus da sie auch Betriebs LED ist
 //#define NOPROGBUTTON  //typ 1,3 es ist kein prog Taster vorhanden sondern progmode wird durch druecken von taste 1&3 oder 2&4 aktiviert
@@ -206,8 +210,8 @@ void main(void)
           else if (sequence==2) {
             if (ow_read_bit()) sequence=3;                       // Konvertierung abgeschlossen
           }
-          else if (sequence==3) {                                // Temperatur einlesen + uebergabe Sensortyp
-            iReadTemp=read_temp(SENSOR_TYPE);
+          else if (sequence==3) {                                // 
+            int iReadTemp=read_temp();                           // Read temperature with auto detected sensor type
             // Bei Sensorfehler wird kein Messwert mehr gesendet
             // TODO Fehler Com-Objekt einfuegen??
             if(iReadTemp >-5600) {

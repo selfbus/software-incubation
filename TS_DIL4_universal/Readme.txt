@@ -1,17 +1,17 @@
 TS_DIL4 Universal 
 
-TS_DIL4_Universal is an Fork of Taster4_universal and has the same features. 
-Additionaly it will support relative humidity and temperature fromwith DHT sensors.
+TS_DIL4_Universal is an Fork of Taster4_universal and has the same features. Additionaly it will support relative humidity and temperature with DHT sensors. Only one sensor type is supported! The sensor can be attachend to the Port: P1_1 (RXD).
 
 DHT sensor support -> OK
 Temperature support -> OK
 Relative humidity support -> OK
 VD with DHT temperature and relative humidity support -> OK
 VD with selectable DHT sensor -> OK
+Ifdef the release targets for DS and DHT Sensors -> OK
+Release builds for DS and DHT -> OK
+Tested the DS release build with DS18b20 & DS1822 -> OK
 
 ToDo:
-- ifdef the release targets (ds&dht)
-- release builds for DS and DHT
-- test the DS release builds
+- Test the DS release build with DS18S20
 
-State: BETA (Development is still in progress )
+State: Release Candidate
