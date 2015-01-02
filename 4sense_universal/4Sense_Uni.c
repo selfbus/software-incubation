@@ -18,11 +18,11 @@
 #include "4Sense_Uni.h"
 
 #ifdef LPC936
-    //#include <fb_lpc936_1.55.h>
-    #include <fb_lpc936.h>
+    #include <fb_lpc936_1.55.h>
+    //#include <fb_lpc936.h>
 #else
-    //#include <fb_lpc922_1.55.h>
-    #include <fb_lpc922.h>
+    #include <fb_lpc922_1.55.h>
+    //#include <fb_lpc922.h>
 #endif
 
 #if defined(DS_SERIES) || defined(DHT)
@@ -248,65 +248,95 @@ __bit start_tempconversion(void)
 }
 
 // Temperatur einlesen
-signed int read_temp(unsigned char sensortyp)
+signed int read_temp(
+# ifdef DS_AUTO_DETECTION
+                      void
+# else
+                      unsigned char sensortyp
+# endif
+                    )
 {
   signed int t;
   unsigned char retry;
-
-  onewire_error &= ~(3<<(kanal<<1)); // Reset channel error log
-
-  // Try 2 times to send temperature request
-  for(retry=0;retry<2;retry++)
+# ifdef DS_AUTO_DETECTION
+  const unsigned char sensortyp= ow_auto_detect_ds_type();
+  if( sensortyp )
   {
-    if (ow_init())    // Sensor available?
+# endif
+    onewire_error &= ~(3<<(kanal<<1)); // Reset channel error log
+
+    // Try 2 times to send temperature request
+    for(retry=0;retry<2;retry++)
     {
-      unsigned char sign,lsb,msb;
-      unsigned int t2;
+      if (ow_init())            // Sensor available?
+      {
+        unsigned char sign,lsb,msb;
+        unsigned int t2;
 
-      interrupted=0;
-      ow_write(0xCC);         // Skip-ROM command: alle parallel angeschlossenen Geraete werden angesprochen
-      ow_write(0xBE);         // read scratchpad command: Speicher einlesen
-      if(interrupted)         // Retry if interrupted
-          continue;
+        interrupted=0;
+        ow_write(0xCC);         // Skip-ROM command: alle parallel angeschlossenen Geraete werden angesprochen
+        ow_write(0xBE);         // read scratchpad command: Speicher einlesen
+        if(interrupted)         // Retry if interrupted
+            continue;
 
-      if(ow_read(9) || (onewire_receive[7]!=0x10) ) {  // Read 9 Bytes
-          //continue;             // Retry if interrupted or CRC faulty
-          return(-6000);      // CRC Error, indicate with -60° since it's outside the possible range
+        if(ow_read(9) || (onewire_receive[7]!=0x10) ) {  // Read 9 Bytes
+            //continue;             // Retry if interrupted or CRC faulty
+            return(-6000);      // CRC Error, indicate with -60° since it's outside the possible range
+        }
+
+        // Get local copy to save space
+        lsb=onewire_receive[0];
+        msb=onewire_receive[1];
+
+        if(sensortyp ==0x10) {  // DS18S20
+          msb&=0xF8;          // oberen 3 Bits von LSB in untere 3 von MSB
+          msb+=(lsb>>5)&0x07;
+
+          lsb=lsb<<3;         // LSB um 3 Bit nach oben verschieben
+          lsb&=0xF0;          // alles unterhalb 2^0 abschneiden
+          lsb+=(16-onewire_receive[6]);
+        }
+
+        sign=msb&0x80;
+        t2=msb*256+lsb;
+        if (sign) t2=(0xFFFF-t2)+1;
+
+        t=t2*6;
+        t2=t2>>2;
+        t=t+t2;                 // hier ist t die Teperatur in 0,01°C
+
+        if(sensortyp ==0x10){   // DS18S20 alignment, datasheet page 3
+          t-=25;
+        }
+
+        if (sign) t=-t;         // Vorzeichen
+
+        return t;               // OK
       }
-
-      // Get local copy to save space
-      lsb=onewire_receive[0];
-      msb=onewire_receive[1];
-
-      if(sensortyp ==0x10) {  // DS18S20
-        msb&=0xF8;          // oberen 3 Bits von LSB in untere 3 von MSB
-        msb+=(lsb>>5)&0x07;
-
-        lsb=lsb<<3;         // LSB um 3 Bit nach oben verschieben
-        lsb&=0xF0;          // alles unterhalb 2^0 abschneiden
-        lsb+=(16-onewire_receive[6]);
-      }
-
-      sign=msb&0x80;
-      t2=msb*256+lsb;
-      if (sign) t2=(0xFFFF-t2)+1;
-
-      t=t2*6;
-      t2=t2>>2;
-      t=t+t2;                 // hier ist t die Teperatur in 0,01°C
-
-      if(sensortyp ==0x10){   // DS18S20 alignment, datasheet page 3
-        t-=25;
-      }
-
-      if (sign) t=-t;         // Vorzeichen
-
-      return t;               // OK
     }
+# ifdef DS_AUTO_DETECTION
   }
+# endif
   return (-6100);               // Fehler, nicht erfolgreich gelesen (-61°)
 }
 
+# ifdef DS_AUTO_DETECTION
+// Automaticaly detect  ds sensor type
+//  Find DS Type by Family Code of each sensor
+//  0x10 = DS1820/DS18S20 / 0x28 = DS18B20 / 0x00 = No Sensor found
+unsigned char ow_auto_detect_ds_type(void)
+{
+  if( ow_init() )             // Sensor available?
+  {
+      ow_write(0x33);         // Read-ROM command
+      if(!ow_read(8))         // Read 64bit Lasered ROM-Code to detect the Family Code
+      {       
+        return onewire_receive[0];
+      }
+  }
+  return 0x00;  // No Sensor found
+}
+# endif
 #endif // #ifdef DS_SERIES
 
 #ifdef DHT

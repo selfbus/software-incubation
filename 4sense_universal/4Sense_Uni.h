@@ -18,7 +18,7 @@
 /*************************************************************************
   Sensor definitions
 *************************************************************************/
-#define DHT           // Define DHT to enable DHT sensor support
+//#define DHT           // Define DHT to enable DHT sensor support
 //#define DS_SERIES     // Define to enable DS sensor support
 
 /*************************************************************************
@@ -30,6 +30,20 @@
 #ifdef DHT
   #define DHT_PORT P1  // Define the Port for DHT Sensor 
 #endif
+
+
+/*************************************************************************
+  Check required definitions
+*************************************************************************/
+#if !defined(DS_SERIES) && !defined(DHT)
+# error 4Sense_Universal is used without target definition! Please define \
+        DHT or DS_SERIES in this header or befor including this header!
+#endif
+#if defined(DHT) && !defined(DHT_PORT)
+# error 4Sense_Universal is used with DHT support, but without defined DATA \
+        Port. Please define DHT_PORT!
+#endif
+
 
 /*************************************************************************
   Timer definitions
@@ -68,14 +82,21 @@ void owdelay(
 
 # ifdef DS_SERIES
     //extern unsigned char kanal;                 // Current channel
-    __bit ow_init(void);                      // Initialize One-wire Device
-    void ow_write(unsigned char owbyte);      // Send Byte to one-wire device
-    unsigned char ow_read(unsigned char);     // Read byte from one-wire device
-    __bit ow_read_bit(void);                  // Read data-bit from one-wire
-    extern unsigned char onewire_receive[];   // Holds DS18x20 received data
-    extern unsigned char onewire_error;       // Error code, 2Bit per sensor
-    __bit start_tempconversion(void);        // Temperaturmessung starten
-    int read_temp(unsigned char sensortyp);  // Temperatur einlesen
+    __bit ow_init(void);                          // Initialize One-wire Device
+    void ow_write(unsigned char owbyte);          // Send Byte to one-wire device
+    unsigned char ow_read(unsigned char);         // Read byte from one-wire device
+    __bit ow_read_bit(void);                      // Read data-bit from one-wire
+    extern unsigned char onewire_receive[];       // Holds DS18x20 received data
+    extern unsigned char onewire_error;           // Error code, 2Bit per sensor
+    __bit start_tempconversion(void);             // Start temperature measuring
+#  define DS_AUTO_DETECTION                       // To reduce the code Size, deactivate this
+#  ifdef DS_AUTO_DETECTION
+      unsigned char ow_auto_detect_ds_type(void);   // Automaticaly detect  ds sensor type
+      int read_temp(void);                          // Read temperature with auto detected ds type
+#  else
+      int read_temp(unsigned char sensortyp);       // Read temperatur, need sensor type
+#  endif
+
 # endif // #ifdef DS_SERIES
 
 # ifdef DHT
@@ -112,5 +133,4 @@ void owdelay(
      #define OWDELAY_DHT_RECEIVE 4600
      #define OWDELAY_DHT_INIT    63000
 #  endif // #ifdef SOFT_DELAY
-
 #endif // #if defined(DS_SERIES) || defined(DHT)
