@@ -361,8 +361,8 @@ void main(void)
   if (status60 & 0x01) TASTER = blink;    // LED blinkt im Prog-Mode
   else TASTER = !(eeprom[0xE2] & 0x10);  // LED ist an oder aus gemaess Parameter fuer Betriebs-LED
 #else
-  if (status60 & 0x01) TASTER = 0;    // LED leuchtet im Prog-Mode
-  else TASTER = 1;            // LED aus
+  if (status60 & 0x01) TASTER = blink;    // LED leuchtet im Prog-Mode
+  else TASTER = !(eeprom[0xE2] & 0x01);   // LED aus
 #endif
   }  while(1);
 }
