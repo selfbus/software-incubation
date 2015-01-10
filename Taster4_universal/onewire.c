@@ -26,7 +26,7 @@
     #include <fb_lpc922.h>
 #endif
 
-#define OWDATA 	P2_7	//RXD Data-Pin P1_1 fuer one-wire Sensor
+#define OWDATA 	P1_1	//RXD Data-Pin P1_1 fuer one-wire Sensor
 
 unsigned char t;
 unsigned char bit_count, wait_count;

@@ -798,8 +798,8 @@ void restart_app(void)
 	TF0=0; //timer0 flag loeschen
 	EA=1;// Interrupts freigeben
 
-	P2M1 &= ~0x80;
-	P2M2 &= ~0x80; // P2.7 bidirektional
+	//P2M1 &= ~0x80;
+	//P2M2 &= ~0x80; // P2.7 bidirektional
 
 	/*
 	// RC5 doesn't seem to work with the CCU since the timer does not reset when writing to TH2, TL2

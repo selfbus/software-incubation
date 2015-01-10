@@ -23,7 +23,8 @@
 *		 Devicetype  = SB Taster, 4-fach
 *
 * \par Changes:
-*		1.00	erste Version;
+*		1.00    erste Version
+*       1.01    Bugfix ProgLED/BetriebsLED liegt auf Bit 0
 */
 
 #include "sb_app_taster4_universal.h"
@@ -43,10 +44,11 @@
 // Wenn Debug aktiv ist werden die Werte in der restart_app() geschrieben damit die Konfiguration nicht
 // immer neu geschrieben werden muss.
 // Geraeteparameter setzen, diese können von der ETS uebschrieben werden wenn Schreibschutz nicht aktiv
-static __code unsigned char __at (0x3903) manufacturer[2]={0x00,0x4C};  // Herstellercode 0x004C = Bosch
-static __code unsigned char __at (0x3905) device_type[2]={0x04, 0x56};  // 0x0456 = Selfbus Taster4_universal
-static __code unsigned char __at (0x390C) port_A_direction={0};         // PORT A Direction Bit Setting
-static __code unsigned char __at (0x390D) run_state={255};              // Run-Status (00=stop FF=run)
+__code unsigned char __at (EEPROM_ADDR +0x03) manufacturer[2]={0x00,0x4C};  // Herstellercode 0x004C = Bosch
+__code unsigned char __at (EEPROM_ADDR +0x05) device_type[2]={0x04, 0x56};  // 0x0456 = Selfbus Taster4_universal
+__code unsigned char __at (EEPROM_ADDR +0x0C) port_A_direction={0};         // PORT A Direction Bit Setting
+__code unsigned char __at (EEPROM_ADDR +0x0D) run_state={255};              // Run-Status (00=stop FF=run)
+__code unsigned int __at  (EEPROM_ADDR +0x17) start_pa={0xFFFF};            // Default PA is 15.15.255
 #endif
 
 
@@ -75,7 +77,7 @@ unsigned char spreizung;
 	#endif
 #endif
 
-#define VERSION		100
+#define VERSION		101
 
 #ifdef DEBUG_H_
     #warning Debug is active! UART is listening to the Debugger now!
@@ -253,7 +255,7 @@ void main(void)
 		}
 		LEDVAL=LEDSTATE & val;
 
-		if (tel_arrived || tel_sent) {//
+		if (tel_arrived || tel_sent) {
 			tel_sent=0;
 			process_tel();
 		}
@@ -315,11 +317,11 @@ void main(void)
 #endif
 
 #ifdef NOPROGLED
-		if (status60 & 0x01) TASTER = blink;		// LED blinkt im Prog-Mode
-		else TASTER = !(eeprom[0xE2] & 0x10);	// LED ist an oder aus gemaess Parameter fuer Betriebs-LED
+		if (status60 & 0x01) TASTER = blink;    // LED blinkt im Prog-Mode
+		else TASTER = (eeprom[0xE2] & 0x01);    // LED ist an oder aus gemaess Parameter fuer Betriebs-LED
 #else
-		if (status60 & 0x01) TASTER = 0;		// LED leuchtet im Prog-Mode
-		else TASTER = 1;						// LED aus
+		if (status60 & 0x01) TASTER = 0;        // LED leuchtet im Prog-Mode
+		else TASTER = 1;                        // LED aus
 #endif
 
 
