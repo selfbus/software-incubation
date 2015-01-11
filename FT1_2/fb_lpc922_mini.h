@@ -125,7 +125,7 @@ extern volatile __bit connected;
 extern __bit ack, nack, busy, tel_arrived, tel_sent, auto_ack, wait_for_ack, tel_acked;
 extern __bit send_ack, send_nack, send_busy, transparency;
 extern unsigned char tx_nextwrite, tx_nextsend, status60;
-
+extern __bit s_telegramm_belegt;
 extern unsigned char conh, conl;	// bei bestehender Verbindung phys. Adresse des Kommunikationspartners
 extern unsigned char pcount;		// Paketzaehler, Gruppenadresszaehler
 extern unsigned char mem_length, mem_adrh, mem_adrl, senders_pcount;	// länge bei memory_read_request

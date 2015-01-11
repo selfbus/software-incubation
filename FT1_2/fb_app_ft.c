@@ -24,19 +24,26 @@
 
 
 #define FT_SEND_T_DATACONNECTED_CONF \
-	{unsigned char cp; for(cp=0;cp<=31;cp++)rsout[cp]=rsin[cp];} \
-	FT_SET_HEADER(rsout[1],0x8E) \
+	FT_SET_HEADER(rsin[1],0x8E) \
 	ft_send_frame();
 
 #define FT_SEND_L_DATA_CONF \
-	{unsigned char cp; for(cp=0;cp<=31;cp++)rsout[cp]=rsin[cp];} \
-	FT_SET_HEADER(rsout[1],0x2E) \
-	rsout[6]=0xB0 + (rsin[6] & 0x0F); \
-	rsout[7]=eeprom[ADDRTAB+1]; \
-	rsout[8]=eeprom[ADDRTAB+2]; \
+	FT_SET_HEADER(rsin[1],0x2E) \
+	rsin[6]=0xB0 + (rsin[6] & 0x0F); \
+	rsin[7]=eeprom[ADDRTAB+1]; \
+	rsin[8]=eeprom[ADDRTAB+2]; \
 	ft_send_frame();
 
 #define FT_SET_HEADER(length, control) \
+	rsin[0]=0x68; \
+	rsin[1]=length; \
+	rsin[2]=length; \
+	rsin[3]=0x68; \
+	fcb=!fcb; \
+	rsin[4]=0xD3+(fcb<<5); \
+	rsin[5]=control;
+
+#define FT_SET_BUS_HEADER(length, control) \
 	rsout[0]=0x68; \
 	rsout[1]=length; \
 	rsout[2]=length; \
@@ -72,13 +79,14 @@
 
 unsigned char timer_data;
 unsigned char send_confirm;
-volatile __bit frame_receiving;	// wird im seriellen INT beim ersten byte gesetzt, nach Bearbeitung des Frames gelöscht.
-
-
+volatile __bit	rsout_busy;	// zeigt an dass der rsout belegt ist. Wird nach Senden des selben geloescht.
+__bit L_Data_conf_done;
+__bit ft_process_var_frame_repeat_request;
 void ft_process_var_frame(void)
 {
 	unsigned char n;
 	__bit write_ok = 0;
+	//rsin_stat &=0x02;	// status var_frame loeschen
 	if (rsin[0] == 0x68 && rsin[3] == 0x68 && rsin[1] == rsin[2])
 	{	// Multi Byte
 		timer_data = 2;	// timer starting data LED
@@ -89,9 +97,18 @@ void ft_process_var_frame(void)
 			{
 			case 0x11:		// send a telegram on the bus
 				//while (fb_state != 0);
-
-				FT_SEND_ACK
-				send_obj_value(0);
+				if(!s_telegramm_belegt)
+				{
+					send_obj_value(0);
+					FT_SEND_ACK
+					ft_process_var_frame_repeat_request = 0; 	
+				}
+				else
+				{
+					// nicht erfolgreich dann wieder setzen
+					ft_process_var_frame_repeat_request = 1; 	
+				}
+				
 				break;
 
 			case 0xA9:		// PEI_switch_request	
@@ -130,11 +147,11 @@ void ft_process_var_frame(void)
 				if (switch_mode == 0x03)
 				{
 					FT_SET_HEADER(0x07, 0x86)
-					rsout[6] = (0x00);
-					rsout[7] = (0x00);
-					rsout[8] = (0x00);
-					rsout[9] = (0x00);
-					rsout[10] = (0x00);
+					rsin[6] = (0x00);
+					rsin[7] = (0x00);
+					rsin[8] = (0x00);
+					rsin[9] = (0x00);
+					rsin[10] = (0x00);
 					ft_send_frame();
 				}
 				break;
@@ -160,16 +177,16 @@ void ft_process_var_frame(void)
 						case 0x00:		// Read_Mask_Version_Req	  
 							FT_SEND_T_DATACONNECTED_CONF
 							FT_SET_HEADER(0x0C, 0x89)
-							rsout[6] = (0x00);
-							rsout[7] = (0x00);
-							rsout[8] = (0x00);
-							rsout[9] = (0x00);
-							rsout[10] = (0x00);
-							rsout[11] = (0x63);	// DRL Länge 3 Bytes
-							rsout[12] = (0x03);	// 03 40 = Read_Mask_Version_res
-							rsout[13] = (0x40);	//
-							rsout[14] = (0x00);	// Maskenversion 00 21
-							rsout[15] = (0x21);
+							rsin[6] = (0x00);
+							rsin[7] = (0x00);
+							rsin[8] = (0x00);
+							rsin[9] = (0x00);
+							rsin[10] = (0x00);
+							rsin[11] = (0x63);	// DRL Länge 3 Bytes
+							rsin[12] = (0x03);	// 03 40 = Read_Mask_Version_res
+							rsin[13] = (0x40);	//
+							rsin[14] = (0x00);	// Maskenversion 00 21
+							rsin[15] = (0x21);
 							ft_send_frame();
 							break;
 						case 0xD5:	// Read_Property_Value_Req
@@ -178,9 +195,9 @@ void ft_process_var_frame(void)
 							{
 								FT_SEND_T_DATACONNECTED_CONF
 								FT_SET_HEADER(0x0F, 0x89)
-								rsout[11] = 0x66;
-								rsout[13] = 0xD6;
-								rsout[18] = property_5;
+								rsin[11] = 0x66;
+								rsin[13] = 0xD6;
+								rsin[18] = property_5;
 								ft_send_frame();
 							}
 							break;
@@ -194,21 +211,21 @@ void ft_process_var_frame(void)
 								else
 									property_5 = 0x01;
 								FT_SET_HEADER(0x0F, 0x89)
-								rsout[11] = 0x66;
-								rsout[13] = 0xD6;
-								rsout[18] = property_5;
+								rsin[11] = 0x66;
+								rsin[13] = 0xD6;
+								rsin[18] = property_5;
 								ft_send_frame();
 							}
 							break;
 
 						case 0xD1:		// Authorize_Req
 							FT_SEND_T_DATACONNECTED_CONF
-							rsout[4] |= 0x80;	// DIR=1 BAU to external device
-							//rsout[4]^=0x20;		// toggle FCB
+							rsin[4] |= 0x80;	// DIR=1 BAU to external device
+							//rsin[4]^=0x20;		// toggle FCB
 
 							FT_SET_HEADER(0x0B, 0x89)
-							rsout[11] = 0x62;							// 66
-							rsout[13] = 0xD2;
+							rsin[11] = 0x62;							// 66
+							rsin[13] = 0xD2;
 							ft_send_frame();
 							break;
 						}
@@ -219,8 +236,8 @@ void ft_process_var_frame(void)
 						{
 						case 0x00:	// Read_Memory_Req
 							FT_SEND_T_DATACONNECTED_CONF
-							ft_send_Read_Memory_Res((rsout[13] & 0x0F), rsout[14],
-									rsout[15]);
+							ft_send_Read_Memory_Res((rsin[13] & 0x0F), rsin[14],
+									rsin[15]);
 							break;
 
 						case 0x80:	// Write_Memory_Req
@@ -261,7 +278,6 @@ void ft_process_var_frame(void)
 		}
 	}
 	//rsinpos=0;
-	frame_receiving=0;
 }
 
 void ft_process_fix_frame(void)		// frame with fixed length received
@@ -273,8 +289,8 @@ void ft_process_fix_frame(void)		// frame with fixed length received
 		if ((rsin[1] & 0x0F) == 0x00)
 		{	//send_reset received
 			FT_SEND_ACK
-			// send an ack
 			restart_app();
+			// send an ack
 		}
 		if (rsin[1] == 0x49)
 		{		// N_DataConnected.ind received
@@ -285,7 +301,6 @@ void ft_process_fix_frame(void)		// frame with fixed length received
 		}
 	}
 	//rsinpos=0;
-	//frame_receiving=0;
 }
 
 void ft_send_Read_Memory_Res(unsigned char bytecount, unsigned char adrh,
@@ -295,19 +310,19 @@ void ft_send_Read_Memory_Res(unsigned char bytecount, unsigned char adrh,
 
 	FT_SET_HEADER(bytecount+12, 0x89)
 
-	rsout[6] = 0x0C;
-	rsout[7] = 0x00;
-	rsout[8] = 0x00;
-	rsout[9] = 0x00;
-	rsout[10] = 0x00;
-	rsout[11] = bytecount + 3;
-	rsout[12] = 0x02;
-	rsout[13] = 0x40 + bytecount;
-	rsout[14] = adrh;
-	rsout[15] = adrl;
+	rsin[6] = 0x0C;
+	rsin[7] = 0x00;
+	rsin[8] = 0x00;
+	rsin[9] = 0x00;
+	rsin[10] = 0x00;
+	rsin[11] = bytecount + 3;
+	rsin[12] = 0x02;
+	rsin[13] = 0x40 + bytecount;
+	rsin[14] = adrh;
+	rsin[15] = adrl;
 	if (switch_mode == 0x03)
 		for (n = 0; n < bytecount; n++)
-			rsout[n + 16] = eeprom[adrl + n];
+			rsin[n + 16] = eeprom[adrl + n];
 	ft_send_frame();
 }
 
@@ -316,10 +331,10 @@ void ft_process_telegram(void)		// EIB telegram received
 	unsigned char n;
 
 	tel_was_acked = 0;
-
+	rsout_busy=1;
 	if (switch_mode == 0x05)		// busmonitor
 	{
-		FT_SET_HEADER((r_telegramm[5]&0x0F)+13, 0x2B)
+		FT_SET_BUS_HEADER((r_telegramm[5]&0x0F)+13, 0x2B)
 		rsout[6] = 0x01;	// status
 		rsout[7] = 0x22;	// timestamp
 		rsout[8] = 0x33;	// timestamp
@@ -327,39 +342,39 @@ void ft_process_telegram(void)		// EIB telegram received
 			rsout[n + 9] = r_telegramm[n];	// -1
 		if(tel_arrived)	// nach Telegramm übernahme muss tel_arrived noch 1 sein, da es im Empfang byte 0(ausser ac,nack,busy) gelöscht wird.
 		{				// Ein gelöschtes tel_arrived bedeutet dass ein nächstes Telegramm den r_telegramm zumindest angefangen 
-			ft_send_frame(); // hat zu überschreiben!!
+			ft_send_bus_frame(); // hat zu überschreiben!!
 	
 			if (tel_was_acked)
 			{
-				FT_SET_HEADER(0x06, 0x2B)
+				FT_SET_BUS_HEADER(0x06, 0x2B)
 				rsout[6] = 0x01;
 				rsout[7] = 0x33;	// timestamp
 				rsout[8] = 0x44;	// timestamp
 				rsout[9] = 0xCC;
-				ft_send_frame();
+				ft_send_bus_frame();
 			}
 		}
 	}
 	else
 	{
-		FT_SET_HEADER((r_telegramm[5]&0x0F)+9, 0x29)
+		FT_SET_BUS_HEADER((r_telegramm[5]&0x0F)+9, 0x29)
 		// +9
 		for (n = 0; n < (rsout[1] - 1); n++)
 			rsout[n + 6] = r_telegramm[n];	// -1
-		if(tel_arrived)	ft_send_frame();// Abfrage tel_arrived siehe Kommentar im busmonitor mode.
-		else TASTER=0;
+		if(tel_arrived)	ft_send_bus_frame();// Abfrage tel_arrived siehe Kommentar im busmonitor mode.
 	}
 	tel_arrived = 0;// hier loeschen, damit nicht erneut ft_process_tel aufgerufen wird
 
 }
 
-void ft_send_frame(void)// send a frame with variable length that is stored in rsin
+void ft_send_bus_frame(void)// send a frame with variable length that is stored in rsout
 {
 	unsigned char b, n, repeat, frame_length, send_char;
 	unsigned int timeout;
 	repeat = 4;
 	while (repeat--)
 	{		// repeat sending frame up to 3 times if not achnowleged
+		//if(repeat<3)auto_ack=0;// automatische Bestätigen in der Statemachine abschalten bis Übertragung geschehen ist
 		rsout[rsout[1] + 4] = 0;
 		for (n = 4; n < (rsout[1] + 4); n++)
 			rsout[rsout[1] + 4] += rsout[n];	// checksum berechnen
@@ -392,6 +407,55 @@ void ft_send_frame(void)// send a frame with variable length that is stored in r
 				repeat = 0;
 				ft_ack = 0;
 				LED_run = 0;
+				rsout_busy = 0;
+				return;
+			}
+		}
+	}
+	LED_run = 1;
+	rsout_busy = 0;
+//	auto_ack=1;
+}
+
+void ft_send_frame(void)// send a frame with variable length that is stored in rsin
+{
+	unsigned char b, n, repeat, frame_length, send_char;
+	unsigned int timeout;
+	repeat = 4;
+	while (repeat--)
+	{		// repeat sending frame up to 3 times if not achnowleged
+		rsin[rsin[1] + 4] = 0;
+		for (n = 4; n < (rsin[1] + 4); n++)
+			rsin[rsin[1] + 4] += rsin[n];	// checksum berechnen
+		rsin[rsin[1] + 5] = 0x16;
+
+		frame_length = rsin[1] + 6;
+		send_char = rsin[0];
+		for (b = 0; b < frame_length; b++)
+		{
+			SBUF = send_char;
+			TB8 = 0;
+			for (n = 1; n != 0; n = n << 1)
+			{
+				if (rsin[b] & n)
+					TB8 = !TB8;
+			}
+			if (ack) tel_was_acked = 1;// fals während dem seriellen Senden ein ACK am bus kam
+			send_char = rsin[b + 1];
+			while (!TI)
+				;
+			TI = 0;
+
+		}
+
+		timeout = 10000;
+		while (timeout--)
+		{		// give enough time to receive an ack
+			if (ft_ack)
+			{
+				repeat = 0;
+				ft_ack = 0;
+				LED_run = 0;
 				return;
 			}
 		}
@@ -407,14 +471,14 @@ void ft_send_fixed_frame(unsigned char controlfield)// send a frame with fixed l
 	r = 0;
 	while (r < 4)
 	{
-		rsout[0] = 0x10;
-		rsout[1] = controlfield;
-		rsout[2] = controlfield;
-		rsout[3] = 0x16;
+		rsin[0] = 0x10;
+		rsin[1] = controlfield;
+		rsin[2] = controlfield;
+		rsin[3] = 0x16;
 //		ES=0;
 		for (n = 0; n < 4; n++)
 		{
-			FT_SEND_CHAR(rsout[n])
+			FT_SEND_CHAR(rsin[n])
 		}
 //		ES=1;
 		//if (ft_get_ack()) r=4;
@@ -429,15 +493,15 @@ void PEI_identify_req(void)
 	FT_SEND_ACK
 
 	FT_SET_HEADER(0x0A, 0xA8)
-	rsout[6] = eeprom[ADDRTAB + 1];
-	rsout[7] = eeprom[ADDRTAB + 2];
-	rsout[8] = 0x00;
-	rsout[9] = 0x01;
-	rsout[10] = 0x00;
-	rsout[11] = 0x00;
-	rsout[12] = 0xE4;
-	rsout[13] = 0x5A;
-	rsout[14] = 0;
+	rsin[6] = eeprom[ADDRTAB + 1];
+	rsin[7] = eeprom[ADDRTAB + 2];
+	rsin[8] = 0x00;
+	rsin[9] = 0x01;
+	rsin[10] = 0x00;
+	rsin[11] = 0x00;
+	rsin[12] = 0xE4;
+	rsin[13] = 0x5A;
+	rsin[14] = 0;
 	ft_send_frame();
 }
 
@@ -479,7 +543,6 @@ void serial_int(void) __interrupt (4) __using (1) // Interrupt on received char 
 		else
 		{                           //else increment buffer pointer, if possible
 			rsin[rsinpos] = rxc;
-			frame_receiving=1;
 			/* check if frame complete */
 			if (rxc == 0x16 && rsinpos == (rsin[1] + 5))
 				rsin_stat = RSIN_VARFRAME;
@@ -528,7 +591,7 @@ __bit build_tel(unsigned char objno)
 	s_telegramm[0] = 0xB0 + (rsin[6] & 0x0F);
 	s_telegramm[1] = eeprom[ADDRTAB + 1];	// PA high
 	s_telegramm[2] = eeprom[ADDRTAB + 2];	// PA low
-	
+	s_telegramm_belegt=1;
 	//if(SP>stackmax)stackmax=SP;
 
 	return build_ok;  // TODO gehört da nicht immer 1 ?
@@ -582,6 +645,8 @@ void send_obj_done(unsigned char objno, __bit success)
 	objno;
 	if (success)send_confirm = 1;
 	else send_confirm=0;
+	
+	s_telegramm_belegt = 0;
 //	// TODO
 //	FT_SET_HEADER(rsin[1],0x2E);
 //	rsin[6]=0xB0 + (rsin[6] & 0x0F);
@@ -592,15 +657,18 @@ void send_obj_done(unsigned char objno, __bit success)
 }
 
 void ft_send_L_Data_conf()
+
 {
-	unsigned char cp;
-	for(cp=0;cp<=31;cp++)rsout[cp]=rsin[cp];
-	FT_SET_HEADER(rsin[1],0x2E );//| (send_confirm & 1)
-	rsout[6]=0xB0 + (rsout[6] & 0x0F);
-	rsout[7]=eeprom[ADDRTAB+1];
-	rsout[8]=eeprom[ADDRTAB+2];
+	unsigned char n;
+	FT_SET_BUS_HEADER((s_telegramm[5]&0x0F)+9, 0x2E)
+	// +9
+	for (n = 1; n < (rsout[1] - 1); n++)
+	rsout[n + 6] = s_telegramm[n];	
+	rsout[6]=0xB0 + (s_telegramm[0] & 0x0F);
 	tel_acked = 0;
-	ft_send_frame();
+	L_Data_conf_done=1;
+	//ft_send_bus_frame();// 
+
 }
 
 void restart_app(void)		// Alle Applikations-Parameter zurücksetzen

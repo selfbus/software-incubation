@@ -58,8 +58,8 @@ __bit inc_pcount;
 __bit telegramm_ok;
 __bit tel_acked;
 
-
-
+__bit s_telegramm_belegt;
+__bit receive_to_nirwana;
 
 
 void X1_int(void) __interrupt (2)		// Flanke des Startbits löst int1 aus
@@ -133,6 +133,8 @@ void T1_int(void) __interrupt (3) 	// Timer 1 Interrupt
 		else {
 			TR1=0;		// nichts mehr zu tun, also statemachine stoppen
 			EX1=1;		// sicherstellen, dass ext. Int. 1 aktiv ist
+			if(!tel_acked)s_telegramm_belegt=0;
+
 		}
 		break;
 
@@ -166,16 +168,23 @@ void T1_int(void) __interrupt (3) 	// Timer 1 Interrupt
 						if(fbrx_byte==0xC0)	busy=1;				// busy empfangen
 					}
 					if (!ack && !nack && !busy && (telpos<=22)) {					// Datenbyte empfangen
-						r_telegramm[telpos]=fbrx_byte;			// Byte speichern
-						cs^=fbrx_byte;							// Checksum berechnen
-						telpos++;								// Telegrammzeiger erhöhen
-						tel_arrived=0;
+						if(!tel_arrived && !receive_to_nirwana)
+						{
+							r_telegramm[telpos]=fbrx_byte;			// Byte speichern
+							cs^=fbrx_byte;							// Checksum berechnen
+							telpos++;								// Telegrammzeiger erhöhen
+							//tel_arrived=0;
+						}
+						else
+						{
+							receive_to_nirwana=1;
+						}
 					}
 				}
 				else parity_ok=0;						// Parity Error
 
 				if (wait_for_ack) {						// es wird ein ACK erwartet
-					wait_for_ack=0;							// Flag zurücksetzen, da wir es ja gerade abarbeiten
+					wait_for_ack=0;							// Flag zuruecksetzen, da wir es ja gerade abarbeiten
 					if (ack && parity_ok) {					// ACK empfangen und paritaet ok
 						repeat_count=0x14;						// keine Wiederholtelegramme mehr senden und Erfolg anzeigen
 						tel_acked=1;
@@ -233,6 +242,7 @@ void T1_int(void) __interrupt (3) 	// Timer 1 Interrupt
 			//if (telpos>1) tel_arrived=1;	// trotzdem den Eingang eines Telegramms anzeigen
 			init_rx();						// wieder in den Empfang zurück
 		}
+		receive_to_nirwana=0;
 		break;
 
 	case 5:	// ACK-Position erreicht
@@ -339,7 +349,13 @@ void T1_int(void) __interrupt (3) 	// Timer 1 Interrupt
 		TR1=1;
 		fb_state=10;
 		break;
-
+	case 15:	// ACK TIMEOUT (30 Bit) erreicht
+		TR1=0;
+		TMOD=(TMOD & 0x0F) +0x10;	// Timer 1 als 16-Bit Timer
+		TH1=0xF1;					// timeout = 15 Bit (auf ACK) + 11 Bit (ACK)= 26 Bit--> 30 bit
+		TL1=0x00;
+		fb_state=0;
+		break;
 //	default:
 		//fb_state++;			// bei allen nicht angegebenen states nur state erhöhen
 	}
@@ -357,8 +373,8 @@ void init_rx(void) 	// Empfangen initiieren (statemachine auf Anfang)
 	telpos=0;
 	TR1=0;
 	TMOD=(TMOD & 0x0F) +0x10;	// Timer 1 als 16-Bit Timer
-	TH1=0x89;					// busfree Zeit = 15 Bit (auf ACK) + 11 Bit (ACK) + 53 Bit
-	TL1=0xAF;
+	TH1=0xB5;					// busfree Zeit =  50 Bit
+	TL1=0x00;
 	send_ack=0;
 	send_nack=0;
 	TF1=0;

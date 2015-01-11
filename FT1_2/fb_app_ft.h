@@ -64,10 +64,12 @@ FB_APP_EXTERN __bit fcb, tel_was_acked;
 FB_APP_EXTERN unsigned char property_5;
 FB_APP_EXTERN __bit ft_ack;
 extern volatile __bit frame_receiving;
+extern __bit L_Data_conf_done;
+extern volatile __bit rsout_busy;
+extern __bit ft_process_var_frame_repeat_request;
 extern unsigned char stackmax;
 extern unsigned char timer_data;
 //extern unsigned char send_confirm;
-
 void ft_process_var_frame();
 void ft_process_fix_frame();
 void ft_process_telegram(void);
@@ -79,6 +81,7 @@ void ft_send_Read_Memory_Res(unsigned char bytecount, unsigned char adrh, unsign
 //bit ft_get_ack(void);
 void ft_rs_init(void);
 void ft_send_frame(void);
+void ft_send_bus_frame(void);// send a frame with variable length that is stored in rsin
 void ft_send_fixed_frame(unsigned char controlfield);
 void serial_int(void) __interrupt (4) __using (2);
 // void ft_send_char(unsigned char sc);

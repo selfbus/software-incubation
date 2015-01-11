@@ -63,15 +63,28 @@ void main(void)
 		  n = rsin_stat;
 		  rsin_stat = RSIN_NONE;
 		ES = ES_save;
-		if (n == RSIN_VARFRAME)
+// Frame von der ETS kommend verarbeiten
+		if ((n == RSIN_VARFRAME) || (ft_process_var_frame_repeat_request == 1))
 			ft_process_var_frame();
 		if (n == RSIN_FIXFRAME)
 			ft_process_fix_frame();
-//		if (tel_arrived && !frame_receiving)
-		if (tel_arrived )
+		
+// Telegramm vom BUS kommend verarbeiten
+		if (tel_arrived && !rsout_busy )
 			ft_process_telegram();
-		if (tel_acked)
+// bestaetigtes Telegramm zu ETS hin beantworten
+		if (L_Data_conf_done )
+		{
+			ft_send_bus_frame();
+			L_Data_conf_done=0;
+		}
+		if (tel_acked && !rsout_busy)
+			{
 			ft_send_L_Data_conf();
+			s_telegramm_belegt=0;
+			}
+		
+// Kontroll LED Behandlung		
 		if (RTCCON >= 0x80)
 		{			// clock für die data LED
 			RTCCON = 0x61;
