@@ -510,7 +510,7 @@ void switch_led(unsigned char ledno, __bit onoff)
 
 		ledvar=LEDSTATE;
 		ledvar&= ~(1<<(ledno+4));	// LEDs sind an Pin 4-7
-		ledvar |= ((onoff<<(ledno+4)));	// unteren 4 bits immer auf 1 lassen !!!
+		ledvar |= (onoff<<(ledno+4));	// unteren 4 bits immer auf 1 lassen !!!
 		LEDSTATE=ledvar;
 	}
 }
@@ -542,7 +542,7 @@ void delay_timer(void)
 	i_tmp,tmp;
 //	long delval;
 //	long duration=1;
-	ledvar;
+//	ledvar;
 	RTCCON=0x60;
 	RTCH=0x07;//
 	RTCL=0x33;//32ms

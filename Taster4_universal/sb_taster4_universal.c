@@ -247,11 +247,14 @@ void main(void)
 			    }//if(APLICATION RUN??..
 		}// else... wenn modul nicht im progmode
 		// LED Behandlung:
-		val=0;// val ist hier pattern fuer das LED Blinken
+		val=255;    // val ist hier pattern fuer das LED Blinken
 		blink=((n >>3)&0x01);
 		for (x=0;x<4;x++)
 		{
-			val |=((~((eeprom[0xE3 + x]>>7)&0x01))|blink)<<(x+4);
+		    if (eeprom[0xE3 +x] & 0x80) // blinken
+		    {
+		        val &= ~(blink<<(x+4));
+		    }
 		}
 		LEDVAL=LEDSTATE & val;
 
