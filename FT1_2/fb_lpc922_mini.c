@@ -352,8 +352,8 @@ void T1_int(void) __interrupt (3) 	// Timer 1 Interrupt
 	case 15:	// ACK TIMEOUT (30 Bit) erreicht
 		TR1=0;
 		TMOD=(TMOD & 0x0F) +0x10;	// Timer 1 als 16-Bit Timer
-		TH1=0xF1;					// timeout = 15 Bit (auf ACK) + 11 Bit (ACK)= 26 Bit--> 30 bit
-		TL1=0x00;
+		TH1=0xd9;					//F100 timeout = 15 Bit (auf ACK) + 11 Bit (ACK)= 26 Bit--> 30 bit
+		TL1=0x7F;					//26 Bit- 35µ für den Sprung sate0-->state 10
 		fb_state=0;
 		break;
 //	default:
@@ -373,8 +373,16 @@ void init_rx(void) 	// Empfangen initiieren (statemachine auf Anfang)
 	telpos=0;
 	TR1=0;
 	TMOD=(TMOD & 0x0F) +0x10;	// Timer 1 als 16-Bit Timer
-	TH1=0xB5;					// busfree Zeit =  50 Bit
-	TL1=0x00;
+	if((s_telegramm[5]&0x80))// && !(s_telegramm[7]&0xC0)
+	{
+		TH1=0x60; // für 10ms Busfree
+		TL1=0x00;// bei write_value_request und read_value_request (Gruppentelegramm schreiben und lesen)
+	}
+	else
+	{
+		TH1=0xB5;					//0xB500 busfree Zeit =  50 Bit
+		TL1=0x00;				
+	}
 	send_ack=0;
 	send_nack=0;
 	TF1=0;

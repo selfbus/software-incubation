@@ -6,6 +6,7 @@
  *  /_/   /_/ |_/_____/_____/_____/\____//____/  
  *                                      
  *  Copyright (c) 2008-2012 Andreas Krebs <kubi@krebsworld.de>
+ *  Copyright (c) 2015		Andreas Krieger 
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 2 as
@@ -63,18 +64,19 @@
 #else
 
 #define FT_SEND_CHAR(sc) \
-	SBUF=sc; \
+	{SBUF=sc; \
 	TB8=0; \
 	for(n=1;n!=0;n=n<<1) { \
 		if (sc & n) TB8=!TB8; \
 	} \
 	while(!TI); \
-	TI=0;
+	TI=0;}
 //for(n=0;n<10;n++) TI=0;
 #endif
 
 // FT Acknowledge an PC senden
-#define FT_SEND_ACK FT_SEND_CHAR(0xE5)
+#define FT_SEND_ACK FT_SEND_CHAR(0xE5);	r_fbc=!r_fbc;
+
 
 
 unsigned char timer_data;
@@ -82,14 +84,24 @@ unsigned char send_confirm;
 volatile __bit	rsout_busy;	// zeigt an dass der rsout belegt ist. Wird nach Senden des selben geloescht.
 __bit L_Data_conf_done;
 __bit ft_process_var_frame_repeat_request;
+__bit ft_ack_request;
+__bit r_fbc;
+volatile 	__bit rsin_parity_error;
 void ft_process_var_frame(void)
 {
 	unsigned char n;
 	__bit write_ok = 0;
-	//rsin_stat &=0x02;	// status var_frame loeschen
+    unsigned char crc;
 	if (rsin[0] == 0x68 && rsin[3] == 0x68 && rsin[1] == rsin[2])
 	{	// Multi Byte
-		timer_data = 2;	// timer starting data LED
+      timer_data = 2;	// timer starting data LED
+	  crc=0x00;
+	  for(n=0;n<rsin[1];n++)
+	  {
+		  crc += rsin[n+4];
+	  }
+	  if((crc==rsin[rsin[1]+4])&&((__bit)(rsin[4]&0x20)==r_fbc))
+	  {
 		if ((rsin[4] & 0xDF) == 0x53)
 		{		// send_Udat
 			switch (rsin[5])
@@ -276,6 +288,7 @@ void ft_process_var_frame(void)
 				break;
 			}
 		}
+	  } // CRC	und r_fbc
 	}
 	//rsinpos=0;
 }
@@ -288,7 +301,7 @@ void ft_process_fix_frame(void)		// frame with fixed length received
 	{	// Single Byte
 		if ((rsin[1] & 0x0F) == 0x00)
 		{	//send_reset received
-			FT_SEND_ACK
+			FT_SEND_CHAR(0xE5) // ACK ohne das r_fbc zu toggeln
 			restart_app();
 			// send an ack
 		}
@@ -385,14 +398,16 @@ void ft_send_bus_frame(void)// send a frame with variable length that is stored 
 		for (b = 0; b < frame_length; b++)
 		{
 			SBUF = send_char;
+			
 			TB8 = 0;
 			for (n = 1; n != 0; n = n << 1)
 			{
 				if (rsout[b] & n)
 					TB8 = !TB8;
 			}
-			if (ack) tel_was_acked = 1;// fals während dem seriellen Senden ein ACK am bus kam
+			if (ack) tel_was_acked = 1;// falls während dem seriellen Senden ein ACK am bus kam
 			send_char = rsout[b + 1];
+
 			while (!TI)
 				;
 			TI = 0;
@@ -526,6 +541,7 @@ void ft_rs_init(void)
 void serial_int(void) __interrupt (4) __using (1) // Interrupt on received char from serial port
 {
 	unsigned char rxc;
+
 	ES = 0; /*????*/
 	if (RI)
 	{
@@ -533,34 +549,40 @@ void serial_int(void) __interrupt (4) __using (1) // Interrupt on received char 
 		if (TF0)
 		{      // time between 2 bytes was too long, discard previous frame.
 			rsinpos = 0;
+			rsin_parity_error=0;
 		}
 		rxc = SBUF;     // store byte in rsbuf
+		ACC=rxc;	// rxc in den Akku laden zum Bilden des parity bits in hardware
+		if(P != RB8)rsin_parity_error=1;
 //      TI=0; //????
-		if (rsinpos == 0 && rxc == 0xE5)
-		{  // in case of ack, set the ft_ack bit
-			ft_ack = 1;
-		}
-		else
-		{                           //else increment buffer pointer, if possible
-			rsin[rsinpos] = rxc;
-			/* check if frame complete */
-			if (rxc == 0x16 && rsinpos == (rsin[1] + 5))
-				rsin_stat = RSIN_VARFRAME;
-			if (rsin[0] == 0x10 && rsinpos == 3)
-				rsin_stat = RSIN_FIXFRAME;
-			if (rsin_stat != RSIN_NONE)
+		if(!rsin_parity_error)
+		{
+			if (rsinpos == 0 && rxc == 0xE5)
+			{  // in case of ack, set the ft_ack bit
+				ft_ack = 1;
+			}
+			else	//else increment buffer pointer, if possible
 			{
-				/* frame complete, copy it to rsin */
-				rsinpos = 0;   // ready to receive next frame.
-			}
-			else
-			{            // increment buffer pointer if there is space left
-				if (rsinpos < sizeof(rsin) - 1)
+				rsin[rsinpos] = rxc;
+				/* check if frame complete */
+				if (rxc == 0x16 && rsinpos == (rsin[1] + 5))
+					rsin_stat = RSIN_VARFRAME;
+				if (rsin[0] == 0x10 && rsinpos == 3)
+					rsin_stat = RSIN_FIXFRAME;
+				if (rsin_stat != RSIN_NONE)
 				{
-					rsinpos++;
+					/* frame complete, copy it to rsin */
+					rsinpos = 0;   // ready to receive next frame.
 				}
-			}
-		}
+				else
+				{            // increment buffer pointer if there is space left
+					if (rsinpos < sizeof(rsin) - 1)
+					{
+						rsinpos++;			
+					}
+				}
+			}//end if(rsinpos == 0 ...
+		}// end if (!rsin_parity_error...
 		TR0 = 0;
 #ifdef ROUTERMODE
 		TH0=0xCC;   // set timer to max idle time between 2 bytes = 33 bit
@@ -692,6 +714,7 @@ void restart_app(void)		// Alle Applikations-Parameter zurücksetzen
 
 	switch_mode = 0x00;		// normal mode
 	fcb = 0;
+	r_fcb=0;
 	property_5 = 0x01;
 	transparency = 1;	// auch fremde Gruppentelegramme werden verarbeitet
 

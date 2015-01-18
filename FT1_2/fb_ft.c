@@ -83,7 +83,17 @@ void main(void)
 			ft_send_L_Data_conf();
 			s_telegramm_belegt=0;
 			}
-		
+/*		if(ft_ack_request&& !s_telegramm_belegt=0;)
+		{
+			SBUF=0xE5; 
+			TB8=0; 
+			for(n=1;n!=0;n=n<<1) { 
+				if (0xE5 & n) TB8=!TB8; 
+			} 
+			while(!TI); 
+			TI=0;
+
+		}*/
 // Kontroll LED Behandlung		
 		if (RTCCON >= 0x80)
 		{			// clock für die data LED

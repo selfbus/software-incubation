@@ -60,13 +60,14 @@
 FB_APP_EXTERN unsigned char  rsin[32];
 FB_APP_EXTERN unsigned char  rsout[32];
 FB_APP_EXTERN unsigned char rsinpos, switch_mode, rsin_stat;
-FB_APP_EXTERN __bit fcb, tel_was_acked;
+FB_APP_EXTERN __bit fcb,r_fcb, tel_was_acked;
 FB_APP_EXTERN unsigned char property_5;
 FB_APP_EXTERN __bit ft_ack;
 extern volatile __bit frame_receiving;
 extern __bit L_Data_conf_done;
 extern volatile __bit rsout_busy;
 extern __bit ft_process_var_frame_repeat_request;
+extern __bit ft_ack_request;
 extern unsigned char stackmax;
 extern unsigned char timer_data;
 //extern unsigned char send_confirm;
