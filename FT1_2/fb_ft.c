@@ -105,7 +105,14 @@ void main(void)
 			}
 			else LED_data = 1;
 		}
-		//P0=switch_mode<<4;	// anzeige..
+/*		P0_2=rsout_busy;	// zeigt an dass der rsout belegt ist. Wird nach Senden des selben geloescht.
+		P0_3=L_Data_conf_done;
+		P0_4=ft_process_var_frame_repeat_request;
+		//ft_ack_request;
+		P0_5=r_fcb;
+		P0_6=first_var_frame;
+		P0_7=rsin_parity_error;
+*/
 	} while (1);
 }
 

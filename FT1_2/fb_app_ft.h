@@ -68,6 +68,9 @@ extern __bit L_Data_conf_done;
 extern volatile __bit rsout_busy;
 extern __bit ft_process_var_frame_repeat_request;
 extern __bit ft_ack_request;
+extern __bit first_var_frame;
+extern volatile __bit rsin_parity_error;
+
 extern unsigned char stackmax;
 extern unsigned char timer_data;
 //extern unsigned char send_confirm;

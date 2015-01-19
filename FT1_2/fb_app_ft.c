@@ -86,6 +86,7 @@ __bit L_Data_conf_done;
 __bit ft_process_var_frame_repeat_request;
 __bit ft_ack_request;
 __bit r_fbc;
+__bit first_var_frame;
 volatile 	__bit rsin_parity_error;
 void ft_process_var_frame(void)
 {
@@ -95,11 +96,17 @@ void ft_process_var_frame(void)
 	if (rsin[0] == 0x68 && rsin[3] == 0x68 && rsin[1] == rsin[2])
 	{	// Multi Byte
       timer_data = 2;	// timer starting data LED
-	  crc=0x00;
+	  crc=0x00;	// checume calculation
 	  for(n=0;n<rsin[1];n++)
 	  {
 		  crc += rsin[n+4];
 	  }
+	  if(first_var_frame)// load the toggle bit @ the first frame after reset
+		  {
+		  first_var_frame=0;
+		  if(rsin[4]&0x20)r_fbc=1;
+		  else r_fbc=0;
+		  }
 	  if((crc==rsin[rsin[1]+4])&&((__bit)(rsin[4]&0x20)==r_fbc))
 	  {
 		if ((rsin[4] & 0xDF) == 0x53)
@@ -715,6 +722,7 @@ void restart_app(void)		// Alle Applikations-Parameter zurücksetzen
 	switch_mode = 0x00;		// normal mode
 	fcb = 0;
 	r_fcb=0;
+	first_var_frame=1;
 	property_5 = 0x01;
 	transparency = 1;	// auch fremde Gruppentelegramme werden verarbeitet
 
