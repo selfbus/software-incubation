@@ -25,6 +25,7 @@
 * \par Changes:
 *		1.00    erste Version
 *       1.01    Bugfix ProgLED/BetriebsLED liegt auf Bit 0
+*       1.02    Bugfix 1-Flächendimmer, Lichtszene
 */
 
 #include "sb_app_taster4_universal.h"
@@ -36,7 +37,7 @@
 // Options
 #define SENSOR_TYPE     0   // !=1 DS18B20
 
-#define NOPROGLED //typ 0,2 Die Progled blinkt im Progmodus da sie auch Betriebs LED ist
+//#define NOPROGLED     //typ 0,2 Die Progled blinkt im Progmodus da sie auch Betriebs LED ist
 //#define NOPROGBUTTON	//typ 1,3 es ist kein prog Taster vorhanden sondern progmode wird durch druecken von taste 1&3 oder 2&4 aktiviert
 
 
@@ -77,7 +78,7 @@ unsigned char spreizung;
 	#endif
 #endif
 
-#define VERSION		101
+#define VERSION		102
 
 #ifdef DEBUG_H_
     #warning Debug is active! UART is listening to the Debugger now!
@@ -99,32 +100,17 @@ void main(void)
 	__bit blink, verstell, verstellt,tastergetoggelt=0;
 
 	signed char buttonpattern=1;
-//	static __code signed char __at (USERRAM_ADDR + 0xBF) trimsave;
 	static __code unsigned char __at (EEPROM_ADDR +0xFE) LED_hell;
 
-	// Verions bit 6 und 7 fuer die varianten, bit 0-5 fuer die verionen (63)
-	//Varianten sind hier noprogbutton=0x040, noprogled=0x80
 	__bit wduf;
 
 	wduf=WDCON&0x02;
 	verstellt;verstell;
 
-	restart_hw();							// Hardware zuruecksetzen
+	restart_hw();				// Hardware zuruecksetzen
 	// TODO, sequence in restart_app verschieben
 	sequence=1;
-/*
-#ifdef NOPROGBUTTON
-	if((((PORT & 0x0F)== 0x03) || ((PORT & 0x0F)== 0x0C)) && wduf) cal=0;
-//	else cal=trimsave;
 
-#else
-	TASTER=1;
-	if(!TASTER && wduf)cal=0;
-//	else cal=trimsave;
-#endif
-	TRIM = (TRIM+trimsave);
-	TRIM &= 0x3F;				//oberen 2 bits ausblenden
-*/
 	WATCHDOG_INIT
 	WATCHDOG_START
 	TASTER=0;
@@ -144,7 +130,7 @@ void main(void)
 
 	verstellt=0;
 	dimmwert = LED_hell;        // Default Helligkeit aus EEPROM laden
-	object_value[5]=dimmwert;   // TODO dimmwert direkt in object_value behandeln
+	object_value[5] = dimmwert; // TODO dimmwert direkt in object_value behandeln
 
 	do {
 		WATCHDOG_FEED
@@ -152,38 +138,48 @@ void main(void)
 		{
 			RTCCON=0x61;    // RTC flag loeschen
 			if(!connected) delay_timer();   // die normal RTC Behandlung
-			else    // wenn connected den timeout fuer Unicast connect behandeln
+			else            // wenn connected den timeout fuer Unicast connect behandeln
             {
-			    if(connected_timeout <= 110)    // 11x 520ms --> ca 6 Sekunden
+			    if(connected_timeout <= 110)     // 11x 520ms --> ca 6 Sekunden
 			        connected_timeout ++;
 			    else
 			        send_obj_value(T_DISCONNECT);// wenn timeout dann disconnect, flag und var wird in build_tel() geloescht
             }
 		}
 
-		n=timer;
-		blink=((n>>2) & 0x01);
+		n = timer;  // Zeit fuer LED blinken
+		// LED Behandlung:
+        val = 255;  // Taster high, alle LEDs ein
+        blink = ((n >>3)&0x01);
+        for (x=0;x<4;x++)
+        {
+            if (eeprom[0xE3 +x] & 0x80) // blinken
+            {
+                val &= ~(blink<<(x+4)); // LED ausschalten
+            }
+        }
+        LEDVAL = (LEDSTATE & val);
 
-		verstell=n & 0x01;
-
-		if (verstell==0)verstellt=0;
+		// Helligkeit LEDs verstellbar via Taster im Progmode
+		verstell = (n & 0x01);
+		if (verstell==0) verstellt = 0;
 
 		if (status60 & 0x01) {			// wenn progmode aktiv ist...
-			if ((PORT & 0x0F)==0x0E) {	// Taste 1 gedrueck
+			if ((PORT & 0x0F)==0x0E) {	// Taste 1 gedrueckt
 				if ((dimmwert<254) && (verstell==1)&& verstellt==0) {
-					dimmwert++;
+					dimmwert++;         // heller
 					verstellt=1;
 				}
 			}
-			if ((PORT & 0x0F)==0x0D) { // Taste 2 gedrueckt
+			if ((PORT & 0x0F)==0x0D) {  // Taste 2 gedrueckt
 				if ((dimmwert>1) && (verstell==1)&& verstellt==0) {
-					dimmwert--;
+					dimmwert--;         // dunkler
 					verstellt=1;
 				}
 			}
 		}
 
-		else {	//Wenn also Modul nicht im Progmode ist..
+		else { // Wenn also Modul nicht im Progmode ist..
 			//##### TASTERABFRAGE ######
 
 			if(APPLICATION_RUN)	{// nur wenn im Run modus und nicht connected
@@ -222,8 +218,6 @@ void main(void)
                         timerbase[8]=eeprom[0xFC]&0x07; //Timer for temperature
                         sequence=0; // wenn wir hier sind haben wir einen gueltigen Messwert, neustart durch timer
 
-
-
 /*  DIES IST DER PI REGLER
                         solltemp = (((int)eeprom [0xE9]<<8 )| eeprom[0xEA])*10;
                         spreizung = eeprom[0xED];
@@ -242,22 +236,13 @@ void main(void)
 	           			send_obj_value(4);
 	           			send_obj_value(13);
 */
+
 	                }// else if(sequence==3..
 				}// if(eeprom... aktiv?
 			    }//if(APLICATION RUN??..
 		}// else... wenn modul nicht im progmode
-		// LED Behandlung:
-		val=255;    // val ist hier pattern fuer das LED Blinken
-		blink=((n >>3)&0x01);
-		for (x=0;x<4;x++)
-		{
-		    if (eeprom[0xE3 +x] & 0x80) // blinken
-		    {
-		        val &= ~(blink<<(x+4));
-		    }
-		}
-		LEDVAL=LEDSTATE & val;
 
+		// Telegramm verarbeiten wenn vorhanden
 		if (tel_arrived || tel_sent) {
 			tel_sent=0;
 			process_tel();
@@ -271,17 +256,17 @@ void main(void)
 #endif
 
 #ifndef NOPROGBUTTON
-		TASTER=1;				        	// Pin als Eingang schalten um Programmiertaster abzufragen
+		TASTER=1;    // Pin als Eingang schalten um Programmiertaster abzufragen
 		if(!TASTER){ // Taster gedrueckt
 			if(tasterpegel<255)	tasterpegel++;
 			else{
 				if(!tastergetoggelt)status60^=0x81;	// Prog-Bit und Parity-Bit im system_state toggeln
 				tastergetoggelt=1;
-					if((status60 & 0x01)==0){	//wenn ausgemacht, Dimmwert speichern
+					if((status60 & 0x01)==0){	    // wenn ausgemacht, Dimmwert speichern
 						EA=0;
 						START_WRITECYCLE;
-						FMADRH= EEPROM_ADDR_H;    // Write to EEPROM area above USERRAM
-						FMADRL= 0xFE;
+						FMADRH= EEPROM_ADDR_H;      // Write to EEPROM area above USERRAM
+						FMADRL= 0xFE;               // LED_hell
 						FMDATA=	dimmwert;
 						STOP_WRITECYCLE;
 						EA=1;
@@ -300,10 +285,10 @@ void main(void)
 			else{
 				if(!tastergetoggelt)status60^=0x81;	// Prog-Bit und Parity-Bit im system_state toggeln
 				tastergetoggelt=1;
-				if((status60 & 0x01)==0){	//wenn ausgemacht Dimmwert speichern
+				if((status60 & 0x01)==0){	        // wenn ausgemacht Dimmwert speichern
 					EA=0;
 					START_WRITECYCLE;
-					FMADRH= EEPROM_ADDR_H;    // Write to EEPROM area above USERRAM
+					FMADRH= EEPROM_ADDR_H;          // Write to EEPROM area above USERRAM
 					FMADRL= 0xFE;
 					FMDATA=	dimmwert;
 					STOP_WRITECYCLE;

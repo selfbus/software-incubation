@@ -363,48 +363,22 @@ unsigned int sendewert(unsigned char objno)
 */
 
 
-/*
-int eis5conversion(int zahl,unsigned char Typ)
-{
-	unsigned char exp=0;
-	unsigned int wert=0;
-	if (Typ==4){// Helligkeitwert
-//		exp=3;// Da kleinster wert 50 lux*100=5000 ==> 5000/8 (exp=3)
-	 	wert=zahl*625;//= 625
-	}
-	if (Typ==6){// Temperaturwert kleinster wert =1 groesster 31
-
-		wert=zahl*100;// Hier reicht uns eine 16bit int var
-	}
-	if(Typ==8)wert=zahl;
-	if (Typ==7){// wenn Dimmwert ( EIS2, also keine Fliesskomma)
-		wert=zahl;
-	}
-	else{// fliesskomma EIS5 berechnen
-	 		while (wert > 2047){//solange Mantisse groesser 11 Bit
-	 			wert=wert>>1;// Mantisse /2
-	 			exp++;// und exponent um 1 erhoehen (ist ein 2^exp)
-	 		}
-	}
- 	return (wert|(exp<<11));// exponent dazu, geht auch bei EIS2 da EXP hier 0 ist.
-}
-*/
 signed int eis5conversion(signed int zahl)// wandelt 16 bit var in eis5 um
 {
 	unsigned char exp=0;
 	if(zahl>=0)
 	{
-		while (zahl > 2047){//solange Mantisse groesser 11 Bit
-			zahl=zahl>>1;// Mantisse /2
-			exp++;// und exponent um 1 erhoehen (ist ein 2^exp)
+		while (zahl > 2047){ // solange Mantisse groesser 11 Bit
+			zahl=zahl>>1;    // Mantisse /2
+			exp++;           // und exponent um 1 erhoehen (ist ein 2^exp)
 		}
 	}
 	else
 	{
-		while (zahl < -2048){//solange Mantisse groesser 11 Bit
-			zahl=zahl >> 1;// Mantisse /2
+		while (zahl < -2048){// solange Mantisse groesser 11 Bit
+			zahl=zahl >> 1;  // Mantisse /2
 			zahl=zahl|0x8000;// signed bit reparieren
-			exp++;// und exponent um 1 erhoehen (ist ein 2^exp)
+			exp++;           // und exponent um 1 erhoehen (ist ein 2^exp)
 		}
 		zahl=zahl & 0x87FF;
 	}
@@ -414,20 +388,20 @@ signed int eis5conversion(signed int zahl)// wandelt 16 bit var in eis5 um
 
 unsigned long read_obj_value(unsigned char objno)
 {
-//	unsigned int retvalue;
 	if(objno<8)	return((bitobject>>objno)&0x01);
 	else return(object_value[objno-8]);
 }
 
 
+// Objekt 0-7 bit, >=8 byte Objekte
 void write_obj_value(unsigned char objno, unsigned int objval)
 {
-	if(objno<8){
+	if(objno<8) {   // Bit
 		if(!objval)bitobject&=(~((0x01)<<objno));
 		else bitobject|=((0x01)<<objno);
 	}
-	else {
-		object_value[objno-8]=objval;//war objno-4
+	else {  // Byte
+		object_value[objno-8]=objval;
 	}
 }
 
@@ -469,7 +443,7 @@ void write_value_req(unsigned char objno)
 */
 void read_value_req(unsigned char objno)
 {
-			send_obj_value(objno+0x40);
+	send_obj_value(objno+0x40);
 }
 
 
@@ -514,7 +488,6 @@ void switch_led(unsigned char ledno, __bit onoff)
 		}
 		if((command&0x03)==3) onoff=!onoff;
 
-
 		ledvar=LEDSTATE;
 		ledvar&= ~(1<<(ledno+4));	// LEDs sind an Pin 4-7
 		ledvar |= (onoff<<(ledno+4));	// unteren 4 bits immer auf 1 lassen !!!
@@ -547,12 +520,10 @@ void delay_timer(void)
 	unsigned char objno, delay_value,ledvar,tmp,m,n;
 	unsigned int i_tmp;
 	i_tmp,tmp;
-//	long delval;
-//	long duration=1;
-//	ledvar;
+
 	RTCCON=0x60;
-	RTCH=0x07;//
-	RTCL=0x33;//32ms
+	RTCH=0x07;   //
+	RTCL=0x33;   //32ms
 	RTCCON=0x61; //	start_rtc(8) RTC neu starten mit 4ms
 // +++++++  Hier werden alle timer  gemaess ihrer basis decremntiert
 	timer++;
@@ -599,7 +570,6 @@ void delay_timer(void)
 				if(eeprom[0xE9+((objno-4)*4)]& 0x01){// wenn Telegrammwiederholung eingeschalten
 
 				timercnt[objno]=eeprom[0xE9+((objno-4)*4)]>>1;
-//				timercnt[objno]=tmp;
 				timerbase[objno]=0;
 				}
 				else{
@@ -739,8 +709,6 @@ void restart_app(void)
 	unsigned char n;
 	__bit write_ok=0;
 
-//	AUXR1  |= CLKLP;
-
 	// Pin 0-3 fuer Taster
 	for (n=0;n<4;n++) {
 		SET_PORT_MODE_BIDIRECTIONAL(n)
@@ -755,10 +723,10 @@ void restart_app(void)
 
 	button_buffer=0x0F;	// Variable fuer letzten abgearbeiteten Taster Status
 
-//	RTCCON=0x60;	//stop_rtc();
+//	RTCCON=0x60;	    //stop_rtc();
 //	RTCH=0x00;
 //	RTCL=0xE6;
-	RTCCON=0x81;	//start_rtc(8);		// RTC neu mit 8ms starten
+	RTCCON=0x81;	    //start_rtc(8);		// RTC neu mit 8ms starten
 
 	timer=0;			// Timer-Variable, wird alle 8ms inkrementiert
 
@@ -777,7 +745,7 @@ void restart_app(void)
 	STOP_WRITECYCLE
 #endif
 
-	for (n=0;n<13;n++) write_obj_value(n,0);		// Objektwerte alle auf 0 setzen
+	for (n=0;n<13;n++) write_obj_value(n,0);    // Objektwerte alle auf 0 setzen
 
 	for (n=0;n<8;n++){
 		timercnt[n]=0;		// timer loeschen
@@ -790,20 +758,20 @@ void restart_app(void)
 	// set timer 0 autoreload 0.05ms
 	TR0=0;
 	TMOD &= 0xF0;
-	TMOD |= 0x02;// T0 autoreload
+	TMOD |= 0x02; // T0 autoreload
 	TH0=0x47;
 	TL0=0x47;
 	TR0=1;
 	 // set timer 0 isr priority to 0
-	IP0 &= 0xFC; //FC		F6	fuer flackerfrei bei 1 kanal
-	IP0 |= 0x0C; //0C		06	dto.
-	IP0H &= 0xF4;//
-	IP0H |= 0x04;// 		Timer 1 auf Level 2
+	IP0 &= 0xFC;  //FC		F6	fuer flackerfrei bei 1 kanal
+	IP0 |= 0x0C;  //0C		06	dto.
+	IP0H &= 0xF4; //
+	IP0H |= 0x04; // 		Timer 1 auf Level 2
 
-	ET0=1;// timer 0 interupt freigeben
+	ET0=1; // timer 0 interupt freigeben
 
 	TF0=0; //timer0 flag loeschen
-	EA=1;// Interrupts freigeben
+	EA=1;  // Interrupts freigeben
 
 	//P2M1 &= ~0x80;
 	//P2M2 &= ~0x80; // P2.7 bidirektional
