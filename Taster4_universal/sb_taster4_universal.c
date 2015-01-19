@@ -26,6 +26,7 @@
 *		1.00    erste Version
 *       1.01    Bugfix ProgLED/BetriebsLED liegt auf Bit 0
 *       1.02    Bugfix 1-Flächendimmer, Lichtszene
+*       1.03    Bugfix Helligkeitswert nur 1x speichern, Remove NOPROGBUTTON
 */
 
 #include "sb_app_taster4_universal.h"
@@ -37,8 +38,7 @@
 // Options
 #define SENSOR_TYPE     0   // !=1 DS18B20
 
-//#define NOPROGLED     //typ 0,2 Die Progled blinkt im Progmodus da sie auch Betriebs LED ist
-//#define NOPROGBUTTON	//typ 1,3 es ist kein prog Taster vorhanden sondern progmode wird durch druecken von taste 1&3 oder 2&4 aktiviert
+//#define NOPROGLED     // Die Progled blinkt im Progmodus da sie auch Betriebs LED ist
 
 
 #ifndef DEBUG_H_
@@ -63,22 +63,7 @@ unsigned int solltemp;
 unsigned char spreizung;
 
 
-
-#ifdef NOPROGBUTTON
-	#ifdef NOPROGLED
-		#define TYPE 3
-	#else
-		#define TYPE 1
-	#endif
-#else
-	#ifdef NOPROGLED
-		#define TYPE 2
-	#else
-		#define TYPE 0
-	#endif
-#endif
-
-#define VERSION		102
+#define VERSION		103
 
 #ifdef DEBUG_H_
     #warning Debug is active! UART is listening to the Debugger now!
@@ -96,7 +81,7 @@ unsigned char bitobject; // fuer die unteren 8 Bitobjekte
 */
 void main(void)
 {
-	unsigned char n,tasterpegel=0,val=0,x;//
+	unsigned char n,tasterpegel=0,val=0,x;
 	__bit blink, verstell, verstellt,tastergetoggelt=0;
 
 	signed char buttonpattern=1;
@@ -147,8 +132,8 @@ void main(void)
             }
 		}
 
-		n = timer;  // Zeit fuer LED blinken
-		// LED Behandlung:
+		n = timer;  // Zeittakt holen
+		// LEDs aktualisieren
         val = 255;  // Taster high, alle LEDs ein
         blink = ((n >>3)&0x01);
         for (x=0;x<4;x++)
@@ -160,7 +145,7 @@ void main(void)
         }
         LEDVAL = (LEDSTATE & val);
 
-		// Helligkeit LEDs verstellbar via Taster im Progmode
+		// LED Helligkeit verstellbar via Taste 1+2 im Progmode
 		verstell = (n & 0x01);
 		if (verstell==0) verstellt = 0;
 
@@ -179,10 +164,9 @@ void main(void)
 			}
 		}
 
-		else { // Wenn also Modul nicht im Progmode ist..
-			//##### TASTERABFRAGE ######
+		else { // Progmode nicht aktiv
 
-			if(APPLICATION_RUN)	{// nur wenn im Run modus und nicht connected
+			if(APPLICATION_RUN)	{ // nur wenn im Run modus und nicht connected
 				if ((PORT & 0x0F) != button_buffer) port_changed(PORT & 0x0F);	// ein Taster wurde gedrueckt
 
 				// Temperatur verarbeiten
@@ -239,8 +223,8 @@ void main(void)
 
 	                }// else if(sequence==3..
 				}// if(eeprom... aktiv?
-			    }//if(APLICATION RUN??..
-		}// else... wenn modul nicht im progmode
+			}//if(APLICATION RUN??..
+		}// Progmode nicht aktiv
 
 		// Telegramm verarbeiten wenn vorhanden
 		if (tel_arrived || tel_sent) {
@@ -255,54 +239,32 @@ void main(void)
 		DEBUG_POINT
 #endif
 
-#ifndef NOPROGBUTTON
-		TASTER=1;    // Pin als Eingang schalten um Programmiertaster abzufragen
-		if(!TASTER){ // Taster gedrueckt
-			if(tasterpegel<255)	tasterpegel++;
-			else{
-				if(!tastergetoggelt)status60^=0x81;	// Prog-Bit und Parity-Bit im system_state toggeln
-				tastergetoggelt=1;
-					if((status60 & 0x01)==0){	    // wenn ausgemacht, Dimmwert speichern
-						EA=0;
-						START_WRITECYCLE;
-						FMADRH= EEPROM_ADDR_H;      // Write to EEPROM area above USERRAM
-						FMADRL= 0xFE;               // LED_hell
-						FMDATA=	dimmwert;
-						STOP_WRITECYCLE;
-						EA=1;
-					}
-			}
-		}
-		else {
-			if(tasterpegel>0) tasterpegel--;
-			else tastergetoggelt=0;
-			}
+    //##### TASTERABFRAGE ######
+    TASTER=1;    // Pin als Eingang schalten um Programmiertaster abzufragen
+    if(!TASTER){ // Taster gedrueckt
+        if(tasterpegel<255)	tasterpegel++;
+        else{
+            if(!tastergetoggelt){
+                tastergetoggelt=1;
+                status60^=0x81;	// Prog-Bit und Parity-Bit im system_state toggeln
 
-#else
-		// progmode wird durch Taste 1&2 bzw. 3&4 getoggelt
-		if (((PORT & 0x0F)== 0x03) || ((PORT & 0x0F)== 0x0C)) {
-			if(tasterpegel<255)	tasterpegel++;
-			else{
-				if(!tastergetoggelt)status60^=0x81;	// Prog-Bit und Parity-Bit im system_state toggeln
-				tastergetoggelt=1;
-				if((status60 & 0x01)==0){	        // wenn ausgemacht Dimmwert speichern
-					EA=0;
-					START_WRITECYCLE;
-					FMADRH= EEPROM_ADDR_H;          // Write to EEPROM area above USERRAM
-					FMADRL= 0xFE;
-					FMDATA=	dimmwert;
-					STOP_WRITECYCLE;
-					EA=1;
-				}
+                if((status60 & 0x01)==0){	    // wenn ausgemacht, Dimmwert speichern
+                    EA=0;
+                    START_WRITECYCLE;
+                    FMADRH= EEPROM_ADDR_H;      // Write to EEPROM area above USERRAM
+                    FMADRL= 0xFE;               // LED_hell
+                    FMDATA=	dimmwert;
+                    STOP_WRITECYCLE;
+                    EA=1;
+                }
+            }
+        }
+    }
+    else {
+        if(tasterpegel>0) tasterpegel--;
+        else tastergetoggelt=0;
+        }
 
-			}
-		}
-
-		if ((PORT & 0x0F)== 0x0F){ ;	// Warten bis alle Taster losgelassen
-			if(tasterpegel>0) tasterpegel--;
-			else tastergetoggelt=0;
-			}
-#endif
 
 #ifdef NOPROGLED
 		if (status60 & 0x01) TASTER = blink;    // LED blinkt im Prog-Mode
