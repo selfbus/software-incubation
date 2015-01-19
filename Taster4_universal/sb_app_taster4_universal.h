@@ -58,7 +58,7 @@ extern unsigned int __idata __at (0xFE-18) object_value[9];
 extern unsigned char bitobject;         // fuer die unteren 8 Bitobjekte
 
 extern unsigned char sequence;
-extern unsigned char timercnt[9],timerbase[9],timerstate[8];
+extern unsigned char timercnt[9]; //,timerbase[9],timerstate[8];
 void timer0_int(void) __interrupt (1);
 void port_changed(unsigned char portval);	// ein Taster wurde gedrueckt oder losgelassen
 void button_changed(unsigned char buttonno, __bit buttonval);	// Taster Aktion abarbeiten

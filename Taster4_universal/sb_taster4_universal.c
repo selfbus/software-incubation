@@ -27,6 +27,7 @@
 *       1.01    Bugfix ProgLED/BetriebsLED liegt auf Bit 0
 *       1.02    Bugfix 1-Flächendimmer, Lichtszene
 *       1.03    Bugfix Helligkeitswert nur 1x speichern, Remove NOPROGBUTTON
+*       1.04    Timebase fuer Temperaturmessung nach Restart_App verschoben
 */
 
 #include "sb_app_taster4_universal.h"
@@ -63,7 +64,7 @@ unsigned int solltemp;
 unsigned char spreizung;
 
 
-#define VERSION		103
+#define VERSION		104
 
 #ifdef DEBUG_H_
     #warning Debug is active! UART is listening to the Debugger now!
@@ -82,7 +83,9 @@ unsigned char bitobject; // fuer die unteren 8 Bitobjekte
 void main(void)
 {
 	unsigned char n,tasterpegel=0,val=0,x;
-	__bit blink, verstell, verstellt,tastergetoggelt=0;
+	__bit blink, verstell;
+	__bit verstellt=0;
+	__bit taster_ein=0;
 
 	signed char buttonpattern=1;
 	static __code unsigned char __at (EEPROM_ADDR +0xFE) LED_hell;
@@ -90,7 +93,7 @@ void main(void)
 	__bit wduf;
 
 	wduf=WDCON&0x02;
-	verstellt;verstell;
+	//verstellt;verstell;
 
 	restart_hw();				// Hardware zuruecksetzen
 	// TODO, sequence in restart_app verschieben
@@ -113,7 +116,6 @@ void main(void)
 	DEBUG_SETUP
 #endif
 
-	verstellt=0;
 	dimmwert = LED_hell;        // Default Helligkeit aus EEPROM laden
 	object_value[5] = dimmwert; // TODO dimmwert direkt in object_value behandeln
 
@@ -167,11 +169,12 @@ void main(void)
 		else { // Progmode nicht aktiv
 
 			if(APPLICATION_RUN)	{ // nur wenn im Run modus und nicht connected
+			    //##### TASTERABFRAGE ######
 				if ((PORT & 0x0F) != button_buffer) port_changed(PORT & 0x0F);	// ein Taster wurde gedrueckt
 
-				// Temperatur verarbeiten
+				// ##### Temperatur verarbeiten #####
 				if(eeprom[0xFC]&0x80) {// Temperaturmessung aktiviert
-	                if (sequence==1)
+	                if (sequence==1)   // Zeit abgelaufen
 	                {
 	                    interrupted=0;
 	                    start_tempconversion();         // Konvertierung starten
@@ -185,22 +188,19 @@ void main(void)
 	                {
 	                    // Temperatur einlesen + uebergabe Sensortyp
 	                    th=read_temp(SENSOR_TYPE);
-                        // Bei Sensorfehler wird kein Messwert mehr gesendet
-	                    // TODO Fehler Com-Objekt einfuegen??
+                        // Bei Sensorfehler wird kein Messwert gesendet
                         if(th >-5600)
                         {
-                            temp=th + ((signed char)(eeprom[0xFD]))*10; //nur positive Temperaturen, Offset verrechnen
+                            temp=th + ((signed char)(eeprom[0xFD]))*10; // Offset verrechnen
                             object_value[4]=eis5conversion(temp);
                             send_obj_value(12);
                             timercnt[8]=eeprom[0xFB];
                         }
-                        else
+                        else // Fehler beim Lesen
                         {
                             timercnt[8]=0x01;   // Restart after 1 second
                         }
-                        // TODO, warum schreiben wir die base immer neu??
-                        timerbase[8]=eeprom[0xFC]&0x07; //Timer for temperature
-                        sequence=0; // wenn wir hier sind haben wir einen gueltigen Messwert, neustart durch timer
+                        sequence=0; // Neustart durch Timer
 
 /*  DIES IST DER PI REGLER
                         solltemp = (((int)eeprom [0xE9]<<8 )| eeprom[0xEA])*10;
@@ -239,13 +239,13 @@ void main(void)
 		DEBUG_POINT
 #endif
 
-    //##### TASTERABFRAGE ######
+    //##### Prog. Taster ABFRAGE ######
     TASTER=1;    // Pin als Eingang schalten um Programmiertaster abzufragen
     if(!TASTER){ // Taster gedrueckt
-        if(tasterpegel<255)	tasterpegel++;
+        if(tasterpegel<255)	tasterpegel++;  // Debounce
         else{
-            if(!tastergetoggelt){
-                tastergetoggelt=1;
+            if(!taster_ein){
+                taster_ein=1;
                 status60^=0x81;	// Prog-Bit und Parity-Bit im system_state toggeln
 
                 if((status60 & 0x01)==0){	    // wenn ausgemacht, Dimmwert speichern
@@ -256,15 +256,15 @@ void main(void)
                     FMDATA=	dimmwert;
                     STOP_WRITECYCLE;
                     EA=1;
+                    object_value[5] = dimmwert; // aktuellen Wert auf com-objekt schreiben
                 }
             }
         }
     }
     else {
-        if(tasterpegel>0) tasterpegel--;
-        else tastergetoggelt=0;
-        }
-
+        if(tasterpegel>0) tasterpegel--;    // Debounce
+        else taster_ein=0;
+    }
 
 #ifdef NOPROGLED
 		if (status60 & 0x01) TASTER = blink;    // LED blinkt im Prog-Mode
@@ -273,7 +273,6 @@ void main(void)
 		if (status60 & 0x01) TASTER = 0;        // LED leuchtet im Prog-Mode
 		else TASTER = 1;                        // LED aus
 #endif
-
 
 	}  while(1);
 }

@@ -426,7 +426,7 @@ void write_value_req(unsigned char objno)
 		if ( (((eeprom[0xE3+(objno)]>>4) & 0x07)) !=4) switch_led(objno,telegramm[7]&0x01);	// LED nur schalten, wenn nicht auf Betaetigungsanzeige parametriert
 		if(objno>=4 && objno<=7)switch_led(objno-4,telegramm[7]&0x01);
 	}
-	else if (objno==13)	// Helligkeitsobjekt LEDs, (Objekte 12-15 sind unsichtbar)
+	else if (objno==13)	// Helligkeitsobjekt LEDs
 	{
 		dimmwert = telegramm[8];
 		object_value[5]=dimmwert;
@@ -503,7 +503,7 @@ void timer0_int  (void) __interrupt (1) // Interrupt T0 fuer soft PWM LED
 	if((dimmcompare) <= dimmwert) PORT = LEDVAL | 0x0F;// LEDs ein
 	else PORT = 0x0F;//LEDs aus
 	// unteren 4 bits immer auf 1 lassen !!!  //LEDSTATE=0x0F;
-} // timer0_int
+}
 
 
 
@@ -515,6 +515,10 @@ void timer0_int  (void) __interrupt (1) // Interrupt T0 fuer soft PWM LED
 */
 const unsigned char tele_repeat_value[8]={63,125,188,250,25,38,50,94};	// 3Bit: 500ms, 1s, 1.5s, 2s, 200ms, 300ms, 400ms, 750ms
 
+// 9 Timer
+// 0-3 LED Bataetigungsanzeige
+// 4-7 Lang, kurz, 2.SE Dauer
+// 8 Temperatur zyklisch lesen
 void delay_timer(void)
 {
 	unsigned char objno, delay_value,ledvar,tmp,m,n;
@@ -772,6 +776,9 @@ void restart_app(void)
 
 	TF0=0; //timer0 flag loeschen
 	EA=1;  // Interrupts freigeben
+
+	// TODO, warum schreiben wir die base immer neu??
+	timerbase[8]=eeprom[0xFC]&0x07; //Timer for temperature
 
 	//P2M1 &= ~0x80;
 	//P2M2 &= ~0x80; // P2.7 bidirektional
