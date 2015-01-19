@@ -6,7 +6,7 @@
  * /____/_____//____/_/   /_____/\____//____/   *
  *
  *  Copyright (c) 2014, Andreas Krieger
- *  Copyright (c) 2014, Stefan Haller
+ *  Copyright (c) 2014-2015, Stefan Haller
  *  Copyright (c) 2008,2009,2010 Andreas Krebs <kubi@krebsworld.de>
  *
  *  This program is free software; you can redistribute it and/or modify

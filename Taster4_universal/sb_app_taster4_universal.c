@@ -6,7 +6,7 @@
  * /____/_____//____/_/   /_____/\____//____/   *
  *
  *  Copyright (c) 2014, Andreas Krieger
- *  Copyright (c) 2014, Stefan Haller
+ *  Copyright (c) 2014-2015, Stefan Haller
  *  Copyright (c) 2008,2009,2013 Andreas Krebs <kubi@krebsworld.de>
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -79,9 +79,9 @@ void port_changed(unsigned char portval)
 */
 void button_changed(unsigned char buttonno, __bit buttonval)
 {
-	unsigned char command=0,bedienung,paravalE9=eeprom[0xE9+(buttonno*4)];
+	unsigned char command=0,bedienung;
+	unsigned char paravalE9 =eeprom[0xE9+(buttonno*4)];
 	__bit objval=0;
-
 	__bit SE2,SE2add;
 
 	//Adresse Funktion Eingang:
@@ -166,7 +166,7 @@ void button_changed(unsigned char buttonno, __bit buttonval)
 			timercnt[buttonno+4]=eeprom[0xEA+(buttonno*4)]>>1;	// Faktor Dauer
 			timerbase[buttonno+4]=(eeprom[0xE7+(buttonno*4)]&0x07);// Basis Dauer zwischen kurz und langzeit
 			if (bedienung==0x20) {// umschalten der dimmrichtung...
-				if(read_obj_value(buttonno+4)&0x08)bedienung=0x30;//wenn heller, dann dunkler
+				if(read_obj_value(buttonno+8)&0x08)bedienung=0x30;//wenn heller, dann dunkler
 				else bedienung=0x10;//sonst heller
 			}
 			if (bedienung==0x10){	// heller
@@ -233,30 +233,37 @@ void button_changed(unsigned char buttonno, __bit buttonval)
 		}
 		break;
 
-		/****************************
-		 * Funktion Wertgeber
-		 ****************************/
+
+	/****************************
+	 * Funktion Wertgeber
+	 ****************************/
 
 	case 4:	// Wertgeber..
-		switch ((eeprom[COMMAND+(buttonno*4)]>>5)& 0x07){// Art des Wertgebers holen
+		switch ((eeprom[COMMAND+(buttonno*4)]>>4)& 0x07){// Art des Wertgebers holen
 
-		case 0:	// ++++++++ Lichtszenenabruf mit Speicherfunktion
+		case 0:	// ++++++++ Lichtszenenabruf
 			if(buttonval){// beim druecken
-				// Tastendruck laenger 5 Sekunden?
-				timercnt[buttonno+4]=(eeprom[0xEA]>>1);
-				timerbase[buttonno+4]=0; //(64ms)
-				timerstate[buttonno+4]=0x50;// Betaetigung laenger als eingestellt bei Lichtszene
-
+				if(paravalE9 &0x80)// wenn speichernd eingestellt
+				{
+					timercnt[buttonno+4]=(eeprom[0xEA]>>1);
+					timerbase[buttonno+4]=0; //(64ms)
+					timerstate[buttonno+4]=0x50;// Betaetigung laenger als eingestellt bei Lichtszene
+				}
+				else // ohne Speicherfunktion eingestellt --> sofort senden
+				{
+					object_value[buttonno] = paravalE9;
+					switch_led(buttonno,1);
+					send_obj_value(buttonno+8);
+				}
 			}
-			else{// nach loslassen...
-				if (timerstate[buttonno+4]==0x50){// wenn 5 sekunden noch nicht erreicht LZ senden
-					//write_obj_value(buttonno+8,eeprom[0xE9+(buttonno*4)]>>1);
-					object_value[buttonno]=paravalE9>>1;
+			else if(paravalE9 &0x80)// wenn speichernd eingestellt
+			{// nach loslassen...
+				if (timerstate[buttonno+4]==0x50){// wenn eingestellte Zeit noch nicht erreicht LZ senden
+					object_value[buttonno]=paravalE9 & 0x7F;
 					switch_led(buttonno,1);
 				}
 				else{ // sonst speichern
-					//write_obj_value(buttonno+8,(eeprom[0xE9+(buttonno*4)]>>1)|0x80);
-					object_value[buttonno]=(paravalE9>>1)|0x80;
+					object_value[buttonno]= paravalE9;
 				}
 				send_obj_value(buttonno+8);
 				timerstate[buttonno+4]=0;
