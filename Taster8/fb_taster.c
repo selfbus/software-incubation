@@ -59,8 +59,13 @@
 #define VERSION		105
 
 unsigned char __at 0x00 RAM[00]; 
-__code unsigned int __at (EEPROM_ADDR + 0x17) start_pa={0xFFFF};      // Default PA is 15.15.255
-unsigned int object_value[8];	// wird hier deklariert um den Speicher besser auszunutzen!!!
+#ifndef debugmode
+	 __code unsigned int __at (EEPROM_ADDR + 0x17) start_pa={0xFFFF};      // Default PA is 15.15.255
+	 __code unsigned char __at (USERRAM_ADDR +0xFE) LED_hell = {255};
+#else
+	 unsigned char LED_hell=255;
+#endif
+	unsigned int object_value[8];	// wird hier deklariert um den Speicher besser auszunutzen!!!
 
 /** 
 * The start point of the program, init all libraries, start the bus interface, the application
@@ -72,26 +77,14 @@ void main(void)
 { 
 	unsigned char n,LED,cmd,tasterpegel=0;
 	__bit blink, verstell, verstellt,tastergetoggelt=0;
-	signed char cal,buttonpattern=1;
-	static __code signed char __at 0x1CFF trimsave;
-	static __code unsigned char __at (USERRAM_ADDR +0xFE) LED_hell = {255};
+	signed char buttonpattern=1;
 	// Verions bit 6 und 7 fuer die varianten, bit 0-5 uer die verionen (63)
 	//Varianten sind hier noprogbutton=0x040, noprogled=0x80
 	__bit wduf;
 	wduf=WDCON&0x02;
 
 	restart_hw();							// Hardware zuruecksetzen	
-#ifdef NOPROGBUTTON
-	if((((PORT & 0x0F)== 0x03) || ((PORT & 0x0F)== 0x0C)) && wduf) cal=0;
-	else cal=trimsave;
-
-#else
-	TASTER=1;
-	if(!TASTER && wduf)cal=0;
-	else cal=trimsave;
-#endif
-	TRIM = (TRIM+trimsave);
-	TRIM &= 0x3F;//oberen 2 bits ausblenden
+	
 	WATCHDOG_INIT
 	WATCHDOG_START
 	TASTER=0;
@@ -112,9 +105,9 @@ void main(void)
 #endif
 	SBUF=0x55; // hiernach ist TI==1
 
-#ifndef TASTER_8
-	for (n=0;n<4;n++) switch_led(n,0);	// Alle LEDs gemaess ihren Parametern setzen
-#endif
+
+	for (n=0;n<8;n++) switch_led(n,0);	// Alle LEDs gemaess ihren Parametern setzen
+
 
 	LED=0;
 	verstellt=0;
@@ -149,13 +142,13 @@ void main(void)
 		
 		if (status60 & 0x01){			//wenn progmode aktiv ist...
 			//n=dimmwert;//LED_hell;
-			if ((PORT & 0x0F)==0x0E){	// Taste 1 gedrueck
+			if (PORT ==0xFE){	// Taste 1 gedrueck
 				if ((dimmwert<254) && (verstell==1)&& verstellt==0){
 					dimmwert++;
 					verstellt=1;
 				}
 			}
-			if ((PORT & 0x0F)==0x0D){ // Taste 2 gedrueckt
+			if ((PORT )==0xFD){ // Taste 2 gedrueckt
 				if ((dimmwert>1) && (verstell==1)&& verstellt==0){
 					dimmwert--;
 					verstellt=1;
@@ -191,23 +184,6 @@ void main(void)
 				TI=0;
 				SBUF=0x55;
 			}
-			if(cmd=='+'){
-				TRIM--;
-				cal--;
-			}
-			if(cmd=='-'){
-				TRIM++;
-				cal++;
-			}
-			if(cmd=='w'){
-				EA=0;
-				START_WRITECYCLE;	//cal an 0x1bff schreiben
-				FMADRH= 0x1C;		
-				FMADRL= 0xFF; 
-				FMDATA=	cal; 
-				STOP_WRITECYCLE;
-				EA=1;				//int wieder freigeben
-			}
 			if(cmd=='p')status60^=0x81;	// Prog-Bit und Parity-Bit im system_state toggeln
 			if(cmd=='v'){
 				while(!TI);
@@ -219,10 +195,6 @@ void main(void)
 				TI=0;
 				SBUF=TYPE;
 			}
-			//if(cmd >=49 && cmd <= 56){
-			//	portbuffer = portbuffer ^ (0x01<< (cmd-49));
-			//	port_schalten();
-			//}
 		}
 #else
 		cmd;

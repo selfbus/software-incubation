@@ -17,7 +17,7 @@
 * @author Andreas Krebs <kubi@krebsworld.de>
 * @date    2008
 * 
-* @brief The Freebus Taster Application, Firmware f�r einen 4-fach Taster mit 4 LEDs
+* @brief The Freebus Taster Application, Firmware fuer einen 8-fach Taster mit 8 LEDs
 * 
 * 
 */
@@ -37,23 +37,20 @@
 
 
 #define TASTER_8
-
+#define HIGH_ACTIV
 
 #define POWERLED		0xCD
 #define LED_DURATION	0xCE
 #define FUNCTION		0xCF	// Funktion der Taster
 #define COMMAND			0xD3	// Funktion der LEDs und Befehle der Taster
-//#define DEL_BASE		0xD4
-//#define DEL_FACTOR1		0xD5
 #define DEL_FACTOR2		0xD6
 
 
 extern unsigned int timer,timerflags;				// Timer fuer Schaltverzoegerungen, wird alle 130us hochgezaehlt
 extern unsigned char __idata __at(0xFE-16)timercnc[16];
-extern unsigned char __idata __at(0xFE-24)timerbase[16];
-extern unsigned char __idata __at(0xFE-32)timerstate[16];
+extern unsigned char __idata __at(0xFE-32)timerbase[16];
+extern unsigned char __idata __at(0xFE-48)timerstate[16];
 extern __bit delay_toggle;		// um nur jedes 2. Mal die delay routine auszufuehren
-//extern long buttontimer[4];
 extern unsigned char LEDSTATE,dimmcompare,dimmwert; // den LED status speichern um Dimmbar zu machen
 extern unsigned char button_buffer;	// puffer fuer taster werte
 
@@ -67,9 +64,7 @@ void button_changed(unsigned char buttonno, __bit buttonval);	// Taster Aktion a
 void switch_led(unsigned char ledno, __bit onoff);	// LED schalten
 #endif
 
-//void write_value_req(void);		// Hauptroutine fuer Ausgaenge schalten gemaess EIS 1 Protokoll (an/aus)
 void delay_timer(void);			// zaehlt alle 130ms die Variable Timer hoch und prueft Queue
-//void send_eis(unsigned char eistyp, unsigned char objno, int sval);	// sendet ein EIS Telegramm
 unsigned long read_obj_value(unsigned char objno);
 void write_obj_value(unsigned char objno, unsigned int objval);
 

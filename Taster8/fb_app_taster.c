@@ -35,9 +35,10 @@ __bit delay_toggle; /// um nur jedes 2. Mal die delay routine auszufuehren
 unsigned char button_buffer; /// Puffer fuer Taster Werte
 unsigned char LEDSTATE,dimmcompare,dimmwert;
 unsigned char __idata __at(0xFE-16)timercnt[16];
-unsigned char __idata __at(0xFE-24)timerbase[16];
-unsigned char __idata __at(0xFE-32)timerstate[16];
+unsigned char __idata __at(0xFE-32)timerbase[16];
+unsigned char __idata __at(0xFE-48)timerstate[16];
 unsigned char bit_obj[8];
+__code unsigned char schrittweite[11] ={1,3,5,8,10,13,15,18,20,29,25};
 /** 
 *  Ein oder mehrere Taster wurden gedrueckt oder losgelassen
 *
@@ -72,15 +73,20 @@ void port_changed(unsigned char portval)
 			for (n=0; n<4; n++) {	// alle 4 Taster einzeln pruefen (koennten ja mehrere gleichzeitig gedrueckt worden sein)
 #endif
 			buttonpattern=1<<n;
+#ifdef HIGH_ACTIV
+			if (!(portval & buttonpattern) && (button_buffer & buttonpattern)) button_changed(n,0);	// Taster losgelassen
+			if ((portval & buttonpattern) && !(button_buffer & buttonpattern)) button_changed(n,1);	// Taster gedrueckt
+#else
 			if ((portval & buttonpattern) && !(button_buffer & buttonpattern)) button_changed(n,0);	// Taster losgelassen
 			if (!(portval & buttonpattern) && (button_buffer & buttonpattern)) button_changed(n,1);	// Taster gedrueckt
-		}
+#endif
+			}
 		button_buffer=portval;	// aktuellen port wert in buffer fuer naechsten Vergleich uebernehmen
 	}
 }
 
 
-
+unsigned char global;
 
 /** 
 * Taster geaendert
@@ -132,21 +138,9 @@ void button_changed(unsigned char buttonno, __bit buttonval)
 		if (buttonval) {	// Taster gedrueckt -> schauen wie lange gehalten
 			if ((eeprom[COMMAND+(buttonno*4)]) & 0x04) switch_led(buttonno,0);	// wenn Betuetigungsanzeige, dann gleich beim druecken einschalten
 			timercnt[buttonno+8]=eeprom[0xD6+(buttonno*4)];	// Faktor Dauer			
-/*			switch (eeprom[0xD5+(buttonno*4)]&0x30) { // Basis Dauer zwischen kurz und langzeit
-			case 0:		// 130ms
-				timerbase[buttonno]=4;
-				break;			
-			case 0x10:	// 260ms
-				timerbase[buttonno]=5;
-				break;
-			case 0x20:	// 520ms
-				timerbase[buttonno]=6;
-				break;
-			case 0x30:	// 1s
-				timerbase[buttonno]=7;
-				break;
-			}
-*/			timerbase[buttonno+8]=(eeprom[0xD5+(buttonno*4)]&0x70)>>4;// Basis Dauer zwischen kurz und langzeit
+
+			timerbase[buttonno+8]=(eeprom[0xD5+(buttonno*4)]&0x70)>>4;// Basis Dauer zwischen kurz und langzeit
+
 			if (bedienung==0x20) {// umschalten der dimmrichtung...
 				if(read_obj_value(buttonno+8)&0x08)bedienung=0x30;//wenn heller, dann dunkler
 				else bedienung=0x10;//sonst heller
@@ -194,26 +188,11 @@ void button_changed(unsigned char buttonno, __bit buttonval)
 	 ****************************/
 	case 3:
 		if (buttonval) {	// Taster gedrueckt -> schauen wie lange gehalten
-			//send_eis(1, buttonno, ((eeprom[0xD3+(buttonno*4)]&0x10)>>4));	// Kurzzeit telegramm immer bei Dr�cken senden
 			write_obj_value(buttonno,((eeprom[0xD3+(buttonno*4)]&0x10)>>4));
 			send_obj_value(buttonno);
-			switch_led(buttonno,1);	// Status-LED schalten (hier nur nie,immer,bet�tigung)
+			switch_led(buttonno,1);	// Status-LED schalten (hier nur nie,immer,Betaetigung)
 			timercnt[buttonno+8]=eeprom[0xD5+(buttonno*4)];	// Faktor Dauer			
-/*			switch (eeprom[0xD4+(buttonno*4)]&0x06) { // Basis Dauer zwischen kurz und langzeit
-			case 0:
-				timerbase[buttonno]=0;
-				break;
-			case 2:	// 130ms
-				timerbase[buttonno]=4;
-				break;
-			case 4:	// 2,2s
-				timerbase[buttonno]=8;
-				break;
-			case 6:	// 33s
-				timerbase[buttonno]=12;
-				break;
-			}
-*/			timerbase[buttonno+8]=(eeprom[0xD4+(buttonno*4)]&0x06)*2;// Basis Dauer zwischen kurz und langzeit
+			timerbase[buttonno+8]=(eeprom[0xD4+(buttonno*4)]&0x06)*2;// Basis Dauer zwischen kurz und langzeit
 			timerstate[buttonno+8]=((eeprom[0xD3+(buttonno*4)]&0x10)>>4)+0x30;
 		}
 		else {	// Taster losgelassen
@@ -346,10 +325,10 @@ int eis5conversion(int zahl,unsigned char Typ)
 	if (Typ==7){// wenn Dimmwert ( EIS2, also keine Flie�komma)
 		wert=zahl;
 	}
-	else{// flie�komma EIS5 berechnen
-	 		while (wert > 2047){//solange Mantisse gr��er 11 Bit
+	else{// fliesskomma EIS5 berechnen
+	 		while (wert > 2047){//solange Mantisse groesser 11 Bit
 	 			wert=wert>>1;// Mantisse /2
-	 			exp++;// und exponent um 1 erh�hen (ist ein 2^exp)
+	 			exp++;// und exponent um 1 erhoehen (ist ein 2^exp)
 	 		}
 	}
  	return (wert+(exp<<11));// exponent dazu, geht auch bei EIS2 da EXP hier 0 ist.
@@ -372,7 +351,7 @@ void write_obj_value(unsigned char objno, unsigned int objval)
 {
 #ifdef TASTER_8
 	if(objno<8)bit_obj[objno]=objval&0x01;
-	else object_value[objno]=objval;
+	else object_value[objno-8]=objval;
 #else
 	if(objno<4)object_value[objno]=objval;
 	else {
@@ -393,7 +372,7 @@ void write_obj_value(unsigned char objno, unsigned int objval)
 void write_value_req(unsigned char objno)
 {
 	unsigned char objtype;
-	if (objno<16) {					// max 12 objekte (0-11)
+	if (objno<16) {					// max 16 objekte (0-11)
 		objtype=eeprom[eeprom[COMMSTABPTR]+objno*3+4];
 		if (objtype<=6){
 			write_obj_value(objno,telegramm[7]& 0x3F); //bit 6+7 loeschen (0x40,0x80)
@@ -498,18 +477,18 @@ void delay_timer(void)
 	unsigned int i_tmp;
 //	long delval;
 //	long duration=1;
-	RTCCON=0x60;
+	RTCCON=0x60;// stop RTC
 	RTCH=0x00;//RTCH=0x01; 
 	RTCL=0xE6;//RTCL=0xCD;	
 	RTCCON=0x61; //	start_rtc(8) RTC neu starten mit 4ms
-// +++++++  Hier werden alle timer  gem�� ihrer basis decremntiert
+// +++++++  Hier werden alle timer  gemaess ihrer basis decremntiert
 	timer++;
 	timerflags = timer&(~(timer-1));// flanke generieren
 	for(n=0;n<16;n++){
 		if(timerflags & 0x0001){// positive flags erzeugen und schieben
 			for(m=0;m<16;m++){// die timer der reihe nach checken und dec wenn laufen
 				if( timercnt[m]){
-					if ((timerbase[m]& 0x0F)==n){// wenn die base mit der gespeicherten base �bereinstimmt
+					if ((timerbase[m]& 0x0F)==n){// wenn die base mit der gespeicherten base uebereinstimmt
 						timercnt[m]=timercnt[m]-1;// den timer[m]decrementieren
 					}//end if(timerbase...
 				}//end if(timercount..)
@@ -564,7 +543,7 @@ void delay_timer(void)
 						tmp=94;// 750ms
 					break;
 					}
-*/				timercnt[objno]=tele_repeat_value[eeprom[0xD5+((objno-4)*4)]& 0x07];	
+*/				timercnt[objno]=tele_repeat_value[eeprom[0xD5+((objno-8)*4)]& 0x07];	
 //				timercnt[objno]=tmp;
 				timerbase[objno]=0;
 				}
@@ -580,10 +559,10 @@ void delay_timer(void)
 						send_obj_value(objno);				// Langzeit Telegramm senden
 
 						// *** timercnt neu laden fuer Dauer Lamellenverstellung ***
-						timercnt[objno]=eeprom[DEL_FACTOR2+((objno-4)*4)];	// Faktor Dauer	T2		
-						timerbase[objno]=(eeprom[0xD4+((objno-4)*4)]&0x60)>>3;	// Basis Dauer T2
+						timercnt[objno]=eeprom[DEL_FACTOR2+((objno-8)*4)];	// Faktor Dauer	T2		
+						timerbase[objno]=(eeprom[0xD4+((objno-8)*4)]&0x60)>>3;	// Basis Dauer T2
 						if (timercnt[objno]) {	// wenn keine lamellenverstellzeit dann nix tun
-							timerstate[objno]=((eeprom[COMMAND+((objno-4)*4)]&0x10)>>4)+0x40; // 0x40,0x41 fuer ende T2 (lamellenvestellzeit)
+							timerstate[objno]=((eeprom[COMMAND+((objno-8)*4)]&0x10)>>4)+0x40; // 0x40,0x41 fuer ende T2 (lamellenvestellzeit)
 						}
 						else {
 							timercnt[objno]=0;
@@ -605,9 +584,9 @@ void delay_timer(void)
 			case 0x70: // Wertgeber Helligkeit langdruecken
 			case 0x80: // Wertgeber Helligkeit verstellen
 				timerbase[objno]=0;
-				timercnt[objno]=tele_repeat_value[(eeprom[0xD4+((objno-4)*4)]& 0x30)>>4];// schrittweite und zeit zw. telegrammen
-				i_tmp=(eeprom[0xD5+4*(objno-4)])<<8;
-				i_tmp +=eeprom[0xD6+4*(objno-4)];
+				timercnt[objno]=tele_repeat_value[(eeprom[0xD4+((objno-8)*4)]& 0x30)>>4];// schrittweite und zeit zw. telegrammen
+				i_tmp=(eeprom[0xD5+4*(objno-8)])<<8;
+				i_tmp +=eeprom[0xD6+4*(objno-8)];
 				if (i_tmp==0x39FD || i_tmp==0x3828)	//Differenz ausgleichen
 				{
 					i_tmp--;
@@ -624,8 +603,8 @@ void delay_timer(void)
 				timerstate[objno]=0x80;
     			EA=0;		// Interrupts sperren, damit flashen nicht unterbrochen wird
     			START_WRITECYCLE
-    			WRITE_BYTE(0x01,0xD5+((objno-4)*4),read_obj_value(objno+4)>>8);
-    			WRITE_BYTE(0x01,0xD6+((objno-4)*4),read_obj_value(objno+4)& 0xFF);
+    			WRITE_BYTE(0x01,0xD5+((objno-8)*4),read_obj_value(objno)>>8);
+    			WRITE_BYTE(0x01,0xD6+((objno-8)*4),read_obj_value(objno)& 0xFF);
     			STOP_WRITECYCLE // Luxwert speichern
     			EA=1;
 				send_obj_value(objno);
@@ -660,8 +639,8 @@ void delay_timer(void)
 			case 0xB0: // Wertgeber Dimmer langdruecken
 			case 0xC0: // Wertgeber Dimmer verstellen
 					tmp=read_obj_value(objno);//
-					m=eeprom[0xD4+((objno-4)*4)]& 0x3F;// schrittweite und zeit zw. telegrammen
-					n= m & 0x0F;  // Schrittweite
+					m=eeprom[0xD4+((objno-8)*4)]& 0x3F;// schrittweite und zeit zw. telegrammen
+					n= schrittweite[m & 0x0F];  // Schrittweite
 					m=m>>4;// zeit zwischen telegrammen
 					if (!tmp){
 						tmp=255;
@@ -702,7 +681,8 @@ void restart_app(void)
 #else
 	for (n=0;n<4;n++) {
 #endif
-		SET_PORT_MODE_BIDIRECTIONAL(n)
+	SET_PORT_MODE_BIDIRECTIONAL(n)
+		//SET_PORT_MODE_INPUT(n)
 	}
 	
 #ifndef TASTER_8
@@ -712,19 +692,22 @@ void restart_app(void)
 	}
 #endif
 	
+	
 #ifdef TASTER_8
-	PORT=0xFF;			// Taster auf high
-	button_buffer=0xFF;	// Variable fuer letzten abgearbeiteten Taster Status
+#	ifdef HIGH_ACTIV
+		P0=0x00;			// Taster auf high
+		button_buffer=0x00;	// Variable fuer letzten abgearbeiteten Taster Status
+#	else
+		P0=0xFF;			// Taster auf high
+		button_buffer=0xFF;	// Variable fuer letzten abgearbeiteten Taster Status
+#	endif
 #else
 	PORT=0x0F;			// Taster auf high, LEDs zunaechst aus
 	button_buffer=0x0F;	// Variable fuer letzten abgearbeiteten Taster Status
 #endif
 
 	
-	RTCCON=0x60;	//stop_rtc();
-	RTCH=0x00;
-	RTCL=0xE6;	
-	RTCCON=0x61;	//start_rtc(8);		// RTC neu mit 8ms starten
+	RTCCON=0x81;	//start_rtc(8);		// RTC neu mit 8ms starten
 	
 	timer=0;			// Timer-Variable, wird alle 8ms inkrementiert
 
@@ -746,7 +729,11 @@ void restart_app(void)
 
 	for (n=0;n<16;n++) write_obj_value(n,0);		// Objektwerte alle auf 0 setzen
 
-	for (n=0;n<16;n++) timercnt[n]=0;		// delay records loeschen
+	for (n=0;n<16;n++)
+		{
+		timercnt[n]=0;		// delay records loeschen
+		timerstate[n]=0;
+		}
 	
 	
 	
