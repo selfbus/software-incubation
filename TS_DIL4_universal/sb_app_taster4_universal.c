@@ -6,7 +6,7 @@
  * /____/_____//____/_/   /_____/\____//____/   *
  *
  *  Copyright (c) 2014, Andreas Krieger
- *  Copyright (c) 2014, Stefan Haller
+ *  Copyright (c) 2014-2015, Stefan Haller
  *  Copyright (c) 2008,2009,2013 Andreas Krebs <kubi@krebsworld.de>
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -37,6 +37,7 @@ unsigned char button_buffer; /// Puffer fuer Taster Werte
 //unsigned char object_value[8];
 unsigned char LEDSTATE,LEDVAL,dimmcompare,dimmwert;
 unsigned char timercnt[9],timerbase[9],timerstate[8];
+unsigned char sequence;
 /**
 *  Ein oder mehrere Taster wurden gedrueckt oder losgelassen
 *
@@ -79,9 +80,9 @@ void port_changed(unsigned char portval)
 */
 void button_changed(unsigned char buttonno, __bit buttonval)
 {
-  unsigned char command=0,bedienung,paravalE9=eeprom[0xE9+(buttonno*4)];
+  unsigned char command=0,bedienung;
+  unsigned char paravalE9=eeprom[0xE9+(buttonno*4)];
   __bit objval=0;
-
   __bit SE2,SE2add;
 
   //Adresse Funktion Eingang:
@@ -160,13 +161,15 @@ void button_changed(unsigned char buttonno, __bit buttonval)
   case 2:
     bedienung=eeprom[COMMAND+(buttonno*4)]&0x30;
     if (buttonval) {  // Taster gedrueckt -> schauen wie lange gehalten
-      if ((eeprom[COMMAND+(buttonno*4)]) & 0x04)
-        switch_led(buttonno,0);  // wenn Betaetigungsanzeige, dann gleich beim druecken einschalten
+    if ((eeprom[COMMAND+(buttonno*4)]) & 0x04)
+    {
+      switch_led(buttonno,0);  // wenn Betaetigungsanzeige, dann gleich beim druecken einschalten
+    }
 
       timercnt[buttonno+4]=eeprom[0xEA+(buttonno*4)]>>1;  // Faktor Dauer
       timerbase[buttonno+4]=(eeprom[0xE7+(buttonno*4)]&0x07);// Basis Dauer zwischen kurz und langzeit
       if (bedienung==0x20) {// umschalten der dimmrichtung...
-        if(read_obj_value(buttonno+4)&0x08)bedienung=0x30;//wenn heller, dann dunkler
+        if(read_obj_value(buttonno+8)&0x08)bedienung=0x30;//wenn heller, dann dunkler
         else bedienung=0x10;//sonst heller
       }
       if (bedienung==0x10){  // heller
@@ -238,25 +241,30 @@ void button_changed(unsigned char buttonno, __bit buttonval)
      ****************************/
 
   case 4:  // Wertgeber..
-    switch ((eeprom[COMMAND+(buttonno*4)]>>5)& 0x07){// Art des Wertgebers holen
-
-    case 0:  // ++++++++ Lichtszenenabruf mit Speicherfunktion
+    switch ((eeprom[COMMAND+(buttonno*4)]>>4)& 0x07){// Art des Wertgebers holen
+    case 0:	// ++++++++ Lichtszenenabruf
       if(buttonval){// beim druecken
-        // Tastendruck laenger 5 Sekunden?
-        timercnt[buttonno+4]=(eeprom[0xEA]>>1);
-        timerbase[buttonno+4]=0; //(64ms)
-        timerstate[buttonno+4]=0x50;// Betaetigung laenger als eingestellt bei Lichtszene
-
+        if(paravalE9 &0x80)// wenn speichernd eingestellt
+        {
+          timercnt[buttonno+4]=(eeprom[0xEA]>>1);
+          timerbase[buttonno+4]=0; //(64ms)
+          timerstate[buttonno+4]=0x50;// Betaetigung laenger als eingestellt bei Lichtszene
+        }
+        else // ohne Speicherfunktion eingestellt --> sofort senden
+        {
+          object_value[buttonno] = paravalE9;
+          switch_led(buttonno,1);
+          send_obj_value(buttonno+8);
+        }
       }
-      else{// nach loslassen...
-        if (timerstate[buttonno+4]==0x50){// wenn 5 sekunden noch nicht erreicht LZ senden
-          //write_obj_value(buttonno+8,eeprom[0xE9+(buttonno*4)]>>1);
-          object_value[buttonno]=paravalE9>>1;
+      else if(paravalE9 &0x80)// wenn speichernd eingestellt
+      {// nach loslassen...
+        if (timerstate[buttonno+4]==0x50){// wenn eingestellte Zeit noch nicht erreicht LZ senden
+          object_value[buttonno]=paravalE9 & 0x7F;
           switch_led(buttonno,1);
         }
         else{ // sonst speichern
-          //write_obj_value(buttonno+8,(eeprom[0xE9+(buttonno*4)]>>1)|0x80);
-          object_value[buttonno]=(paravalE9>>1)|0x80;
+          object_value[buttonno]= paravalE9;
         }
         send_obj_value(buttonno+8);
         timerstate[buttonno+4]=0;
@@ -356,32 +364,6 @@ unsigned int sendewert(unsigned char objno)
 */
 
 
-/*
-int eis5conversion(int zahl,unsigned char Typ)
-{
-  unsigned char exp=0;
-  unsigned int wert=0;
-  if (Typ==4){// Helligkeitwert
-//    exp=3;// Da kleinster wert 50 lux*100=5000 ==> 5000/8 (exp=3)
-     wert=zahl*625;//= 625
-  }
-  if (Typ==6){// Temperaturwert kleinster wert =1 groesster 31
-
-    wert=zahl*100;// Hier reicht uns eine 16bit int var
-  }
-  if(Typ==8)wert=zahl;
-  if (Typ==7){// wenn Dimmwert ( EIS2, also keine Fliesskomma)
-    wert=zahl;
-  }
-  else{// fliesskomma EIS5 berechnen
-       while (wert > 2047){//solange Mantisse groesser 11 Bit
-         wert=wert>>1;// Mantisse /2
-         exp++;// und exponent um 1 erhoehen (ist ein 2^exp)
-       }
-  }
-   return (wert|(exp<<11));// exponent dazu, geht auch bei EIS2 da EXP hier 0 ist.
-}
-*/
 signed int eis5conversion(signed int zahl)// wandelt 16 bit var in eis5 um
 {
   unsigned char exp=0;
@@ -413,14 +395,15 @@ unsigned long read_obj_value(unsigned char objno)
 }
 
 
+// Objekt 0-7 bit, >=8 byte Objekte
 void write_obj_value(unsigned char objno, unsigned int objval)
 {
-  if(objno<8){
+  if(objno<8){  // Bit
     if(!objval)bitobject&=(~((0x01)<<objno));
     else bitobject|=((0x01)<<objno);
   }
-  else {
-    object_value[objno-8]=objval;//war objno-4
+  else {  //Byte
+    object_value[objno-8]=objval;
   }
 }
 
@@ -500,7 +483,7 @@ void switch_led(unsigned char ledno, __bit onoff)
     case 5: // LED nach externen objekt
     case 6:
       // LED invertiert nach externen Objekt
-      onoff=(bitobject>>(ledno+5))&0x01;
+      onoff=(bitobject>>(ledno+4))&0x01;
     break;
     default:
       break;
@@ -509,8 +492,8 @@ void switch_led(unsigned char ledno, __bit onoff)
 
 
     ledvar=LEDSTATE;
-    ledvar&= ~(1<<(ledno+5));  // LEDs sind an Pin 4-7
-    ledvar |= ((onoff<<(ledno+5)));  // unteren 4 bits immer auf 1 lassen !!!
+    ledvar&= ~(1<<(ledno+4));  // LEDs sind an Pin 4-7
+    ledvar |= (onoff<<(ledno+4));  // unteren 4 bits immer auf 1 lassen !!!
     LEDSTATE=ledvar;
   }
 }
@@ -537,12 +520,11 @@ const unsigned char tele_repeat_value[8]={63,125,188,250,25,38,50,94};  // 3Bit:
 
 void delay_timer(void)
 {
-  unsigned char objno, delay_value,ledvar,tmp,m,n;
+  unsigned char objno, delay_value,tmp,m,n;
+  //unsigned char ledvar;
   unsigned int i_tmp;
   i_tmp,tmp;
-//  long delval;
-//  long duration=1;
-  ledvar;
+
   RTCCON=0x60;
   RTCH=0x07;//
   RTCL=0x33;//32ms
@@ -571,11 +553,11 @@ void delay_timer(void)
 //    if(delay_state) {      // 0x00 = delay Eintrag ist leer
       case 0x10:
         if (objno<4) {  // LED bei Betaetigungsanzeige nach eingestellter Zeit ausschalten
-          ledvar=LEDSTATE;
-          ledvar &= ~(1<<(objno+5));  // LEDs sind an Pin 4-7
-          ledvar |= 0x0F;        // unbedingt taster pins wieder auf 1
-          LEDSTATE=ledvar;
-          timerstate[objno]=0;
+          //ledvar=LEDSTATE;
+          //ledvar &= ~(1<<(objno+4));  // LEDs sind an Pin 4-7
+          //ledvar |= 0x0F;        // unbedingt taster pins wieder auf 1
+          //LEDSTATE=ledvar;
+          //timerstate[objno]=0;
         }
         else// die 4 oberen fuer 2. Schaltebene
         {
@@ -592,7 +574,6 @@ void delay_timer(void)
         if(eeprom[0xE9+((objno-4)*4)]& 0x01){// wenn Telegrammwiederholung eingeschalten
 
         timercnt[objno]=eeprom[0xE9+((objno-4)*4)]>>1;
-//        timercnt[objno]=tmp;
         timerbase[objno]=0;
         }
         else{
@@ -717,7 +698,7 @@ void delay_timer(void)
 //#if defined(DS_SERIES) || defined(DHT)
   if(!(timercnt[8]))// timer fuer zyclisches Temperaturmessen und senden
   {
-    if(!sequence)sequence=1;
+    if(!sequence) sequence= 1; // restart
   }
 //#endif
 }
@@ -734,8 +715,6 @@ void restart_app(void)
 {
   unsigned char n;
   __bit write_ok=0;
-
-//  AUXR1  |= CLKLP;
 
   // Pin 0-3 fuer Taster
   for (n=0;n<4;n++) {
@@ -780,7 +759,8 @@ void restart_app(void)
     timerstate[n]=0;  // timer stati loeschen
     switch_led(n,0);  // LED's gemaess parametrierung, bei invertierter Anzeige -->ein
   }
-
+  
+  sequence= 1;         // reset read sequence
   //LEDSTATE=0;
 
   // set timer 0 autoreload 0.05ms

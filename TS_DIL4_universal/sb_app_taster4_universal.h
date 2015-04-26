@@ -6,7 +6,7 @@
  * /____/_____//____/_/   /_____/\____//____/   *
  *
  *  Copyright (c) 2014, Andreas Krieger
- *  Copyright (c) 2014, Stefan Haller
+ *  Copyright (c) 2014-2015, Stefan Haller
  *  Copyright (c) 2008,2009,2010 Andreas Krebs <kubi@krebsworld.de>
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -29,10 +29,10 @@
 //#define LPC936  // LPC936 anstatt LPC922
 
 #ifdef LPC936
-    #include <fb_lpc936_1.55.h>
+    #include <fb_lpc936_1.56.h>
     //#include <fb_lpc936.h>
 #else
-    #include <fb_lpc922_1.55.h>
+    #include <fb_lpc922_1.56.h>
     //#include <fb_lpc922.h>
 #endif
 
@@ -69,7 +69,5 @@ void delay_timer(void);   // zaehlt alle 130ms die Variable Timer hoch und pruef
 //void send_eis(unsigned char eistyp, unsigned char objno, int sval); // sendet ein EIS Telegramm
 unsigned long read_obj_value(unsigned char objno);
 void write_obj_value(unsigned char objno, unsigned int objval);
-
-
 
 #endif
