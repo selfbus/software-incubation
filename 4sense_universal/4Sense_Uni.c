@@ -18,10 +18,10 @@
 #include "4Sense_Uni.h"
 
 #ifdef LPC936
-    #include <fb_lpc936_1.55.h>
+    #include <fb_lpc936_1.56.h>
     //#include <fb_lpc936.h>
 #else
-    #include <fb_lpc922_1.55.h>
+    #include <fb_lpc922_1.56.h>
     //#include <fb_lpc922.h>
 #endif
 
