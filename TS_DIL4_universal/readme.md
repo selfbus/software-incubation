@@ -12,15 +12,15 @@ TS_DIL4_Universal is an Fork of [Taster4_universal] and has the same features. A
 - Release builds for DS and DHT -> OK
 - Tested the DS release build with DS18b20 & DS1822 -> OK
 - Tested the DS release build with DS18S20 -> OK
-
+- Likely fixed: FW: Get and send the temperature and humidity is interrupted after a few weeks. Workarround: Reset unit. -> still testing
 ####ToDo:
-- Bug fixing
+
+- Long-Term Test
 
 ####KnownBugs:
 - VD: The latest VD (V13) is buggy. Download and use --> [VD_V12]
-- FW: Get and send the temperature and humidity is interrupted after a few weeks. Workarround: Reset unit.
 
-###State: Still RC
+###State: Release candidate
 
 [Taster4_universal]:https://github.com/selfbus/software/tree/master/Taster4_universal
 [4sense_universal]:https://github.com/selfbus/software-incubation/tree/master/4sense_universal
