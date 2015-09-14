@@ -83,9 +83,11 @@
 //#include <P89LPC922.h>
 //#include "fb_lpc922_1.53.h"
 #include "fb_app_2i2o.h"
-#include  "../com/debug.h"
-#include "../com/fb_rs232.h"
-#include"../com/watchdog.h"
+//#include  "../com/debug.h"
+//#include "../com/fb_rs232.h"
+//#include"../com/watchdog.h"
+
+
 
 /** 
 * The start point of the program, init all libraries, start the bus interface, the application
@@ -124,15 +126,18 @@
 #endif
 #define VERSION 39
 
-unsigned char __at 0x00 RAM[00]; 
-__code unsigned int __at (EEPROM_ADDR + 0x17) start_pa={0xFFFF};      // Default PA is 15.15.255
-
+unsigned char __idata __at 0x00 RAM[00];
+//__code unsigned int __at (EEPROM_ADDR + 0x17) start_pa={0xFFFF};      // Default PA is 15.15.255
+//const unsigned char bitmask_1[8] ={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
+__bit bus_return_ready=0; 
+const unsigned char bitmask_1[8] ={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
 
 void main(void)
 { 
 	unsigned char timer_precounter=0;
 
-	unsigned char n,cmd,tasterpegel=0;
+	unsigned char n,cmd,tasterpegel=0,pin=2,p0h;
+	unsigned int base;
 	signed char cal;
 //	unsigned int m;
 	static __code signed char __at 0x1BFF trimsave;
@@ -159,19 +164,28 @@ void main(void)
 	else phival=16;
 #endif
 	TR0=1;
-	if (!wduf){// BUS return verzögerung nur wenn nicht watchdog underflow
-		for (n=0;n<50;n++) {		// Warten bis Bus stabil
-			TR0=0;					// Timer 0 anhalten
-			TH0=eeprom[ADDRTAB+1];	// Timer 0 setzen mit phys. Adr. damit Geräte unterschiedlich beginnen zu senden
-			TL0=eeprom[ADDRTAB+2];
-			TF0=0;					// Überlauf-Flag zurücksetzen
-			TR0=1;					// Timer 0 starten
-			while(!TF0);
-		}
-	}
-	WATCHDOG_INIT
-	WATCHDOG_START
 	restart_app();							// Anwendungsspezifische Einstellungen zuruecksetzen
+	if(!wduf){
+	  // Verzögerung Busspannungswiederkehr	
+		  for(base=0;base<=(eeprom[0xD4]<<(eeprom[0xFE]>>4)) ;base++){//faktor startverz hohlen und um basis nach links schieben
+		//	  start_rtc(130);		// rtc auf 130ms
+				RTCCON=0x60;		// RTC anhalten und Flag löschen
+				RTCH=0x1D;			// reload Real Time Clock für 65ms
+				RTCL=0x40;
+				RTCCON=0x61;		// RTC starten
+			    while (RTCCON<=0x7F) ;	// Realtime clock ueberlauf abwarten
+			    // feed the watchdog
+			    EA = 0;
+			    WFEED1 = 0xA5;
+			    WFEED2 = 0x5A;
+			    EA=1;
+
+			    //	  stop_rtc;
+		  }
+	  }
+		WATCHDOG_INIT
+		WATCHDOG_START
+
 	if(!wduf)bus_return();							// Aktionen bei Busspannungswiederkehr
 
 #ifndef debugmode
@@ -194,8 +208,36 @@ void main(void)
 	do  {
 		WATCHDOG_FEED
 
-		if(APPLICATION_RUN) {	// nur wenn run-mode gesetzt
+	if(APPLICATION_RUN) {	// nur wenn run-mode gesetzt
 
+
+	  p0h=P0 & 0x0C;				// prüfen ob ein Eingang sich geändert hat
+
+	  if(!bus_return_ready)
+	  {
+		  portbuffer=p0h;
+	  	  if(!wduf)bus_return();			// Anwendungsspezifische Einstellungen zurücksetzen
+	  	  bus_return_ready=1;
+	  }
+	  
+	  if (p0h!=portbuffer) 
+	    {	
+
+		  if (((p0h^portbuffer) & bitmask_1[pin])&& !(in_blocked & bitmask_1[pin]) )//kürzeste Version
+	        {
+	          pin_changed(pin);				// Änderung verarbeiten
+	        }
+	      portbuffer|=(p0h& bitmask_1[pin]);					// neuen Portzustand in buffer speichern
+	      portbuffer&=(p0h| ~bitmask_1[pin]);					// neuen Portzustand in buffer speichern
+	      pin++;	// nächsten pin prüfen..
+	      if(pin==3)pin=2;// maximal 2-3
+
+	    }
+	      
+			
+			
+			
+			
 			if(RTCCON>=0x80){
 				RTCCON=0x60;		// RTC Flag löschen
 				RTCH=0x03;			//0E reload Real Time Clock
@@ -244,28 +286,18 @@ void main(void)
 			if (portchanged)port_schalten();	// Ausgänge schalten
 
 			// Rückmeldungen senden
-			if(rm_send) {	// wenn nichts zu senden ist keine Zeit vertrödeln
+			if(rm_send&0x03) {	// wenn nichts zu senden ist keine Zeit vertrödeln
 				if(rm_send & (1<<rm_count)) {
-					if(send_obj_value(rm_count + 12)) {	// falls erfolgreich, dann nächste
+					if(send_obj_value(rm_count + 16)) {	// falls erfolgreich, dann nächste
 						rm_send&=(0xFF-(1<<rm_count));
-						rm_count++;
-#ifdef MAX_PORTS_8
-						rm_count&=0x07;
-#else
-						rm_count&=0x03;
-#endif						
+						rm_count^=0x01;
 					}
 				}
 				else {	// RM sollte nicht gesendet werden
-					rm_count++;
-#ifdef MAX_PORTS_8
-						rm_count&=0x07;
-#else
-						rm_count&=0x03;
-#endif						
+					rm_count^=0x01;
 				}
 			}
-			else rm_count=0;	// Immer mal wieder auf Null setzen, damit Reihenfolge von 1 bis 8 geht
+			else rm_count=0;
 
 
 			// portbuffer flashen, Abbruch durch ext-int wird akzeptiert und später neu probiert
@@ -377,7 +409,8 @@ void main(void)
 		}//end if(RI...
 		
 #else //ifndef debugmode
-DEBUGPOINT;
+//DEBUGPOINT;
+//SNIFFPOINT;		
 #endif
 #endif // ifndef BUS_DOWN
 		TASTER=1;				// Pin als Eingang schalten um Taster abzufragen

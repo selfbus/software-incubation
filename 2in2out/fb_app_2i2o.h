@@ -17,7 +17,12 @@
 #ifndef FB_APP_2i2o
 #define FB_APP_2i2o
 
-//#define debugmode
+#define debugmode
+
+#include "debug.h"
+#include "fb_rs232.h"
+#include "watchdog.h"
+
 
 #ifdef LPC936
 	#include <fb_lpc936_1.55.h>
@@ -55,7 +60,7 @@
 #define BLOCKPOL	0xEF	// Polarität der Sperrobjekte angepasst
 #define RELMODE		0xF0	// Relaisbetrieb angepasst
 // nachfolgend vom out8:
-#define RMINV		0xF3	// Rückmeldung invertiert oder normal
+#define RMINV		0xF1	// Rückmeldung invertiert oder normal
 #define	DELAYTAB	0xF9	// Start der Tabelle für Verzögerungswerte (Basis)
 
 /*
@@ -92,6 +97,7 @@
 #define	LED_SCK		P0_5
 #define LED_RCK		P0_6
 
+extern unsigned char in_blocked;
 extern 	__bit portchanged;// globale variable, sie ist 1 wenn sich portbuffer geändert hat
 extern unsigned char portbuffer;
 extern unsigned char rm_send;		// die von der main zu sendenden Rückmeldungen
@@ -101,12 +107,15 @@ extern unsigned char portausgabe_off; // auszuschaltende IO, die dann im t 0 int
 extern volatile unsigned char schalten_state; // status T0 int
 extern unsigned char phival;
 extern __bit zeropulse;
+extern const unsigned char bitmask_1[8];
 #endif
 #ifdef BUS_DOWN
 	void bus_down (void);
 #endif
 //void write_value_req(void) ;		// Hauptroutine für Ausgänge schalten gemäß EIS 1 Protokoll (an/aus)
 //void read_value_req(void) ;
+void pin_changed(unsigned char pinno);
+
 void delay_timer(void);		// zählt alle 130ms die Variable Timer hoch und prüft Queue
 void port_schalten(void);	// Ausgänge schalten
 void object_schalten(unsigned char objno, __bit objstate);	// Objekt schalten
