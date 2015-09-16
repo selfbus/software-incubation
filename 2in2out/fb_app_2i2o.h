@@ -30,7 +30,6 @@
 #include <fb_lpc922_1.55.h>
 #endif
 
-
 //#define IO_BISTAB
 //#define BUS_DOWN
 #define MAX_PORTS_4		// Anzahl Ausgänge (nur 4 oder 8 erlaubt)
@@ -38,6 +37,14 @@
 //#define SPIBISTAB			// Serielle Ausgabe für bistabile relaise aktivieren
 //#define panasonic
 //#define zeroswitch			// für Platine mit Nullspannungserkennung
+
+//#define in4					// schaltet P0_4 - P0_7 auf pullup
+//#define IN8_2TE					// nur für shifter version des in8 /typebit 3
+//#define wertgeber				// mit Wertgeber
+//#define zaehler				// mit Zähler
+//#define dimmer					// mit Dimmfunktionen
+//#define zykls					// mit zyklisches senden
+
 
 #ifdef zeroswitch
 	#ifndef panasonic		//OMRON
@@ -51,7 +58,7 @@
 	#endif
 #endif
 // Parameter-Adressen im EEPROM
-
+#define TIMERANZ	0x08	// timeranzahl (17)
 #define FUNCASS		0xEB	// Startadresse der Zuordnung der Zusatzfunktionen (2 Byte) angepasst nur ein Byte
 #define OFFDISABLE	0xEA	// Aus-Telegramm ignorieren angepasst
 #define FUNCTYP		0xEC	// Typ der Zusatzfunktion angepasst
@@ -62,6 +69,10 @@
 // nachfolgend vom out8:
 #define RMINV		0xF1	// Rückmeldung invertiert oder normal
 #define	DELAYTAB	0xF9	// Start der Tabelle für Verzögerungswerte (Basis)
+
+
+#define DEBTIME			0xD2	// Entprellzeit in 0,5ms
+
 
 /*
 #define FUNCASS		0xD8	// Startadresse der Zuordnung der Zusatzfunktionen (2 Byte)
@@ -76,13 +87,8 @@
 */
 // Adressen zum speichern von Applikations Daten
 #define PORTSAVE	0x99	// Portzustände
-#define TIMERANZ	0x08	// timeranzahl
-
-
-
 
 #define DUTY	0x50	// 0xFF=immer low 0x00=immer high
-
 
 #define REFRESH \
 		P0= oldportbuffer;	// refresh des Portzustandes in der hal
@@ -99,7 +105,7 @@
 
 extern unsigned char in_blocked;
 extern 	__bit portchanged;// globale variable, sie ist 1 wenn sich portbuffer geändert hat
-extern unsigned char portbuffer;
+extern unsigned char portbuffer,p0h;
 extern unsigned char rm_send;		// die von der main zu sendenden Rückmeldungen
 #ifdef zeroswitch
 extern unsigned char portausgabe_on; // einzuschaltende IO, die dann im ext 0 int übernommen werden
@@ -108,14 +114,13 @@ extern volatile unsigned char schalten_state; // status T0 int
 extern unsigned char phival;
 extern __bit zeropulse;
 extern const unsigned char bitmask_1[8];
+
 #endif
 #ifdef BUS_DOWN
 	void bus_down (void);
 #endif
 //void write_value_req(void) ;		// Hauptroutine für Ausgänge schalten gemäß EIS 1 Protokoll (an/aus)
 //void read_value_req(void) ;
-void pin_changed(unsigned char pinno);
-
 void delay_timer(void);		// zählt alle 130ms die Variable Timer hoch und prüft Queue
 void port_schalten(void);	// Ausgänge schalten
 void object_schalten(unsigned char objno, __bit objstate);	// Objekt schalten
@@ -132,5 +137,10 @@ void EX0_int(void) __interrupt (0);
 void timer0_int(void) __interrupt (1) ;
 #endif
 
-
+void pin_changed(unsigned char pinno);
+unsigned char debounce(unsigned char pinno);		// Entprellzeit abwarten und prüfen
+void write_send(unsigned char objno,unsigned int objval);
+void schalten(__bit risefall, unsigned char pinno);	// Schaltbefehl senden
+void write_send(unsigned char objno,unsigned int objval);
+extern const unsigned char bitmask_1[8];
 #endif

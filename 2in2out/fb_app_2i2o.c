@@ -48,19 +48,24 @@
 
 unsigned char timerbase[TIMERANZ];// Speicherplatz für die Zeitbasis und 4 status bits
 unsigned char timercnt[TIMERANZ];// speicherplatz für den timercounter und 1 status bit
+unsigned char __idata __at (0xFE-9)  timerstate[TIMERANZ];
+//unsigned char timerstate[TIMERANZ];
 unsigned int timer;		// Timer für Schaltverzögerungen, wird alle 130us hochgezählt
-
+unsigned char timer_base,timer_state;
+unsigned char para_value,pinno,pinnoX4,para_adr;
 unsigned char Tval,Taster_ctr;
 unsigned char out_state;	// Werte der Objekte 0-7 (Ausgängsobjekte)
 unsigned char rm_state;		// Werte der Objekte 12-19 (Rückmeldeobjekte)
 unsigned char zf_state;		// Werte der Objekte 8-11 (Zusatzfunktionen 1-4)
-unsigned char portbuffer;	// Zwischenspeicherung der Portzustände
+unsigned char portbuffer,p0h;	// Zwischenspeicherung der Portzustände
 unsigned char oldportbuffer;// Wert von portbuffer vor Änderung (war früher ...0x29)
 unsigned char blocked;		// Sperrung der 8 Ausgänge (1=gesperrt)
 unsigned char in_blocked;
 unsigned char logicstate;	// Zustand der Verknüpfungen pro Ausgang
 __bit delay_toggle;			// um nur jedes 2. Mal die delay routine auszuführen
 __bit portchanged;
+__bit objval=0,jobj=0;
+__bit st_Flanke=0;
 //__bit zeropulse;
 unsigned char rm_send;		// die von der main zu sendenden Rückmeldungen
 unsigned char objects_l[2];
@@ -77,8 +82,235 @@ unsigned char phival;
 
 void pin_changed(unsigned char pin_no)
 {
-	DEBUG 	pin_no;
+	unsigned char tmp;
+	unsigned char objoffset=8;
+	unsigned char typ=0;
+	unsigned char n;
+	timer_base=0;
+	para_value=0;
+
+	pinno=pin_no;
+	pinnoX4=pinno*4;
+	para_adr=0xD5+(pinnoX4);
+	n;
+
+	if (debounce(pinno))			// Entprellzeit abwarten und prüfen
+  {
+	timer_base=(eeprom[0xF6+((pinno+1)>>1)]>>(4*((pinno&0x01)^0x01)))&0x07  ;
+	st_Flanke=(((portbuffer>>pinno)&0x01)==0) && (((p0h>>pinno)&0x01)==1);
+	timer_state=timerstate[pinno];
+	switch ((eeprom[0xCF] >> ((pinno & 0x01)*4)) & 0x0F)	// Funktion des Eingangs
+    {
+    case 0x01:				// Funktion Schalten
+    	schalten(st_Flanke,pinno);			// Flanke Eingang x.1
+
+#ifdef zykls	// mit zyklisch senden Eingang normal behandeln
+		schalten(st_Flanke,pinno+8);		// Flanke Eingang x.2
+
+#else			// ohne zyklisch senden dafür 2. schaltebene
+        tmp=(eeprom[para_adr]&0x0C);//0xD5/ bit 2-3 zykl senden aktiv 2. Schaltebene
+		if ((tmp==0x04 && st_Flanke==1)||(tmp==0x08 && st_Flanke==0)){
+        	 timercnt[pinno]= eeprom[para_adr+1]+ 0x80;//0xD6 Faktor Dauer )
+         	 timerbase[pinno]=0;
+         	 timer_state = 0x20|st_Flanke;//speichern des portzustandes
+         }
+         else {// kein zyklsenden, bzw loslassen
+         			timercnt[pinno]=0;
+         			schalten(st_Flanke,pinno+8);		// Flanke Eingang x.2
+         }
+#endif
+     break;  
+      case 0x02:				// Funktion Dimmen
+    		/***********************
+    		 * Funktion Dimmen
+    		 ***********************/
+#ifdef dimmer    		
+         if (st_Flanke){// Taster gedrueckt -> schauen wie lange gehalten
+  			timercnt[pinno]=0x80+(eeprom[0xD7+(pinnoX4)]&0x7F);	// Faktor/Dauer			
+			timerbase[pinno]=timer_base;
+
+   			objval=(read_obj_value(pinno+8)>>3)&0x01;
+  			switch (eeprom[para_adr]&0x70) {
+  			case 0x00:	// UM Dimmen
+  				objval = !objval;	// Dimmrichtung ändern
+  				break;
+  			case 0x10:				// zweiflaechen heller parametriert
+  			case 0x30:
+  				objval=1;
+  				break;
+  			default:	
+  			//case 0x20:			// zweiflaechen dunkler parametriert
+  			//case 0x40:
+  				objval=0;
+  			}
+  			if(objval){	// wenn heller dimmen soll
+  				timer_state = ((eeprom[para_adr+0x01]&0x38)>>3)+ 0x48;	// dimmen
+  				}
+  			else{		// wenn dunkler dimmen soll
+  				timer_state = (eeprom[para_adr+0x01]&0x07)+ 0x40;	// dimmen
+  				}
+          }
+  		else {		// Taster losgelassen
+  			if ((timer_state & 0x50)== 0x40) {		// wenn delaytimer noch laeuft, dann Schalten, also EIS1 telegramm senden
+  	//		if (timercnt[pinno]>0x80) {		// wenn delaytimer noch laeuft, dann Schalten, also EIS1 telegramm senden
+  		  				objval = read_obj_value(pinno);
+  				switch (eeprom[para_adr]&0x70) {//Bedienkonzept angucken
+  				case 0x10:	// zweiflaechen ein
+  					objval=1;
+  					break;
+  				case 0x20:	// zweiflaechen aus
+  					objval=0;
+  					break;
+  				default:	
+  			//	case 0x00:	// UM Einflaeche
+  			//	case 0x30:	// UM-heller
+  			//	case 0x40:	// UM-dunkler
+  					objval = !objval;
+  				}
+  				write_send(pinno,objval);
+  				timercnt[pinno]=0;
+  			}
+  			else {	// Timer schon abgelaufen (also dimmen), dann beim loslassen stop-telegramm senden
+  				tmp=read_obj_value(pinno+8);
+  				if (eeprom[0xD5+(pinnoX4)] & 0x08) {	// ... natuerlich nur wenn parameter dementsprechend 
+  					write_send(pinno+8, tmp & 0x08);		// Stop Telegramm
+  				}
+  				else write_obj_value(pinno+8,tmp & 0x08);	// auch wenn Stopp Telegramm nicht gesendet wird, Objektwert auf 0 setzen
+				timer_state=0;
+				timercnt[pinno]=0;
+  			}
+  			
+  		}
+#endif
+        break;
+       
+        case 0x03:				//Funktion Jalousie
+        	/****************************
+        	 * Funktion Jalousie
+        	 ****************************/
+        	n=0xD8+(pinno*4);
+			para_value=(eeprom[n]&0x30)>>4;//Jalofunktion holen
+			switch (para_value){
+				case 1:		//auf
+					jobj=0;
+				break;
+				case 2:		//ab
+					jobj=1;
+				break;
+				case 3:		//UM
+	    			jobj=read_obj_value(pinno+8)^0x01;//neues Jaloobj invers zum langzeit
+	    		break;
+			}
+			if (st_Flanke){// Taster gedrueckt -> schauen wie lange gehalten
+            	if(eeprom[n]& 0x08){	//wenn Bedienkonzept lang-kurz ()
+            		//timerbase[pinno]=0;
+            		timer_state = jobj+0x80;
+            		timercnt[pinno]=0x80;//langzeit in delay_timer SOFORT ausführen
+            	}
+            	else{								//wenn Bedienkonzept kurz-lang-kurz
+	            	write_send( pinno, jobj);	// Kurzzeit telegramm immer bei Drücken senden
+	    			timercnt[pinno]=0x80+eeprom[0xD6+(pinno*4)];//Faktor Dauer )
+	    			timerbase[pinno]=timer_base;
+	    			// Zeit zwischen kurz und langzeit)	
+	     			//
+	    			timer_state = jobj+0x80;
+	            }// ende Bedienkonzept lang-kurz-lang
+            }//ende steigende Flanke
+    		else {	// Taster losgelassen
+  			if (timer_state & 0x10) write_send( pinno, jobj);	// wenn delaytimer noch laueft und in T2 ist, dann kurzzeit telegramm senden
+    			else timercnt[pinno]=0;	// T2 bereits abgelaufen
+    		}
+        break;
+
+#ifdef wertgeber 
+    	/**********************************************************
+    	 * Funktion Wertgeber Dimmen,Temparatur,Helligkeit
+    	 **********************************************************/
+       
+        case 0x04:// Dimmwertgeber
+        	para_value=0xFF;
+        	typ=0x01;
+        	objoffset=0;//läuft absichtlich in den nächsten case
+        case 0x07:// Temperaturwertgeber
+         	//para_value=para_value |0x1F; <--wird in Helligkeitswertgeber eh nochmal erledigt!
+         	typ=typ|0x02;//kein objoffset zugewiesen,d.h. 8,da mit 8 initialisiert
+        case 0x08:// Helligkeitswertgeber,
+        	para_value=para_value |0x1F;
+        	typ=typ|0x04;//kein objoffset zugewiesen,d.h. 8,da mit 8 initialisiert
+        	n=0xD5+(pinno*4);
+        	tmp=(((eeprom[n]&0x04)>>2)|(eeprom[n+1]&0x80)>>6);//in tmp steigend fallend reaktion
+        	if (st_Flanke){// Taster gedrueckt       in tmp bit0 steigend, bit1 fallend
+        		
+        		if(tmp&0x01) write_send( pinno+objoffset, eis5conversion((eeprom[n+2]& para_value),typ));	//wert senden
+        	}//ende steigende Flanke
+    		else {	// Taster losgelassen dimmwert senden
+  			if (tmp>=0x02) write_send( pinno+objoffset, eis5conversion(eeprom[n+tmp]& para_value,typ));
+    		}
+         break;
+ 
+         case 0x05:
+    	/*******************************************
+    	 * Funktion Wertgeber Lichtszenen
+    	 *******************************************/
+        	 n=0xD5+(pinno*4);
+        	 para_value=eeprom[n] & 0x0C;
+        	 
+		if (st_Flanke){// Taster gedrueckt 
+			if(para_value!=0x04) write_send( pinno,eeprom[n+2]&0x7F );	// Lichtszenennummer senden
+		}
+		else{
+			if(para_value>=0x04) write_send( pinno,eeprom[n+3]&0x7F );	// Lichtszenennummer senden
+		}
+ 	
+        break;
+#endif        
+
+        
+    }
+	timerstate[pinno]=timer_state;
+  }// end if (debounce)...
+	
 }
+
+
+void schalten(__bit risefall, unsigned char pinno)	// Schaltbefehl senden
+{
+	unsigned char func,sendval=0;
+
+		func=eeprom[0xD7+(pinno & 0x07)*4]; //0xD7
+		if (pinno>=8)func=func>>4;			// wenn 2. Schaltobjekt dann obere 4 bit
+		if (risefall) func=(func>>2);		// Funktion bei steigender Flanke obere 2 bit
+		func=func&0x03;					// Funktion maskieren
+		if (func!=0)
+		{
+			if (func==0x03) sendval=read_obj_value(pinno) ^0x01;  //UM
+			else sendval = func & 0x01;	// EIN   AUS
+			write_send(pinno,sendval);
+		}
+	
+}
+
+
+unsigned char debounce(unsigned char pinno)	// Entprellzeit abwarten und prüfen !!
+{
+  unsigned char debtime,n,w;//,ret;//,port_help;
+  debtime=eeprom[DEBTIME];			// Entprellzeit in 0,5ms Schritten
+  if (debtime>0) {
+	  for(n=0;n<debtime;n++){
+	  	for(w=112;w>0;w--); 
+	  	}// delay ca. 4,5µs
+  }
+  return ((~(P0^p0h))& bitmask_1[pinno]);//ret=1;
+}
+
+
+  void (write_send)(unsigned char objno,unsigned int value){
+
+  	write_obj_value(objno,value);
+  	send_obj_value(objno);
+  }
+
+
 void write_value_req(unsigned char objno) 	// Ausgänge schalten gemäß EIS 1 Protokoll (an/aus)
 {
   unsigned char zfout,zftyp;
@@ -597,7 +829,7 @@ void port_schalten(void)		// Schaltet die Ports mit PWM, DUTY ist Pulsverhältnis
 
 		PWM=0;			// Vollstrom an
 
-		P0=portbuffer;		// Ports schalten
+		P0=portbuffer|0x0C;		// Ports schalten
 		TF0=0;			// Timer 0 für Haltezeit Vollstrom verwenden
 		TH0=0x00;		// 16ms (10ms=6fff)
 		TL0=0x00;
@@ -605,7 +837,7 @@ void port_schalten(void)		// Schaltet die Ports mit PWM, DUTY ist Pulsverhältnis
 		TAMOD=0x00;
 		TR0=1;
 	}
-	else P0=portbuffer;
+	else P0=portbuffer|0x0C;
 
 	rm_state=portbuffer ^ eeprom[RMINV];	// Rückmeldeobjekte setzen
 	#ifdef MAX_PORTS_8
@@ -917,7 +1149,7 @@ void restart_app(void) 		// Alle Applikations-Parameter zurücksetzen
 #ifdef HAND
 	Tval=0x00;
 #endif
-	P0=0;
+	P0=0x0C;
 	P0M1=0x00;		// Port 0 Modus push-pull für Ausgang
 #ifdef MAX_PORTS_8
 	P0M2=0xFF;

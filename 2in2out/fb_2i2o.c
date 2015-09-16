@@ -136,7 +136,7 @@ void main(void)
 { 
 	unsigned char timer_precounter=0;
 
-	unsigned char n,cmd,tasterpegel=0,pin=2,p0h;
+	unsigned char n,cmd,tasterpegel=0,pin=2;
 	unsigned int base;
 	signed char cal;
 //	unsigned int m;
@@ -229,9 +229,9 @@ void main(void)
 	        }
 	      portbuffer|=(p0h& bitmask_1[pin]);					// neuen Portzustand in buffer speichern
 	      portbuffer&=(p0h| ~bitmask_1[pin]);					// neuen Portzustand in buffer speichern
-	      pin++;	// nächsten pin prüfen..
-	      if(pin==3)pin=2;// maximal 2-3
-
+	     // if(pin==3)pin=2;// maximal 2-3
+	   //   else pin=3;	// nächsten pin prüfen..
+	      pin^=0x01;// pin ist mit 2 initialisiert somit wird zwischen 2 und 3 hin und hergeschalten
 	    }
 	      
 			
