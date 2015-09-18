@@ -58,7 +58,7 @@
 	#endif
 #endif
 // Parameter-Adressen im EEPROM
-#define TIMERANZ	0x08	// timeranzahl (17)
+#define TIMERANZ	0x04	// timeranzahl (17)
 #define FUNCASS		0xEB	// Startadresse der Zuordnung der Zusatzfunktionen (2 Byte) angepasst nur ein Byte
 #define OFFDISABLE	0xEA	// Aus-Telegramm ignorieren angepasst
 #define FUNCTYP		0xEC	// Typ der Zusatzfunktion angepasst
@@ -86,7 +86,8 @@
 #define	DELAYTAB	0xF9	// Start der Tabelle für Verzögerungswerte (Basis)
 */
 // Adressen zum speichern von Applikations Daten
-#define PORTSAVE	0x99	// Portzustände
+//#define PORTSAVE	0xFC	// Portzustände
+extern const unsigned char __at 0x1CFF PORTSAVE;
 
 #define DUTY	0x50	// 0xFF=immer low 0x00=immer high
 

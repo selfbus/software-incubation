@@ -45,6 +45,7 @@
 //#include  "../com/debug.h"
 //#include "../com/fb_rs232.h"
 //#include"../com/watchdog.h"
+const unsigned char __at 0x1CFF PORTSAVE;
 
 unsigned char timerbase[TIMERANZ];// Speicherplatz für die Zeitbasis und 4 status bits
 unsigned char timercnt[TIMERANZ];// speicherplatz für den timercounter und 1 status bit
@@ -96,10 +97,22 @@ void pin_changed(unsigned char pin_no)
 
 	if (debounce(pinno))			// Entprellzeit abwarten und prüfen
   {
-	timer_base=(eeprom[0xF6+((pinno+1)>>1)]>>(4*((pinno&0x01)^0x01)))&0x07  ;
+//	timer_base=(eeprom[0xF6+((pinno+1)>>1)]>>(4*((pinno&0x01)^0x01)))&0x07  ;
+	tmp=eeprom[0xCF]; // parameter für den switch holen
+	if (pinno&0x01){
+		tmp>>=4;	// wenn pinno==3 dann nach rechts schieben
+		timer_base=(eeprom[0xF7]>>4); // parameter für Zeit basis holen
+	}
+	else{
+		timer_base=(eeprom[0xF8]); //wenn pinno 2 dann parameter Zeitbasis holen
+	}
+	timer_base &= 0x07; // Parameter Zeitbasis maskieren
+	tmp&=0x0F;			// Parameter für switch maskieren 
 	st_Flanke=(((portbuffer>>pinno)&0x01)==0) && (((p0h>>pinno)&0x01)==1);
 	timer_state=timerstate[pinno];
-	switch ((eeprom[0xCF] >> ((pinno & 0x01)*4)) & 0x0F)	// Funktion des Eingangs
+	
+//	switch ((eeprom[0xCF] >> ((pinno & 0x01)*4)) & 0x0F)	// Funktion des Eingangs
+	switch (tmp)
     {
     case 0x01:				// Funktion Schalten
     	schalten(st_Flanke,pinno);			// Flanke Eingang x.1
@@ -556,8 +569,10 @@ void delay_timer(void)	// zählt alle 65ms die Variable Timer hoch und prüft Queu
 		
 		// ab Hier die aktion...
 		
-		for(objno=0;objno<=1;objno++) {
-				if(timercnt[objno]==0x80) {			// 0x00 = delay Eintrag ist leer   
+		for(objno=0;objno<=3;objno++) {
+			timer_state=timerstate[objno];
+			if(timercnt[objno]==0x80) {			// 0x00 = delay Eintrag ist leer   
+				if(objno<2){
 					portchanged=1;
 					port_pattern=0x01<<objno;
 					if(timerbase[objno]&0x10) { //if(delay_state==0x81) {	// einschalten
@@ -591,7 +606,69 @@ void delay_timer(void)	// zählt alle 65ms die Variable Timer hoch und prüft Queu
 						}
 						timercnt[objno]=0;
 					}
-			}   
+				}
+				else { //  also objno >=2
+				#ifndef zykls
+							if (timer_state & 0x20){
+
+									schalten(timer_state & 0x01,objno+8);
+									jobj=read_obj_value((objno&0x07)+8);
+						/*			if(timerbase[objno]<15){
+										schalten(jobj,objno+8);
+									}
+						*/			//timercnt[objno]=(eeprom[0xD6+(objno*4)]&0x7F)+0x80;
+									//schalten(timer_state & 0x01,objno+8);
+									//timerbase[objno]=0;
+									timercnt[objno]=0;
+									//timerstate=0;
+							}
+				#endif
+							if (timer_state & 0x80) { // 0x80, 0x81 für langzeit telegramm senden
+										write_send( objno+8, timer_state & 0x01);	// Langzeit Telegramm senden
+										// *** delay record neu laden für Dauer Lamellenverstellung ***
+
+						    			m = eeprom[0xD7+(objno*4)];	// Faktor Dauer	Lamelle	T2	
+						    			if (m > 3){// wenn lamellenverstellzeit >3 dann zeit sichern und kurztele zwecks stop
+						    				//d.h. bei minimum nach ETS Faktor=3 T2 ist abgeschaltet->kein stop
+						    				//damit kann Jalousie als schalter mit 2 schaltebenen verwendung finden
+
+						    				timerbase[objno]= ((eeprom[0xFA+((objno+1)>>1)]>>(4*((objno&0x01)^0x01)))&0x07);
+						    				jobj=read_obj_value((objno&0x07)+8);
+						    				timerstate[objno]= jobj|0x10; // 0x10,0x11 fuer ende T2 (lamellenvestellzeit)
+						    				timercnt[objno]= m + 0x80;
+						    			}
+										else timercnt[objno]=0;
+						    			//timerbase[objno]=0;
+							}
+							switch (timer_state & 0x50){		
+							case 0x10:
+										timerstate[objno]=0; // wenn T2 abgelaufen dann nichts mehr machen
+							break;		
+				#ifdef dimmer
+							case 0x40:
+								 // 0x4x fuer Dimmer Funktion
+										write_send( objno+8, timer_state );	// Langzeit Telegramm senden
+										timerstate[objno]|=0x10;
+										timercnt[objno] = eeprom[0xD8+(objno*4)]| 0x80 ;//0xD6 Faktor Telegrammwiederholung
+										timerbase[objno]=(eeprom[0xFA+((objno+1)>>1)]>>(4*((objno&0x01)^0x01)))&0x0F;	//Basis Tele wdg
+							break;
+							case 0x50: // 0x50 Dimmer telegramm wiederholung
+										timercnt[objno] = eeprom[0xD8+(objno*4)]| 0x80 ;//0xD6 Faktor Telegrammwiederholung
+										send_obj_value(objno+8);
+							break;
+				#endif
+							default:
+							}
+				#ifdef zaehler
+							if(timer_state==0 && (timerbase[objno]& 0x80)==0x80){//Impulszähler
+				        			timercnt[objno]=eeprom[0xD6+(objno)*4]|0x80;//Torzeit setzen;Löschung anfordern
+				        			timerbase[objno]=(eeprom[0xF6+((objno+1)>>1)]>>(4*((objno&0x01)^0x01)))|0xC0;
+				        			send_obj_value(objno+8);
+							}
+				#endif
+				}
+			}   // ende if (timercnt == 0x80
+				
 		}
 }
 //
@@ -1079,7 +1156,7 @@ void bus_return(void)		// Aktionen bei Busspannungswiederkehr
 {
 	unsigned char n, bw, bwh;
 
-	portbuffer=eeprom[PORTSAVE];	// Verhalten nach Busspannungs-Wiederkehr
+	portbuffer=PORTSAVE;	// Verhalten nach Busspannungs-Wiederkehr
 
 	bw=eeprom[0xF6];
 	for(n=0;n<=3;n++) {			// Ausgänge 1-4

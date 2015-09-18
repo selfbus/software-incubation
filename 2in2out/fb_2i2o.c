@@ -23,58 +23,6 @@
 * 		4 out Devicetype 0x2062 = Jung Aktor 2134.16 
 *
 * \par Changes:
-*	2.00	erstes Programm in C für Hardware Ver. 2 \n
-*	2.01	Schaltverzögerung hinzugefügt \n
-*	2.02	Restart Fehler behoben \n
-*	2.03	Arrays korrigiert \n
-*	2.04	Bugs in bin_out behoben		\n
-*	3.01	auf 89LPC922 portiert und Bugs behoben		\n
-*	3.02	Verzögerung über RTC		behobene Bugs: Verzoegerung geht nach einiger Zeit sehr langsam \n
-*	3.03	Timer 0 für PWM		\n
-*	3.04	RX & TX Timing nochmals optimiert 	behobene Bugs: get_ack funktionierte nicht \n
-*	3.05	Zeitschaltfunktion hinzugefuegt \n
-*	3.06	Öffner-/Schliesserbetrieb und Verhalten nach Busspannungswiederkehr hinzugefügt \n
-*	3.07	Rückmeldeobjekte eingefuegt \n
-*	3.08	gat Array entfernt und durch gapos_in_gat funktion ersetzt \n
-*	3.09	Sperrobjekte hinzugefügt \n
-*	3.10	Fehler in main() behoben (kein delay!)
-*	3.11	Fehler bei Zusatzfunktionstyp behoben,  \n
-*			Fehler bei Sperrobjekten behoben, \n
-*			Relais ziehen jetzt vollen Strom auch bei Busspannungswiederkehr \n
-*	3.12	Fehler bei Sperrobjekten und Rueckmeldung im out8 behoben,  \n
-*			ausserdem ziehen Relais jetzt auch bei Busspannungswiederkehr mit vollem Strom. \n
-*	3.13	Parametrierung für alte/neue Relaisschaltung eingefügt \n
-*			Parametrierung für 4-port / 8-port hinzugefügt, damit eine Soft fï¿½r out4 und out8 \n
-*			Parametrierung für Handbetrieb zunaechst eingefügt \n
-*			read_value_request lief nicht korrekt, behoben \n
-*			Rückmeldung bei Busspannungswiederkehr funktioniert jetzt \n
-*			Warteschleife bei Busspannungswiederkehr eingefügt, wg. stabilitaet
-*	3.14	Rückmelde-Telegramm löst intern jetzt max. zwei weitere Rückmeldungen aus
-* 	3.15	Fehler mit PWM für alte Relais-Schaltung behoben
-* 	3.16	Polarität der Sperrobjegte eingebaut
-* 	3.17	Bug bei Polarität der Sperrobjekte behoben
-* 	3.18	Progmode lässt sich jetzt per ets setzen
-* 			Interrupts beim retart aus, da sonst ggf. flashen unterbrochen wird wenn int
-* 			Ausführungszustand wird in Geräteinfo angezeigt
-* 			NACK wird bei fehlerhaft empfangenem Telegramm gesendet
-* 			Handsteuerung läuft
-* 	3.19	Relais bekamen manchmal keinen Vollstrom -> behoben
-* 			Interrupts bei progmode flashen in der main() aus
-*   3.20	port_schalten() wird jetzt zentral von der main aufgerufen
-*   3.30	umgestellt auf statemachine library
-*   3.31	ein paar lokale Variablen enfernt um stack zu entlasten
-*   3.32	Funktion bei Beginn/Ende der Sperre nur wenn Sperre vorher inaktiv/aktiv war
-*   3.33	Auf lib Version 1.22 f.f. angepasst (tel_sent, rtc- und timer-funktion)
-*	3.34	Trimfunktion via RS 600bd.(c + - w) version (v) und Type (t) abrufbar. 
-			progmode(p) relaise toggeln(ziffer 1-8)
-*   3.35	Fehler bei Rückmeldung und bei eeprom flashen behoben, neue LIB
-* 	3.36	Umstellung auf lib1.4x.
-*   3.37	Handbedienung mit zerodetection integrieren. bug RTC 8ms- 65ms gefixt
-* 	3.37fb	Betrifft spi version(feedback). Pulse verlängert, Rücklesen eingebaut(kein zerodetect mehr möglich, Brücke nötig!
-* 			auf PCB Bot von INT0 an C5 und Pin 9 shiftreg)
-* 	3.38	connected timout hinzugefügt
-* 	3.39	LIB 1.55 initiale PA jetzt 15.15.255
- TODO 
  
 * @todo:
 	- Prio beim Senden implementieren \n
@@ -131,18 +79,17 @@ unsigned char __idata __at 0x00 RAM[00];
 //const unsigned char bitmask_1[8] ={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
 __bit bus_return_ready=0; 
 const unsigned char bitmask_1[8] ={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
-
+//const unsigned char __at 0x1CFF PORTSAVE;
 void main(void)
 { 
 	unsigned char timer_precounter=0;
 
 	unsigned char n,cmd,tasterpegel=0,pin=2;
 	unsigned int base;
-	signed char cal;
+//	signed char cal;
 //	unsigned int m;
-	static __code signed char __at 0x1BFF trimsave;
 #ifdef zeroswitch
-	static __code unsigned char __at 0x1BFE phisave={16};
+	static __code unsigned char __at 0x1CFE phisave={16};
 #endif
 	unsigned char rm_count=0;
 	__bit wduf;
@@ -153,12 +100,12 @@ void main(void)
 	restart_hw();							// Hardware zuruecksetzen
 // im folgendem wird der watchdof underflow abgefragt und mit gedrücktem Progtaster
 // ein resetten der cal Variable veranlasst um wieder per rs232 trimmen zu können.	
-	TASTER=1;
-	if(!TASTER && wduf)cal=0;
-	else cal=trimsave;
+//	TASTER=1;
+//	if(!TASTER && wduf)cal=0;
+//	else cal=trimsave;
 	TASTER=0;
-	TRIM = (TRIM+trimsave);
-	TRIM &= 0x3F;//oberen 2 bits ausblenden
+//	TRIM = (TRIM+trimsave);
+//	TRIM &= 0x3F;//oberen 2 bits ausblenden
 #ifdef zeroswitch
 	if(phisave<=52)	phival=phisave;
 	else phival=16;
@@ -303,12 +250,12 @@ void main(void)
 			// portbuffer flashen, Abbruch durch ext-int wird akzeptiert und später neu probiert
 			// T1-int wird solange abgeschaltet, 
 
-			if (fb_state==0 && (TH1<0XC0) && (!wait_for_ack)&& portbuffer!=eeprom[PORTSAVE]) {
+	/*		if (fb_state==0 && (TH1<0XC0) && (!wait_for_ack)&& portbuffer!=eeprom[PORTSAVE]) {
 				START_WRITECYCLE;
-				WRITE_BYTE(0x01,PORTSAVE,portbuffer);
+				WRITE_BYTE(0x00,0xFF,portbuffer);
 				STOP_WRITECYCLE;
 			}
-		
+	*/	
 		}// end if(APPLICATION RUN..
 		else if (RTCCON>=0x80 && connected)	// Realtime clock ueberlauf
 			{			// wenn connected den timeout für Unicast connect behandeln
@@ -336,7 +283,7 @@ void main(void)
 		
 #ifndef debugmode		
 		// Eingehendes Terminal Kommando verarbeiten...
-		if (RI){
+/*		if (RI){
 			RI=0;
 			cmd=SBUF;
 
@@ -407,9 +354,9 @@ void main(void)
 			}
 #endif						
 		}//end if(RI...
-		
+*/		
 #else //ifndef debugmode
-//DEBUGPOINT;
+DEBUGPOINT;
 //SNIFFPOINT;		
 #endif
 #endif // ifndef BUS_DOWN
