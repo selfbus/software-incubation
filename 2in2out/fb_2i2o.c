@@ -88,9 +88,6 @@ void main(void)
 	unsigned int base;
 //	signed char cal;
 //	unsigned int m;
-#ifdef zeroswitch
-	static __code unsigned char __at 0x1CFE phisave={16};
-#endif
 	unsigned char rm_count=0;
 	__bit wduf;
 	__bit tastergetoggelt=0;
@@ -106,10 +103,6 @@ void main(void)
 	TASTER=0;
 //	TRIM = (TRIM+trimsave);
 //	TRIM &= 0x3F;//oberen 2 bits ausblenden
-#ifdef zeroswitch
-	if(phisave<=52)	phival=phisave;
-	else phival=16;
-#endif
 	TR0=1;
 	restart_app();							// Anwendungsspezifische Einstellungen zuruecksetzen
 	if(!wduf){
@@ -140,15 +133,7 @@ void main(void)
 #else
 	RS_INIT_115200
 #endif
-#ifndef BUS_DOWN
-# ifdef HAND
-#  ifndef zeroswitch
 	SBUF=0x55;
-#  endif
-# else
-	SBUF=0x55;
-# endif
-#endif
 
 // ################## main loop #########################	
 
@@ -190,46 +175,24 @@ void main(void)
 				RTCH=0x03;			//0E reload Real Time Clock
 				RTCL=0x9A;			//A0 16ms +precounter x4
 				RTCCON=0x61;		// RTC  Flag löschen
-#ifdef HAND				
-				handbedienung();// alle 16ms
-#endif				
 				timer_precounter++;
 				if((timer_precounter&0x03)==3)
 				{
 					delay_timer();	// timer handler jedes 4. mal--> 64ms
 				}
 			}
-#ifndef zeroswitch
 			if(TF0 && (TMOD & 0x0F)==0x01) {	// Vollstrom für Relais ausschalten und wieder PWM ein
-	#ifndef SPIBISTAB
 				TMOD=(TMOD & 0xF0) + 2;			// Timer 0 als PWM
 				TAMOD=0x01;
 				TH0=DUTY;
-	#endif				
 				TF0=0;
-	#ifndef SPIBISTAB
 				AUXR1|=0x10;	// PWM von Timer 0 auf Pin ausgeben
-	#endif
 				PWM=1;			// PWM Pin muss auf 1 gesetzt werden, damit PWM geht !!!
-	#ifndef SPIBISTAB
-		#ifndef IO_BISTAB		
 				TR0=1;
-		#endif
-	#endif
-	
-	#ifdef IO_BISTAB
-				P0=0;// wenn Bistabile über IO diese ausschalten
-	#endif
 			}
-#endif
+
 		
 			
-#ifdef BUS_DOWN
-			if(TxD){
-				if(bus_activ)bus_down();
-			}
-			else bus_activ=1;
-#endif			
 			if (portchanged)port_schalten();	// Ausgänge schalten
 
 			// Rückmeldungen senden
@@ -250,12 +213,12 @@ void main(void)
 			// portbuffer flashen, Abbruch durch ext-int wird akzeptiert und später neu probiert
 			// T1-int wird solange abgeschaltet, 
 
-	/*		if (fb_state==0 && (TH1<0XC0) && (!wait_for_ack)&& portbuffer!=eeprom[PORTSAVE]) {
+			if (fb_state==0 && (TH1<0XC0) && (!wait_for_ack)&& portbuffer!=PORTSAVE) {
 				START_WRITECYCLE;
 				WRITE_BYTE(0x00,0xFF,portbuffer);
 				STOP_WRITECYCLE;
 			}
-	*/	
+		
 		}// end if(APPLICATION RUN..
 		else if (RTCCON>=0x80 && connected)	// Realtime clock ueberlauf
 			{			// wenn connected den timeout für Unicast connect behandeln
@@ -279,87 +242,9 @@ void main(void)
 			for(n=0;n<100;n++);	// falls Hauptroutine keine Zeit verbraucht, der PROG LED etwas Zeit geben, damit sie auch leuchten kann
 		}
 		cmd;
-#ifndef BUS_DOWN
-		
-#ifndef debugmode		
-		// Eingehendes Terminal Kommando verarbeiten...
-/*		if (RI){
-			RI=0;
-			cmd=SBUF;
-
-			if(cmd=='c'){
-				while(!TI);
-				TI=0;
-				SBUF=0x55;
-			}
-			if(cmd=='+'){
-				TRIM--;
-				cal--;
-			}
-			if(cmd=='-'){
-				TRIM++;
-				cal++;
-			}
-			if(cmd=='w'){
-				EA=0;
-				START_WRITECYCLE;	//cal an 0x1bff schreiben
-#ifdef zeroswitch
-				FMADRH= 0x1B;		
-				FMADRL= 0xFE; 
-				FMDATA= phival;
-#else
-				FMADRH= 0x1B;		
-				FMADRL= 0xFF; 
-#endif
-				FMDATA=	cal;
-				STOP_WRITECYCLE;
-				EA=1;				//int wieder freigeben
-			}
-			if(cmd=='p')status60^=0x81;	// Prog-Bit und Parity-Bit im system_state toggeln
-#ifdef zeroswitch
-			if(cmd=='<'){
-				if (phival){
-					phival--;
-					TI=0;
-					SBUF=phival;
-				}
-			}	
-			if(cmd=='>'){
-				if(phival<51){
-					phival++;	// 
-					TI=0;
-					SBUF=phival;
-				}
-			}
-#endif			
-			if(cmd=='v'){
-				while(!TI);
-				TI=0;
-				SBUF=VERSION;
-			}
-			if(cmd=='t'){
-				while(!TI);
-				TI=0;
-				SBUF=TYPE;
-			}
-#ifdef MAX_PORTS_8
-			if(cmd >=49 && cmd <= 56){
-				portbuffer = portbuffer ^ (0x01<< (cmd-49));
-				port_schalten();
-			}
-#else
-			if(cmd >=49 && cmd <= 52){
-				portbuffer = portbuffer ^ (0x01<< (cmd-49));
-				port_schalten();
-			}
-#endif						
-		}//end if(RI...
-*/		
-#else //ifndef debugmode
 DEBUGPOINT;
-//SNIFFPOINT;		
-#endif
-#endif // ifndef BUS_DOWN
+//SNIFFPOINT;	
+		
 		TASTER=1;				// Pin als Eingang schalten um Taster abzufragen
 		if(!TASTER){ // Taster gedrückt
 			if(tasterpegel<255)	tasterpegel++;
