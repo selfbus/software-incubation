@@ -70,7 +70,6 @@ void pin_changed(unsigned char pin_no)
 	pinnoX4=pinno*4;
 	para_adr=0xD5+(pinnoX4);
 	n;
-
 	if (debounce(pinno))			// Entprellzeit abwarten und prüfen
   {
 //	timer_base=(eeprom[0xF6+((pinno+1)>>1)]>>(4*((pinno&0x01)^0x01)))&0x07  ;
@@ -91,23 +90,21 @@ void pin_changed(unsigned char pin_no)
 	switch (tmp)
     {
     case 0x01:				// Funktion Schalten
-    	schalten(st_Flanke,pinno);			// Flanke Eingang x.1
-
 #ifdef zykls	// mit zyklisch senden Eingang normal behandeln
+    	schalten(st_Flanke,pinno);			// Flanke Eingang x.1
 		schalten(st_Flanke,pinno+8);		// Flanke Eingang x.2
-
 #else			// ohne zyklisch senden dafür 2. schaltebene
         tmp=(eeprom[para_adr]&0x0C);//0xD5/ bit 2-3 zykl senden aktiv 2. Schaltebene
         if((tmp==0x04 && st_Flanke==1)||(tmp==0x08 && st_Flanke==0)){
         	timercnt[pinno]= eeprom[para_adr+1]+ 0x80;//0xD6 Faktor Dauer )
          	timerbase[pinno]=0;
          	timer_state = 0x20|st_Flanke;//speichern des portzustandes
-         	//DEBUG timercnt[pinno];
          }
          else {// kein zyklsenden, bzw loslassen
-         			timercnt[pinno]=0;
-         			schalten(st_Flanke,pinno+8);		// Flanke Eingang x.2
-         //			DEBUG timercnt[pinno];
+         		if(timercnt[pinno]>0x80){ //Wenn Zeit beim loslassen noch lief
+         	    	schalten(timerstate[pinno]&0x01,pinno);			// Flanke Eingang x.1
+         		}
+         		timercnt[pinno]=0;
          }
 #endif
      break;  
@@ -253,6 +250,7 @@ void pin_changed(unsigned char pin_no)
         
     }
 	timerstate[pinno]=timer_state;
+//	DEBUG timercnt[pinno];
   }// end if (debounce)...
 	
 }
@@ -302,9 +300,11 @@ void write_value_req(unsigned char objno) 	// Ausgänge schalten gemäß EIS 1 Prot
   unsigned char blockstart, blockend, block_polarity;
   unsigned char obj_bitpattern, zf_bitpattern;
   		obj_bitpattern=0x01<<(objno-8);
-          if (objno<8) object_schalten(objno,telegramm[7]&0x01);	// Objektnummer 0-7 entspricht den Ausgängen 1-8
-
-          if (objno>7 && objno<12)	// Objektnummer 8-11 entspricht den Zusatzfunktionen 1-4
+          if (objno<2) object_schalten(objno,telegramm[7]&0x01);	// Objektnummer 0-7 entspricht den Ausgängen 1-8
+          if (objno>=2 ){
+          write_obj_value(objno,telegramm[7]& 0x3F); //bit 6+7 löschen (0x40,0x80)
+          }
+          if (objno>7 && objno<9)	// Objektnummer 8-9 entspricht den Zusatzfunktionen 1-2
           {
             write_obj_value(objno, telegramm[7]&0x01);
             zfout=0;
@@ -540,7 +540,6 @@ void delay_timer(void)	// zählt alle 65ms die Variable Timer hoch und prüft Queu
 		}//end for (n=...
 		
 		// ab Hier die aktion...
-		
 		for(objno=0;objno<=3;objno++) {
 			timer_state=timerstate[objno];
 			if(timercnt[objno]==0x80) {			//runbit 7 gesetzt und Zeit abgelaufen 
@@ -581,8 +580,6 @@ void delay_timer(void)	// zählt alle 65ms die Variable Timer hoch und prüft Queu
 				}
 				else { //  also objno >=2 ### Eingaenge ###
 				#ifndef zykls
-							//DEBUG objno;
-							//DEBUG timercnt[objno];
 							if (timer_state & 0x20){
 									schalten(timer_state & 0x01,objno+8);
 						//			jobj=read_obj_value((objno&0x07)+8);
@@ -593,7 +590,7 @@ void delay_timer(void)	// zählt alle 65ms die Variable Timer hoch und prüft Queu
 									//schalten(timer_state & 0x01,objno+8);
 									//timerbase[objno]=0;
 									timercnt[objno]=0;
-									//timerstate=0;
+									//timerstate[objno]=0;
 							}
 				#endif
 							if (timer_state & 0x80) { // 0x80, 0x81 für langzeit telegramm senden
