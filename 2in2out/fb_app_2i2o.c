@@ -94,18 +94,24 @@ void pin_changed(unsigned char pin_no)
     	schalten(st_Flanke,pinno);			// Flanke Eingang x.1
 		schalten(st_Flanke,pinno+8);		// Flanke Eingang x.2
 #else			// ohne zyklisch senden dafür 2. schaltebene
-        tmp=(eeprom[para_adr]&0x0C);//0xD5/ bit 2-3 zykl senden aktiv 2. Schaltebene
-        if((tmp==0x04 && st_Flanke==1)||(tmp==0x08 && st_Flanke==0)){
-        	timercnt[pinno]= eeprom[para_adr+1]+ 0x80;//0xD6 Faktor Dauer )
-         	timerbase[pinno]=0;
-         	timer_state = 0x20|st_Flanke;//speichern des portzustandes
-         }
-         else {// kein zyklsenden, bzw loslassen
-         		if(timercnt[pinno]>0x80){ //Wenn Zeit beim loslassen noch lief
-         	    	schalten(timerstate[pinno]&0x01,pinno);			// Flanke Eingang x.1
-         		}
-         		timercnt[pinno]=0;
-         }
+		if(eeprom[para_adr]&0x0C){// 2. SE aktiviert?
+	        tmp=(eeprom[para_adr+2]&0xC0);//0xd7+pinno*4   bit 2-3 zykl senden aktiv 2. Schaltebene
+	        if(((tmp&0xC0) && st_Flanke==1)||((tmp&0x30) && st_Flanke==0)){// für Obj x.2
+	        	timercnt[pinno]= eeprom[para_adr+1]+ 0x80;//0xD6 Faktor Dauer )
+	         	timerbase[pinno]=0;
+	         	timer_state = 0x20|st_Flanke;//speichern des portzustandes
+	         }
+	         else {// kein zyklsenden, bzw loslassen
+	         		if(timercnt[pinno]>0x80){ //Wenn Zeit beim loslassen noch lief
+	         	    	schalten(st_Flanke,pinno);			// Flanke Eingang x.1
+	         		}
+	         		timercnt[pinno]=0;
+	         }
+		}//Ende 2. SE aktiviert?
+		else{
+	    	schalten(st_Flanke,pinno);			// Flanke Eingang x.1
+			schalten(st_Flanke,pinno+8);		// Flanke Eingang x.2
+		}
 #endif
      break;  
       case 0x02:				// Funktion Dimmen
@@ -189,7 +195,7 @@ void pin_changed(unsigned char pin_no)
 	    			jobj=read_obj_value(pinno+8)^0x01;//neues Jaloobj invers zum langzeit
 	    		break;
 			}
-			if (st_Flanke){// Taster gedrueckt -> schauen wie lange gehalten
+/*			if (st_Flanke){// Taster gedrueckt -> schauen wie lange gehalten
             	if(eeprom[n]& 0x08){	//wenn Bedienkonzept lang-kurz ()
             		//timerbase[pinno]=0;
             		timer_state = jobj+0x80;
@@ -208,7 +214,7 @@ void pin_changed(unsigned char pin_no)
   			if (timer_state & 0x10) write_send( pinno, jobj);	// wenn delaytimer noch laueft und in T2 ist, dann kurzzeit telegramm senden
     			else timercnt[pinno]=0;	// T2 bereits abgelaufen
     		}
-        break;
+*/        break;
 
 #ifdef wertgeber 
     	/**********************************************************
@@ -259,7 +265,7 @@ void pin_changed(unsigned char pin_no)
 void schalten(__bit risefall, unsigned char pinno)	// Schaltbefehl senden
 {
 	unsigned char func,sendval=0;
-
+											// pinno 2,3 entspricht Eingang 1,2
 		func=eeprom[0xD7+(pinno & 0x07)*4]; //0xD7
 		if (pinno>=8)func=func>>4;			// wenn 2. Schaltobjekt dann obere 4 bit
 		if (risefall) func=(func>>2);		// Funktion bei steigender Flanke obere 2 bit
