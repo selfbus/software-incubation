@@ -75,8 +75,11 @@
 #define VERSION 39
 
 unsigned char __idata __at 0x00 RAM[00];
-//__code unsigned int __at (EEPROM_ADDR + 0x17) start_pa={0xFFFF};      // Default PA is 15.15.255
-//const unsigned char bitmask_1[8] ={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
+static __code unsigned char __at 0x1D03 manufacturer[2]={0,4};	// Herstellercode 0x0004 = Jung
+static __code unsigned char __at 0x1D0C port_A_direction={0};	// PORT A Direction Bit Setting
+static __code unsigned char __at 0x1D0D run_state={255};		// Run-Status (00=stop FF=run)
+__code unsigned int __at (EEPROM_ADDR + 0x17) start_pa={0xFFFF};      // Default PA is 15.15.255
+
 __bit bus_return_ready=0; 
 const unsigned char bitmask_1[8] ={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
 //const unsigned char __at 0x1CFF PORTSAVE;
@@ -126,7 +129,7 @@ void main(void)
 		WATCHDOG_INIT
 		WATCHDOG_START
 
-	if(!wduf)bus_return();							// Aktionen bei Busspannungswiederkehr
+	//if(!wduf)bus_return();							// Aktionen bei Busspannungswiederkehr
 
 #ifndef debugmode
 	RS_INIT_600
@@ -151,7 +154,6 @@ void main(void)
 	  	  if(!wduf)bus_return();			// Anwendungsspezifische Einstellungen zurücksetzen
 	  	  bus_return_ready=1;
 	  }
-	  
 	  if (p0h!=portbuffer) 
 	    {	
 

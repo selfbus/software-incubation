@@ -40,11 +40,12 @@
 
 //#define in4					// schaltet P0_4 - P0_7 auf pullup
 //#define IN8_2TE					// nur für shifter version des in8 /typebit 3
+#define schalte
 //#define wertgeber				// mit Wertgeber
 //#define zaehler				// mit Zähler
 //#define dimmer					// mit Dimmfunktionen
 //#define zykls					// mit zyklisches senden
-
+//define jalo
 
 #ifdef zeroswitch
 	#ifndef panasonic		//OMRON
@@ -132,7 +133,7 @@ void restart_app(void) ;		// Alle Applikations-Parameter zurücksetzen
 void handbedienung(void);
 unsigned long read_obj_value(unsigned char objno) ;	// gibt den Wert eines Objektes zurueck
 void write_obj_value(unsigned char objno,unsigned int objvalue);	// schreibt den aktuellen Wert eines Objektes ins 'USERRAM'
-
+void sperren(unsigned char obj,unsigned char freigabe);
 #ifdef zeroswitch
 void EX0_int(void) __interrupt (0);
 void timer0_int(void) __interrupt (1) ;

@@ -90,12 +90,13 @@ void pin_changed(unsigned char pin_no)
 	switch (tmp)
     {
     case 0x01:				// Funktion Schalten
-#ifdef zykls	// mit zyklisch senden Eingang normal behandeln
+#ifdef schalte	
+#  ifdef zykls	// mit zyklisch senden Eingang normal behandeln
     	schalten(st_Flanke,pinno);			// Flanke Eingang x.1
 		schalten(st_Flanke,pinno+8);		// Flanke Eingang x.2
-#else			// ohne zyklisch senden dafür 2. schaltebene
+#  else			// ohne zyklisch senden dafür 2. schaltebene
 		if(eeprom[para_adr]&0x0C){// 2. SE aktiviert?
-	        tmp=(eeprom[para_adr+2]&0xC0);//0xd7+pinno*4   bit 2-3 zykl senden aktiv 2. Schaltebene
+	        tmp=(eeprom[para_adr+2]);//0xd7+pinno*4   bit 4,4 / 6,7 zykl senden aktiv 2. Schaltebene
 	        if(((tmp&0xC0) && st_Flanke==1)||((tmp&0x30) && st_Flanke==0)){// für Obj x.2
 	        	timercnt[pinno]= eeprom[para_adr+1]+ 0x80;//0xD6 Faktor Dauer )
 	         	timerbase[pinno]=0;
@@ -108,12 +109,14 @@ void pin_changed(unsigned char pin_no)
 	         		timercnt[pinno]=0;
 	         }
 		}//Ende 2. SE aktiviert?
-		else{
+		else{ // 2. SE NICHT aktiviert...
 	    	schalten(st_Flanke,pinno);			// Flanke Eingang x.1
 			schalten(st_Flanke,pinno+8);		// Flanke Eingang x.2
 		}
+#  endif
 #endif
-     break;  
+		break;  
+     
       case 0x02:				// Funktion Dimmen
     		/***********************
     		 * Funktion Dimmen
@@ -177,7 +180,7 @@ void pin_changed(unsigned char pin_no)
   		}
 #endif
         break;
-       
+#ifdef jalo       
         case 0x03:				//Funktion Jalousie
         	/****************************
         	 * Funktion Jalousie
@@ -195,7 +198,7 @@ void pin_changed(unsigned char pin_no)
 	    			jobj=read_obj_value(pinno+8)^0x01;//neues Jaloobj invers zum langzeit
 	    		break;
 			}
-/*			if (st_Flanke){// Taster gedrueckt -> schauen wie lange gehalten
+			if (st_Flanke){// Taster gedrueckt -> schauen wie lange gehalten
             	if(eeprom[n]& 0x08){	//wenn Bedienkonzept lang-kurz ()
             		//timerbase[pinno]=0;
             		timer_state = jobj+0x80;
@@ -214,8 +217,8 @@ void pin_changed(unsigned char pin_no)
   			if (timer_state & 0x10) write_send( pinno, jobj);	// wenn delaytimer noch laueft und in T2 ist, dann kurzzeit telegramm senden
     			else timercnt[pinno]=0;	// T2 bereits abgelaufen
     		}
-*/        break;
-
+        break;
+# endif
 #ifdef wertgeber 
     	/**********************************************************
     	 * Funktion Wertgeber Dimmen,Temparatur,Helligkeit
@@ -256,12 +259,11 @@ void pin_changed(unsigned char pin_no)
         
     }
 	timerstate[pinno]=timer_state;
-//	DEBUG timercnt[pinno];
   }// end if (debounce)...
 	
 }
 
-
+#ifdef schalte
 void schalten(__bit risefall, unsigned char pinno)	// Schaltbefehl senden
 {
 	unsigned char func,sendval=0;
@@ -278,7 +280,7 @@ void schalten(__bit risefall, unsigned char pinno)	// Schaltbefehl senden
 		}
 	
 }
-
+#endif
 
 unsigned char debounce(unsigned char pinno)	// Entprellzeit abwarten und prüfen !!
 {
@@ -443,14 +445,111 @@ void write_obj_value(unsigned char objno,unsigned int objvalue)	// schreibt den 
 		if(objvalue==0) rm_state&=0xFF-(1<<(objno-16));
 		else rm_state|=1<<(objno-16);
 	}
-	if(objno>=18) {						// Sperre Eingänge
-		if(objvalue==0) in_blocked &=0xFF-(1<<(objno-18));
-		else in_blocked |= 1<<(objno-18);
+	if(objno>=18) {	// Sperre Eingänge
+		objvalue&=0x01;
+		objvalue^=((eeprom[0xd5+((objno-16)*4)]&0x02)>>1);
+		if(objvalue==0) in_blocked &=0xFF-(1<<(objno-16));
+		else {in_blocked |= 1<<(objno-16);}
+		sperren(objno-16,objvalue);
 	}
 }
 
 
 
+void sperren (unsigned char obj,unsigned char freigabe)
+{	
+	__bit objval=0;
+	//sending=1;
+	unsigned char sendobj=255;
+	unsigned char paratmp;
+	freigabe;paratmp;
+#ifndef dimmer
+	if (freigabe){
+		paratmp=(eeprom[0xd5+obj*4]>>4)&0x03;
+	}
+	else{
+		paratmp=eeprom[0xd8+obj*4]&0x03;
+	}
+#endif
+	switch ((eeprom[0xCE+(obj>>1)] >> ((obj & 0x01)*4)) & 0x0F){// Funtion des zugehörigen Eingangs
+	case 0x01:// funktion Schalten sperren
+#ifdef schalte
+		sendobj=obj;
+		switch (paratmp){
+
+			case 0x01:		//EIN
+				objval=1;
+			break;
+			case 0x02:		//AUS
+				objval=0;
+			break;
+			case 0x03:	//UM
+				if (freigabe){ //ende sperre-> aktueller Zustand
+				objval= (portbuffer>>obj)& 0x01;
+				}
+				else{	
+    			objval=read_obj_value(obj)^0x01;//Tele invers senden
+				}
+
+			break;
+			default:
+			sendobj=255;
+		}
+#endif		
+		//if (sending) write_send(obj,objval);
+	break;	
+	case 0x02:// funktion Dimmer-sperren
+#ifdef dimmer
+		objval = read_obj_value(obj);
+		sendobj=obj;
+		if (freigabe){		// Ende Sperre  
+			if (eeprom[0xD5+(obj*4)]&0x80) objval=0;
+			else sendobj=255;
+		}
+		else{				// Beginn Sperre
+			switch (eeprom[0xD5+(obj*4)+1]& 0xC0) {//Bedienkonzept angucken
+			case 0x40:	// zweiflaechen ein
+				objval=1;
+				break;
+			case 0x80:	// zweiflaechen aus
+				objval=0;
+				break;
+			case 0xC0:	// UM-heller
+				objval = !objval;
+				break;
+			default:
+			sendobj=255;
+			}
+		}
+		//if (sending) write_send(obj,objval);	// value senden
+#endif		
+	break;
+#ifdef jalo
+	case 0x03:// Funktion Jalousie - Sperren
+		sendobj=obj+8;
+		switch ((paratmp){
+			case 0x01:		//ab
+				objval=0;
+			break;
+			case 0x02:		//auf
+				objval=1;
+			break;
+			case 0x03:	//UM
+    			objval=read_obj_value(obj+8)^0x01;//neues Jaloobj invers zum langzeit
+    		break;
+			default:
+			sendobj=255;	
+		}
+		//if (sending) write_send(obj+8,objval);
+	break;
+#endif	
+	}// Ende switch funktion
+	if(sendobj<=16){
+		write_obj_value(sendobj,objval);
+		while(!send_obj_value(sendobj));
+	}
+	
+}// End function
 
 
 
@@ -585,20 +684,15 @@ void delay_timer(void)	// zählt alle 65ms die Variable Timer hoch und prüft Queu
 					}
 				}
 				else { //  also objno >=2 ### Eingaenge ###
-				#ifndef zykls
+#				ifdef schalte
+#				ifndef zykls
 							if (timer_state & 0x20){
 									schalten(timer_state & 0x01,objno+8);
-						//			jobj=read_obj_value((objno&0x07)+8);
-						/*			if(timerbase[objno]<15){
-										schalten(jobj,objno+8);
-									}
-						*/			//timercnt[objno]=(eeprom[0xD6+(objno*4)]&0x7F)+0x80;
-									//schalten(timer_state & 0x01,objno+8);
-									//timerbase[objno]=0;
 									timercnt[objno]=0;
-									//timerstate[objno]=0;
 							}
-				#endif
+#				endif
+#				endif
+				#ifdef jalo			
 							if (timer_state & 0x80) { // 0x80, 0x81 für langzeit telegramm senden
 										write_send( objno+8, timer_state & 0x01);	// Langzeit Telegramm senden
 										// *** delay record neu laden für Dauer Lamellenverstellung ***
@@ -616,6 +710,7 @@ void delay_timer(void)	// zählt alle 65ms die Variable Timer hoch und prüft Queu
 										else timercnt[objno]=0;
 						    			//timerbase[objno]=0;
 							}
+				#endif			
 							switch (timer_state & 0x50){		
 							case 0x10:
 										timerstate[objno]=0; // wenn T2 abgelaufen dann nichts mehr machen
@@ -680,9 +775,10 @@ void port_schalten(void)		// Schaltet die Ports mit PWM, DUTY ist Pulsverhältnis
 
 void bus_return(void)		// Aktionen bei Busspannungswiederkehr
 {
-	unsigned char n, bw, bwh;
-
-	portbuffer=PORTSAVE;	// Verhalten nach Busspannungs-Wiederkehr
+	unsigned char n, bw, bwh,senden;
+	__bit objval=0;
+	portbuffer|= (PORTSAVE&0x0C);	// Verhalten nach Busspannungs-Wiederkehr
+	portbuffer&=(PORTSAVE|0xF3);
 
 	bw=eeprom[0xF6];
 	for(n=0;n<=1;n++) {			// Ausgänge 1-2
@@ -695,6 +791,59 @@ void bus_return(void)		// Aktionen bei Busspannungswiederkehr
 	rm_state=portbuffer ^ eeprom[RMINV];	// Rückmeldeobjekte setzen
 	// Rückmeldung bei Busspannungswiederkehr
 	rm_send|=~portbuffer;// Rückmeldung nur für Objekte mit Wert 0, da Wert 1 in normalem port_schalten eh gesendet wird
+	
+	for (n=2;n<4;n++){
+		  senden=0;
+		  timercnt[n]=0;// alle timer ausschalten
+		  objects_l[n-2]=0;
+		  objects_h[n-2]=0;
+		  switch ((eeprom[0xCF] >> ((n & 0x01)*4)) & 0x0F)	// Funktion des objektes
+			{
+#ifndef dimmer
+		  	case 0x01:// schalten
+			timerstate[n]=0;
+			case 0x03:// Jalousie
+		//  case 0x04:// Wertgeber(lichtszene)		
+				switch(eeprom[0xD5+(n*4)]&0xC0){
+				case 0x40:
+					objval=1;
+					senden=1;
+				break;	
+				case 0x80:
+					objval=0;
+					senden=1;
+				break;
+				case 0xC0:
+					portbuffer ^= (0x01<<n);//Bit im portbuffer invertieren, löst eine Flanke aus
+				}
+			break;
+#else
+			case 0x02://dimmen austele
+				if(eeprom[0xD7+(n*4)]&0x80){
+					objval=0;
+					senden=1;
+					}
+				if(eeprom[0xD8+(n*4)]&0x80){
+					objval=1;
+					senden=1;
+				//ansonsten nichts tun !	
+				}
+			break;
+#endif
+			}
+		  
+		if (senden){
+			write_obj_value(n,objval);// eis1, kein selftele, speichern ja
+			while(!send_obj_value(n));
+		}
+		if((eeprom[0xD5+(n*4)]& 0x03)==2){ //bei invertierter Sperre Sperrobjekt setzen.
+			in_blocked |= bitmask_1[n];
+		}
+		else{
+			in_blocked &= (~bitmask_1[n]);
+		}
+	  }
+	
 }
 
 void restart_app(void) 		// Alle Applikations-Parameter zurücksetzen
@@ -720,13 +869,13 @@ void restart_app(void) 		// Alle Applikations-Parameter zurücksetzen
 	logicstate=0;
 	delay_toggle=0;
 	
-	EA=0;						// Interrupts sperren, damit flashen nicht unterbrochen wird
+/*	EA=0;						// Interrupts sperren, damit flashen nicht unterbrochen wird
 	START_WRITECYCLE
 	WRITE_BYTE(0x01,0x03,0x00)	// Herstellercode 0x0004 = Jung
 	WRITE_BYTE(0x01,0x04,0x04)
 #ifdef MAX_PORTS_4				// 4-fach Aktor
-	WRITE_BYTE(0x01,0x05,0x20)	// Devicetype 0x2062 = Jung Aktor 2134.16
-	WRITE_BYTE(0x01,0x06,0x71)// 2 out= 2071
+//	WRITE_BYTE(0x01,0x05,0x20)	// Devicetype 0x2062 = Jung Aktor 2134.16
+//	WRITE_BYTE(0x01,0x06,0x71)// 2 out= 2071
 #endif
 //	WRITE_BYTE(0x01,0x07,0x01)	// Versionnumber of application programm
 	WRITE_BYTE(0x01,0x0C,0x00)	// PORT A Direction Bit Setting
@@ -734,6 +883,6 @@ void restart_app(void) 		// Alle Applikations-Parameter zurücksetzen
 	STOP_WRITECYCLE
 	EA=1;						// Interrupts freigeben
 	IT0=0;// ??
-	RTCCON=0x81;				// RTC starten und OV flag setzen
+*/	RTCCON=0x81;				// RTC starten und OV flag setzen
 	//EX0=1;
 }
