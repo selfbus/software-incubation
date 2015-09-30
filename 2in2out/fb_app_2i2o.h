@@ -44,8 +44,8 @@
 //#define wertgeber				// mit Wertgeber
 //#define zaehler				// mit Zähler
 //#define dimmer					// mit Dimmfunktionen
-//#define zykls					// mit zyklisches senden
-//define jalo
+#define zykls					// mit zyklisches senden
+//#define jalo
 
 #ifdef zeroswitch
 	#ifndef panasonic		//OMRON
@@ -109,6 +109,11 @@ extern unsigned char in_blocked;
 extern 	__bit portchanged;// globale variable, sie ist 1 wenn sich portbuffer geändert hat
 extern unsigned char portbuffer,p0h;
 extern unsigned char rm_send;		// die von der main zu sendenden Rückmeldungen
+extern unsigned char timercnt[TIMERANZ];
+extern unsigned char timerbase[TIMERANZ];
+extern unsigned char timerstate[TIMERANZ];
+
+
 #ifdef zeroswitch
 extern unsigned char portausgabe_on; // einzuschaltende IO, die dann im ext 0 int übernommen werden
 extern unsigned char portausgabe_off; // auszuschaltende IO, die dann im t 0 int übernommen werden
@@ -116,7 +121,6 @@ extern volatile unsigned char schalten_state; // status T0 int
 extern unsigned char phival;
 extern __bit zeropulse;
 extern const unsigned char bitmask_1[8];
-
 #endif
 #ifdef BUS_DOWN
 	void bus_down (void);

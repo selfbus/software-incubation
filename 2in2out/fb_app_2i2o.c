@@ -527,7 +527,7 @@ void sperren (unsigned char obj,unsigned char freigabe)
 #ifdef jalo
 	case 0x03:// Funktion Jalousie - Sperren
 		sendobj=obj+8;
-		switch ((paratmp){
+		switch (paratmp){
 			case 0x01:		//ab
 				objval=0;
 			break;

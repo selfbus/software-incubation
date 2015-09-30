@@ -87,7 +87,7 @@ void main(void)
 { 
 	unsigned char timer_precounter=0;
 
-	unsigned char n,cmd,tasterpegel=0,pin=2;
+	unsigned char n,tmp,tasterpegel=0,pin=2,objno,objstate;
 	unsigned int base;
 //	signed char cal;
 //	unsigned int m;
@@ -220,6 +220,32 @@ void main(void)
 				WRITE_BYTE(0x00,0xFF,portbuffer);
 				STOP_WRITECYCLE;
 			}
+			
+#ifdef zykls
+		for(objno=2;objno<=3;objno++){	
+	    	tmp=(eeprom[0xD5+(objno*4)]&0x0C);//0xD5/ bit 2-3 zykl senden aktiv 
+    		objstate=read_obj_value(objno);
+    		if (((eeprom[0xCE+(objno>>1)] >> ((objno & 0x01)*4)) & 0x0F)==1){// bei Funktion=Schalten
+	    		if ((tmp==0x04 && objstate==1)||(tmp==0x08 && objstate==0)|| tmp==0x0C){//bei zykl senden aktiviert
+					n=timercnt[objno];
+					if ((n & 0x7F) ==0){ 		//    wenn aus oder abgelaufen
+						timercnt[objno] = (eeprom[0xD6+(objno*4)]& 0x3F)+ 0x80 ;//0xD6 Faktor Zyklisch senden x.1 + x.2 )+ einschalten
+						timerbase[objno]=(eeprom[0xF6+((objno+1)>>1)]>>(4*((objno&0x01)^0x01)))&0x07;	//Basis zyklisch senden
+						if (n & 0x80){// wenn timer ein war
+							if(!(in_blocked & bitmask_1[objno]))
+							{
+							while(!send_obj_value(objno));//send_obj_value(objno);		// Eingang x.1 zyklisch senden
+							}
+						}
+					}
+				}
+				else timercnt[objno]=0;
+	  		}
+		}
+
+#endif
+
+			
 		
 		}// end if(APPLICATION RUN..
 		else if (RTCCON>=0x80 && connected)	// Realtime clock ueberlauf
@@ -243,7 +269,7 @@ void main(void)
 		else {
 			for(n=0;n<100;n++);	// falls Hauptroutine keine Zeit verbraucht, der PROG LED etwas Zeit geben, damit sie auch leuchten kann
 		}
-		cmd;
+
 DEBUGPOINT;
 //SNIFFPOINT;	
 		
