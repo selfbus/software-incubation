@@ -272,7 +272,7 @@ void schalten(__bit risefall, unsigned char pinno)	// Schaltbefehl senden
 		if (pinno>=8)func=func>>4;			// wenn 2. Schaltobjekt dann obere 4 bit
 		if (risefall) func=(func>>2);		// Funktion bei steigender Flanke obere 2 bit
 		func=func&0x03;					// Funktion maskieren
-		if (func!=0)
+		if (func!=0 || !bus_return_ready)// bypass für bus return, damit immer Eingangszustand auch dann gesendet wird wenn flanken nicht parametriert
 		{
 			if (func==0x03) sendval=read_obj_value(pinno) ^0x01;  //UM
 			else sendval = func & 0x01;	// EIN   AUS

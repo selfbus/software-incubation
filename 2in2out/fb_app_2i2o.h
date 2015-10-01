@@ -44,7 +44,7 @@
 //#define wertgeber				// mit Wertgeber
 //#define zaehler				// mit Zähler
 //#define dimmer					// mit Dimmfunktionen
-#define zykls					// mit zyklisches senden
+//#define zykls					// mit zyklisches senden
 //#define jalo
 
 #ifdef zeroswitch
@@ -112,7 +112,7 @@ extern unsigned char rm_send;		// die von der main zu sendenden Rückmeldungen
 extern unsigned char timercnt[TIMERANZ];
 extern unsigned char timerbase[TIMERANZ];
 extern unsigned char timerstate[TIMERANZ];
-
+extern __bit bus_return_ready;
 
 #ifdef zeroswitch
 extern unsigned char portausgabe_on; // einzuschaltende IO, die dann im ext 0 int übernommen werden

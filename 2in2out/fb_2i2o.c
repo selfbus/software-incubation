@@ -87,25 +87,19 @@ void main(void)
 { 
 	unsigned char timer_precounter=0;
 
-	unsigned char n,tmp,tasterpegel=0,pin=2,objno,objstate;
+	unsigned char n,tasterpegel=0,pin=2;
 	unsigned int base;
-//	signed char cal;
-//	unsigned int m;
 	unsigned char rm_count=0;
+#ifdef zykls
+	unsigned char objno,tmp,objstate;
+#endif
 	__bit wduf;
 	__bit tastergetoggelt=0;
 	__bit bus_activ=0;
 
 	wduf=WDCON&0x02;
 	restart_hw();							// Hardware zuruecksetzen
-// im folgendem wird der watchdof underflow abgefragt und mit gedrücktem Progtaster
-// ein resetten der cal Variable veranlasst um wieder per rs232 trimmen zu können.	
-//	TASTER=1;
-//	if(!TASTER && wduf)cal=0;
-//	else cal=trimsave;
 	TASTER=0;
-//	TRIM = (TRIM+trimsave);
-//	TRIM &= 0x3F;//oberen 2 bits ausblenden
 	TR0=1;
 	restart_app();							// Anwendungsspezifische Einstellungen zuruecksetzen
 	if(!wduf){
@@ -126,10 +120,9 @@ void main(void)
 			    //	  stop_rtc;
 		  }
 	  }
-		WATCHDOG_INIT
-		WATCHDOG_START
 
-	//if(!wduf)bus_return();							// Aktionen bei Busspannungswiederkehr
+	WATCHDOG_INIT
+	WATCHDOG_START
 
 #ifndef debugmode
 	RS_INIT_600
@@ -167,21 +160,12 @@ void main(void)
 	   //   else pin=3;	// nächsten pin prüfen..
 	      pin^=0x01;// pin ist mit 2 initialisiert somit wird zwischen 2 und 3 hin und hergeschalten
 	    }
-	      
-			
-			
-			
-			
 			if(RTCCON>=0x80){
 				RTCCON=0x60;		// RTC Flag löschen
-				RTCH=0x03;			//0E reload Real Time Clock
-				RTCL=0x9A;			//A0 16ms +precounter x4
+				RTCH=0x0E;			//0E reload Real Time Clock
+				RTCL=0xA0;			//A0 16ms +precounter x4
 				RTCCON=0x61;		// RTC  Flag löschen
-				timer_precounter++;
-				if((timer_precounter&0x03)==3)
-				{
-					delay_timer();	// timer handler jedes 4. mal--> 64ms
-				}
+				delay_timer();	// timer handler jedes 4. mal--> 64ms
 			}
 			if(TF0 && (TMOD & 0x0F)==0x01) {	// Vollstrom für Relais ausschalten und wieder PWM ein
 				TMOD=(TMOD & 0xF0) + 2;			// Timer 0 als PWM
