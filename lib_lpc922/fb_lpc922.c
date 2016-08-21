@@ -86,12 +86,14 @@ void T1_int(void) __interrupt (3) 	// Timer 1 Interrupt
 	// Empfang aktiv, Busfrei counter runterzaehlen und wenn Bus frei, dann Sendespeicher
 	// pruefen und ggf. Senden initiieren
 	case 0:
+	/*
 		TR1=0;			// Timer 1 stoppen
 		TMOD=(TMOD & 0x0F) + 0x20;	// Timer 1 als 8-Bit autoreload
 		TL1=128;		// Timer laden
 		TH1=128;
 		TF1=0;			// Timer1-flag loeschen						1 cycle
 		TR1=1;			// Timer1 starten							1 cycle
+	*/
 		if(tx_nextsend != tx_nextwrite) { 			// wenn zu sendendes Objekt vorhanden
 
 			// __bit build_tel(unsigned char objno)
@@ -214,12 +216,14 @@ void T1_int(void) __interrupt (3) 	// Timer 1 Interrupt
 			//}
 			if(build_ok){//(build_tel(tx_buffer[tx_nextsend])) {	// wenn Telegramm gebildet werden konnte
 				EX1=0; 				//Um zu vermeiden dass man in die Abfrage hinein-empfaengt
-				if(!fb_state) { 	//nur bilden wenn vorher kein rx_intit durch ext int kam
-					if((tx_buffer[tx_nextsend]&0x20)==0) {	// wenn erstmaliges Senden des Objektes
-						tx_buffer[tx_nextsend]|=0x20;		// Bit fuer "wird gerade gesendet"
+				if(!fb_state) { 	//nur senden wenn vorher kein rx_intit durch ext int kam
+//					if((tx_buffer[tx_nextsend]&0x20)==0) {	// wenn erstmaliges Senden des Objektes
+					if(!repeatflag) {	// wenn erstmaliges Senden des Objektes
+						tx_buffer[tx_nextsend]|=0x20;		// Bit fuer "wird gerade gesendet" (war vorher im state 0 )
 						repeat_count=0;						// Wiederholungszaehler fuer nicht geackte Telegramme
 					}
-					if (repeat_count<4) init_tx();		// Senden starten
+					if (repeat_count<4) init_tx((__bit)(telegramm[0]&0x01)&& repeat_count==0);// Senden starten (eventuell mit 3 Bit verzögerung)
+//					if (repeat_count<4) init_tx(0);// Senden starten (eventuell mit 3 Bit verzögerung)
 					else {		// wenn bereits 4 x wiederholt oder erfolgreich gesendet(geackt) -> naechstes Objekt
 						tx_nextsend++;
 						tx_nextsend&=0x07;
@@ -350,19 +354,27 @@ void T1_int(void) __interrupt (3) 	// Timer 1 Interrupt
 		if (telegramm_ok) {	// Checksum und Laenge OK
 			if (its_me) {					// Gerät adressiert
 				send_ack=1;
-				init_tx();						// Senden initiieren
+				init_tx(0);						// Senden initiieren
 				wait_for_ack=0;					// bei ACK senden nicht erneut auf ACK warten
 			}
 			else init_rx();					// Gerät nicht adressiert, also zurück zu Empfang
 		}
 		else {							// Checksum oder Parity nicht OK
 			send_nack=1;
-			init_tx();
+			init_tx(0);
 			wait_for_ack=0;					// bei NACK senden nicht erneut auf ACK warten
 		}
 		break;
 
-
+	case 9:
+		TR1=0;			// Timer 1 stoppen
+		TMOD=(TMOD & 0x0F) + 0x20;	// Timer 1 als 8-Bit autoreload
+		TL1=128;		// Timer laden
+		TH1=110;
+		TF1=0;			// Timer1-flag loeschen						1 cycle
+		TR1=1;			// Timer1 starten							1 cycle
+		fb_state=10;
+		break;
 
 	case 10:	// Byte Senden, T=0us
 		send_byte=telegramm[telpos];
@@ -480,7 +492,7 @@ void init_rx(void) 	// Empfangen initiieren (statemachine auf Anfang)
 }
 
 
-void init_tx(void) 		// Checksum des Telegramms berechnen und Senden initiieren
+void init_tx(__bit low_prio_time) 		// Checksum des Telegramms berechnen und Senden initiieren
 {
 	unsigned char n, cs_pos;
 
@@ -499,8 +511,15 @@ void init_tx(void) 		// Checksum des Telegramms berechnen und Senden initiieren
 	ack=0;
 	nack=0;
 	wait_for_ack=1;
-
 	fb_state=10;						// naechster state: senden
+	if (low_prio_time){
+		fb_state=9;
+		TR1=0;
+		TMOD=(TMOD & 0x0F) +0x10;	// Timer 1 als 16-Bit Timer
+		TH1=0xFB;					// Timer 1 auf Low Prio Abstand setzen (3 Bit Pause = 312Âµs
+		TL1=0x90;
+		TR1=1;
+	}
 	fb_pattern=0;						// naechstes zu sendendes Bit, 0=Startbit
 	telpos=0;							// naechstes zu sendende Byte
 	EX1=0;								// ext. int1 inaktiv

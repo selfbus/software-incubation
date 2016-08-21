@@ -15,6 +15,7 @@ S:Lfb_lpc922.T1_int$type$3$3({1}SB0$1:U),R,0,0,[b2]
 S:Lfb_lpc922.T1_int$repeatflag$3$3({1}SB0$1:U),R,0,0,[b1]
 F:G$init_rx$0$0({2}DF,SV:S),Z,0,0,0,0,0
 F:G$init_tx$0$0({2}DF,SV:S),Z,0,0,0,0,0
+S:Lfb_lpc922.init_tx$low_prio_time$1$1({1}SB0$1:U),R,0,0,[b0]
 S:Lfb_lpc922.init_tx$n$1$1({1}SC:U),R,0,0,[r6]
 S:Lfb_lpc922.init_tx$cs_pos$1$1({1}SC:U),R,0,0,[r7]
 F:G$gapos_in_gat$0$0({2}DF,SC:U),Z,0,0,0,0,0
