@@ -37,6 +37,7 @@ unsigned char __at(0x00) RAM[00]; //nur fuer die Debug Ausgabe
 
 //__code unsigned char __at(USERRAM_ADDR) userram[255];/// Bereich im Flash fuer User-RAM
 __code unsigned char __at(EEPROM_ADDR) eeprom[255];	 /// Bereich im Flash fuer EEPROM
+__code unsigned char priotable[]={0xB0,0xB8,0xB4,0xBC};
 
 __bit parity_ok;			// Parity Bit des letzten empfangenen Bytes OK
 volatile __bit interrupted;	// Wird durch interrupt-routine gesetzt. So kann eine andere Routine pruefen, ob sie unterbrochen wurde
@@ -104,6 +105,9 @@ void T1_int(void) __interrupt (3) 	// Timer 1 Interrupt
 				__bit type, repeatflag;
 
 				repeatflag=objno&0x20;
+				// Die Absenderadresse brauchen wir sowieso immer!...
+				telegramm[1]=eeprom[ADDRTAB+1];
+				telegramm[2]=eeprom[ADDRTAB+2];
 
 				if(objno<128) {		// Multicast
 					type=(objno&0x40);	// bei Multicast ist type0 normal und type1 response telegramm
@@ -119,16 +123,14 @@ void T1_int(void) __interrupt (3) 	// Timer 1 Interrupt
 					{
 						n=eeprom[COMMSTABPTR]+objno+objno+objno+3; //Adresse obj flags für Priorität holen
 						
-						telegramm[0]=0xB0 |((eeprom[n]&0x03)<< 2);// die prio ins erste Byte des tele einfügen
-						telegramm[1]=eeprom[ADDRTAB+1];
-						telegramm[2]=eeprom[ADDRTAB+2];
+						telegramm[0]=priotable[eeprom[n]&0x03];// die prio ins erste Byte des tele einfügen
 						telegramm[3]=eeprom[ADDRTAB+1+gapos*2];
 						telegramm[4]=eeprom[ADDRTAB+2+gapos*2];
 						telegramm[6]=0x00;
 						if (type) telegramm[7]=0x40;		// read_value_response Telegramm (angefordert)
 						else telegramm[7]=0x80;				// write_value_request Telegramm (nicht angefordert)
 
-						objtype=eeprom[n+1];		// eine Adresse höher ist objecttype
+						objtype=eeprom[n+1];		// eine Adresse höher als obj flags ist objecttype
 
 						if(objtype>6) length=objtype-5; else length=1;
 						telegramm[5]=0xE0+length;
@@ -142,8 +144,8 @@ void T1_int(void) __interrupt (3) 	// Timer 1 Interrupt
 				}
 				else {		// Unicast
 					telegramm[0]=0xB0;				// Control Byte
-					telegramm[1]=eeprom[ADDRTAB+1];	// Quelladresse ist phys. Adresse
-					telegramm[2]=eeprom[ADDRTAB+2];
+					//telegramm[1]=eeprom[ADDRTAB+1];	// Quelladresse ist phys. Adresse
+					//telegramm[2]=eeprom[ADDRTAB+2];	// zwecks Einsparung vor dem if( verlegt.
 					telegramm[3]=conh;
 					telegramm[4]=conl;
 
