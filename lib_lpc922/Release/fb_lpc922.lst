@@ -1,0 +1,3161 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : free open source ANSI-C Compiler
+                              3 ; Version 3.1.0 #7066 (Nov 22 2011) (MINGW32)
+                              4 ; This file was generated Sun Aug 21 11:09:01 2016
+                              5 ;--------------------------------------------------------
+                              6 	.module fb_lpc922
+                              7 	.optsdcc -mmcs51 --model-small
+                              8 	
+                              9 ;--------------------------------------------------------
+                             10 ; Public variables in this module
+                             11 ;--------------------------------------------------------
+                             12 	.globl _priotable
+                             13 	.globl _eeprom
+                             14 	.globl _read_obj_value
+                             15 	.globl _read_value_req
+                             16 	.globl _write_value_req
+                             17 	.globl _P3_1
+                             18 	.globl _P3_0
+                             19 	.globl _P1_7
+                             20 	.globl _P1_6
+                             21 	.globl _P1_5
+                             22 	.globl _P1_4
+                             23 	.globl _P1_3
+                             24 	.globl _P1_2
+                             25 	.globl _P1_1
+                             26 	.globl _P1_0
+                             27 	.globl _P0_7
+                             28 	.globl _P0_6
+                             29 	.globl _P0_5
+                             30 	.globl _P0_4
+                             31 	.globl _P0_3
+                             32 	.globl _P0_2
+                             33 	.globl _P0_1
+                             34 	.globl _P0_0
+                             35 	.globl _I2CON_0
+                             36 	.globl _I2CON_2
+                             37 	.globl _I2CON_3
+                             38 	.globl _I2CON_4
+                             39 	.globl _I2CON_5
+                             40 	.globl _I2CON_6
+                             41 	.globl _SCON_7
+                             42 	.globl _SCON_6
+                             43 	.globl _SCON_5
+                             44 	.globl _SCON_4
+                             45 	.globl _SCON_3
+                             46 	.globl _SCON_2
+                             47 	.globl _SCON_1
+                             48 	.globl _SCON_0
+                             49 	.globl _IP0_0
+                             50 	.globl _IP0_1
+                             51 	.globl _IP0_2
+                             52 	.globl _IP0_3
+                             53 	.globl _IP0_4
+                             54 	.globl _IP0_5
+                             55 	.globl _IP0_6
+                             56 	.globl _IP1_0
+                             57 	.globl _IP1_1
+                             58 	.globl _IP1_2
+                             59 	.globl _IP1_6
+                             60 	.globl _IEN1_0
+                             61 	.globl _IEN1_1
+                             62 	.globl _IEN1_2
+                             63 	.globl _IEN0_0
+                             64 	.globl _IEN0_1
+                             65 	.globl _IEN0_2
+                             66 	.globl _IEN0_3
+                             67 	.globl _IEN0_4
+                             68 	.globl _IEN0_5
+                             69 	.globl _IEN0_6
+                             70 	.globl _IEN0_7
+                             71 	.globl _TCON_0
+                             72 	.globl _TCON_1
+                             73 	.globl _TCON_2
+                             74 	.globl _TCON_3
+                             75 	.globl _TCON_4
+                             76 	.globl _TCON_5
+                             77 	.globl _TCON_6
+                             78 	.globl _TCON_7
+                             79 	.globl _PSW_7
+                             80 	.globl _PSW_6
+                             81 	.globl _PSW_5
+                             82 	.globl _PSW_4
+                             83 	.globl _PSW_3
+                             84 	.globl _PSW_2
+                             85 	.globl _PSW_1
+                             86 	.globl _PSW_0
+                             87 	.globl _IEN1
+                             88 	.globl _IP0H
+                             89 	.globl _WFEED2
+                             90 	.globl _WFEED1
+                             91 	.globl _WDL
+                             92 	.globl _WDCON
+                             93 	.globl _TRIM
+                             94 	.globl _TAMOD
+                             95 	.globl _SSTAT
+                             96 	.globl _RTCL
+                             97 	.globl _RTCH
+                             98 	.globl _RTCCON
+                             99 	.globl _RSTSRC
+                            100 	.globl _PT0AD
+                            101 	.globl _PCONA
+                            102 	.globl _P3M2
+                            103 	.globl _P3M1
+                            104 	.globl _P1M2
+                            105 	.globl _P1M1
+                            106 	.globl _P0M2
+                            107 	.globl _P0M1
+                            108 	.globl _KBPATN
+                            109 	.globl _KBMASK
+                            110 	.globl _KBCON
+                            111 	.globl _IP1H
+                            112 	.globl _IP1
+                            113 	.globl _I2STAT
+                            114 	.globl _I2SCLL
+                            115 	.globl _I2SCLH
+                            116 	.globl _I2DAT
+                            117 	.globl _I2CON
+                            118 	.globl _I2ADR
+                            119 	.globl _FMDATA
+                            120 	.globl _FMCON
+                            121 	.globl _FMADRL
+                            122 	.globl _FMADRH
+                            123 	.globl _DIVM
+                            124 	.globl _CMP2
+                            125 	.globl _CMP1
+                            126 	.globl _BRGCON
+                            127 	.globl _BRGR1
+                            128 	.globl _BRGR0
+                            129 	.globl _SADEN
+                            130 	.globl _SADDR
+                            131 	.globl _AUXR1
+                            132 	.globl _SBUF
+                            133 	.globl _SCON
+                            134 	.globl _IP0
+                            135 	.globl _IEN0
+                            136 	.globl _TH1
+                            137 	.globl _TH0
+                            138 	.globl _TL1
+                            139 	.globl _TL0
+                            140 	.globl _TMOD
+                            141 	.globl _TCON
+                            142 	.globl _PCON
+                            143 	.globl _DPH
+                            144 	.globl _DPL
+                            145 	.globl _SP
+                            146 	.globl _B
+                            147 	.globl _ACC
+                            148 	.globl _PSW
+                            149 	.globl _P3
+                            150 	.globl _P1
+                            151 	.globl _P0
+                            152 	.globl _telegramm_ok
+                            153 	.globl _inc_pcount
+                            154 	.globl _connected
+                            155 	.globl _send_nack
+                            156 	.globl _send_ack
+                            157 	.globl _wait_for_ack
+                            158 	.globl _fbtx_bit
+                            159 	.globl _auto_ack
+                            160 	.globl _tel_sent
+                            161 	.globl _tel_arrived
+                            162 	.globl _its_me
+                            163 	.globl _nack
+                            164 	.globl _ack
+                            165 	.globl _fb_parity
+                            166 	.globl _interrupted
+                            167 	.globl _parity_ok
+                            168 	.globl _connected_timeout
+                            169 	.globl _status60
+                            170 	.globl _tx_nextsend
+                            171 	.globl _tx_nextwrite
+                            172 	.globl _RAM
+                            173 	.globl _repeat_count
+                            174 	.globl _fb_state
+                            175 	.globl _fb_pattern
+                            176 	.globl _fbrx_byte
+                            177 	.globl _cs
+                            178 	.globl _telpos
+                            179 	.globl _tx_buffer
+                            180 	.globl _telegramm
+                            181 	.globl _senders_pcount
+                            182 	.globl _mem_adrl
+                            183 	.globl _mem_adrh
+                            184 	.globl _mem_length
+                            185 	.globl _pcount
+                            186 	.globl _conl
+                            187 	.globl _conh
+                            188 	.globl _X1_int
+                            189 	.globl _T1_int
+                            190 	.globl _init_rx
+                            191 	.globl _init_tx
+                            192 	.globl _gapos_in_gat
+                            193 	.globl _send_obj_value
+                            194 	.globl _process_tel
+                            195 	.globl _read_objflags
+                            196 	.globl _restart_hw
+                            197 ;--------------------------------------------------------
+                            198 ; special function registers
+                            199 ;--------------------------------------------------------
+                            200 	.area RSEG    (ABS,DATA)
+   0000                     201 	.org 0x0000
+                    0080    202 G$P0$0$0 == 0x0080
+                    0080    203 _P0	=	0x0080
+                    0090    204 G$P1$0$0 == 0x0090
+                    0090    205 _P1	=	0x0090
+                    00B0    206 G$P3$0$0 == 0x00b0
+                    00B0    207 _P3	=	0x00b0
+                    00D0    208 G$PSW$0$0 == 0x00d0
+                    00D0    209 _PSW	=	0x00d0
+                    00E0    210 G$ACC$0$0 == 0x00e0
+                    00E0    211 _ACC	=	0x00e0
+                    00F0    212 G$B$0$0 == 0x00f0
+                    00F0    213 _B	=	0x00f0
+                    0081    214 G$SP$0$0 == 0x0081
+                    0081    215 _SP	=	0x0081
+                    0082    216 G$DPL$0$0 == 0x0082
+                    0082    217 _DPL	=	0x0082
+                    0083    218 G$DPH$0$0 == 0x0083
+                    0083    219 _DPH	=	0x0083
+                    0087    220 G$PCON$0$0 == 0x0087
+                    0087    221 _PCON	=	0x0087
+                    0088    222 G$TCON$0$0 == 0x0088
+                    0088    223 _TCON	=	0x0088
+                    0089    224 G$TMOD$0$0 == 0x0089
+                    0089    225 _TMOD	=	0x0089
+                    008A    226 G$TL0$0$0 == 0x008a
+                    008A    227 _TL0	=	0x008a
+                    008B    228 G$TL1$0$0 == 0x008b
+                    008B    229 _TL1	=	0x008b
+                    008C    230 G$TH0$0$0 == 0x008c
+                    008C    231 _TH0	=	0x008c
+                    008D    232 G$TH1$0$0 == 0x008d
+                    008D    233 _TH1	=	0x008d
+                    00A8    234 G$IEN0$0$0 == 0x00a8
+                    00A8    235 _IEN0	=	0x00a8
+                    00B8    236 G$IP0$0$0 == 0x00b8
+                    00B8    237 _IP0	=	0x00b8
+                    0098    238 G$SCON$0$0 == 0x0098
+                    0098    239 _SCON	=	0x0098
+                    0099    240 G$SBUF$0$0 == 0x0099
+                    0099    241 _SBUF	=	0x0099
+                    00A2    242 G$AUXR1$0$0 == 0x00a2
+                    00A2    243 _AUXR1	=	0x00a2
+                    00A9    244 G$SADDR$0$0 == 0x00a9
+                    00A9    245 _SADDR	=	0x00a9
+                    00B9    246 G$SADEN$0$0 == 0x00b9
+                    00B9    247 _SADEN	=	0x00b9
+                    00BE    248 G$BRGR0$0$0 == 0x00be
+                    00BE    249 _BRGR0	=	0x00be
+                    00BF    250 G$BRGR1$0$0 == 0x00bf
+                    00BF    251 _BRGR1	=	0x00bf
+                    00BD    252 G$BRGCON$0$0 == 0x00bd
+                    00BD    253 _BRGCON	=	0x00bd
+                    00AC    254 G$CMP1$0$0 == 0x00ac
+                    00AC    255 _CMP1	=	0x00ac
+                    00AD    256 G$CMP2$0$0 == 0x00ad
+                    00AD    257 _CMP2	=	0x00ad
+                    0095    258 G$DIVM$0$0 == 0x0095
+                    0095    259 _DIVM	=	0x0095
+                    00E7    260 G$FMADRH$0$0 == 0x00e7
+                    00E7    261 _FMADRH	=	0x00e7
+                    00E6    262 G$FMADRL$0$0 == 0x00e6
+                    00E6    263 _FMADRL	=	0x00e6
+                    00E4    264 G$FMCON$0$0 == 0x00e4
+                    00E4    265 _FMCON	=	0x00e4
+                    00E5    266 G$FMDATA$0$0 == 0x00e5
+                    00E5    267 _FMDATA	=	0x00e5
+                    00DB    268 G$I2ADR$0$0 == 0x00db
+                    00DB    269 _I2ADR	=	0x00db
+                    00D8    270 G$I2CON$0$0 == 0x00d8
+                    00D8    271 _I2CON	=	0x00d8
+                    00DA    272 G$I2DAT$0$0 == 0x00da
+                    00DA    273 _I2DAT	=	0x00da
+                    00DD    274 G$I2SCLH$0$0 == 0x00dd
+                    00DD    275 _I2SCLH	=	0x00dd
+                    00DC    276 G$I2SCLL$0$0 == 0x00dc
+                    00DC    277 _I2SCLL	=	0x00dc
+                    00D9    278 G$I2STAT$0$0 == 0x00d9
+                    00D9    279 _I2STAT	=	0x00d9
+                    00F8    280 G$IP1$0$0 == 0x00f8
+                    00F8    281 _IP1	=	0x00f8
+                    00F7    282 G$IP1H$0$0 == 0x00f7
+                    00F7    283 _IP1H	=	0x00f7
+                    0094    284 G$KBCON$0$0 == 0x0094
+                    0094    285 _KBCON	=	0x0094
+                    0086    286 G$KBMASK$0$0 == 0x0086
+                    0086    287 _KBMASK	=	0x0086
+                    0093    288 G$KBPATN$0$0 == 0x0093
+                    0093    289 _KBPATN	=	0x0093
+                    0084    290 G$P0M1$0$0 == 0x0084
+                    0084    291 _P0M1	=	0x0084
+                    0085    292 G$P0M2$0$0 == 0x0085
+                    0085    293 _P0M2	=	0x0085
+                    0091    294 G$P1M1$0$0 == 0x0091
+                    0091    295 _P1M1	=	0x0091
+                    0092    296 G$P1M2$0$0 == 0x0092
+                    0092    297 _P1M2	=	0x0092
+                    00B1    298 G$P3M1$0$0 == 0x00b1
+                    00B1    299 _P3M1	=	0x00b1
+                    00B2    300 G$P3M2$0$0 == 0x00b2
+                    00B2    301 _P3M2	=	0x00b2
+                    00B5    302 G$PCONA$0$0 == 0x00b5
+                    00B5    303 _PCONA	=	0x00b5
+                    00F6    304 G$PT0AD$0$0 == 0x00f6
+                    00F6    305 _PT0AD	=	0x00f6
+                    00DF    306 G$RSTSRC$0$0 == 0x00df
+                    00DF    307 _RSTSRC	=	0x00df
+                    00D1    308 G$RTCCON$0$0 == 0x00d1
+                    00D1    309 _RTCCON	=	0x00d1
+                    00D2    310 G$RTCH$0$0 == 0x00d2
+                    00D2    311 _RTCH	=	0x00d2
+                    00D3    312 G$RTCL$0$0 == 0x00d3
+                    00D3    313 _RTCL	=	0x00d3
+                    00BA    314 G$SSTAT$0$0 == 0x00ba
+                    00BA    315 _SSTAT	=	0x00ba
+                    008F    316 G$TAMOD$0$0 == 0x008f
+                    008F    317 _TAMOD	=	0x008f
+                    0096    318 G$TRIM$0$0 == 0x0096
+                    0096    319 _TRIM	=	0x0096
+                    00A7    320 G$WDCON$0$0 == 0x00a7
+                    00A7    321 _WDCON	=	0x00a7
+                    00C1    322 G$WDL$0$0 == 0x00c1
+                    00C1    323 _WDL	=	0x00c1
+                    00C2    324 G$WFEED1$0$0 == 0x00c2
+                    00C2    325 _WFEED1	=	0x00c2
+                    00C3    326 G$WFEED2$0$0 == 0x00c3
+                    00C3    327 _WFEED2	=	0x00c3
+                    00B7    328 G$IP0H$0$0 == 0x00b7
+                    00B7    329 _IP0H	=	0x00b7
+                    00E8    330 G$IEN1$0$0 == 0x00e8
+                    00E8    331 _IEN1	=	0x00e8
+                            332 ;--------------------------------------------------------
+                            333 ; special function bits
+                            334 ;--------------------------------------------------------
+                            335 	.area RSEG    (ABS,DATA)
+   0000                     336 	.org 0x0000
+                    00D0    337 G$PSW_0$0$0 == 0x00d0
+                    00D0    338 _PSW_0	=	0x00d0
+                    00D1    339 G$PSW_1$0$0 == 0x00d1
+                    00D1    340 _PSW_1	=	0x00d1
+                    00D2    341 G$PSW_2$0$0 == 0x00d2
+                    00D2    342 _PSW_2	=	0x00d2
+                    00D3    343 G$PSW_3$0$0 == 0x00d3
+                    00D3    344 _PSW_3	=	0x00d3
+                    00D4    345 G$PSW_4$0$0 == 0x00d4
+                    00D4    346 _PSW_4	=	0x00d4
+                    00D5    347 G$PSW_5$0$0 == 0x00d5
+                    00D5    348 _PSW_5	=	0x00d5
+                    00D6    349 G$PSW_6$0$0 == 0x00d6
+                    00D6    350 _PSW_6	=	0x00d6
+                    00D7    351 G$PSW_7$0$0 == 0x00d7
+                    00D7    352 _PSW_7	=	0x00d7
+                    008F    353 G$TCON_7$0$0 == 0x008f
+                    008F    354 _TCON_7	=	0x008f
+                    008E    355 G$TCON_6$0$0 == 0x008e
+                    008E    356 _TCON_6	=	0x008e
+                    008D    357 G$TCON_5$0$0 == 0x008d
+                    008D    358 _TCON_5	=	0x008d
+                    008C    359 G$TCON_4$0$0 == 0x008c
+                    008C    360 _TCON_4	=	0x008c
+                    008B    361 G$TCON_3$0$0 == 0x008b
+                    008B    362 _TCON_3	=	0x008b
+                    008A    363 G$TCON_2$0$0 == 0x008a
+                    008A    364 _TCON_2	=	0x008a
+                    0089    365 G$TCON_1$0$0 == 0x0089
+                    0089    366 _TCON_1	=	0x0089
+                    0088    367 G$TCON_0$0$0 == 0x0088
+                    0088    368 _TCON_0	=	0x0088
+                    00AF    369 G$IEN0_7$0$0 == 0x00af
+                    00AF    370 _IEN0_7	=	0x00af
+                    00AE    371 G$IEN0_6$0$0 == 0x00ae
+                    00AE    372 _IEN0_6	=	0x00ae
+                    00AD    373 G$IEN0_5$0$0 == 0x00ad
+                    00AD    374 _IEN0_5	=	0x00ad
+                    00AC    375 G$IEN0_4$0$0 == 0x00ac
+                    00AC    376 _IEN0_4	=	0x00ac
+                    00AB    377 G$IEN0_3$0$0 == 0x00ab
+                    00AB    378 _IEN0_3	=	0x00ab
+                    00AA    379 G$IEN0_2$0$0 == 0x00aa
+                    00AA    380 _IEN0_2	=	0x00aa
+                    00A9    381 G$IEN0_1$0$0 == 0x00a9
+                    00A9    382 _IEN0_1	=	0x00a9
+                    00A8    383 G$IEN0_0$0$0 == 0x00a8
+                    00A8    384 _IEN0_0	=	0x00a8
+                    00EA    385 G$IEN1_2$0$0 == 0x00ea
+                    00EA    386 _IEN1_2	=	0x00ea
+                    00E9    387 G$IEN1_1$0$0 == 0x00e9
+                    00E9    388 _IEN1_1	=	0x00e9
+                    00E8    389 G$IEN1_0$0$0 == 0x00e8
+                    00E8    390 _IEN1_0	=	0x00e8
+                    00FE    391 G$IP1_6$0$0 == 0x00fe
+                    00FE    392 _IP1_6	=	0x00fe
+                    00FA    393 G$IP1_2$0$0 == 0x00fa
+                    00FA    394 _IP1_2	=	0x00fa
+                    00F9    395 G$IP1_1$0$0 == 0x00f9
+                    00F9    396 _IP1_1	=	0x00f9
+                    00F8    397 G$IP1_0$0$0 == 0x00f8
+                    00F8    398 _IP1_0	=	0x00f8
+                    00BE    399 G$IP0_6$0$0 == 0x00be
+                    00BE    400 _IP0_6	=	0x00be
+                    00BD    401 G$IP0_5$0$0 == 0x00bd
+                    00BD    402 _IP0_5	=	0x00bd
+                    00BC    403 G$IP0_4$0$0 == 0x00bc
+                    00BC    404 _IP0_4	=	0x00bc
+                    00BB    405 G$IP0_3$0$0 == 0x00bb
+                    00BB    406 _IP0_3	=	0x00bb
+                    00BA    407 G$IP0_2$0$0 == 0x00ba
+                    00BA    408 _IP0_2	=	0x00ba
+                    00B9    409 G$IP0_1$0$0 == 0x00b9
+                    00B9    410 _IP0_1	=	0x00b9
+                    00B8    411 G$IP0_0$0$0 == 0x00b8
+                    00B8    412 _IP0_0	=	0x00b8
+                    0098    413 G$SCON_0$0$0 == 0x0098
+                    0098    414 _SCON_0	=	0x0098
+                    0099    415 G$SCON_1$0$0 == 0x0099
+                    0099    416 _SCON_1	=	0x0099
+                    009A    417 G$SCON_2$0$0 == 0x009a
+                    009A    418 _SCON_2	=	0x009a
+                    009B    419 G$SCON_3$0$0 == 0x009b
+                    009B    420 _SCON_3	=	0x009b
+                    009C    421 G$SCON_4$0$0 == 0x009c
+                    009C    422 _SCON_4	=	0x009c
+                    009D    423 G$SCON_5$0$0 == 0x009d
+                    009D    424 _SCON_5	=	0x009d
+                    009E    425 G$SCON_6$0$0 == 0x009e
+                    009E    426 _SCON_6	=	0x009e
+                    009F    427 G$SCON_7$0$0 == 0x009f
+                    009F    428 _SCON_7	=	0x009f
+                    00DE    429 G$I2CON_6$0$0 == 0x00de
+                    00DE    430 _I2CON_6	=	0x00de
+                    00DD    431 G$I2CON_5$0$0 == 0x00dd
+                    00DD    432 _I2CON_5	=	0x00dd
+                    00DC    433 G$I2CON_4$0$0 == 0x00dc
+                    00DC    434 _I2CON_4	=	0x00dc
+                    00DB    435 G$I2CON_3$0$0 == 0x00db
+                    00DB    436 _I2CON_3	=	0x00db
+                    00DA    437 G$I2CON_2$0$0 == 0x00da
+                    00DA    438 _I2CON_2	=	0x00da
+                    00D8    439 G$I2CON_0$0$0 == 0x00d8
+                    00D8    440 _I2CON_0	=	0x00d8
+                    0080    441 G$P0_0$0$0 == 0x0080
+                    0080    442 _P0_0	=	0x0080
+                    0081    443 G$P0_1$0$0 == 0x0081
+                    0081    444 _P0_1	=	0x0081
+                    0082    445 G$P0_2$0$0 == 0x0082
+                    0082    446 _P0_2	=	0x0082
+                    0083    447 G$P0_3$0$0 == 0x0083
+                    0083    448 _P0_3	=	0x0083
+                    0084    449 G$P0_4$0$0 == 0x0084
+                    0084    450 _P0_4	=	0x0084
+                    0085    451 G$P0_5$0$0 == 0x0085
+                    0085    452 _P0_5	=	0x0085
+                    0086    453 G$P0_6$0$0 == 0x0086
+                    0086    454 _P0_6	=	0x0086
+                    0087    455 G$P0_7$0$0 == 0x0087
+                    0087    456 _P0_7	=	0x0087
+                    0090    457 G$P1_0$0$0 == 0x0090
+                    0090    458 _P1_0	=	0x0090
+                    0091    459 G$P1_1$0$0 == 0x0091
+                    0091    460 _P1_1	=	0x0091
+                    0092    461 G$P1_2$0$0 == 0x0092
+                    0092    462 _P1_2	=	0x0092
+                    0093    463 G$P1_3$0$0 == 0x0093
+                    0093    464 _P1_3	=	0x0093
+                    0094    465 G$P1_4$0$0 == 0x0094
+                    0094    466 _P1_4	=	0x0094
+                    0095    467 G$P1_5$0$0 == 0x0095
+                    0095    468 _P1_5	=	0x0095
+                    0096    469 G$P1_6$0$0 == 0x0096
+                    0096    470 _P1_6	=	0x0096
+                    0097    471 G$P1_7$0$0 == 0x0097
+                    0097    472 _P1_7	=	0x0097
+                    00B0    473 G$P3_0$0$0 == 0x00b0
+                    00B0    474 _P3_0	=	0x00b0
+                    00B1    475 G$P3_1$0$0 == 0x00b1
+                    00B1    476 _P3_1	=	0x00b1
+                            477 ;--------------------------------------------------------
+                            478 ; overlayable register banks
+                            479 ;--------------------------------------------------------
+                            480 	.area REG_BANK_0	(REL,OVR,DATA)
+   0000                     481 	.ds 8
+                            482 ;--------------------------------------------------------
+                            483 ; overlayable bit register bank
+                            484 ;--------------------------------------------------------
+                            485 	.area BIT_BANK	(REL,OVR,DATA)
+   0000                     486 bits:
+   0000                     487 	.ds 1
+                    8000    488 	b0 = bits[0]
+                    8100    489 	b1 = bits[1]
+                    8200    490 	b2 = bits[2]
+                    8300    491 	b3 = bits[3]
+                    8400    492 	b4 = bits[4]
+                    8500    493 	b5 = bits[5]
+                    8600    494 	b6 = bits[6]
+                    8700    495 	b7 = bits[7]
+                            496 ;--------------------------------------------------------
+                            497 ; internal ram data
+                            498 ;--------------------------------------------------------
+                            499 	.area DSEG    (DATA)
+                    0000    500 G$conh$0$0==.
+   0000                     501 _conh::
+   0000                     502 	.ds 1
+                    0001    503 G$conl$0$0==.
+   0001                     504 _conl::
+   0001                     505 	.ds 1
+                    0002    506 G$pcount$0$0==.
+   0002                     507 _pcount::
+   0002                     508 	.ds 1
+                    0003    509 G$mem_length$0$0==.
+   0003                     510 _mem_length::
+   0003                     511 	.ds 1
+                    0004    512 G$mem_adrh$0$0==.
+   0004                     513 _mem_adrh::
+   0004                     514 	.ds 1
+                    0005    515 G$mem_adrl$0$0==.
+   0005                     516 _mem_adrl::
+   0005                     517 	.ds 1
+                    0006    518 G$senders_pcount$0$0==.
+   0006                     519 _senders_pcount::
+   0006                     520 	.ds 1
+                    0007    521 G$telegramm$0$0==.
+   0007                     522 _telegramm::
+   0007                     523 	.ds 23
+                    001E    524 G$tx_buffer$0$0==.
+   001E                     525 _tx_buffer::
+   001E                     526 	.ds 8
+                    0026    527 G$telpos$0$0==.
+   0026                     528 _telpos::
+   0026                     529 	.ds 1
+                    0027    530 G$cs$0$0==.
+   0027                     531 _cs::
+   0027                     532 	.ds 1
+                    0028    533 G$fbrx_byte$0$0==.
+   0028                     534 _fbrx_byte::
+   0028                     535 	.ds 1
+                    0029    536 G$fb_pattern$0$0==.
+   0029                     537 _fb_pattern::
+   0029                     538 	.ds 1
+                    002A    539 G$fb_state$0$0==.
+   002A                     540 _fb_state::
+   002A                     541 	.ds 1
+                    002B    542 G$repeat_count$0$0==.
+   002B                     543 _repeat_count::
+   002B                     544 	.ds 1
+                    0000    545 G$RAM$0$0 == 0x0000
+                    0000    546 _RAM	=	0x0000
+                    002C    547 G$tx_nextwrite$0$0==.
+   002C                     548 _tx_nextwrite::
+   002C                     549 	.ds 1
+                    002D    550 G$tx_nextsend$0$0==.
+   002D                     551 _tx_nextsend::
+   002D                     552 	.ds 1
+                    002E    553 G$status60$0$0==.
+   002E                     554 _status60::
+   002E                     555 	.ds 1
+                    002F    556 G$connected_timeout$0$0==.
+   002F                     557 _connected_timeout::
+   002F                     558 	.ds 1
+                            559 ;--------------------------------------------------------
+                            560 ; overlayable items in internal ram 
+                            561 ;--------------------------------------------------------
+                            562 	.area OSEG    (OVR,DATA)
+                            563 ;--------------------------------------------------------
+                            564 ; indirectly addressable internal ram data
+                            565 ;--------------------------------------------------------
+                            566 	.area ISEG    (DATA)
+                            567 ;--------------------------------------------------------
+                            568 ; absolute internal ram data
+                            569 ;--------------------------------------------------------
+                            570 	.area IABS    (ABS,DATA)
+                            571 	.area IABS    (ABS,DATA)
+                            572 ;--------------------------------------------------------
+                            573 ; bit data
+                            574 ;--------------------------------------------------------
+                            575 	.area BSEG    (BIT)
+                    0000    576 G$parity_ok$0$0==.
+   0000                     577 _parity_ok::
+   0000                     578 	.ds 1
+                    0001    579 G$interrupted$0$0==.
+   0001                     580 _interrupted::
+   0001                     581 	.ds 1
+                    0002    582 G$fb_parity$0$0==.
+   0002                     583 _fb_parity::
+   0002                     584 	.ds 1
+                    0003    585 G$ack$0$0==.
+   0003                     586 _ack::
+   0003                     587 	.ds 1
+                    0004    588 G$nack$0$0==.
+   0004                     589 _nack::
+   0004                     590 	.ds 1
+                    0005    591 G$its_me$0$0==.
+   0005                     592 _its_me::
+   0005                     593 	.ds 1
+                    0006    594 G$tel_arrived$0$0==.
+   0006                     595 _tel_arrived::
+   0006                     596 	.ds 1
+                    0007    597 G$tel_sent$0$0==.
+   0007                     598 _tel_sent::
+   0007                     599 	.ds 1
+                    0008    600 G$auto_ack$0$0==.
+   0008                     601 _auto_ack::
+   0008                     602 	.ds 1
+                    0009    603 G$fbtx_bit$0$0==.
+   0009                     604 _fbtx_bit::
+   0009                     605 	.ds 1
+                    000A    606 G$wait_for_ack$0$0==.
+   000A                     607 _wait_for_ack::
+   000A                     608 	.ds 1
+                    000B    609 G$send_ack$0$0==.
+   000B                     610 _send_ack::
+   000B                     611 	.ds 1
+                    000C    612 G$send_nack$0$0==.
+   000C                     613 _send_nack::
+   000C                     614 	.ds 1
+                    000D    615 G$connected$0$0==.
+   000D                     616 _connected::
+   000D                     617 	.ds 1
+                    000E    618 G$inc_pcount$0$0==.
+   000E                     619 _inc_pcount::
+   000E                     620 	.ds 1
+                    000F    621 G$telegramm_ok$0$0==.
+   000F                     622 _telegramm_ok::
+   000F                     623 	.ds 1
+                            624 ;--------------------------------------------------------
+                            625 ; paged external ram data
+                            626 ;--------------------------------------------------------
+                            627 	.area PSEG    (PAG,XDATA)
+                            628 ;--------------------------------------------------------
+                            629 ; external ram data
+                            630 ;--------------------------------------------------------
+                            631 	.area XSEG    (XDATA)
+                            632 ;--------------------------------------------------------
+                            633 ; absolute external ram data
+                            634 ;--------------------------------------------------------
+                            635 	.area XABS    (ABS,XDATA)
+                            636 ;--------------------------------------------------------
+                            637 ; external initialized ram data
+                            638 ;--------------------------------------------------------
+                            639 	.area XISEG   (XDATA)
+                            640 	.area HOME    (CODE)
+                            641 	.area GSINIT0 (CODE)
+                            642 	.area GSINIT1 (CODE)
+                            643 	.area GSINIT2 (CODE)
+                            644 	.area GSINIT3 (CODE)
+                            645 	.area GSINIT4 (CODE)
+                            646 	.area GSINIT5 (CODE)
+                            647 	.area GSINIT  (CODE)
+                            648 	.area GSFINAL (CODE)
+                            649 	.area CSEG    (CODE)
+                            650 ;--------------------------------------------------------
+                            651 ; global & static initialisations
+                            652 ;--------------------------------------------------------
+                            653 	.area HOME    (CODE)
+                            654 	.area GSINIT  (CODE)
+                            655 	.area GSFINAL (CODE)
+                            656 	.area GSINIT  (CODE)
+                            657 ;--------------------------------------------------------
+                            658 ; Home
+                            659 ;--------------------------------------------------------
+                            660 	.area HOME    (CODE)
+                            661 	.area HOME    (CODE)
+                            662 ;--------------------------------------------------------
+                            663 ; code
+                            664 ;--------------------------------------------------------
+                            665 	.area CSEG    (CODE)
+                            666 ;------------------------------------------------------------
+                            667 ;Allocation info for local variables in function 'X1_int'
+                            668 ;------------------------------------------------------------
+                    0000    669 	G$X1_int$0$0 ==.
+                    0000    670 	C$fb_lpc922.c$57$0$0 ==.
+                            671 ;	..\fb_lpc922.c:57: void X1_int(void) __interrupt (2)		// Flanke des Startbits laest int1 aus
+                            672 ;	-----------------------------------------
+                            673 ;	 function X1_int
+                            674 ;	-----------------------------------------
+   0000                     675 _X1_int:
+                    0007    676 	ar7 = 0x07
+                    0006    677 	ar6 = 0x06
+                    0005    678 	ar5 = 0x05
+                    0004    679 	ar4 = 0x04
+                    0003    680 	ar3 = 0x03
+                    0002    681 	ar2 = 0x02
+                    0001    682 	ar1 = 0x01
+                    0000    683 	ar0 = 0x00
+   0000 C0 E0               684 	push	acc
+   0002 C0 D0               685 	push	psw
+                    0004    686 	C$fb_lpc922.c$60$1$1 ==.
+                            687 ;	..\fb_lpc922.c:60: EX1=0;			// int1 stoppen								1 cycle = 0,27127us
+   0004 C2 AA               688 	clr	_IEN0_2
+                    0006    689 	C$fb_lpc922.c$61$1$1 ==.
+                            690 ;	..\fb_lpc922.c:61: TR1=0;			// Timer 1 stoppen
+   0006 C2 8E               691 	clr	_TCON_6
+                    0008    692 	C$fb_lpc922.c$62$1$1 ==.
+                            693 ;	..\fb_lpc922.c:62: TMOD=(TMOD & 0x0F) + 0x20;	// Timer 1 als 8-Bit autoreload
+   0008 74 0F               694 	mov	a,#0x0F
+   000A 55 89               695 	anl	a,_TMOD
+   000C 24 20               696 	add	a,#0x20
+   000E F5 89               697 	mov	_TMOD,a
+                    0010    698 	C$fb_lpc922.c$63$1$1 ==.
+                            699 ;	..\fb_lpc922.c:63: TL1=53;//108;//128;		// Timer laden so dass in state 2 bei 75Âµs abgefragt wird
+   0010 75 8B 35            700 	mov	_TL1,#0x35
+                    0013    701 	C$fb_lpc922.c$64$1$1 ==.
+                            702 ;	..\fb_lpc922.c:64: TH1=128;//128;			// autoreload auf 35Âµs setzen (gilt fuer sprung von 2 auf 3)
+   0013 75 8D 80            703 	mov	_TH1,#0x80
+                    0016    704 	C$fb_lpc922.c$65$1$1 ==.
+                            705 ;	..\fb_lpc922.c:65: TF1=0;			// Timer1-flag loeschen						1 cycle
+   0016 C2 8F               706 	clr	_TCON_7
+                    0018    707 	C$fb_lpc922.c$66$1$1 ==.
+                            708 ;	..\fb_lpc922.c:66: TR1=1;			// Timer1 starten							1 cycle
+   0018 D2 8E               709 	setb	_TCON_6
+                    001A    710 	C$fb_lpc922.c$67$1$1 ==.
+                            711 ;	..\fb_lpc922.c:67: ET1=1;			// Timer1-int aktiv							1 cycle
+   001A D2 AB               712 	setb	_IEN0_3
+                    001C    713 	C$fb_lpc922.c$68$1$1 ==.
+                            714 ;	..\fb_lpc922.c:68: fb_state=2;		// naechster state
+   001C 75*2A 02            715 	mov	_fb_state,#0x02
+                    001F    716 	C$fb_lpc922.c$69$1$1 ==.
+                            717 ;	..\fb_lpc922.c:69: fb_parity=0;	// Parity Bit loeschen
+   001F C2*02               718 	clr	_fb_parity
+                    0021    719 	C$fb_lpc922.c$70$1$1 ==.
+                            720 ;	..\fb_lpc922.c:70: parity_ok=1;	// wird bei Fehler geloescht
+   0021 D2*00               721 	setb	_parity_ok
+                    0023    722 	C$fb_lpc922.c$71$1$1 ==.
+                            723 ;	..\fb_lpc922.c:71: fb_pattern=0;
+   0023 75*29 00            724 	mov	_fb_pattern,#0x00
+                    0026    725 	C$fb_lpc922.c$72$1$1 ==.
+                            726 ;	..\fb_lpc922.c:72: fbrx_byte=0;
+   0026 75*28 00            727 	mov	_fbrx_byte,#0x00
+                    0029    728 	C$fb_lpc922.c$73$1$1 ==.
+                            729 ;	..\fb_lpc922.c:73: interrupted=1;	// signalisiert app, dass unterbrochen wurde
+   0029 D2*01               730 	setb	_interrupted
+   002B D0 D0               731 	pop	psw
+   002D D0 E0               732 	pop	acc
+                    002F    733 	C$fb_lpc922.c$74$1$1 ==.
+                    002F    734 	XG$X1_int$0$0 ==.
+   002F 32                  735 	reti
+                            736 ;	eliminated unneeded mov psw,# (no regs used in bank)
+                            737 ;	eliminated unneeded push/pop dpl
+                            738 ;	eliminated unneeded push/pop dph
+                            739 ;	eliminated unneeded push/pop b
+                            740 ;------------------------------------------------------------
+                            741 ;Allocation info for local variables in function 'T1_int'
+                            742 ;------------------------------------------------------------
+                            743 ;fbrx_bit                  Allocated to registers b0 
+                            744 ;send_byte                 Allocated to registers r7 
+                            745 ;objno                     Allocated to registers r7 
+                            746 ;build_ok                  Allocated to registers b0 
+                            747 ;objvalue                  Allocated to stack - _bp +1
+                            748 ;gapos                     Allocated to registers r5 r6 
+                            749 ;objtype                   Allocated to registers r6 
+                            750 ;n                         Allocated to registers r4 
+                            751 ;length                    Allocated to registers r6 
+                            752 ;asspos                    Allocated to registers r4 
+                            753 ;type                      Allocated to registers b2 
+                            754 ;repeatflag                Allocated to registers b1 
+                            755 ;------------------------------------------------------------
+                    0030    756 	G$T1_int$0$0 ==.
+                    0030    757 	C$fb_lpc922.c$78$1$1 ==.
+                            758 ;	..\fb_lpc922.c:78: void T1_int(void) __interrupt (3) 	// Timer 1 Interrupt
+                            759 ;	-----------------------------------------
+                            760 ;	 function T1_int
+                            761 ;	-----------------------------------------
+   0030                     762 _T1_int:
+   0030 C0*00               763 	push	bits
+   0032 C0 E0               764 	push	acc
+   0034 C0 F0               765 	push	b
+   0036 C0 82               766 	push	dpl
+   0038 C0 83               767 	push	dph
+   003A C0 07               768 	push	(0+7)
+   003C C0 06               769 	push	(0+6)
+   003E C0 05               770 	push	(0+5)
+   0040 C0 04               771 	push	(0+4)
+   0042 C0 03               772 	push	(0+3)
+   0044 C0 02               773 	push	(0+2)
+   0046 C0 01               774 	push	(0+1)
+   0048 C0 00               775 	push	(0+0)
+   004A C0 D0               776 	push	psw
+   004C 75 D0 00            777 	mov	psw,#0x00
+   004F C0*00               778 	push	_bp
+   0051 E5 81               779 	mov	a,sp
+   0053 F5*00               780 	mov	_bp,a
+   0055 24 04               781 	add	a,#0x04
+   0057 F5 81               782 	mov	sp,a
+                    0059    783 	C$fb_lpc922.c$84$1$1 ==.
+                            784 ;	..\fb_lpc922.c:84: switch (fb_state){
+   0059 E5*2A               785 	mov	a,_fb_state
+   005B FF                  786 	mov	r7,a
+   005C 24 F1               787 	add	a,#0xff - 0x0E
+   005E 50 03               788 	jnc	00326$
+   0060 02s05r94            789 	ljmp	00253$
+   0063                     790 00326$:
+   0063 EF                  791 	mov	a,r7
+   0064 2F                  792 	add	a,r7
+   0065 2F                  793 	add	a,r7
+   0066 90s00r6A            794 	mov	dptr,#00327$
+   0069 73                  795 	jmp	@a+dptr
+   006A                     796 00327$:
+   006A 02s00r97            797 	ljmp	00101$
+   006D 02s05r94            798 	ljmp	00253$
+   0070 02s03r2E            799 	ljmp	00150$
+   0073 02s03rEE            800 	ljmp	00187$
+   0076 02s03rF7            801 	ljmp	00188$
+   0079 02s04r81            802 	ljmp	00209$
+   007C 02s05r94            803 	ljmp	00253$
+   007F 02s05r94            804 	ljmp	00253$
+   0082 02s05r94            805 	ljmp	00253$
+   0085 02s05r94            806 	ljmp	00253$
+   0088 02s04rA3            807 	ljmp	00216$
+   008B 02s05r0B            808 	ljmp	00237$
+   008E 02s05r94            809 	ljmp	00253$
+   0091 02s05r2F            810 	ljmp	00244$
+   0094 02s05r7D            811 	ljmp	00252$
+                    0097    812 	C$fb_lpc922.c$88$2$2 ==.
+                            813 ;	..\fb_lpc922.c:88: case 0:
+   0097                     814 00101$:
+                    0097    815 	C$fb_lpc922.c$89$2$2 ==.
+                            816 ;	..\fb_lpc922.c:89: TR1=0;			// Timer 1 stoppen
+   0097 C2 8E               817 	clr	_TCON_6
+                    0099    818 	C$fb_lpc922.c$90$2$2 ==.
+                            819 ;	..\fb_lpc922.c:90: TMOD=(TMOD & 0x0F) + 0x20;	// Timer 1 als 8-Bit autoreload
+   0099 74 0F               820 	mov	a,#0x0F
+   009B 55 89               821 	anl	a,_TMOD
+   009D 24 20               822 	add	a,#0x20
+   009F F5 89               823 	mov	_TMOD,a
+                    00A1    824 	C$fb_lpc922.c$91$2$2 ==.
+                            825 ;	..\fb_lpc922.c:91: TL1=128;		// Timer laden
+   00A1 75 8B 80            826 	mov	_TL1,#0x80
+                    00A4    827 	C$fb_lpc922.c$92$2$2 ==.
+                            828 ;	..\fb_lpc922.c:92: TH1=128;
+   00A4 75 8D 80            829 	mov	_TH1,#0x80
+                    00A7    830 	C$fb_lpc922.c$93$2$2 ==.
+                            831 ;	..\fb_lpc922.c:93: TF1=0;			// Timer1-flag loeschen						1 cycle
+   00A7 C2 8F               832 	clr	_TCON_7
+                    00A9    833 	C$fb_lpc922.c$94$2$2 ==.
+                            834 ;	..\fb_lpc922.c:94: TR1=1;			// Timer1 starten							1 cycle
+   00A9 D2 8E               835 	setb	_TCON_6
+                    00AB    836 	C$fb_lpc922.c$95$2$2 ==.
+                            837 ;	..\fb_lpc922.c:95: if(tx_nextsend != tx_nextwrite) { 			// wenn zu sendendes Objekt vorhanden
+   00AB E5*2C               838 	mov	a,_tx_nextwrite
+   00AD B5*2D 03            839 	cjne	a,_tx_nextsend,00328$
+   00B0 02s03r27            840 	ljmp	00148$
+   00B3                     841 00328$:
+                    00B3    842 	C$fb_lpc922.c$99$3$3 ==.
+                            843 ;	..\fb_lpc922.c:99: unsigned char objno=tx_buffer[tx_nextsend];
+   00B3 E5*2D               844 	mov	a,_tx_nextsend
+   00B5 24r1E               845 	add	a,#_tx_buffer
+   00B7 F9                  846 	mov	r1,a
+   00B8 87 07               847 	mov	ar7,@r1
+                    00BA    848 	C$fb_lpc922.c$100$3$3 ==.
+                            849 ;	..\fb_lpc922.c:100: __bit build_ok=0;
+   00BA C2*00               850 	clr	b0
+                    00BC    851 	C$fb_lpc922.c$102$3$3 ==.
+                            852 ;	..\fb_lpc922.c:102: unsigned int gapos=0xFE;
+   00BC 7D FE               853 	mov	r5,#0xFE
+   00BE 7E 00               854 	mov	r6,#0x00
+                    00C0    855 	C$fb_lpc922.c$107$3$3 ==.
+                            856 ;	..\fb_lpc922.c:107: repeatflag=objno&0x20;
+   00C0 EF                  857 	mov	a,r7
+   00C1 A2 E5               858 	mov	c,acc[5]
+   00C3 E4                  859 	clr	a
+   00C4 33                  860 	rlc	a
+   00C5 24 FF               861 	add	a,#0xff
+   00C7 92*00               862 	mov	b1,c
+                    00C9    863 	C$fb_lpc922.c$109$3$3 ==.
+                            864 ;	..\fb_lpc922.c:109: telegramm[1]=eeprom[ADDRTAB+1];
+   00C9 90 1D 17            865 	mov	dptr,#(_eeprom + 0x0017)
+   00CC E4                  866 	clr	a
+   00CD 93                  867 	movc	a,@a+dptr
+   00CE FC                  868 	mov	r4,a
+   00CF 8C*08               869 	mov	(_telegramm + 0x0001),r4
+                    00D1    870 	C$fb_lpc922.c$110$3$3 ==.
+                            871 ;	..\fb_lpc922.c:110: telegramm[2]=eeprom[ADDRTAB+2];
+   00D1 90 1D 18            872 	mov	dptr,#(_eeprom + 0x0018)
+   00D4 E4                  873 	clr	a
+   00D5 93                  874 	movc	a,@a+dptr
+   00D6 FC                  875 	mov	r4,a
+   00D7 8C*09               876 	mov	(_telegramm + 0x0002),r4
+                    00D9    877 	C$fb_lpc922.c$112$3$3 ==.
+                            878 ;	..\fb_lpc922.c:112: if(objno<128) {		// Multicast
+   00D9 BF 80 00            879 	cjne	r7,#0x80,00329$
+   00DC                     880 00329$:
+   00DC 40 03               881 	jc	00330$
+   00DE 02s02r0B            882 	ljmp	00133$
+   00E1                     883 00330$:
+                    00E1    884 	C$fb_lpc922.c$113$1$1 ==.
+                            885 ;	..\fb_lpc922.c:113: type=(objno&0x40);	// bei Multicast ist type0 normal und type1 response telegramm
+   00E1 C0 05               886 	push	ar5
+   00E3 C0 06               887 	push	ar6
+   00E5 EF                  888 	mov	a,r7
+   00E6 23                  889 	rl	a
+   00E7 23                  890 	rl	a
+   00E8 54 01               891 	anl	a,#0x01
+   00EA 24 FF               892 	add	a,#0xff
+   00EC 92*00               893 	mov	b2,c
+                    00EE    894 	C$fb_lpc922.c$114$4$4 ==.
+                            895 ;	..\fb_lpc922.c:114: objno&=0x1F;
+   00EE 53 07 1F            896 	anl	ar7,#0x1F
+                    00F1    897 	C$fb_lpc922.c$116$4$4 ==.
+                            898 ;	..\fb_lpc922.c:116: objvalue=read_obj_value(objno);		// Objektwert lesen
+   00F1 8F 82               899 	mov	dpl,r7
+   00F3 C0 07               900 	push	ar7
+   00F5 C0 05               901 	push	ar5
+   00F7 C0*00               902 	push	bits
+   00F9 12s00r00            903 	lcall	_read_obj_value
+   00FC AA 82               904 	mov	r2,dpl
+   00FE AB 83               905 	mov	r3,dph
+   0100 AC F0               906 	mov	r4,b
+   0102 FE                  907 	mov	r6,a
+   0103 D0*00               908 	pop	bits
+   0105 D0 05               909 	pop	ar5
+   0107 D0 07               910 	pop	ar7
+   0109 A8*00               911 	mov	r0,_bp
+   010B 08                  912 	inc	r0
+   010C A6 02               913 	mov	@r0,ar2
+   010E 08                  914 	inc	r0
+   010F A6 03               915 	mov	@r0,ar3
+   0111 08                  916 	inc	r0
+   0112 A6 04               917 	mov	@r0,ar4
+   0114 08                  918 	inc	r0
+   0115 A6 06               919 	mov	@r0,ar6
+                    0117    920 	C$fb_lpc922.c$119$4$4 ==.
+                            921 ;	..\fb_lpc922.c:119: asspos=eeprom[ASSOCTABPTR]+1+2*objno;
+   0117 90 1D 11            922 	mov	dptr,#(_eeprom + 0x0011)
+   011A E4                  923 	clr	a
+   011B 93                  924 	movc	a,@a+dptr
+   011C FE                  925 	mov	r6,a
+   011D 0E                  926 	inc	r6
+   011E EF                  927 	mov	a,r7
+   011F 2F                  928 	add	a,r7
+   0120 FD                  929 	mov	r5,a
+   0121 2E                  930 	add	a,r6
+                    0122    931 	C$fb_lpc922.c$120$4$4 ==.
+                            932 ;	..\fb_lpc922.c:120: if(eeprom[asspos+1]==objno) gapos=eeprom[asspos];
+   0122 FC                  933 	mov	r4,a
+   0123 04                  934 	inc	a
+   0124 90 1D 00            935 	mov	dptr,#_eeprom
+   0127 93                  936 	movc	a,@a+dptr
+   0128 FE                  937 	mov	r6,a
+   0129 B5 07 02            938 	cjne	a,ar7,00331$
+   012C 80 06               939 	sjmp	00332$
+   012E                     940 00331$:
+   012E D0 06               941 	pop	ar6
+   0130 D0 05               942 	pop	ar5
+   0132 80 0F               943 	sjmp	00103$
+   0134                     944 00332$:
+   0134 D0 06               945 	pop	ar6
+   0136 D0 05               946 	pop	ar5
+   0138 8C 82               947 	mov	dpl,r4
+   013A 75 83 1D            948 	mov	dph,#(_eeprom >> 8)
+   013D E4                  949 	clr	a
+   013E 93                  950 	movc	a,@a+dptr
+   013F FC                  951 	mov	r4,a
+   0140 FD                  952 	mov	r5,a
+   0141 7E 00               953 	mov	r6,#0x00
+   0143                     954 00103$:
+                    0143    955 	C$fb_lpc922.c$122$4$4 ==.
+                            956 ;	..\fb_lpc922.c:122: if (gapos!=0xFE) // wenn keine Gruppenadresse hinterlegt nix tun
+   0143 BD FE 06            957 	cjne	r5,#0xFE,00333$
+   0146 BE 00 03            958 	cjne	r6,#0x00,00333$
+   0149 02s02rD6            959 	ljmp	00134$
+   014C                     960 00333$:
+                    014C    961 	C$fb_lpc922.c$124$5$5 ==.
+                            962 ;	..\fb_lpc922.c:124: n=eeprom[COMMSTABPTR]+objno+objno+objno+3; //Adresse obj flags für Priorität holen
+   014C 90 1D 12            963 	mov	dptr,#(_eeprom + 0x0012)
+   014F E4                  964 	clr	a
+   0150 93                  965 	movc	a,@a+dptr
+   0151 2F                  966 	add	a,r7
+   0152 2F                  967 	add	a,r7
+   0153 2F                  968 	add	a,r7
+   0154 FC                  969 	mov	r4,a
+   0155 0C                  970 	inc	r4
+   0156 0C                  971 	inc	r4
+   0157 0C                  972 	inc	r4
+                    0158    973 	C$fb_lpc922.c$126$5$5 ==.
+                            974 ;	..\fb_lpc922.c:126: telegramm[0]=priotable[eeprom[n]&0x03];// die prio ins erste Byte des tele einfügen
+   0158 8C 82               975 	mov	dpl,r4
+   015A 75 83 1D            976 	mov	dph,#(_eeprom >> 8)
+   015D E4                  977 	clr	a
+   015E 93                  978 	movc	a,@a+dptr
+   015F FB                  979 	mov	r3,a
+   0160 74 03               980 	mov	a,#0x03
+   0162 5B                  981 	anl	a,r3
+   0163 90s00r00            982 	mov	dptr,#_priotable
+   0166 93                  983 	movc	a,@a+dptr
+   0167 FB                  984 	mov	r3,a
+   0168 8B*07               985 	mov	_telegramm,r3
+                    016A    986 	C$fb_lpc922.c$127$5$5 ==.
+                            987 ;	..\fb_lpc922.c:127: telegramm[3]=eeprom[ADDRTAB+1+gapos*2];
+   016A ED                  988 	mov	a,r5
+   016B 2D                  989 	add	a,r5
+   016C FD                  990 	mov	r5,a
+   016D 24 17               991 	add	a,#0x17
+   016F 90 1D 00            992 	mov	dptr,#_eeprom
+   0172 93                  993 	movc	a,@a+dptr
+   0173 FE                  994 	mov	r6,a
+   0174 8E*0A               995 	mov	(_telegramm + 0x0003),r6
+                    0176    996 	C$fb_lpc922.c$128$5$5 ==.
+                            997 ;	..\fb_lpc922.c:128: telegramm[4]=eeprom[ADDRTAB+2+gapos*2];
+   0176 74 18               998 	mov	a,#0x18
+   0178 2D                  999 	add	a,r5
+   0179 90 1D 00           1000 	mov	dptr,#_eeprom
+   017C 93                 1001 	movc	a,@a+dptr
+   017D FE                 1002 	mov	r6,a
+   017E 8E*0B              1003 	mov	(_telegramm + 0x0004),r6
+                    0180   1004 	C$fb_lpc922.c$129$5$5 ==.
+                           1005 ;	..\fb_lpc922.c:129: telegramm[6]=0x00;
+   0180 75*0D 00           1006 	mov	(_telegramm + 0x0006),#0x00
+                    0183   1007 	C$fb_lpc922.c$130$5$5 ==.
+                           1008 ;	..\fb_lpc922.c:130: if (type) telegramm[7]=0x40;		// read_value_response Telegramm (angefordert)
+   0183 30*00 05           1009 	jnb	b2,00105$
+   0186 75*0E 40           1010 	mov	(_telegramm + 0x0007),#0x40
+   0189 80 03              1011 	sjmp	00106$
+   018B                    1012 00105$:
+                    018B   1013 	C$fb_lpc922.c$131$5$5 ==.
+                           1014 ;	..\fb_lpc922.c:131: else telegramm[7]=0x80;				// write_value_request Telegramm (nicht angefordert)
+   018B 75*0E 80           1015 	mov	(_telegramm + 0x0007),#0x80
+   018E                    1016 00106$:
+                    018E   1017 	C$fb_lpc922.c$133$5$5 ==.
+                           1018 ;	..\fb_lpc922.c:133: objtype=eeprom[n+1];		// eine Adresse höher als obj flags ist objecttype
+   018E EC                 1019 	mov	a,r4
+   018F 04                 1020 	inc	a
+   0190 90 1D 00           1021 	mov	dptr,#_eeprom
+   0193 93                 1022 	movc	a,@a+dptr
+                    0194   1023 	C$fb_lpc922.c$135$5$5 ==.
+                           1024 ;	..\fb_lpc922.c:135: if(objtype>6) length=objtype-5; else length=1;
+   0194 FE                 1025 	mov  r6,a
+   0195 24 F9              1026 	add	a,#0xff - 0x06
+   0197 50 06              1027 	jnc	00108$
+   0199 EE                 1028 	mov	a,r6
+   019A 24 FB              1029 	add	a,#0xFB
+   019C FE                 1030 	mov	r6,a
+   019D 80 02              1031 	sjmp	00109$
+   019F                    1032 00108$:
+   019F 7E 01              1033 	mov	r6,#0x01
+   01A1                    1034 00109$:
+                    01A1   1035 	C$fb_lpc922.c$136$5$5 ==.
+                           1036 ;	..\fb_lpc922.c:136: telegramm[5]=0xE0+length;
+   01A1 74 E0              1037 	mov	a,#0xE0
+   01A3 2E                 1038 	add	a,r6
+   01A4 F5*0C              1039 	mov	(_telegramm + 0x0005),a
+                    01A6   1040 	C$fb_lpc922.c$137$5$5 ==.
+                           1041 ;	..\fb_lpc922.c:137: if (length>1) telegramm[length+6]=objvalue; else telegramm[7]+=(objvalue&0x3F);
+   01A6 EE                 1042 	mov	a,r6
+   01A7 24 FE              1043 	add	a,#0xff - 0x01
+   01A9 50 0F              1044 	jnc	00111$
+   01AB 74 06              1045 	mov	a,#0x06
+   01AD 2E                 1046 	add	a,r6
+   01AE 24r07              1047 	add	a,#_telegramm
+   01B0 F9                 1048 	mov	r1,a
+   01B1 A8*00              1049 	mov	r0,_bp
+   01B3 08                 1050 	inc	r0
+   01B4 86 05              1051 	mov	ar5,@r0
+   01B6 A7 05              1052 	mov	@r1,ar5
+   01B8 80 10              1053 	sjmp	00112$
+   01BA                    1054 00111$:
+   01BA A8*00              1055 	mov	r0,_bp
+   01BC 08                 1056 	inc	r0
+   01BD 74 3F              1057 	mov	a,#0x3F
+   01BF 56                 1058 	anl	a,@r0
+   01C0 FA                 1059 	mov	r2,a
+   01C1 E4                 1060 	clr	a
+   01C2 FB                 1061 	mov	r3,a
+   01C3 FC                 1062 	mov	r4,a
+   01C4 FD                 1063 	mov	r5,a
+   01C5 EA                 1064 	mov	a,r2
+   01C6 25*0E              1065 	add	a,(_telegramm + 0x0007)
+   01C8 F5*0E              1066 	mov	(_telegramm + 0x0007),a
+   01CA                    1067 00112$:
+                    01CA   1068 	C$fb_lpc922.c$138$5$5 ==.
+                           1069 ;	..\fb_lpc922.c:138: if (length>2) telegramm[length+5]=objvalue>>8;
+   01CA EE                 1070 	mov	a,r6
+   01CB 24 FD              1071 	add	a,#0xff - 0x02
+   01CD 50 0E              1072 	jnc	00114$
+   01CF 74 05              1073 	mov	a,#0x05
+   01D1 2E                 1074 	add	a,r6
+   01D2 24r07              1075 	add	a,#_telegramm
+   01D4 F9                 1076 	mov	r1,a
+   01D5 A8*00              1077 	mov	r0,_bp
+   01D7 08                 1078 	inc	r0
+   01D8 08                 1079 	inc	r0
+   01D9 86 05              1080 	mov	ar5,@r0
+   01DB A7 05              1081 	mov	@r1,ar5
+   01DD                    1082 00114$:
+                    01DD   1083 	C$fb_lpc922.c$139$5$5 ==.
+                           1084 ;	..\fb_lpc922.c:139: if (length>3) telegramm[length+4]=objvalue>>16;
+   01DD EE                 1085 	mov	a,r6
+   01DE 24 FC              1086 	add	a,#0xff - 0x03
+   01E0 50 0F              1087 	jnc	00116$
+   01E2 74 04              1088 	mov	a,#0x04
+   01E4 2E                 1089 	add	a,r6
+   01E5 24r07              1090 	add	a,#_telegramm
+   01E7 F9                 1091 	mov	r1,a
+   01E8 A8*00              1092 	mov	r0,_bp
+   01EA 08                 1093 	inc	r0
+   01EB 08                 1094 	inc	r0
+   01EC 08                 1095 	inc	r0
+   01ED 86 05              1096 	mov	ar5,@r0
+   01EF A7 05              1097 	mov	@r1,ar5
+   01F1                    1098 00116$:
+                    01F1   1099 	C$fb_lpc922.c$140$5$5 ==.
+                           1100 ;	..\fb_lpc922.c:140: if (length>4) telegramm[length+3]=objvalue>>24;
+   01F1 EE                 1101 	mov	a,r6
+   01F2 24 FB              1102 	add	a,#0xff - 0x04
+   01F4 50 10              1103 	jnc	00118$
+   01F6 74 03              1104 	mov	a,#0x03
+   01F8 2E                 1105 	add	a,r6
+   01F9 24r07              1106 	add	a,#_telegramm
+   01FB F9                 1107 	mov	r1,a
+   01FC A8*00              1108 	mov	r0,_bp
+   01FE 08                 1109 	inc	r0
+   01FF 08                 1110 	inc	r0
+   0200 08                 1111 	inc	r0
+   0201 08                 1112 	inc	r0
+   0202 86 06              1113 	mov	ar6,@r0
+   0204 A7 06              1114 	mov	@r1,ar6
+   0206                    1115 00118$:
+                    0206   1116 	C$fb_lpc922.c$142$5$5 ==.
+                           1117 ;	..\fb_lpc922.c:142: build_ok=1;
+   0206 D2*00              1118 	setb	b0
+   0208 02s02rD6           1119 	ljmp	00134$
+   020B                    1120 00133$:
+                    020B   1121 	C$fb_lpc922.c$146$4$6 ==.
+                           1122 ;	..\fb_lpc922.c:146: telegramm[0]=0xB0;				// Control Byte
+   020B 75*07 B0           1123 	mov	_telegramm,#0xB0
+                    020E   1124 	C$fb_lpc922.c$149$4$6 ==.
+                           1125 ;	..\fb_lpc922.c:149: telegramm[3]=conh;
+   020E 85*00*0A           1126 	mov	(_telegramm + 0x0003),_conh
+                    0211   1127 	C$fb_lpc922.c$150$4$6 ==.
+                           1128 ;	..\fb_lpc922.c:150: telegramm[4]=conl;
+   0211 85*01*0B           1129 	mov	(_telegramm + 0x0004),_conl
+                    0214   1130 	C$fb_lpc922.c$152$4$6 ==.
+                           1131 ;	..\fb_lpc922.c:152: switch(objno&0x1F) {
+   0214 53 07 1F           1132 	anl	ar7,#0x1F
+   0217 EF                 1133 	mov	a,r7
+   0218 24 FA              1134 	add	a,#0xff - 0x05
+   021A 50 03              1135 	jnc	00340$
+   021C 02s02rD4           1136 	ljmp	00131$
+   021F                    1137 00340$:
+   021F EF                 1138 	mov	a,r7
+   0220 2F                 1139 	add	a,r7
+   0221 2F                 1140 	add	a,r7
+   0222 90s02r26           1141 	mov	dptr,#00341$
+   0225 73                 1142 	jmp	@a+dptr
+   0226                    1143 00341$:
+   0226 02s02rD4           1144 	ljmp	00131$
+   0229 02s02r38           1145 	ljmp	00121$
+   022C 02s02r44           1146 	ljmp	00122$
+   022F 02s02r5B           1147 	ljmp	00123$
+   0232 02s02r6C           1148 	ljmp	00124$
+   0235 02s02rCC           1149 	ljmp	00130$
+                    0238   1150 	C$fb_lpc922.c$153$5$7 ==.
+                           1151 ;	..\fb_lpc922.c:153: case 1:	// NCD ACK Quittierung (129) mit Paketnummer vom Sender, nicht der Eigenen!!!
+   0238                    1152 00121$:
+                    0238   1153 	C$fb_lpc922.c$154$5$7 ==.
+                           1154 ;	..\fb_lpc922.c:154: telegramm[5]=0x60;					// DRL
+   0238 75*0C 60           1155 	mov	(_telegramm + 0x0005),#0x60
+                    023B   1156 	C$fb_lpc922.c$155$5$7 ==.
+                           1157 ;	..\fb_lpc922.c:155: telegramm[6]=senders_pcount + 0xC2;	// Bit 6,7(TCPI = 11 NCD Quittierung) und Bit 0,1 (10=ACK)
+   023B 74 C2              1158 	mov	a,#0xC2
+   023D 25*06              1159 	add	a,_senders_pcount
+   023F F5*0D              1160 	mov	(_telegramm + 0x0006),a
+                    0241   1161 	C$fb_lpc922.c$156$5$7 ==.
+                           1162 ;	..\fb_lpc922.c:156: break;
+   0241 02s02rD4           1163 	ljmp	00131$
+                    0244   1164 	C$fb_lpc922.c$157$5$7 ==.
+                           1165 ;	..\fb_lpc922.c:157: case 2:	// read mask response (130)
+   0244                    1166 00122$:
+                    0244   1167 	C$fb_lpc922.c$158$5$7 ==.
+                           1168 ;	..\fb_lpc922.c:158: telegramm[5]=0x63;					// DRL
+   0244 75*0C 63           1169 	mov	(_telegramm + 0x0005),#0x63
+                    0247   1170 	C$fb_lpc922.c$159$5$7 ==.
+                           1171 ;	..\fb_lpc922.c:159: telegramm[6]=pcount + 0x43;			// bei response immer eigene Paketnummer senden
+   0247 74 43              1172 	mov	a,#0x43
+   0249 25*02              1173 	add	a,_pcount
+   024B F5*0D              1174 	mov	(_telegramm + 0x0006),a
+                    024D   1175 	C$fb_lpc922.c$160$5$7 ==.
+                           1176 ;	..\fb_lpc922.c:160: telegramm[7]=0x40;
+   024D 75*0E 40           1177 	mov	(_telegramm + 0x0007),#0x40
+                    0250   1178 	C$fb_lpc922.c$161$5$7 ==.
+                           1179 ;	..\fb_lpc922.c:161: telegramm[8]=0x00;                  // Medium Type 0 (TP1), FW Type 0
+   0250 75*0F 00           1180 	mov	(_telegramm + 0x0008),#0x00
+                    0253   1181 	C$fb_lpc922.c$162$5$7 ==.
+                           1182 ;	..\fb_lpc922.c:162: telegramm[9]=0x12;					// FW Version 1.2 (Maskenversion 1.2 = BCU1)
+   0253 75*10 12           1183 	mov	(_telegramm + 0x0009),#0x12
+                    0256   1184 	C$fb_lpc922.c$163$5$7 ==.
+                           1185 ;	..\fb_lpc922.c:163: inc_pcount=1;
+   0256 D2*0E              1186 	setb	_inc_pcount
+                    0258   1187 	C$fb_lpc922.c$164$5$7 ==.
+                           1188 ;	..\fb_lpc922.c:164: break;
+   0258 02s02rD4           1189 	ljmp	00131$
+                    025B   1190 	C$fb_lpc922.c$165$5$7 ==.
+                           1191 ;	..\fb_lpc922.c:165: case 3:	// read PA response (131)
+   025B                    1192 00123$:
+                    025B   1193 	C$fb_lpc922.c$166$5$7 ==.
+                           1194 ;	..\fb_lpc922.c:166: telegramm[3]=0x00;			// Zieladresse auf 0000, da Broadcast
+   025B 75*0A 00           1195 	mov	(_telegramm + 0x0003),#0x00
+                    025E   1196 	C$fb_lpc922.c$167$5$7 ==.
+                           1197 ;	..\fb_lpc922.c:167: telegramm[4]=0x00;
+   025E 75*0B 00           1198 	mov	(_telegramm + 0x0004),#0x00
+                    0261   1199 	C$fb_lpc922.c$168$5$7 ==.
+                           1200 ;	..\fb_lpc922.c:168: telegramm[5]=0xE1;			// DRL
+   0261 75*0C E1           1201 	mov	(_telegramm + 0x0005),#0xE1
+                    0264   1202 	C$fb_lpc922.c$169$5$7 ==.
+                           1203 ;	..\fb_lpc922.c:169: telegramm[6]=0x01;
+   0264 75*0D 01           1204 	mov	(_telegramm + 0x0006),#0x01
+                    0267   1205 	C$fb_lpc922.c$170$5$7 ==.
+                           1206 ;	..\fb_lpc922.c:170: telegramm[7]=0x40;
+   0267 75*0E 40           1207 	mov	(_telegramm + 0x0007),#0x40
+                    026A   1208 	C$fb_lpc922.c$171$5$7 ==.
+                           1209 ;	..\fb_lpc922.c:171: break;
+                    026A   1210 	C$fb_lpc922.c$172$5$7 ==.
+                           1211 ;	..\fb_lpc922.c:172: case 4:	// memory_read_response (132)
+   026A 80 68              1212 	sjmp	00131$
+   026C                    1213 00124$:
+                    026C   1214 	C$fb_lpc922.c$173$1$1 ==.
+                           1215 ;	..\fb_lpc922.c:173: for(n=0;n<mem_length;n++) {
+   026C 7F 00              1216 	mov	r7,#0x00
+   026E                    1217 00254$:
+   026E C3                 1218 	clr	c
+   026F EF                 1219 	mov	a,r7
+   0270 95*03              1220 	subb	a,_mem_length
+   0272 50 3C              1221 	jnc	00257$
+                    0274   1222 	C$fb_lpc922.c$174$6$8 ==.
+                           1223 ;	..\fb_lpc922.c:174: if (mem_adrh==0) {
+   0274 E5*04              1224 	mov	a,_mem_adrh
+   0276 70 26              1225 	jnz	00128$
+                    0278   1226 	C$fb_lpc922.c$175$7$9 ==.
+                           1227 ;	..\fb_lpc922.c:175: telegramm[n+10]=0;//userram[mem_adrl+n];
+   0278 74 0A              1228 	mov	a,#0x0A
+   027A 2F                 1229 	add	a,r7
+   027B 24r07              1230 	add	a,#_telegramm
+   027D F8                 1231 	mov	r0,a
+   027E 76 00              1232 	mov	@r0,#0x00
+                    0280   1233 	C$fb_lpc922.c$176$7$9 ==.
+                           1234 ;	..\fb_lpc922.c:176: if(mem_adrl+n==0x60) telegramm[n+10]=status60;	// ausser bei 0x60
+   0280 AD*05              1235 	mov	r5,_mem_adrl
+   0282 7E 00              1236 	mov	r6,#0x00
+   0284 8F 03              1237 	mov	ar3,r7
+   0286 7C 00              1238 	mov	r4,#0x00
+   0288 EB                 1239 	mov	a,r3
+   0289 2D                 1240 	add	a,r5
+   028A FD                 1241 	mov	r5,a
+   028B EC                 1242 	mov	a,r4
+   028C 3E                 1243 	addc	a,r6
+   028D FE                 1244 	mov	r6,a
+   028E BD 60 1C           1245 	cjne	r5,#0x60,00256$
+   0291 BE 00 19           1246 	cjne	r6,#0x00,00256$
+   0294 74 0A              1247 	mov	a,#0x0A
+   0296 2F                 1248 	add	a,r7
+   0297 24r07              1249 	add	a,#_telegramm
+   0299 F8                 1250 	mov	r0,a
+   029A A6*2E              1251 	mov	@r0,_status60
+   029C 80 0F              1252 	sjmp	00256$
+   029E                    1253 00128$:
+                    029E   1254 	C$fb_lpc922.c$178$6$8 ==.
+                           1255 ;	..\fb_lpc922.c:178: else telegramm[n+10]=eeprom[mem_adrl+n];//else if (mem_adrh==1)
+   029E 74 0A              1256 	mov	a,#0x0A
+   02A0 2F                 1257 	add	a,r7
+   02A1 24r07              1258 	add	a,#_telegramm
+   02A3 F9                 1259 	mov	r1,a
+   02A4 EF                 1260 	mov	a,r7
+   02A5 25*05              1261 	add	a,_mem_adrl
+   02A7 90 1D 00           1262 	mov	dptr,#_eeprom
+   02AA 93                 1263 	movc	a,@a+dptr
+   02AB FE                 1264 	mov	r6,a
+   02AC F7                 1265 	mov	@r1,a
+   02AD                    1266 00256$:
+                    02AD   1267 	C$fb_lpc922.c$173$5$7 ==.
+                           1268 ;	..\fb_lpc922.c:173: for(n=0;n<mem_length;n++) {
+   02AD 0F                 1269 	inc	r7
+   02AE 80 BE              1270 	sjmp	00254$
+   02B0                    1271 00257$:
+                    02B0   1272 	C$fb_lpc922.c$181$5$7 ==.
+                           1273 ;	..\fb_lpc922.c:181: telegramm[5]=mem_length+0x63;		// DRL (Anzahl Bytes + 3)
+   02B0 74 63              1274 	mov	a,#0x63
+   02B2 25*03              1275 	add	a,_mem_length
+   02B4 F5*0C              1276 	mov	(_telegramm + 0x0005),a
+                    02B6   1277 	C$fb_lpc922.c$182$5$7 ==.
+                           1278 ;	..\fb_lpc922.c:182: telegramm[6]=pcount|0x42;			// eigener Paketzaehler, TCPI und ersten beiden Befehlsbits
+   02B6 74 42              1279 	mov	a,#0x42
+   02B8 45*02              1280 	orl	a,_pcount
+   02BA F5*0D              1281 	mov	(_telegramm + 0x0006),a
+                    02BC   1282 	C$fb_lpc922.c$183$5$7 ==.
+                           1283 ;	..\fb_lpc922.c:183: telegramm[7]=mem_length|0x40;		// letzten 2 Befehlsbits
+   02BC 74 40              1284 	mov	a,#0x40
+   02BE 45*03              1285 	orl	a,_mem_length
+   02C0 F5*0E              1286 	mov	(_telegramm + 0x0007),a
+                    02C2   1287 	C$fb_lpc922.c$184$5$7 ==.
+                           1288 ;	..\fb_lpc922.c:184: telegramm[8]=mem_adrh;
+   02C2 85*04*0F           1289 	mov	(_telegramm + 0x0008),_mem_adrh
+                    02C5   1290 	C$fb_lpc922.c$185$5$7 ==.
+                           1291 ;	..\fb_lpc922.c:185: telegramm[9]=mem_adrl;
+   02C5 85*05*10           1292 	mov	(_telegramm + 0x0009),_mem_adrl
+                    02C8   1293 	C$fb_lpc922.c$186$5$7 ==.
+                           1294 ;	..\fb_lpc922.c:186: inc_pcount=1;
+   02C8 D2*0E              1295 	setb	_inc_pcount
+                    02CA   1296 	C$fb_lpc922.c$187$5$7 ==.
+                           1297 ;	..\fb_lpc922.c:187: break;
+                    02CA   1298 	C$fb_lpc922.c$188$5$7 ==.
+                           1299 ;	..\fb_lpc922.c:188: case 5:	// T-disconnect (133)
+   02CA 80 08              1300 	sjmp	00131$
+   02CC                    1301 00130$:
+                    02CC   1302 	C$fb_lpc922.c$189$5$7 ==.
+                           1303 ;	..\fb_lpc922.c:189: telegramm[5]=0x60;
+   02CC 75*0C 60           1304 	mov	(_telegramm + 0x0005),#0x60
+                    02CF   1305 	C$fb_lpc922.c$190$5$7 ==.
+                           1306 ;	..\fb_lpc922.c:190: telegramm[6]=0x81;
+   02CF 75*0D 81           1307 	mov	(_telegramm + 0x0006),#0x81
+                    02D2   1308 	C$fb_lpc922.c$191$5$7 ==.
+                           1309 ;	..\fb_lpc922.c:191: connected=0;
+   02D2 C2*0D              1310 	clr	_connected
+                    02D4   1311 	C$fb_lpc922.c$209$4$6 ==.
+                           1312 ;	..\fb_lpc922.c:209: }
+   02D4                    1313 00131$:
+                    02D4   1314 	C$fb_lpc922.c$210$4$6 ==.
+                           1315 ;	..\fb_lpc922.c:210: build_ok=1;
+   02D4 D2*00              1316 	setb	b0
+   02D6                    1317 00134$:
+                    02D6   1318 	C$fb_lpc922.c$212$3$3 ==.
+                           1319 ;	..\fb_lpc922.c:212: if(repeatflag) telegramm[0]&=0xDF;		// Wiederholungsbit loeschen fuer Wiederholtelegramm
+   02D6 30*00 06           1320 	jnb	b1,00136$
+   02D9 74 DF              1321 	mov	a,#0xDF
+   02DB 55*07              1322 	anl	a,_telegramm
+   02DD F5*07              1323 	mov	_telegramm,a
+   02DF                    1324 00136$:
+                    02DF   1325 	C$fb_lpc922.c$215$3$3 ==.
+                           1326 ;	..\fb_lpc922.c:215: if(build_ok){//(build_tel(tx_buffer[tx_nextsend])) {	// wenn Telegramm gebildet werden konnte
+   02DF 30*00 3D           1327 	jnb	b0,00145$
+                    02E2   1328 	C$fb_lpc922.c$216$4$10 ==.
+                           1329 ;	..\fb_lpc922.c:216: EX1=0; 				//Um zu vermeiden dass man in die Abfrage hinein-empfaengt
+   02E2 C2 AA              1330 	clr	_IEN0_2
+                    02E4   1331 	C$fb_lpc922.c$217$4$10 ==.
+                           1332 ;	..\fb_lpc922.c:217: if(!fb_state) { 	//nur bilden wenn vorher kein rx_intit durch ext int kam
+   02E4 E5*2A              1333 	mov	a,_fb_state
+   02E6 70 32              1334 	jnz	00143$
+                    02E8   1335 	C$fb_lpc922.c$218$5$11 ==.
+                           1336 ;	..\fb_lpc922.c:218: if((tx_buffer[tx_nextsend]&0x20)==0) {	// wenn erstmaliges Senden des Objektes
+   02E8 E5*2D              1337 	mov	a,_tx_nextsend
+   02EA 24r1E              1338 	add	a,#_tx_buffer
+   02EC F9                 1339 	mov	r1,a
+   02ED E7                 1340 	mov	a,@r1
+   02EE FF                 1341 	mov	r7,a
+   02EF 20 E5 07           1342 	jb	acc.5,00138$
+                    02F2   1343 	C$fb_lpc922.c$219$6$12 ==.
+                           1344 ;	..\fb_lpc922.c:219: tx_buffer[tx_nextsend]|=0x20;		// Bit fuer "wird gerade gesendet"
+   02F2 74 20              1345 	mov	a,#0x20
+   02F4 4F                 1346 	orl	a,r7
+   02F5 F7                 1347 	mov	@r1,a
+                    02F6   1348 	C$fb_lpc922.c$220$6$12 ==.
+                           1349 ;	..\fb_lpc922.c:220: repeat_count=0;						// Wiederholungszaehler fuer nicht geackte Telegramme
+   02F6 75*2B 00           1350 	mov	_repeat_count,#0x00
+   02F9                    1351 00138$:
+                    02F9   1352 	C$fb_lpc922.c$222$5$11 ==.
+                           1353 ;	..\fb_lpc922.c:222: if (repeat_count<4) init_tx();		// Senden starten
+   02F9 74 FC              1354 	mov	a,#0x100 - 0x04
+   02FB 25*2B              1355 	add	a,_repeat_count
+   02FD 40 05              1356 	jc	00140$
+   02FF 12s05rE6           1357 	lcall	_init_tx
+   0302 80 16              1358 	sjmp	00143$
+   0304                    1359 00140$:
+                    0304   1360 	C$fb_lpc922.c$224$6$13 ==.
+                           1361 ;	..\fb_lpc922.c:224: tx_nextsend++;
+   0304 05*2D              1362 	inc	_tx_nextsend
+                    0306   1363 	C$fb_lpc922.c$225$6$13 ==.
+                           1364 ;	..\fb_lpc922.c:225: tx_nextsend&=0x07;
+   0306 53*2D 07           1365 	anl	_tx_nextsend,#0x07
+                    0309   1366 	C$fb_lpc922.c$226$6$13 ==.
+                           1367 ;	..\fb_lpc922.c:226: wait_for_ack=0;
+   0309 C2*0A              1368 	clr	_wait_for_ack
+                    030B   1369 	C$fb_lpc922.c$227$6$13 ==.
+                           1370 ;	..\fb_lpc922.c:227: inc_pcount=0;
+   030B C2*0E              1371 	clr	_inc_pcount
+                    030D   1372 	C$fb_lpc922.c$228$6$13 ==.
+                           1373 ;	..\fb_lpc922.c:228: init_rx();
+   030D 12s05rB8           1374 	lcall	_init_rx
+                    0310   1375 	C$fb_lpc922.c$229$6$13 ==.
+                           1376 ;	..\fb_lpc922.c:229: TR1=0;		// hier nicht noch einmal die ganze busfree Zeit warten
+   0310 C2 8E              1377 	clr	_TCON_6
+                    0312   1378 	C$fb_lpc922.c$230$6$13 ==.
+                           1379 ;	..\fb_lpc922.c:230: TH1=0xF0;
+   0312 75 8D F0           1380 	mov	_TH1,#0xF0
+                    0315   1381 	C$fb_lpc922.c$231$6$13 ==.
+                           1382 ;	..\fb_lpc922.c:231: TL1=0x00;
+   0315 75 8B 00           1383 	mov	_TL1,#0x00
+                    0318   1384 	C$fb_lpc922.c$232$6$13 ==.
+                           1385 ;	..\fb_lpc922.c:232: TR1=1;
+   0318 D2 8E              1386 	setb	_TCON_6
+   031A                    1387 00143$:
+                    031A   1388 	C$fb_lpc922.c$235$4$10 ==.
+                           1389 ;	..\fb_lpc922.c:235: EX1=1;	// ext1 int einschalten falls Empfang...
+   031A D2 AA              1390 	setb	_IEN0_2
+   031C 02s05r94           1391 	ljmp	00253$
+   031F                    1392 00145$:
+                    031F   1393 	C$fb_lpc922.c$238$4$14 ==.
+                           1394 ;	..\fb_lpc922.c:238: tx_nextsend++; //hier Zeiger erhoehen wenn Telegramm nicht gebildet werden konnte
+   031F 05*2D              1395 	inc	_tx_nextsend
+                    0321   1396 	C$fb_lpc922.c$239$4$14 ==.
+                           1397 ;	..\fb_lpc922.c:239: tx_nextsend&=0x07;
+   0321 53*2D 07           1398 	anl	_tx_nextsend,#0x07
+   0324 02s05r94           1399 	ljmp	00253$
+   0327                    1400 00148$:
+                    0327   1401 	C$fb_lpc922.c$243$3$15 ==.
+                           1402 ;	..\fb_lpc922.c:243: TR1=0;		// nichts mehr zu tun, also statemachine stoppen
+   0327 C2 8E              1403 	clr	_TCON_6
+                    0329   1404 	C$fb_lpc922.c$244$3$15 ==.
+                           1405 ;	..\fb_lpc922.c:244: EX1=1;		// sicherstellen, dass ext. Int. 1 aktiv ist
+   0329 D2 AA              1406 	setb	_IEN0_2
+                    032B   1407 	C$fb_lpc922.c$246$2$2 ==.
+                           1408 ;	..\fb_lpc922.c:246: break;
+   032B 02s05r94           1409 	ljmp	00253$
+                    032E   1410 	C$fb_lpc922.c$249$2$2 ==.
+                           1411 ;	..\fb_lpc922.c:249: case 2: // T=75us
+   032E                    1412 00150$:
+                    032E   1413 	C$fb_lpc922.c$250$2$2 ==.
+                           1414 ;	..\fb_lpc922.c:250: fbrx_bit=!IE1;				// Flipflop des ext. Int. 1 auslesen, ist 1 bei fallender Flanke am Pin
+   032E A2 8B              1415 	mov	c,_TCON_3
+   0330 B3                 1416 	cpl	c
+   0331 92*00              1417 	mov	b0,c
+                    0333   1418 	C$fb_lpc922.c$251$2$2 ==.
+                           1419 ;	..\fb_lpc922.c:251: IE1=0;						// Flipflop zuruecksetzen
+   0333 C2 8B              1420 	clr	_TCON_3
+                    0335   1421 	C$fb_lpc922.c$252$2$2 ==.
+                           1422 ;	..\fb_lpc922.c:252: fb_state=3;// naechster state: 3
+   0335 75*2A 03           1423 	mov	_fb_state,#0x03
+                    0338   1424 	C$fb_lpc922.c$253$2$2 ==.
+                           1425 ;	..\fb_lpc922.c:253: TH1=0;// reload auf 70µs (zeit swischen state 3 und 2)
+   0338 75 8D 00           1426 	mov	_TH1,#0x00
+                    033B   1427 	C$fb_lpc922.c$254$2$2 ==.
+                           1428 ;	..\fb_lpc922.c:254: if(fb_pattern==0) {			// fb_pattern=0 bedeutet, dass bisher nur das Startbit empfangen wurde
+   033B E5*29              1429 	mov	a,_fb_pattern
+   033D 70 0A              1430 	jnz	00185$
+                    033F   1431 	C$fb_lpc922.c$255$3$16 ==.
+                           1432 ;	..\fb_lpc922.c:255: fb_pattern=1;			// 70us nach Startbit, als naecstes kommt Datenbit 0
+   033F 75*29 01           1433 	mov	_fb_pattern,#0x01
+                    0342   1434 	C$fb_lpc922.c$256$3$16 ==.
+                           1435 ;	..\fb_lpc922.c:256: ack=0;					// Empfang eines neuen Bytes, also ack/nack Flags zuruecksetzen
+   0342 C2*03              1436 	clr	_ack
+                    0344   1437 	C$fb_lpc922.c$257$3$16 ==.
+                           1438 ;	..\fb_lpc922.c:257: nack=0;
+   0344 C2*04              1439 	clr	_nack
+   0346 02s05r94           1440 	ljmp	00253$
+   0349                    1441 00185$:
+                    0349   1442 	C$fb_lpc922.c$260$3$17 ==.
+                           1443 ;	..\fb_lpc922.c:260: if(fb_pattern<129) {					// Daten-Bit LSB first
+   0349 74 7F              1444 	mov	a,#0x100 - 0x81
+   034B 25*29              1445 	add	a,_fb_pattern
+   034D 40 1C              1446 	jc	00182$
+                    034F   1447 	C$fb_lpc922.c$261$4$18 ==.
+                           1448 ;	..\fb_lpc922.c:261: if(fbrx_bit) {
+   034F 30*00 08           1449 	jnb	b0,00152$
+                    0352   1450 	C$fb_lpc922.c$262$5$19 ==.
+                           1451 ;	..\fb_lpc922.c:262: fb_parity=!fb_parity;			// Paritybit berechnen
+   0352 B2*02              1452 	cpl	_fb_parity
+                    0354   1453 	C$fb_lpc922.c$263$5$19 ==.
+                           1454 ;	..\fb_lpc922.c:263: fbrx_byte+=fb_pattern;			// Datenbit speichern
+   0354 E5*29              1455 	mov	a,_fb_pattern
+   0356 25*28              1456 	add	a,_fbrx_byte
+   0358 F5*28              1457 	mov	_fbrx_byte,a
+   035A                    1458 00152$:
+                    035A   1459 	C$fb_lpc922.c$265$4$18 ==.
+                           1460 ;	..\fb_lpc922.c:265: fb_pattern=fb_pattern<<1;			// naechstes Bit
+   035A E5*29              1461 	mov	a,_fb_pattern
+   035C 25*29              1462 	add	a,_fb_pattern
+                    035E   1463 	C$fb_lpc922.c$266$4$18 ==.
+                           1464 ;	..\fb_lpc922.c:266: if(fb_pattern==0) fb_pattern=129;	// alle Daten-Bits gelesen, Parity-Bit folgt
+   035E F5*29              1465 	mov	_fb_pattern,a
+   0360 60 03              1466 	jz	00354$
+   0362 02s05r94           1467 	ljmp	00253$
+   0365                    1468 00354$:
+   0365 75*29 81           1469 	mov	_fb_pattern,#0x81
+   0368 02s05r94           1470 	ljmp	00253$
+   036B                    1471 00182$:
+                    036B   1472 	C$fb_lpc922.c$269$4$20 ==.
+                           1473 ;	..\fb_lpc922.c:269: TR1=0;
+   036B C2 8E              1474 	clr	_TCON_6
+                    036D   1475 	C$fb_lpc922.c$270$4$20 ==.
+                           1476 ;	..\fb_lpc922.c:270: TF1=0; //pruefen ob erforderlich!!!
+   036D C2 8F              1477 	clr	_TCON_7
+                    036F   1478 	C$fb_lpc922.c$271$4$20 ==.
+                           1479 ;	..\fb_lpc922.c:271: if(fb_parity==fbrx_bit) {				// Parity-Bit OK
+   036F A2*02              1480 	mov	c,_fb_parity
+   0371 20*00 01           1481 	jb	b0,00355$
+   0374 B3                 1482 	cpl	c
+   0375                    1483 00355$:
+   0375 50 2C              1484 	jnc	00166$
+                    0377   1485 	C$fb_lpc922.c$272$5$21 ==.
+                           1486 ;	..\fb_lpc922.c:272: if (telpos==0) {						// erstes empfangenes Byte
+   0377 E5*26              1487 	mov	a,_telpos
+   0379 70 0E              1488 	jnz	00160$
+                    037B   1489 	C$fb_lpc922.c$273$6$22 ==.
+                           1490 ;	..\fb_lpc922.c:273: if (fbrx_byte==0xCC) ack=1;				// ACK empfangen
+   037B 74 CC              1491 	mov	a,#0xCC
+   037D B5*28 02           1492 	cjne	a,_fbrx_byte,00156$
+   0380 D2*03              1493 	setb	_ack
+   0382                    1494 00156$:
+                    0382   1495 	C$fb_lpc922.c$274$6$22 ==.
+                           1496 ;	..\fb_lpc922.c:274: if (fbrx_byte==0x0C) nack=1;			// NACK empfangen
+   0382 74 0C              1497 	mov	a,#0x0C
+   0384 B5*28 02           1498 	cjne	a,_fbrx_byte,00160$
+   0387 D2*04              1499 	setb	_nack
+   0389                    1500 00160$:
+                    0389   1501 	C$fb_lpc922.c$276$5$21 ==.
+                           1502 ;	..\fb_lpc922.c:276: if (!ack && !nack && telpos<=22) {			// Datenbyte empfangen, pointer auf Arraygroesse begrenzen
+   0389 20*03 19           1503 	jb	_ack,00167$
+   038C 20*04 16           1504 	jb	_nack,00167$
+   038F E5*26              1505 	mov	a,_telpos
+   0391 24 E9              1506 	add	a,#0xff - 0x16
+   0393 40 10              1507 	jc	00167$
+                    0395   1508 	C$fb_lpc922.c$277$6$23 ==.
+                           1509 ;	..\fb_lpc922.c:277: telegramm[telpos]=fbrx_byte;			// Byte speichern
+   0395 E5*26              1510 	mov	a,_telpos
+   0397 24r07              1511 	add	a,#_telegramm
+   0399 F8                 1512 	mov	r0,a
+                    039A   1513 	C$fb_lpc922.c$278$6$23 ==.
+                           1514 ;	..\fb_lpc922.c:278: cs^=fbrx_byte;							// Checksum berechnen
+   039A E5*28              1515 	mov	a,_fbrx_byte
+   039C F6                 1516 	mov	@r0,a
+   039D 62*27              1517 	xrl	_cs,a
+                    039F   1518 	C$fb_lpc922.c$279$6$23 ==.
+                           1519 ;	..\fb_lpc922.c:279: telpos++;								// Telegrammzeiger erhoehen
+   039F 05*26              1520 	inc	_telpos
+   03A1 80 02              1521 	sjmp	00167$
+   03A3                    1522 00166$:
+                    03A3   1523 	C$fb_lpc922.c$282$4$20 ==.
+                           1524 ;	..\fb_lpc922.c:282: else parity_ok=0;						// Parity Error
+   03A3 C2*00              1525 	clr	_parity_ok
+   03A5                    1526 00167$:
+                    03A5   1527 	C$fb_lpc922.c$284$4$20 ==.
+                           1528 ;	..\fb_lpc922.c:284: if (wait_for_ack) {						// es wird ein ACK erwartet
+                    03A5   1529 	C$fb_lpc922.c$285$5$24 ==.
+                           1530 ;	..\fb_lpc922.c:285: wait_for_ack=0;							// Flag zurücksetzen, da wir es ja gerade abarbeiten
+   03A5 10*0A 02           1531 	jbc	_wait_for_ack,00365$
+   03A8 80 1D              1532 	sjmp	00179$
+   03AA                    1533 00365$:
+                    03AA   1534 	C$fb_lpc922.c$286$5$24 ==.
+                           1535 ;	..\fb_lpc922.c:286: if (ack && parity_ok) {					// ACK empfangen und auch erwartet
+   03AA 30*03 14           1536 	jnb	_ack,00171$
+   03AD 30*00 11           1537 	jnb	_parity_ok,00171$
+                    03B0   1538 	C$fb_lpc922.c$287$6$25 ==.
+                           1539 ;	..\fb_lpc922.c:287: repeat_count=4;						// keine Wiederholtelegramme mehr senden
+   03B0 75*2B 04           1540 	mov	_repeat_count,#0x04
+                    03B3   1541 	C$fb_lpc922.c$291$6$25 ==.
+                           1542 ;	..\fb_lpc922.c:291: if(inc_pcount) {
+                    03B3   1543 	C$fb_lpc922.c$292$7$26 ==.
+                           1544 ;	..\fb_lpc922.c:292: inc_pcount=0;
+   03B3 10*0E 02           1545 	jbc	_inc_pcount,00368$
+   03B6 80 09              1546 	sjmp	00171$
+   03B8                    1547 00368$:
+                    03B8   1548 	C$fb_lpc922.c$293$7$26 ==.
+                           1549 ;	..\fb_lpc922.c:293: pcount+=4;
+   03B8 E5*02              1550 	mov	a,_pcount
+   03BA 24 04              1551 	add	a,#0x04
+   03BC F5*02              1552 	mov	_pcount,a
+                    03BE   1553 	C$fb_lpc922.c$294$7$26 ==.
+                           1554 ;	..\fb_lpc922.c:294: pcount&=0x3C;
+   03BE 53*02 3C           1555 	anl	_pcount,#0x3C
+   03C1                    1556 00171$:
+                    03C1   1557 	C$fb_lpc922.c$297$5$24 ==.
+                           1558 ;	..\fb_lpc922.c:297: init_rx();
+   03C1 12s05rB8           1559 	lcall	_init_rx
+   03C4 02s05r94           1560 	ljmp	00253$
+   03C7                    1561 00179$:
+                    03C7   1562 	C$fb_lpc922.c$300$5$27 ==.
+                           1563 ;	..\fb_lpc922.c:300: if (parity_ok && (!ack && !nack)) {		// ganz normales Datenbyte
+   03C7 30*00 1E           1564 	jnb	_parity_ok,00174$
+   03CA 20*03 1B           1565 	jb	_ack,00174$
+   03CD 20*04 18           1566 	jb	_nack,00174$
+                    03D0   1567 	C$fb_lpc922.c$301$6$28 ==.
+                           1568 ;	..\fb_lpc922.c:301: TMOD=(TMOD & 0x0F) +0x10;			// Timer 1 als 16-Bit Timer
+   03D0 74 0F              1569 	mov	a,#0x0F
+   03D2 55 89              1570 	anl	a,_TMOD
+   03D4 24 10              1571 	add	a,#0x10
+   03D6 F5 89              1572 	mov	_TMOD,a
+                    03D8   1573 	C$fb_lpc922.c$302$6$28 ==.
+                           1574 ;	..\fb_lpc922.c:302: TH1=0xFA;//0xFA;							// Timer 1 auf Timeout-Position setzen (370us)
+   03D8 75 8D FA           1575 	mov	_TH1,#0xFA
+                    03DB   1576 	C$fb_lpc922.c$303$6$28 ==.
+                           1577 ;	..\fb_lpc922.c:303: TL1=0x70;//4f 0xAB; (bis hierher sinds 91Âµs)
+   03DB 75 8B 70           1578 	mov	_TL1,#0x70
+                    03DE   1579 	C$fb_lpc922.c$304$6$28 ==.
+                           1580 ;	..\fb_lpc922.c:304: TR1=1;
+   03DE D2 8E              1581 	setb	_TCON_6
+                    03E0   1582 	C$fb_lpc922.c$305$6$28 ==.
+                           1583 ;	..\fb_lpc922.c:305: fb_state=4;							// naechster state: timeout = Telegramm fertig
+   03E0 75*2A 04           1584 	mov	_fb_state,#0x04
+                    03E3   1585 	C$fb_lpc922.c$306$6$28 ==.
+                           1586 ;	..\fb_lpc922.c:306: EX1=1;								// int1 aktiv, falls noch ein Byte kommt
+   03E3 D2 AA              1587 	setb	_IEN0_2
+   03E5 02s05r94           1588 	ljmp	00253$
+   03E8                    1589 00174$:
+                    03E8   1590 	C$fb_lpc922.c$308$5$27 ==.
+                           1591 ;	..\fb_lpc922.c:308: else init_rx();							// irgendwas empfangen
+   03E8 12s05rB8           1592 	lcall	_init_rx
+                    03EB   1593 	C$fb_lpc922.c$312$2$2 ==.
+                           1594 ;	..\fb_lpc922.c:312: break;
+   03EB 02s05r94           1595 	ljmp	00253$
+                    03EE   1596 	C$fb_lpc922.c$314$2$2 ==.
+                           1597 ;	..\fb_lpc922.c:314: case 3: // T=104us=0us
+   03EE                    1598 00187$:
+                    03EE   1599 	C$fb_lpc922.c$315$2$2 ==.
+                           1600 ;	..\fb_lpc922.c:315: TH1=128;// reload auf 35Âµs (Zeit zwischen State 2 und 3)
+   03EE 75 8D 80           1601 	mov	_TH1,#0x80
+                    03F1   1602 	C$fb_lpc922.c$316$2$2 ==.
+                           1603 ;	..\fb_lpc922.c:316: fb_state=2;//1
+   03F1 75*2A 02           1604 	mov	_fb_state,#0x02
+                    03F4   1605 	C$fb_lpc922.c$317$2$2 ==.
+                           1606 ;	..\fb_lpc922.c:317: break;
+   03F4 02s05r94           1607 	ljmp	00253$
+                    03F7   1608 	C$fb_lpc922.c$319$2$2 ==.
+                           1609 ;	..\fb_lpc922.c:319: case 4:	//	Timeout, d.h. Telegramm-Ende
+   03F7                    1610 00188$:
+                    03F7   1611 	C$fb_lpc922.c$320$2$2 ==.
+                           1612 ;	..\fb_lpc922.c:320: if (auto_ack && telpos>7) {//>4		// wenn ACK/NACK gesendet werden soll und Telegramm zumindest 7 Bytes hat, da sonst ein NACK wenig Sinn macht
+   03F7 20*08 03           1613 	jb	_auto_ack,00372$
+   03FA 02s04r7B           1614 	ljmp	00206$
+   03FD                    1615 00372$:
+   03FD E5*26              1616 	mov	a,_telpos
+   03FF 24 F8              1617 	add	a,#0xff - 0x07
+   0401 50 78              1618 	jnc	00206$
+                    0403   1619 	C$fb_lpc922.c$321$3$29 ==.
+                           1620 ;	..\fb_lpc922.c:321: TR1=0;
+   0403 C2 8E              1621 	clr	_TCON_6
+                    0405   1622 	C$fb_lpc922.c$322$3$29 ==.
+                           1623 ;	..\fb_lpc922.c:322: TMOD=(TMOD & 0x0F) +0x10;	// Timer 1 als 16-Bit Timer
+   0405 74 0F              1624 	mov	a,#0x0F
+   0407 55 89              1625 	anl	a,_TMOD
+   0409 24 10              1626 	add	a,#0x10
+   040B F5 89              1627 	mov	_TMOD,a
+                    040D   1628 	C$fb_lpc922.c$323$3$29 ==.
+                           1629 ;	..\fb_lpc922.c:323: TH1=0xEF;					// Timer 1 auf ACK / NACK -Position setzen (15 Bit Pause = 2708Âµs (26 Bit) nach Beginn Startbit vom letzten Datenbyte)
+   040D 75 8D EF           1630 	mov	_TH1,#0xEF
+                    0410   1631 	C$fb_lpc922.c$324$3$29 ==.
+                           1632 ;	..\fb_lpc922.c:324: TL1=0x42;
+   0410 75 8B 42           1633 	mov	_TL1,#0x42
+                    0413   1634 	C$fb_lpc922.c$325$3$29 ==.
+                           1635 ;	..\fb_lpc922.c:325: TR1=1;
+   0413 D2 8E              1636 	setb	_TCON_6
+                    0415   1637 	C$fb_lpc922.c$326$3$29 ==.
+                           1638 ;	..\fb_lpc922.c:326: its_me=0;//transparency; // indiziert, ob dieses Geraet adressiert wurde, bei transparecy=1 immer
+   0415 C2*05              1639 	clr	_its_me
+                    0417   1640 	C$fb_lpc922.c$327$3$29 ==.
+                           1641 ;	..\fb_lpc922.c:327: if(telegramm[5]&0x80) {
+   0417 E5*0C              1642 	mov	a,(_telegramm + 0x0005)
+   0419 30 E7 1F           1643 	jnb	acc.7,00198$
+                    041C   1644 	C$fb_lpc922.c$328$4$30 ==.
+                           1645 ;	..\fb_lpc922.c:328: if (gapos_in_gat(telegramm[3],telegramm[4])!=0xFF) its_me=1;	// Gruppenadresse
+   041C 85*0A 82           1646 	mov	dpl,(_telegramm + 0x0003)
+   041F C0*0B              1647 	push	(_telegramm + 0x0004)
+   0421 12s06r30           1648 	lcall	_gapos_in_gat
+   0424 AF 82              1649 	mov	r7,dpl
+   0426 15 81              1650 	dec	sp
+   0428 BF FF 02           1651 	cjne	r7,#0xFF,00375$
+   042B 80 02              1652 	sjmp	00190$
+   042D                    1653 00375$:
+   042D D2*05              1654 	setb	_its_me
+   042F                    1655 00190$:
+                    042F   1656 	C$fb_lpc922.c$329$4$30 ==.
+                           1657 ;	..\fb_lpc922.c:329: if (telegramm[3]==0 && telegramm[4]==0) its_me=1;				// Broadcast
+   042F E5*0A              1658 	mov	a,(_telegramm + 0x0003)
+   0431 70 1C              1659 	jnz	00199$
+   0433 E5*0B              1660 	mov	a,(_telegramm + 0x0004)
+   0435 70 18              1661 	jnz	00199$
+   0437 D2*05              1662 	setb	_its_me
+   0439 80 14              1663 	sjmp	00199$
+   043B                    1664 00198$:
+                    043B   1665 	C$fb_lpc922.c$331$3$29 ==.
+                           1666 ;	..\fb_lpc922.c:331: else if(telegramm[3]==eeprom[ADDRTAB+1] && telegramm[4]==eeprom[ADDRTAB+2]) its_me=1;	// phys. Adresse
+   043B 90 1D 17           1667 	mov	dptr,#(_eeprom + 0x0017)
+   043E E4                 1668 	clr	a
+   043F 93                 1669 	movc	a,@a+dptr
+   0440 FF                 1670 	mov	r7,a
+   0441 B5*0A 0B           1671 	cjne	a,(_telegramm + 0x0003),00199$
+   0444 90 1D 18           1672 	mov	dptr,#(_eeprom + 0x0018)
+   0447 E4                 1673 	clr	a
+   0448 93                 1674 	movc	a,@a+dptr
+   0449 FF                 1675 	mov	r7,a
+   044A B5*0B 02           1676 	cjne	a,(_telegramm + 0x0004),00199$
+   044D D2*05              1677 	setb	_its_me
+   044F                    1678 00199$:
+                    044F   1679 	C$fb_lpc922.c$334$3$29 ==.
+                           1680 ;	..\fb_lpc922.c:334: if ((cs==0xFF)&&((telegramm[5]&0x0F)+8)== (telpos))
+   044F 74 FF              1681 	mov	a,#0xFF
+   0451 B5*27 21           1682 	cjne	a,_cs,00203$
+   0454 74 0F              1683 	mov	a,#0x0F
+   0456 55*0C              1684 	anl	a,(_telegramm + 0x0005)
+   0458 FF                 1685 	mov	r7,a
+   0459 7E 00              1686 	mov	r6,#0x00
+   045B 74 08              1687 	mov	a,#0x08
+   045D 2F                 1688 	add	a,r7
+   045E FF                 1689 	mov	r7,a
+   045F E4                 1690 	clr	a
+   0460 3E                 1691 	addc	a,r6
+   0461 FE                 1692 	mov	r6,a
+   0462 AC*26              1693 	mov	r4,_telpos
+   0464 7D 00              1694 	mov	r5,#0x00
+   0466 EF                 1695 	mov	a,r7
+   0467 B5 04 0B           1696 	cjne	a,ar4,00203$
+   046A EE                 1697 	mov	a,r6
+   046B B5 05 07           1698 	cjne	a,ar5,00203$
+                    046E   1699 	C$fb_lpc922.c$336$4$31 ==.
+                           1700 ;	..\fb_lpc922.c:336: telegramm_ok=1;
+   046E D2*0F              1701 	setb	_telegramm_ok
+                    0470   1702 	C$fb_lpc922.c$337$4$31 ==.
+                           1703 ;	..\fb_lpc922.c:337: if(its_me)tel_arrived=1;//&&(telegramm[5]&0x0F== telpos-8)
+   0470 30*05 02           1704 	jnb	_its_me,00203$
+   0473 D2*06              1705 	setb	_tel_arrived
+   0475                    1706 00203$:
+                    0475   1707 	C$fb_lpc922.c$339$3$29 ==.
+                           1708 ;	..\fb_lpc922.c:339: fb_state=5;					// naechster state: ACK-Position erreicht
+   0475 75*2A 05           1709 	mov	_fb_state,#0x05
+   0478 02s05r94           1710 	ljmp	00253$
+   047B                    1711 00206$:
+                    047B   1712 	C$fb_lpc922.c$344$3$32 ==.
+                           1713 ;	..\fb_lpc922.c:344: init_rx();						// wieder in den Empfang zurück
+   047B 12s05rB8           1714 	lcall	_init_rx
+                    047E   1715 	C$fb_lpc922.c$346$2$2 ==.
+                           1716 ;	..\fb_lpc922.c:346: break;
+   047E 02s05r94           1717 	ljmp	00253$
+                    0481   1718 	C$fb_lpc922.c$348$2$2 ==.
+                           1719 ;	..\fb_lpc922.c:348: case 5:	// ACK-Position erreicht
+   0481                    1720 00209$:
+                    0481   1721 	C$fb_lpc922.c$349$2$2 ==.
+                           1722 ;	..\fb_lpc922.c:349: TR1=0;
+   0481 C2 8E              1723 	clr	_TCON_6
+                    0483   1724 	C$fb_lpc922.c$350$2$2 ==.
+                           1725 ;	..\fb_lpc922.c:350: if (telegramm_ok) {	// Checksum und Laenge OK
+   0483 30*0F 13           1726 	jnb	_telegramm_ok,00214$
+                    0486   1727 	C$fb_lpc922.c$351$3$33 ==.
+                           1728 ;	..\fb_lpc922.c:351: if (its_me) {					// Gerät adressiert
+   0486 30*05 0A           1729 	jnb	_its_me,00211$
+                    0489   1730 	C$fb_lpc922.c$352$4$34 ==.
+                           1731 ;	..\fb_lpc922.c:352: send_ack=1;
+   0489 D2*0B              1732 	setb	_send_ack
+                    048B   1733 	C$fb_lpc922.c$353$4$34 ==.
+                           1734 ;	..\fb_lpc922.c:353: init_tx();						// Senden initiieren
+   048B 12s05rE6           1735 	lcall	_init_tx
+                    048E   1736 	C$fb_lpc922.c$354$4$34 ==.
+                           1737 ;	..\fb_lpc922.c:354: wait_for_ack=0;					// bei ACK senden nicht erneut auf ACK warten
+   048E C2*0A              1738 	clr	_wait_for_ack
+   0490 02s05r94           1739 	ljmp	00253$
+   0493                    1740 00211$:
+                    0493   1741 	C$fb_lpc922.c$356$3$33 ==.
+                           1742 ;	..\fb_lpc922.c:356: else init_rx();					// Gerät nicht adressiert, also zurück zu Empfang
+   0493 12s05rB8           1743 	lcall	_init_rx
+   0496 02s05r94           1744 	ljmp	00253$
+   0499                    1745 00214$:
+                    0499   1746 	C$fb_lpc922.c$359$3$35 ==.
+                           1747 ;	..\fb_lpc922.c:359: send_nack=1;
+   0499 D2*0C              1748 	setb	_send_nack
+                    049B   1749 	C$fb_lpc922.c$360$3$35 ==.
+                           1750 ;	..\fb_lpc922.c:360: init_tx();
+   049B 12s05rE6           1751 	lcall	_init_tx
+                    049E   1752 	C$fb_lpc922.c$361$3$35 ==.
+                           1753 ;	..\fb_lpc922.c:361: wait_for_ack=0;					// bei NACK senden nicht erneut auf ACK warten
+   049E C2*0A              1754 	clr	_wait_for_ack
+                    04A0   1755 	C$fb_lpc922.c$363$2$2 ==.
+                           1756 ;	..\fb_lpc922.c:363: break;
+   04A0 02s05r94           1757 	ljmp	00253$
+                    04A3   1758 	C$fb_lpc922.c$367$2$2 ==.
+                           1759 ;	..\fb_lpc922.c:367: case 10:	// Byte Senden, T=0us
+   04A3                    1760 00216$:
+                    04A3   1761 	C$fb_lpc922.c$368$2$2 ==.
+                           1762 ;	..\fb_lpc922.c:368: send_byte=telegramm[telpos];
+   04A3 E5*26              1763 	mov	a,_telpos
+   04A5 24r07              1764 	add	a,#_telegramm
+   04A7 F9                 1765 	mov	r1,a
+   04A8 87 07              1766 	mov	ar7,@r1
+                    04AA   1767 	C$fb_lpc922.c$369$2$2 ==.
+                           1768 ;	..\fb_lpc922.c:369: if (send_ack) send_byte=0xCC;
+   04AA 30*0B 02           1769 	jnb	_send_ack,00218$
+   04AD 7F CC              1770 	mov	r7,#0xCC
+   04AF                    1771 00218$:
+                    04AF   1772 	C$fb_lpc922.c$370$2$2 ==.
+                           1773 ;	..\fb_lpc922.c:370: if (send_nack) send_byte=0x0C;
+   04AF 30*0C 02           1774 	jnb	_send_nack,00220$
+   04B2 7F 0C              1775 	mov	r7,#0x0C
+   04B4                    1776 00220$:
+                    04B4   1777 	C$fb_lpc922.c$371$2$2 ==.
+                           1778 ;	..\fb_lpc922.c:371: EX1=0;					// Empfang verhindern
+   04B4 C2 AA              1779 	clr	_IEN0_2
+                    04B6   1780 	C$fb_lpc922.c$372$2$2 ==.
+                           1781 ;	..\fb_lpc922.c:372: if(fb_state==10){
+   04B6 74 0A              1782 	mov	a,#0x0A
+   04B8 B5*2A 02           1783 	cjne	a,_fb_state,00391$
+   04BB 80 03              1784 	sjmp	00392$
+   04BD                    1785 00391$:
+   04BD 02s05r94           1786 	ljmp	00253$
+   04C0                    1787 00392$:
+                    04C0   1788 	C$fb_lpc922.c$373$3$36 ==.
+                           1789 ;	..\fb_lpc922.c:373: if (fb_pattern<=128) {			// Startbit und Datenbits (pattern=0:startbit, 1 2 4 8 .. 128 Datenbits, 129 parity)
+   04C0 E5*29              1790 	mov	a,_fb_pattern
+   04C2 24 7F              1791 	add	a,#0xff - 0x80
+   04C4 40 2C              1792 	jc	00233$
+                    04C6   1793 	C$fb_lpc922.c$374$4$37 ==.
+                           1794 ;	..\fb_lpc922.c:374: if ((send_byte & fb_pattern)==0) {	// wenn Bit logisch 0 ist
+   04C6 E5*29              1795 	mov	a,_fb_pattern
+   04C8 5F                 1796 	anl	a,r7
+   04C9 70 08              1797 	jnz	00222$
+                    04CB   1798 	C$fb_lpc922.c$376$5$38 ==.
+                           1799 ;	..\fb_lpc922.c:376: FBOUTC=1;						// Bus runter ziehen
+   04CB D2 96              1800 	setb	_P1_6
+                    04CD   1801 	C$fb_lpc922.c$378$5$38 ==.
+                           1802 ;	..\fb_lpc922.c:378: fbtx_bit=0;						// fbtx_bit dient zur spaeteren Kollisionspruefung
+   04CD C2*09              1803 	clr	_fbtx_bit
+                    04CF   1804 	C$fb_lpc922.c$379$5$38 ==.
+                           1805 ;	..\fb_lpc922.c:379: fb_parity=!fb_parity;			// Parity-Bit berechnen
+   04CF B2*02              1806 	cpl	_fb_parity
+   04D1 80 02              1807 	sjmp	00223$
+   04D3                    1808 00222$:
+                    04D3   1809 	C$fb_lpc922.c$381$4$37 ==.
+                           1810 ;	..\fb_lpc922.c:381: else fbtx_bit=1;
+   04D3 D2*09              1811 	setb	_fbtx_bit
+   04D5                    1812 00223$:
+                    04D5   1813 	C$fb_lpc922.c$382$4$37 ==.
+                           1814 ;	..\fb_lpc922.c:382: if (fb_pattern==0) {				// wenn Startbit: parity zuruecksetzen
+   04D5 E5*29              1815 	mov	a,_fb_pattern
+   04D7 70 07              1816 	jnz	00225$
+                    04D9   1817 	C$fb_lpc922.c$383$5$39 ==.
+                           1818 ;	..\fb_lpc922.c:383: fb_pattern=1;					// auf erstes Datenbit zeigen
+   04D9 75*29 01           1819 	mov	_fb_pattern,#0x01
+                    04DC   1820 	C$fb_lpc922.c$384$5$39 ==.
+                           1821 ;	..\fb_lpc922.c:384: fb_parity=0;
+   04DC C2*02              1822 	clr	_fb_parity
+   04DE 80 06              1823 	sjmp	00226$
+   04E0                    1824 00225$:
+                    04E0   1825 	C$fb_lpc922.c$386$4$37 ==.
+                           1826 ;	..\fb_lpc922.c:386: else fb_pattern=fb_pattern<<1;		// naechstes Datenbit
+   04E0 E5*29              1827 	mov	a,_fb_pattern
+   04E2 25*29              1828 	add	a,_fb_pattern
+   04E4 F5*29              1829 	mov	_fb_pattern,a
+   04E6                    1830 00226$:
+                    04E6   1831 	C$fb_lpc922.c$387$4$37 ==.
+                           1832 ;	..\fb_lpc922.c:387: if(fb_pattern==0) fb_pattern=129;	// alle Daten-Bits gesendet, Parity-Bit folgt
+   04E6 E5*29              1833 	mov	a,_fb_pattern
+   04E8 70 03              1834 	jnz	00228$
+   04EA 75*29 81           1835 	mov	_fb_pattern,#0x81
+   04ED                    1836 00228$:
+                    04ED   1837 	C$fb_lpc922.c$388$4$37 ==.
+                           1838 ;	..\fb_lpc922.c:388: fb_state=11;
+   04ED 75*2A 0B           1839 	mov	_fb_state,#0x0B
+   04F0 80 13              1840 	sjmp	00234$
+   04F2                    1841 00233$:
+                    04F2   1842 	C$fb_lpc922.c$391$4$40 ==.
+                           1843 ;	..\fb_lpc922.c:391: if (!fb_parity) {				// wenn Parity-Bit logisch 0
+   04F2 20*02 06           1844 	jb	_fb_parity,00230$
+                    04F5   1845 	C$fb_lpc922.c$392$5$41 ==.
+                           1846 ;	..\fb_lpc922.c:392: FBOUTC=1;						// Bus runterziehen
+   04F5 D2 96              1847 	setb	_P1_6
+                    04F7   1848 	C$fb_lpc922.c$393$5$41 ==.
+                           1849 ;	..\fb_lpc922.c:393: fbtx_bit=0;						// fbtx_bit dient zur spaeteren Kollisionspruefung
+   04F7 C2*09              1850 	clr	_fbtx_bit
+   04F9 80 02              1851 	sjmp	00231$
+   04FB                    1852 00230$:
+                    04FB   1853 	C$fb_lpc922.c$395$4$40 ==.
+                           1854 ;	..\fb_lpc922.c:395: else fbtx_bit=1;
+   04FB D2*09              1855 	setb	_fbtx_bit
+   04FD                    1856 00231$:
+                    04FD   1857 	C$fb_lpc922.c$396$4$40 ==.
+                           1858 ;	..\fb_lpc922.c:396: telpos++;					// naechstes Byte
+   04FD 05*26              1859 	inc	_telpos
+                    04FF   1860 	C$fb_lpc922.c$397$4$40 ==.
+                           1861 ;	..\fb_lpc922.c:397: fb_pattern=0;				// wieder mit Startbit beginnen
+   04FF 75*29 00           1862 	mov	_fb_pattern,#0x00
+                    0502   1863 	C$fb_lpc922.c$398$4$40 ==.
+                           1864 ;	..\fb_lpc922.c:398: fb_state=13;				// Pruefen ob Telegramm fertig
+   0502 75*2A 0D           1865 	mov	_fb_state,#0x0D
+   0505                    1866 00234$:
+                    0505   1867 	C$fb_lpc922.c$400$3$36 ==.
+                           1868 ;	..\fb_lpc922.c:400: TH1=18; //reload 70µ -delay interrupt (von state 11 auf 13)
+   0505 75 8D 12           1869 	mov	_TH1,#0x12
+                    0508   1870 	C$fb_lpc922.c$402$2$2 ==.
+                           1871 ;	..\fb_lpc922.c:402: break;
+   0508 02s05r94           1872 	ljmp	00253$
+                    050B   1873 	C$fb_lpc922.c$404$2$2 ==.
+                           1874 ;	..\fb_lpc922.c:404: case 11:	// Sendestufe aus, T=35us
+   050B                    1875 00237$:
+                    050B   1876 	C$fb_lpc922.c$405$2$2 ==.
+                           1877 ;	..\fb_lpc922.c:405: if(telpos==0 && fb_pattern==1) {	// 1. Byte Startbit
+   050B E5*26              1878 	mov	a,_telpos
+   050D 70 07              1879 	jnz	00239$
+   050F 74 01              1880 	mov	a,#0x01
+   0511 B5*29 02           1881 	cjne	a,_fb_pattern,00239$
+                    0514   1882 	C$fb_lpc922.c$406$3$42 ==.
+                           1883 ;	..\fb_lpc922.c:406: repeat_count++;		// angefangener Sendeversuch, also Zaehler erhoehen
+   0514 05*2B              1884 	inc	_repeat_count
+   0516                    1885 00239$:
+                    0516   1886 	C$fb_lpc922.c$408$2$2 ==.
+                           1887 ;	..\fb_lpc922.c:408: FBOUTC=0;				// Sendestufe aus
+   0516 C2 96              1888 	clr	_P1_6
+                    0518   1889 	C$fb_lpc922.c$409$2$2 ==.
+                           1890 ;	..\fb_lpc922.c:409: if (fbtx_bit & IE1) {	// Kollision
+   0518 A2*09              1891 	mov	c,_fbtx_bit
+   051A 82 8B              1892 	anl	c,_TCON_3
+   051C 50 07              1893 	jnc	00242$
+                    051E   1894 	C$fb_lpc922.c$410$3$43 ==.
+                           1895 ;	..\fb_lpc922.c:410: wait_for_ack=0;
+   051E C2*0A              1896 	clr	_wait_for_ack
+                    0520   1897 	C$fb_lpc922.c$411$3$43 ==.
+                           1898 ;	..\fb_lpc922.c:411: init_rx();				// Senden abbrechen und Empfang initialisieren
+   0520 12s05rB8           1899 	lcall	_init_rx
+   0523 80 06              1900 	sjmp	00243$
+   0525                    1901 00242$:
+                    0525   1902 	C$fb_lpc922.c$414$3$44 ==.
+                           1903 ;	..\fb_lpc922.c:414: fb_state=10;//12;
+   0525 75*2A 0A           1904 	mov	_fb_state,#0x0A
+                    0528   1905 	C$fb_lpc922.c$415$3$44 ==.
+                           1906 ;	..\fb_lpc922.c:415: TH1=110;// 35Âµs + delay (von state 10 auf 11)
+   0528 75 8D 6E           1907 	mov	_TH1,#0x6E
+   052B                    1908 00243$:
+                    052B   1909 	C$fb_lpc922.c$417$2$2 ==.
+                           1910 ;	..\fb_lpc922.c:417: IE1=0;					// Flipflop loeschen
+   052B C2 8B              1911 	clr	_TCON_3
+                    052D   1912 	C$fb_lpc922.c$418$2$2 ==.
+                           1913 ;	..\fb_lpc922.c:418: break;
+                    052D   1914 	C$fb_lpc922.c$424$2$2 ==.
+                           1915 ;	..\fb_lpc922.c:424: case 13:	// Byte uebertragen, T=35us, pruefen ob Telegramm fertig
+   052D 80 65              1916 	sjmp	00253$
+   052F                    1917 00244$:
+                    052F   1918 	C$fb_lpc922.c$425$2$2 ==.
+                           1919 ;	..\fb_lpc922.c:425: FBOUTC=0;
+   052F C2 96              1920 	clr	_P1_6
+                    0531   1921 	C$fb_lpc922.c$426$2$2 ==.
+                           1922 ;	..\fb_lpc922.c:426: TR1=0;
+   0531 C2 8E              1923 	clr	_TCON_6
+                    0533   1924 	C$fb_lpc922.c$427$2$2 ==.
+                           1925 ;	..\fb_lpc922.c:427: TMOD=(TMOD & 0x0F) +0x10;	// Timer 1 als 16-Bit Timer
+   0533 74 0F              1926 	mov	a,#0x0F
+   0535 55 89              1927 	anl	a,_TMOD
+   0537 24 10              1928 	add	a,#0x10
+   0539 F5 89              1929 	mov	_TMOD,a
+                    053B   1930 	C$fb_lpc922.c$428$2$2 ==.
+                           1931 ;	..\fb_lpc922.c:428: TH1=0xFB;					// Timer 1 auf Interbyte Abstand setzen (3 Bit Pause = 312Âµs
+   053B 75 8D FB           1932 	mov	_TH1,#0xFB
+                    053E   1933 	C$fb_lpc922.c$429$2$2 ==.
+                           1934 ;	..\fb_lpc922.c:429: TL1=0x90;
+   053E 75 8B 90           1935 	mov	_TL1,#0x90
+                    0541   1936 	C$fb_lpc922.c$430$2$2 ==.
+                           1937 ;	..\fb_lpc922.c:430: TR1=1;
+   0541 D2 8E              1938 	setb	_TCON_6
+                    0543   1939 	C$fb_lpc922.c$431$2$2 ==.
+                           1940 ;	..\fb_lpc922.c:431: if (send_ack || send_nack) {	// ACK/NACK senden
+   0543 20*0B 03           1941 	jb	_send_ack,00248$
+   0546 30*0C 05           1942 	jnb	_send_nack,00249$
+   0549                    1943 00248$:
+                    0549   1944 	C$fb_lpc922.c$432$3$45 ==.
+                           1945 ;	..\fb_lpc922.c:432: init_rx();					// ACK senden abgeschlossen, also statemachine auf Anfang
+   0549 12s05rB8           1946 	lcall	_init_rx
+   054C 80 2B              1947 	sjmp	00250$
+   054E                    1948 00249$:
+                    054E   1949 	C$fb_lpc922.c$435$3$46 ==.
+                           1950 ;	..\fb_lpc922.c:435: if (telpos>((telegramm[5]&0x0F)+7)) {		// Telegramm fertig gesendet
+   054E 74 0F              1951 	mov	a,#0x0F
+   0550 55*0C              1952 	anl	a,(_telegramm + 0x0005)
+   0552 FF                 1953 	mov	r7,a
+   0553 7E 00              1954 	mov	r6,#0x00
+   0555 74 07              1955 	mov	a,#0x07
+   0557 2F                 1956 	add	a,r7
+   0558 FF                 1957 	mov	r7,a
+   0559 E4                 1958 	clr	a
+   055A 3E                 1959 	addc	a,r6
+   055B FE                 1960 	mov	r6,a
+   055C AC*26              1961 	mov	r4,_telpos
+   055E 7D 00              1962 	mov	r5,#0x00
+   0560 C3                 1963 	clr	c
+   0561 EF                 1964 	mov	a,r7
+   0562 9C                 1965 	subb	a,r4
+   0563 EE                 1966 	mov	a,r6
+   0564 64 80              1967 	xrl	a,#0x80
+   0566 8D F0              1968 	mov	b,r5
+   0568 63 F0 80           1969 	xrl	b,#0x80
+   056B 95 F0              1970 	subb	a,b
+   056D 50 07              1971 	jnc	00246$
+                    056F   1972 	C$fb_lpc922.c$436$4$47 ==.
+                           1973 ;	..\fb_lpc922.c:436: tel_sent=1;
+   056F D2*07              1974 	setb	_tel_sent
+                    0571   1975 	C$fb_lpc922.c$437$4$47 ==.
+                           1976 ;	..\fb_lpc922.c:437: init_rx();	// Telegramm senden abgeschlossen, ggf. wiederholen wenn nicht geackt wird
+   0571 12s05rB8           1977 	lcall	_init_rx
+   0574 80 03              1978 	sjmp	00250$
+   0576                    1979 00246$:
+                    0576   1980 	C$fb_lpc922.c$439$3$46 ==.
+                           1981 ;	..\fb_lpc922.c:439: else fb_state=14;		// naechstes Byte: Interbyte Abstand einhalten
+   0576 75*2A 0E           1982 	mov	_fb_state,#0x0E
+   0579                    1983 00250$:
+                    0579   1984 	C$fb_lpc922.c$441$2$2 ==.
+                           1985 ;	..\fb_lpc922.c:441: IE1=0;
+   0579 C2 8B              1986 	clr	_TCON_3
+                    057B   1987 	C$fb_lpc922.c$442$2$2 ==.
+                           1988 ;	..\fb_lpc922.c:442: break;
+                    057B   1989 	C$fb_lpc922.c$444$2$2 ==.
+                           1990 ;	..\fb_lpc922.c:444: case 14:	// Interbyte Abstand erreicht (=Stopbit + 2 Bit)
+   057B 80 17              1991 	sjmp	00253$
+   057D                    1992 00252$:
+                    057D   1993 	C$fb_lpc922.c$445$2$2 ==.
+                           1994 ;	..\fb_lpc922.c:445: TR1=0;
+   057D C2 8E              1995 	clr	_TCON_6
+                    057F   1996 	C$fb_lpc922.c$446$2$2 ==.
+                           1997 ;	..\fb_lpc922.c:446: TMOD=(TMOD & 0x0F) +0x20;			// Timer 1 als 8-Bit autoreload
+   057F 74 0F              1998 	mov	a,#0x0F
+   0581 55 89              1999 	anl	a,_TMOD
+   0583 24 20              2000 	add	a,#0x20
+   0585 F5 89              2001 	mov	_TMOD,a
+                    0587   2002 	C$fb_lpc922.c$447$2$2 ==.
+                           2003 ;	..\fb_lpc922.c:447: TH1=110;							// Timer 1 auf 104/3 us laden
+   0587 75 8D 6E           2004 	mov	_TH1,#0x6E
+                    058A   2005 	C$fb_lpc922.c$448$2$2 ==.
+                           2006 ;	..\fb_lpc922.c:448: TL1=128;
+   058A 75 8B 80           2007 	mov	_TL1,#0x80
+                    058D   2008 	C$fb_lpc922.c$449$2$2 ==.
+                           2009 ;	..\fb_lpc922.c:449: TF1=0;
+   058D C2 8F              2010 	clr	_TCON_7
+                    058F   2011 	C$fb_lpc922.c$450$2$2 ==.
+                           2012 ;	..\fb_lpc922.c:450: TR1=1;
+   058F D2 8E              2013 	setb	_TCON_6
+                    0591   2014 	C$fb_lpc922.c$451$2$2 ==.
+                           2015 ;	..\fb_lpc922.c:451: fb_state=10;
+   0591 75*2A 0A           2016 	mov	_fb_state,#0x0A
+                    0594   2017 	C$fb_lpc922.c$456$1$1 ==.
+                           2018 ;	..\fb_lpc922.c:456: }
+   0594                    2019 00253$:
+                    0594   2020 	C$fb_lpc922.c$457$1$1 ==.
+                           2021 ;	..\fb_lpc922.c:457: interrupted=1;			// zeigt der app, dass sie unterbrochen wurde
+   0594 D2*01              2022 	setb	_interrupted
+   0596 85*00 81           2023 	mov	sp,_bp
+   0599 D0*00              2024 	pop	_bp
+   059B D0 D0              2025 	pop	psw
+   059D D0 00              2026 	pop	(0+0)
+   059F D0 01              2027 	pop	(0+1)
+   05A1 D0 02              2028 	pop	(0+2)
+   05A3 D0 03              2029 	pop	(0+3)
+   05A5 D0 04              2030 	pop	(0+4)
+   05A7 D0 05              2031 	pop	(0+5)
+   05A9 D0 06              2032 	pop	(0+6)
+   05AB D0 07              2033 	pop	(0+7)
+   05AD D0 83              2034 	pop	dph
+   05AF D0 82              2035 	pop	dpl
+   05B1 D0 F0              2036 	pop	b
+   05B3 D0 E0              2037 	pop	acc
+   05B5 D0*00              2038 	pop	bits
+                    05B7   2039 	C$fb_lpc922.c$458$1$1 ==.
+                    05B7   2040 	XG$T1_int$0$0 ==.
+   05B7 32                 2041 	reti
+                           2042 ;------------------------------------------------------------
+                           2043 ;Allocation info for local variables in function 'init_rx'
+                           2044 ;------------------------------------------------------------
+                    05B8   2045 	G$init_rx$0$0 ==.
+                    05B8   2046 	C$fb_lpc922.c$461$1$1 ==.
+                           2047 ;	..\fb_lpc922.c:461: void init_rx(void) 	// Empfangen initiieren (statemachine auf Anfang)
+                           2048 ;	-----------------------------------------
+                           2049 ;	 function init_rx
+                           2050 ;	-----------------------------------------
+   05B8                    2051 _init_rx:
+                    05B8   2052 	C$fb_lpc922.c$463$1$1 ==.
+                           2053 ;	..\fb_lpc922.c:463: fb_state=0;
+   05B8 75*2A 00           2054 	mov	_fb_state,#0x00
+                    05BB   2055 	C$fb_lpc922.c$464$1$1 ==.
+                           2056 ;	..\fb_lpc922.c:464: IE1=0;
+   05BB C2 8B              2057 	clr	_TCON_3
+                    05BD   2058 	C$fb_lpc922.c$465$1$1 ==.
+                           2059 ;	..\fb_lpc922.c:465: TR1=0;
+   05BD C2 8E              2060 	clr	_TCON_6
+                    05BF   2061 	C$fb_lpc922.c$466$1$1 ==.
+                           2062 ;	..\fb_lpc922.c:466: ET1=0;
+   05BF C2 AB              2063 	clr	_IEN0_3
+                    05C1   2064 	C$fb_lpc922.c$467$1$1 ==.
+                           2065 ;	..\fb_lpc922.c:467: cs=0;
+   05C1 75*27 00           2066 	mov	_cs,#0x00
+                    05C4   2067 	C$fb_lpc922.c$468$1$1 ==.
+                           2068 ;	..\fb_lpc922.c:468: telpos=0;
+   05C4 75*26 00           2069 	mov	_telpos,#0x00
+                    05C7   2070 	C$fb_lpc922.c$469$1$1 ==.
+                           2071 ;	..\fb_lpc922.c:469: TR1=0;
+   05C7 C2 8E              2072 	clr	_TCON_6
+                    05C9   2073 	C$fb_lpc922.c$470$1$1 ==.
+                           2074 ;	..\fb_lpc922.c:470: TMOD=(TMOD & 0x0F) +0x10;	// Timer 1 als 16-Bit Timer
+   05C9 74 0F              2075 	mov	a,#0x0F
+   05CB 55 89              2076 	anl	a,_TMOD
+   05CD 24 10              2077 	add	a,#0x10
+   05CF F5 89              2078 	mov	_TMOD,a
+                    05D1   2079 	C$fb_lpc922.c$471$1$1 ==.
+                           2080 ;	..\fb_lpc922.c:471: TH1=0x89;					// busfree Zeit = 15 Bit (auf ACK) + 11 Bit (ACK) + 53 Bit
+   05D1 75 8D 89           2081 	mov	_TH1,#0x89
+                    05D4   2082 	C$fb_lpc922.c$472$1$1 ==.
+                           2083 ;	..\fb_lpc922.c:472: TL1=0xAF;
+   05D4 75 8B AF           2084 	mov	_TL1,#0xAF
+                    05D7   2085 	C$fb_lpc922.c$473$1$1 ==.
+                           2086 ;	..\fb_lpc922.c:473: send_ack=0;
+   05D7 C2*0B              2087 	clr	_send_ack
+                    05D9   2088 	C$fb_lpc922.c$474$1$1 ==.
+                           2089 ;	..\fb_lpc922.c:474: send_nack=0;
+   05D9 C2*0C              2090 	clr	_send_nack
+                    05DB   2091 	C$fb_lpc922.c$475$1$1 ==.
+                           2092 ;	..\fb_lpc922.c:475: TF1=0;
+   05DB C2 8F              2093 	clr	_TCON_7
+                    05DD   2094 	C$fb_lpc922.c$476$1$1 ==.
+                           2095 ;	..\fb_lpc922.c:476: TR1=1;
+   05DD D2 8E              2096 	setb	_TCON_6
+                    05DF   2097 	C$fb_lpc922.c$477$1$1 ==.
+                           2098 ;	..\fb_lpc922.c:477: EX1=1;
+   05DF D2 AA              2099 	setb	_IEN0_2
+                    05E1   2100 	C$fb_lpc922.c$478$1$1 ==.
+                           2101 ;	..\fb_lpc922.c:478: ET1=1;
+   05E1 D2 AB              2102 	setb	_IEN0_3
+                    05E3   2103 	C$fb_lpc922.c$479$1$1 ==.
+                           2104 ;	..\fb_lpc922.c:479: telegramm_ok=0;
+   05E3 C2*0F              2105 	clr	_telegramm_ok
+                    05E5   2106 	C$fb_lpc922.c$480$1$1 ==.
+                    05E5   2107 	XG$init_rx$0$0 ==.
+   05E5 22                 2108 	ret
+                           2109 ;------------------------------------------------------------
+                           2110 ;Allocation info for local variables in function 'init_tx'
+                           2111 ;------------------------------------------------------------
+                           2112 ;n                         Allocated to registers r6 
+                           2113 ;cs_pos                    Allocated to registers r7 
+                           2114 ;------------------------------------------------------------
+                    05E6   2115 	G$init_tx$0$0 ==.
+                    05E6   2116 	C$fb_lpc922.c$483$1$1 ==.
+                           2117 ;	..\fb_lpc922.c:483: void init_tx(void) 		// Checksum des Telegramms berechnen und Senden initiieren
+                           2118 ;	-----------------------------------------
+                           2119 ;	 function init_tx
+                           2120 ;	-----------------------------------------
+   05E6                    2121 _init_tx:
+                    05E6   2122 	C$fb_lpc922.c$487$1$1 ==.
+                           2123 ;	..\fb_lpc922.c:487: TR1=0;
+   05E6 C2 8E              2124 	clr	_TCON_6
+                    05E8   2125 	C$fb_lpc922.c$488$1$1 ==.
+                           2126 ;	..\fb_lpc922.c:488: TMOD=(TMOD & 0x0F) +0x20;			// Timer 1 als 8-Bit autoreload
+   05E8 74 0F              2127 	mov	a,#0x0F
+   05EA 55 89              2128 	anl	a,_TMOD
+   05EC 24 20              2129 	add	a,#0x20
+   05EE F5 89              2130 	mov	_TMOD,a
+                    05F0   2131 	C$fb_lpc922.c$489$1$1 ==.
+                           2132 ;	..\fb_lpc922.c:489: TH1=110;							// von state 10 auf 11
+   05F0 75 8D 6E           2133 	mov	_TH1,#0x6E
+                    05F3   2134 	C$fb_lpc922.c$490$1$1 ==.
+                           2135 ;	..\fb_lpc922.c:490: TL1=128;							// von hier bis state 10
+   05F3 75 8B 80           2136 	mov	_TL1,#0x80
+                    05F6   2137 	C$fb_lpc922.c$491$1$1 ==.
+                           2138 ;	..\fb_lpc922.c:491: TF1=0;
+   05F6 C2 8F              2139 	clr	_TCON_7
+                    05F8   2140 	C$fb_lpc922.c$493$1$1 ==.
+                           2141 ;	..\fb_lpc922.c:493: cs_pos=(telegramm[5]&0x0F)+7;		// Position der Checksum im Telegramm
+   05F8 74 0F              2142 	mov	a,#0x0F
+   05FA 55*0C              2143 	anl	a,(_telegramm + 0x0005)
+   05FC 24 07              2144 	add	a,#0x07
+   05FE FF                 2145 	mov	r7,a
+                    05FF   2146 	C$fb_lpc922.c$494$1$1 ==.
+                           2147 ;	..\fb_lpc922.c:494: cs=0xFF;
+   05FF 75*27 FF           2148 	mov	_cs,#0xFF
+                    0602   2149 	C$fb_lpc922.c$495$1$1 ==.
+                           2150 ;	..\fb_lpc922.c:495: for(n=0;n<cs_pos;n++) {
+   0602 7E 00              2151 	mov	r6,#0x00
+   0604                    2152 00101$:
+   0604 C3                 2153 	clr	c
+   0605 EE                 2154 	mov	a,r6
+   0606 9F                 2155 	subb	a,r7
+   0607 50 0B              2156 	jnc	00104$
+                    0609   2157 	C$fb_lpc922.c$496$2$2 ==.
+                           2158 ;	..\fb_lpc922.c:496: cs^=telegramm[n];				// Checksum berechnen
+   0609 EE                 2159 	mov	a,r6
+   060A 24r07              2160 	add	a,#_telegramm
+   060C F9                 2161 	mov	r1,a
+   060D E7                 2162 	mov	a,@r1
+   060E FD                 2163 	mov	r5,a
+   060F 62*27              2164 	xrl	_cs,a
+                    0611   2165 	C$fb_lpc922.c$495$1$1 ==.
+                           2166 ;	..\fb_lpc922.c:495: for(n=0;n<cs_pos;n++) {
+   0611 0E                 2167 	inc	r6
+   0612 80 F0              2168 	sjmp	00101$
+   0614                    2169 00104$:
+                    0614   2170 	C$fb_lpc922.c$498$1$1 ==.
+                           2171 ;	..\fb_lpc922.c:498: telegramm[cs_pos]=cs;				// Checksum hinter Nutzdaten anfaegen
+   0614 EF                 2172 	mov	a,r7
+   0615 24r07              2173 	add	a,#_telegramm
+   0617 F8                 2174 	mov	r0,a
+   0618 A6*27              2175 	mov	@r0,_cs
+                    061A   2176 	C$fb_lpc922.c$499$1$1 ==.
+                           2177 ;	..\fb_lpc922.c:499: ack=0;
+   061A C2*03              2178 	clr	_ack
+                    061C   2179 	C$fb_lpc922.c$500$1$1 ==.
+                           2180 ;	..\fb_lpc922.c:500: nack=0;
+   061C C2*04              2181 	clr	_nack
+                    061E   2182 	C$fb_lpc922.c$501$1$1 ==.
+                           2183 ;	..\fb_lpc922.c:501: wait_for_ack=1;
+   061E D2*0A              2184 	setb	_wait_for_ack
+                    0620   2185 	C$fb_lpc922.c$503$1$1 ==.
+                           2186 ;	..\fb_lpc922.c:503: fb_state=10;						// naechster state: senden
+   0620 75*2A 0A           2187 	mov	_fb_state,#0x0A
+                    0623   2188 	C$fb_lpc922.c$504$1$1 ==.
+                           2189 ;	..\fb_lpc922.c:504: fb_pattern=0;						// naechstes zu sendendes Bit, 0=Startbit
+   0623 75*29 00           2190 	mov	_fb_pattern,#0x00
+                    0626   2191 	C$fb_lpc922.c$505$1$1 ==.
+                           2192 ;	..\fb_lpc922.c:505: telpos=0;							// naechstes zu sendende Byte
+   0626 75*26 00           2193 	mov	_telpos,#0x00
+                    0629   2194 	C$fb_lpc922.c$506$1$1 ==.
+                           2195 ;	..\fb_lpc922.c:506: EX1=0;								// ext. int1 inaktiv
+   0629 C2 AA              2196 	clr	_IEN0_2
+                    062B   2197 	C$fb_lpc922.c$507$1$1 ==.
+                           2198 ;	..\fb_lpc922.c:507: TR1=1;								// Timer 1 starten
+   062B D2 8E              2199 	setb	_TCON_6
+                    062D   2200 	C$fb_lpc922.c$508$1$1 ==.
+                           2201 ;	..\fb_lpc922.c:508: ET1=1;								// Timer 1 int. aktiv
+   062D D2 AB              2202 	setb	_IEN0_3
+                    062F   2203 	C$fb_lpc922.c$509$1$1 ==.
+                    062F   2204 	XG$init_tx$0$0 ==.
+   062F 22                 2205 	ret
+                           2206 ;------------------------------------------------------------
+                           2207 ;Allocation info for local variables in function 'gapos_in_gat'
+                           2208 ;------------------------------------------------------------
+                           2209 ;gal                       Allocated to stack - _bp -3
+                           2210 ;gah                       Allocated to registers r7 
+                           2211 ;ga_position               Allocated to registers r6 
+                           2212 ;n                         Allocated to registers r5 
+                           2213 ;------------------------------------------------------------
+                    0630   2214 	G$gapos_in_gat$0$0 ==.
+                    0630   2215 	C$fb_lpc922.c$516$1$1 ==.
+                           2216 ;	..\fb_lpc922.c:516: unsigned char gapos_in_gat(unsigned char gah, unsigned char gal)
+                           2217 ;	-----------------------------------------
+                           2218 ;	 function gapos_in_gat
+                           2219 ;	-----------------------------------------
+   0630                    2220 _gapos_in_gat:
+   0630 C0*00              2221 	push	_bp
+   0632 85 81*00           2222 	mov	_bp,sp
+   0635 AF 82              2223 	mov	r7,dpl
+                    0637   2224 	C$fb_lpc922.c$520$1$1 ==.
+                           2225 ;	..\fb_lpc922.c:520: ga_position=0xFF; 			// default return Wert 0xFF = nicht gefunden
+   0637 7E FF              2226 	mov	r6,#0xFF
+                    0639   2227 	C$fb_lpc922.c$521$1$1 ==.
+                           2228 ;	..\fb_lpc922.c:521: if (eeprom[ADDRTAB]<0xFF){ // && !transparency
+   0639 90 1D 16           2229 	mov	dptr,#(_eeprom + 0x0016)
+   063C E4                 2230 	clr	a
+   063D 93                 2231 	movc	a,@a+dptr
+   063E FD                 2232 	mov	r5,a
+   063F BD FF 00           2233 	cjne	r5,#0xFF,00121$
+   0642                    2234 00121$:
+   0642 50 35              2235 	jnc	00107$
+                    0644   2236 	C$fb_lpc922.c$522$2$2 ==.
+                           2237 ;	..\fb_lpc922.c:522: if (eeprom[ADDRTAB]) {
+   0644 90 1D 16           2238 	mov	dptr,#(_eeprom + 0x0016)
+   0647 E4                 2239 	clr	a
+   0648 93                 2240 	movc	a,@a+dptr
+   0649 60 2E              2241 	jz	00107$
+                    064B   2242 	C$fb_lpc922.c$523$3$3 ==.
+                           2243 ;	..\fb_lpc922.c:523: for (n=eeprom[ADDRTAB]-1;n;n--) {
+   064B 90 1D 16           2244 	mov	dptr,#(_eeprom + 0x0016)
+   064E E4                 2245 	clr	a
+   064F 93                 2246 	movc	a,@a+dptr
+   0650 FD                 2247 	mov	r5,a
+   0651 1D                 2248 	dec	r5
+   0652                    2249 00108$:
+   0652 ED                 2250 	mov	a,r5
+   0653 60 24              2251 	jz	00107$
+                    0655   2252 	C$fb_lpc922.c$524$4$4 ==.
+                           2253 ;	..\fb_lpc922.c:524: if (gah==eeprom[ADDRTAB+n*2+1] && gal==eeprom[ADDRTAB+n*2+2])
+   0655 ED                 2254 	mov	a,r5
+   0656 2D                 2255 	add	a,r5
+   0657 FC                 2256 	mov	r4,a
+   0658 24 17              2257 	add	a,#0x17
+   065A 90 1D 00           2258 	mov	dptr,#_eeprom
+   065D 93                 2259 	movc	a,@a+dptr
+   065E FB                 2260 	mov	r3,a
+   065F EF                 2261 	mov	a,r7
+   0660 B5 03 13           2262 	cjne	a,ar3,00110$
+   0663 74 18              2263 	mov	a,#0x18
+   0665 2C                 2264 	add	a,r4
+   0666 90 1D 00           2265 	mov	dptr,#_eeprom
+   0669 93                 2266 	movc	a,@a+dptr
+   066A FC                 2267 	mov	r4,a
+   066B E5*00              2268 	mov	a,_bp
+   066D 24 FD              2269 	add	a,#0xfd
+   066F F8                 2270 	mov	r0,a
+   0670 E6                 2271 	mov	a,@r0
+   0671 B5 04 02           2272 	cjne	a,ar4,00110$
+                    0674   2273 	C$fb_lpc922.c$525$4$4 ==.
+                           2274 ;	..\fb_lpc922.c:525: ga_position=n;
+   0674 8D 06              2275 	mov	ar6,r5
+   0676                    2276 00110$:
+                    0676   2277 	C$fb_lpc922.c$523$3$3 ==.
+                           2278 ;	..\fb_lpc922.c:523: for (n=eeprom[ADDRTAB]-1;n;n--) {
+   0676 1D                 2279 	dec	r5
+   0677 80 D9              2280 	sjmp	00108$
+   0679                    2281 00107$:
+                    0679   2282 	C$fb_lpc922.c$529$1$1 ==.
+                           2283 ;	..\fb_lpc922.c:529: return (ga_position);
+   0679 8E 82              2284 	mov	dpl,r6
+   067B D0*00              2285 	pop	_bp
+                    067D   2286 	C$fb_lpc922.c$530$1$1 ==.
+                    067D   2287 	XG$gapos_in_gat$0$0 ==.
+   067D 22                 2288 	ret
+                           2289 ;------------------------------------------------------------
+                           2290 ;Allocation info for local variables in function 'send_obj_value'
+                           2291 ;------------------------------------------------------------
+                           2292 ;objno                     Allocated to registers r7 
+                           2293 ;success                   Allocated to registers b0 
+                           2294 ;------------------------------------------------------------
+                    067E   2295 	G$send_obj_value$0$0 ==.
+                    067E   2296 	C$fb_lpc922.c$537$1$1 ==.
+                           2297 ;	..\fb_lpc922.c:537: __bit send_obj_value(unsigned char objno)
+                           2298 ;	-----------------------------------------
+                           2299 ;	 function send_obj_value
+                           2300 ;	-----------------------------------------
+   067E                    2301 _send_obj_value:
+   067E AF 82              2302 	mov	r7,dpl
+                    0680   2303 	C$fb_lpc922.c$539$1$1 ==.
+                           2304 ;	..\fb_lpc922.c:539: __bit success=0;
+   0680 C2*00              2305 	clr	b0
+                    0682   2306 	C$fb_lpc922.c$541$1$1 ==.
+                           2307 ;	..\fb_lpc922.c:541: if (objno < 0x40 && (read_objflags(objno) & 0x44) != 0x44)
+   0682 BF 40 00           2308 	cjne	r7,#0x40,00112$
+   0685                    2309 00112$:
+   0685 50 1B              2310 	jnc	00104$
+   0687 8F 82              2311 	mov	dpl,r7
+   0689 C0 07              2312 	push	ar7
+   068B C0*00              2313 	push	bits
+   068D 12s09rBC           2314 	lcall	_read_objflags
+   0690 E5 82              2315 	mov	a,dpl
+   0692 D0*00              2316 	pop	bits
+   0694 D0 07              2317 	pop	ar7
+   0696 54 44              2318 	anl	a,#0x44
+   0698 FE                 2319 	mov	r6,a
+   0699 BE 44 02           2320 	cjne	r6,#0x44,00114$
+   069C 80 04              2321 	sjmp	00104$
+   069E                    2322 00114$:
+                    069E   2323 	C$fb_lpc922.c$543$2$2 ==.
+                           2324 ;	..\fb_lpc922.c:543: success=1;
+   069E D2*00              2325 	setb	b0
+   06A0 80 2A              2326 	sjmp	00105$
+   06A2                    2327 00104$:
+                    06A2   2328 	C$fb_lpc922.c$545$1$1 ==.
+                           2329 ;	..\fb_lpc922.c:545: else if(tx_nextsend!=((tx_nextwrite+1)&0x07)) {
+   06A2 AD*2C              2330 	mov	r5,_tx_nextwrite
+   06A4 7E 00              2331 	mov	r6,#0x00
+   06A6 0D                 2332 	inc	r5
+   06A7 BD 00 01           2333 	cjne	r5,#0x00,00115$
+   06AA 0E                 2334 	inc	r6
+   06AB                    2335 00115$:
+   06AB 53 05 07           2336 	anl	ar5,#0x07
+   06AE 7E 00              2337 	mov	r6,#0x00
+   06B0 AB*2D              2338 	mov	r3,_tx_nextsend
+   06B2 7C 00              2339 	mov	r4,#0x00
+   06B4 EB                 2340 	mov	a,r3
+   06B5 B5 05 06           2341 	cjne	a,ar5,00116$
+   06B8 EC                 2342 	mov	a,r4
+   06B9 B5 06 02           2343 	cjne	a,ar6,00116$
+   06BC 80 0E              2344 	sjmp	00105$
+   06BE                    2345 00116$:
+                    06BE   2346 	C$fb_lpc922.c$546$2$3 ==.
+                           2347 ;	..\fb_lpc922.c:546: tx_buffer[tx_nextwrite]=objno;
+   06BE E5*2C              2348 	mov	a,_tx_nextwrite
+   06C0 24r1E              2349 	add	a,#_tx_buffer
+   06C2 F8                 2350 	mov	r0,a
+   06C3 A6 07              2351 	mov	@r0,ar7
+                    06C5   2352 	C$fb_lpc922.c$547$2$3 ==.
+                           2353 ;	..\fb_lpc922.c:547: tx_nextwrite++;
+   06C5 05*2C              2354 	inc	_tx_nextwrite
+                    06C7   2355 	C$fb_lpc922.c$548$2$3 ==.
+                           2356 ;	..\fb_lpc922.c:548: tx_nextwrite&=0x07;
+   06C7 53*2C 07           2357 	anl	_tx_nextwrite,#0x07
+                    06CA   2358 	C$fb_lpc922.c$549$2$3 ==.
+                           2359 ;	..\fb_lpc922.c:549: success=1;
+   06CA D2*00              2360 	setb	b0
+   06CC                    2361 00105$:
+                    06CC   2362 	C$fb_lpc922.c$552$1$1 ==.
+                           2363 ;	..\fb_lpc922.c:552: TR1=1;	// statemachine starten falls vorher in state 0 gestoppt
+   06CC D2 8E              2364 	setb	_TCON_6
+                    06CE   2365 	C$fb_lpc922.c$553$1$1 ==.
+                           2366 ;	..\fb_lpc922.c:553: return(success);
+   06CE A2*00              2367 	mov	c,b0
+                    06D0   2368 	C$fb_lpc922.c$554$1$1 ==.
+                    06D0   2369 	XG$send_obj_value$0$0 ==.
+   06D0 22                 2370 	ret
+                           2371 ;------------------------------------------------------------
+                           2372 ;Allocation info for local variables in function 'process_tel'
+                           2373 ;------------------------------------------------------------
+                           2374 ;tpdu                      Allocated to registers r6 
+                           2375 ;apdu                      Allocated to stack - _bp +1
+                           2376 ;ab                        Allocated to registers r7 
+                           2377 ;n                         Allocated to stack - _bp +2
+                           2378 ;objno                     Allocated to registers r3 
+                           2379 ;objflags                  Allocated to registers r2 
+                           2380 ;gapos                     Allocated to registers r7 
+                           2381 ;atp                       Allocated to registers r6 
+                           2382 ;assmax                    Allocated to registers r5 
+                           2383 ;asspos                    Allocated to registers r6 
+                           2384 ;sloc0                     Allocated to stack - _bp +11
+                           2385 ;sloc1                     Allocated to stack - _bp +12
+                           2386 ;sloc2                     Allocated to stack - _bp +3
+                           2387 ;------------------------------------------------------------
+                    06D1   2388 	G$process_tel$0$0 ==.
+                    06D1   2389 	C$fb_lpc922.c$559$1$1 ==.
+                           2390 ;	..\fb_lpc922.c:559: void process_tel(void)
+                           2391 ;	-----------------------------------------
+                           2392 ;	 function process_tel
+                           2393 ;	-----------------------------------------
+   06D1                    2394 _process_tel:
+   06D1 C0*00              2395 	push	_bp
+   06D3 E5 81              2396 	mov	a,sp
+   06D5 F5*00              2397 	mov	_bp,a
+   06D7 24 04              2398 	add	a,#0x04
+   06D9 F5 81              2399 	mov	sp,a
+                    06DB   2400 	C$fb_lpc922.c$564$1$1 ==.
+                           2401 ;	..\fb_lpc922.c:564: tel_arrived=0;
+   06DB C2*06              2402 	clr	_tel_arrived
+                    06DD   2403 	C$fb_lpc922.c$565$1$1 ==.
+                           2404 ;	..\fb_lpc922.c:565: tpdu=telegramm[6]&0xC3;
+   06DD AF*0D              2405 	mov	r7,(_telegramm + 0x0006)
+   06DF 74 C3              2406 	mov	a,#0xC3
+   06E1 5F                 2407 	anl	a,r7
+   06E2 FE                 2408 	mov	r6,a
+                    06E3   2409 	C$fb_lpc922.c$566$1$1 ==.
+                           2410 ;	..\fb_lpc922.c:566: apdu=telegramm[7];
+   06E3 A8*00              2411 	mov	r0,_bp
+   06E5 08                 2412 	inc	r0
+   06E6 A6*0E              2413 	mov	@r0,(_telegramm + 0x0007)
+                    06E8   2414 	C$fb_lpc922.c$569$1$1 ==.
+                           2415 ;	..\fb_lpc922.c:569: if(telegramm[3]==0 && telegramm[4]==0) {	// nur wenn wenn Zieladresse = 0
+   06E8 E5*0A              2416 	mov	a,(_telegramm + 0x0003)
+   06EA FC                 2417 	mov	r4,a
+   06EB 70 49              2418 	jnz	00169$
+   06ED E5*0B              2419 	mov	a,(_telegramm + 0x0004)
+   06EF 70 45              2420 	jnz	00169$
+                    06F1   2421 	C$fb_lpc922.c$570$2$2 ==.
+                           2422 ;	..\fb_lpc922.c:570: if(status60 & 0x01) {					// und nur im prog mode
+   06F1 E5*2E              2423 	mov	a,_status60
+   06F3 20 E0 03           2424 	jb	acc.0,00222$
+   06F6 02s09rB6           2425 	ljmp	00176$
+   06F9                    2426 00222$:
+                    06F9   2427 	C$fb_lpc922.c$571$3$3 ==.
+                           2428 ;	..\fb_lpc922.c:571: if(tpdu==BROADCAST_PDU_SET_PA_REQ && apdu==SET_PHYSADDR_REQUEST) //set_pa();				// 00000000 11000000
+   06F9 EE                 2429 	mov	a,r6
+   06FA 70 20              2430 	jnz	00105$
+   06FC A8*00              2431 	mov	r0,_bp
+   06FE 08                 2432 	inc	r0
+   06FF B6 C0 1A           2433 	cjne	@r0,#0xC0,00105$
+                    0702   2434 	C$fb_lpc922.c$574$4$4 ==.
+                           2435 ;	..\fb_lpc922.c:574: while(fb_state!=0);		// warten falls noch gesendet wird
+   0702                    2436 00101$:
+   0702 E5*2A              2437 	mov	a,_fb_state
+   0704 70 FC              2438 	jnz	00101$
+                    0706   2439 	C$fb_lpc922.c$575$4$4 ==.
+                           2440 ;	..\fb_lpc922.c:575: EA=0;
+   0706 C2 AF              2441 	clr	_IEN0_7
+                    0708   2442 	C$fb_lpc922.c$576$4$4 ==.
+                           2443 ;	..\fb_lpc922.c:576: FMCON=0x00;				// load command, leert das pageregister
+   0708 75 E4 00           2444 	mov	_FMCON,#0x00
+                    070B   2445 	C$fb_lpc922.c$577$4$4 ==.
+                           2446 ;	..\fb_lpc922.c:577: FMADRH=EEPROM_ADDR_H;	// 0x1D bei 922;
+   070B 75 E7 1D           2447 	mov	_FMADRH,#0x1D
+                    070E   2448 	C$fb_lpc922.c$578$4$4 ==.
+                           2449 ;	..\fb_lpc922.c:578: FMADRL=ADDRTAB+1;
+   070E 75 E6 17           2450 	mov	_FMADRL,#0x17
+                    0711   2451 	C$fb_lpc922.c$579$4$4 ==.
+                           2452 ;	..\fb_lpc922.c:579: FMDATA=telegramm[8];
+   0711 85*0F E5           2453 	mov	_FMDATA,(_telegramm + 0x0008)
+                    0714   2454 	C$fb_lpc922.c$580$4$4 ==.
+                           2455 ;	..\fb_lpc922.c:580: FMDATA=telegramm[9];	// naechstes Byte, da autoinkrement
+   0714 85*10 E5           2456 	mov	_FMDATA,(_telegramm + 0x0009)
+                    0717   2457 	C$fb_lpc922.c$581$4$4 ==.
+                           2458 ;	..\fb_lpc922.c:581: FMCON=0x68;				// write command, schreibt pageregister ins flash und versetzt CPU in idle fuer 4ms
+   0717 75 E4 68           2459 	mov	_FMCON,#0x68
+                    071A   2460 	C$fb_lpc922.c$582$4$4 ==.
+                           2461 ;	..\fb_lpc922.c:582: EA=1;
+   071A D2 AF              2462 	setb	_IEN0_7
+   071C                    2463 00105$:
+                    071C   2464 	C$fb_lpc922.c$589$3$3 ==.
+                           2465 ;	..\fb_lpc922.c:589: if(tpdu==BROADCAST_PDU_READ_PA && apdu==READ_PHYSADDR_REQUEST) send_obj_value(READ_PHYSADDR_RESPONSE);	// 00000001 00000000
+   071C BE 01 02           2466 	cjne	r6,#0x01,00227$
+   071F 80 03              2467 	sjmp	00228$
+   0721                    2468 00227$:
+   0721 02s09rB6           2469 	ljmp	00176$
+   0724                    2470 00228$:
+   0724 A8*00              2471 	mov	r0,_bp
+   0726 08                 2472 	inc	r0
+   0727 E6                 2473 	mov	a,@r0
+   0728 60 03              2474 	jz	00229$
+   072A 02s09rB6           2475 	ljmp	00176$
+   072D                    2476 00229$:
+   072D 75 82 83           2477 	mov	dpl,#0x83
+   0730 12s06r7E           2478 	lcall	_send_obj_value
+   0733 02s09rB6           2479 	ljmp	00176$
+   0736                    2480 00169$:
+                    0736   2481 	C$fb_lpc922.c$594$2$5 ==.
+                           2482 ;	..\fb_lpc922.c:594: if((telegramm[5]&0x80)==0x00) {	// Destination Adress Flag Bit 7, 0=phys. Adr., 1=Gruppenadr.
+   0736 E5*0C              2483 	mov	a,(_telegramm + 0x0005)
+   0738 30 E7 03           2484 	jnb	acc.7,00230$
+   073B 02s09r01           2485 	ljmp	00166$
+   073E                    2486 00230$:
+                    073E   2487 	C$fb_lpc922.c$595$3$6 ==.
+                           2488 ;	..\fb_lpc922.c:595: if(telegramm[3]==eeprom[ADDRTAB+1] && telegramm[4]==eeprom[ADDRTAB+2]) {	// nur wenn es die eigene phys. Adr. ist
+   073E 90 1D 17           2489 	mov	dptr,#(_eeprom + 0x0017)
+   0741 E4                 2490 	clr	a
+   0742 93                 2491 	movc	a,@a+dptr
+   0743 FB                 2492 	mov	r3,a
+   0744 EC                 2493 	mov	a,r4
+   0745 B5 03 02           2494 	cjne	a,ar3,00231$
+   0748 80 03              2495 	sjmp	00232$
+   074A                    2496 00231$:
+   074A 02s09rB6           2497 	ljmp	00176$
+   074D                    2498 00232$:
+   074D 90 1D 18           2499 	mov	dptr,#(_eeprom + 0x0018)
+   0750 E4                 2500 	clr	a
+   0751 93                 2501 	movc	a,@a+dptr
+   0752 FB                 2502 	mov	r3,a
+   0753 B5*0B 02           2503 	cjne	a,(_telegramm + 0x0004),00233$
+   0756 80 03              2504 	sjmp	00234$
+   0758                    2505 00233$:
+   0758 02s09rB6           2506 	ljmp	00176$
+   075B                    2507 00234$:
+                    075B   2508 	C$fb_lpc922.c$596$4$7 ==.
+                           2509 ;	..\fb_lpc922.c:596: connected_timeout=0;//wenn ein unicast uns betrifft den timeout ruecksetzen
+   075B 75*2F 00           2510 	mov	_connected_timeout,#0x00
+                    075E   2511 	C$fb_lpc922.c$599$4$7 ==.
+                           2512 ;	..\fb_lpc922.c:599: switch (tpdu) {	// transport layer control field
+   075E BE 42 02           2513 	cjne	r6,#0x42,00235$
+   0761 80 1B              2514 	sjmp	00112$
+   0763                    2515 00235$:
+   0763 BE 43 03           2516 	cjne	r6,#0x43,00236$
+   0766 02s08r95           2517 	ljmp	00130$
+   0769                    2518 00236$:
+   0769 BE 80 03           2519 	cjne	r6,#0x80,00237$
+   076C 02s08rBB           2520 	ljmp	00135$
+   076F                    2521 00237$:
+   076F BE 81 03           2522 	cjne	r6,#0x81,00238$
+   0772 02s08rDD           2523 	ljmp	00138$
+   0775                    2524 00238$:
+   0775 BE 83 03           2525 	cjne	r6,#0x83,00239$
+   0778 02s08rF6           2526 	ljmp	00142$
+   077B                    2527 00239$:
+   077B 02s09rB6           2528 	ljmp	00176$
+                    077E   2529 	C$fb_lpc922.c$609$5$8 ==.
+                           2530 ;	..\fb_lpc922.c:609: case DATA_PDU_MEMORY_OPERATIONS:
+   077E                    2531 00112$:
+                    077E   2532 	C$fb_lpc922.c$610$5$8 ==.
+                           2533 ;	..\fb_lpc922.c:610: if(connected){
+   077E 20*0D 03           2534 	jb	_connected,00240$
+   0781 02s09rB6           2535 	ljmp	00176$
+   0784                    2536 00240$:
+                    0784   2537 	C$fb_lpc922.c$611$6$9 ==.
+                           2538 ;	..\fb_lpc922.c:611: senders_pcount=telegramm[6]&0x3C;
+   0784 74 3C              2539 	mov	a,#0x3C
+   0786 5F                 2540 	anl	a,r7
+   0787 F5*06              2541 	mov	_senders_pcount,a
+                    0789   2542 	C$fb_lpc922.c$612$6$9 ==.
+                           2543 ;	..\fb_lpc922.c:612: apdu &= 0xF0;						// da bei memory operations nur obere 4 Bits aktiv
+   0789 A8*00              2544 	mov	r0,_bp
+   078B 08                 2545 	inc	r0
+   078C E6                 2546 	mov	a,@r0
+   078D 54 F0              2547 	anl	a,#0xF0
+   078F F6                 2548 	mov	@r0,a
+                    0790   2549 	C$fb_lpc922.c$613$6$9 ==.
+                           2550 ;	..\fb_lpc922.c:613: if(apdu==WRITE_MEMORY_REQUEST) {	// 01pppp10 1000xxxx
+   0790 A8*00              2551 	mov	r0,_bp
+   0792 08                 2552 	inc	r0
+   0793 B6 80 02           2553 	cjne	@r0,#0x80,00241$
+   0796 80 03              2554 	sjmp	00242$
+   0798                    2555 00241$:
+   0798 02s08r74           2556 	ljmp	00125$
+   079B                    2557 00242$:
+                    079B   2558 	C$fb_lpc922.c$614$7$10 ==.
+                           2559 ;	..\fb_lpc922.c:614: send_obj_value(NCD_ACK);
+   079B 75 82 81           2560 	mov	dpl,#0x81
+   079E 12s06r7E           2561 	lcall	_send_obj_value
+                    07A1   2562 	C$fb_lpc922.c$617$8$11 ==.
+                           2563 ;	..\fb_lpc922.c:617: ab=telegramm[7]&0x0F;		// Anzahl Bytes
+   07A1 74 0F              2564 	mov	a,#0x0F
+   07A3 55*0E              2565 	anl	a,(_telegramm + 0x0007)
+   07A5 FF                 2566 	mov	r7,a
+                    07A6   2567 	C$fb_lpc922.c$619$8$11 ==.
+                           2568 ;	..\fb_lpc922.c:619: while(fb_state!=0);					// warten falls noch gesendet wird
+   07A6                    2569 00113$:
+   07A6 E5*2A              2570 	mov	a,_fb_state
+   07A8 70 FC              2571 	jnz	00113$
+                    07AA   2572 	C$fb_lpc922.c$621$8$11 ==.
+                           2573 ;	..\fb_lpc922.c:621: EA=0;
+   07AA C2 AF              2574 	clr	_IEN0_7
+                    07AC   2575 	C$fb_lpc922.c$622$8$11 ==.
+                           2576 ;	..\fb_lpc922.c:622: START_WRITECYCLE;					// load command, leert das pageregister
+   07AC 75 E4 00           2577 	mov	_FMCON,#0x00
+                    07AF   2578 	C$fb_lpc922.c$623$9$12 ==.
+                           2579 ;	..\fb_lpc922.c:623: for(n=0;n<ab;n++) {
+   07AF AA*0F              2580 	mov	r2,(_telegramm + 0x0008)
+   07B1 74 01              2581 	mov	a,#0x01
+   07B3 5A                 2582 	anl	a,r2
+   07B4 24 1C              2583 	add	a,#0x1C
+   07B6 FC                 2584 	mov	r4,a
+   07B7 AE*10              2585 	mov	r6,(_telegramm + 0x0009)
+   07B9 A8*00              2586 	mov	r0,_bp
+   07BB 08                 2587 	inc	r0
+   07BC 08                 2588 	inc	r0
+   07BD 76 00              2589 	mov	@r0,#0x00
+   07BF                    2590 00172$:
+   07BF A8*00              2591 	mov	r0,_bp
+   07C1 08                 2592 	inc	r0
+   07C2 08                 2593 	inc	r0
+   07C3 C3                 2594 	clr	c
+   07C4 E6                 2595 	mov	a,@r0
+   07C5 9F                 2596 	subb	a,r7
+   07C6 40 03              2597 	jc	00244$
+   07C8 02s08r6F           2598 	ljmp	00175$
+   07CB                    2599 00244$:
+                    07CB   2600 	C$fb_lpc922.c$624$9$12 ==.
+                           2601 ;	..\fb_lpc922.c:624: if(telegramm[8]==0)
+   07CB EA                 2602 	mov	a,r2
+   07CC 70 3C              2603 	jnz	00119$
+                    07CE   2604 	C$fb_lpc922.c$626$1$1 ==.
+                           2605 ;	..\fb_lpc922.c:626: if((telegramm[9]+n)==0x60) status60=telegramm[10+n];
+   07CE C0 02              2606 	push	ar2
+   07D0 E5*00              2607 	mov	a,_bp
+   07D2 24 03              2608 	add	a,#0x03
+   07D4 F8                 2609 	mov	r0,a
+   07D5 A6 06              2610 	mov	@r0,ar6
+   07D7 08                 2611 	inc	r0
+   07D8 76 00              2612 	mov	@r0,#0x00
+   07DA A8*00              2613 	mov	r0,_bp
+   07DC 08                 2614 	inc	r0
+   07DD 08                 2615 	inc	r0
+   07DE 86 03              2616 	mov	ar3,@r0
+   07E0 7D 00              2617 	mov	r5,#0x00
+   07E2 E5*00              2618 	mov	a,_bp
+   07E4 24 03              2619 	add	a,#0x03
+   07E6 F8                 2620 	mov	r0,a
+   07E7 EB                 2621 	mov	a,r3
+   07E8 26                 2622 	add	a,@r0
+   07E9 FB                 2623 	mov	r3,a
+   07EA ED                 2624 	mov	a,r5
+   07EB 08                 2625 	inc	r0
+   07EC 36                 2626 	addc	a,@r0
+   07ED FD                 2627 	mov	r5,a
+   07EE BB 60 05           2628 	cjne	r3,#0x60,00246$
+   07F1 BD 00 02           2629 	cjne	r5,#0x00,00246$
+   07F4 80 04              2630 	sjmp	00247$
+   07F6                    2631 00246$:
+   07F6 D0 02              2632 	pop	ar2
+   07F8 80 26              2633 	sjmp	00120$
+   07FA                    2634 00247$:
+   07FA D0 02              2635 	pop	ar2
+   07FC A8*00              2636 	mov	r0,_bp
+   07FE 08                 2637 	inc	r0
+   07FF 08                 2638 	inc	r0
+   0800 74 0A              2639 	mov	a,#0x0A
+   0802 26                 2640 	add	a,@r0
+   0803 24r07              2641 	add	a,#_telegramm
+   0805 F9                 2642 	mov	r1,a
+   0806 87*2E              2643 	mov	_status60,@r1
+   0808 80 16              2644 	sjmp	00120$
+   080A                    2645 00119$:
+                    080A   2646 	C$fb_lpc922.c$637$10$14 ==.
+                           2647 ;	..\fb_lpc922.c:637: WRITE_BYTE(telegramm[8],telegramm[9]+n,telegramm[n+10]);
+   080A 8C E7              2648 	mov	_FMADRH,r4
+   080C A8*00              2649 	mov	r0,_bp
+   080E 08                 2650 	inc	r0
+   080F 08                 2651 	inc	r0
+   0810 E6                 2652 	mov	a,@r0
+   0811 2E                 2653 	add	a,r6
+   0812 F5 E6              2654 	mov	_FMADRL,a
+   0814 A8*00              2655 	mov	r0,_bp
+   0816 08                 2656 	inc	r0
+   0817 08                 2657 	inc	r0
+   0818 74 0A              2658 	mov	a,#0x0A
+   081A 26                 2659 	add	a,@r0
+   081B 24r07              2660 	add	a,#_telegramm
+   081D F9                 2661 	mov	r1,a
+   081E 87 E5              2662 	mov	_FMDATA,@r1
+   0820                    2663 00120$:
+                    0820   2664 	C$fb_lpc922.c$639$9$12 ==.
+                           2665 ;	..\fb_lpc922.c:639: if ((((telegramm[9]+n)&0x3F)==0x3F) && n!=(ab-1)) {		// Ende des 64-Byte Pageregisters, also zwischendurch flashen
+   0820 8E 03              2666 	mov	ar3,r6
+   0822 7D 00              2667 	mov	r5,#0x00
+   0824 A8*00              2668 	mov	r0,_bp
+   0826 08                 2669 	inc	r0
+   0827 08                 2670 	inc	r0
+   0828 E5*00              2671 	mov	a,_bp
+   082A 24 03              2672 	add	a,#0x03
+   082C F9                 2673 	mov	r1,a
+   082D E6                 2674 	mov	a,@r0
+   082E F7                 2675 	mov	@r1,a
+   082F 09                 2676 	inc	r1
+   0830 77 00              2677 	mov	@r1,#0x00
+   0832 E5*00              2678 	mov	a,_bp
+   0834 24 03              2679 	add	a,#0x03
+   0836 F8                 2680 	mov	r0,a
+   0837 E6                 2681 	mov	a,@r0
+   0838 2B                 2682 	add	a,r3
+   0839 FB                 2683 	mov	r3,a
+   083A 08                 2684 	inc	r0
+   083B E6                 2685 	mov	a,@r0
+   083C 3D                 2686 	addc	a,r5
+   083D 53 03 3F           2687 	anl	ar3,#0x3F
+   0840 7D 00              2688 	mov	r5,#0x00
+   0842 BB 3F 22           2689 	cjne	r3,#0x3F,00174$
+   0845 BD 00 1F           2690 	cjne	r5,#0x00,00174$
+   0848 8F 03              2691 	mov	ar3,r7
+   084A 7D 00              2692 	mov	r5,#0x00
+   084C 1B                 2693 	dec	r3
+   084D BB FF 01           2694 	cjne	r3,#0xFF,00250$
+   0850 1D                 2695 	dec	r5
+   0851                    2696 00250$:
+   0851 E5*00              2697 	mov	a,_bp
+   0853 24 03              2698 	add	a,#0x03
+   0855 F8                 2699 	mov	r0,a
+   0856 E6                 2700 	mov	a,@r0
+   0857 B5 03 07           2701 	cjne	a,ar3,00251$
+   085A 08                 2702 	inc	r0
+   085B E6                 2703 	mov	a,@r0
+   085C B5 05 02           2704 	cjne	a,ar5,00251$
+   085F 80 06              2705 	sjmp	00174$
+   0861                    2706 00251$:
+                    0861   2707 	C$fb_lpc922.c$640$10$15 ==.
+                           2708 ;	..\fb_lpc922.c:640: STOP_WRITECYCLE;			// write command, schreibt pageregister ins flash und versetzt CPU in idle fuer 4ms
+   0861 75 E4 68           2709 	mov	_FMCON,#0x68
+                    0864   2710 	C$fb_lpc922.c$641$10$15 ==.
+                           2711 ;	..\fb_lpc922.c:641: START_WRITECYCLE;		// load command, leert das pageregister
+   0864 75 E4 00           2712 	mov	_FMCON,#0x00
+   0867                    2713 00174$:
+                    0867   2714 	C$fb_lpc922.c$623$8$11 ==.
+                           2715 ;	..\fb_lpc922.c:623: for(n=0;n<ab;n++) {
+   0867 A8*00              2716 	mov	r0,_bp
+   0869 08                 2717 	inc	r0
+   086A 08                 2718 	inc	r0
+   086B 06                 2719 	inc	@r0
+   086C 02s07rBF           2720 	ljmp	00172$
+   086F                    2721 00175$:
+                    086F   2722 	C$fb_lpc922.c$644$8$11 ==.
+                           2723 ;	..\fb_lpc922.c:644: STOP_WRITECYCLE;					// write command, schreibt pageregister ins flash und versetzt CPU in idle fuer 4ms
+   086F 75 E4 68           2724 	mov	_FMCON,#0x68
+                    0872   2725 	C$fb_lpc922.c$645$8$11 ==.
+                           2726 ;	..\fb_lpc922.c:645: EA=1;
+   0872 D2 AF              2727 	setb	_IEN0_7
+   0874                    2728 00125$:
+                    0874   2729 	C$fb_lpc922.c$648$6$9 ==.
+                           2730 ;	..\fb_lpc922.c:648: if(apdu==READ_MEMORY_REQUEST) {		// 01pppp10 0000xxxx
+   0874 A8*00              2731 	mov	r0,_bp
+   0876 08                 2732 	inc	r0
+   0877 E6                 2733 	mov	a,@r0
+   0878 60 03              2734 	jz	00252$
+   087A 02s09rB6           2735 	ljmp	00176$
+   087D                    2736 00252$:
+                    087D   2737 	C$fb_lpc922.c$649$7$16 ==.
+                           2738 ;	..\fb_lpc922.c:649: mem_length=telegramm[7];		// Anzahl Bytes fuer spaeteres(!) memory Auslesen
+   087D 85*0E*03           2739 	mov	_mem_length,(_telegramm + 0x0007)
+                    0880   2740 	C$fb_lpc922.c$650$7$16 ==.
+                           2741 ;	..\fb_lpc922.c:650: mem_adrh = telegramm[8];		// Adresse
+   0880 85*0F*04           2742 	mov	_mem_adrh,(_telegramm + 0x0008)
+                    0883   2743 	C$fb_lpc922.c$651$7$16 ==.
+                           2744 ;	..\fb_lpc922.c:651: mem_adrl = telegramm[9];
+   0883 85*10*05           2745 	mov	_mem_adrl,(_telegramm + 0x0009)
+                    0886   2746 	C$fb_lpc922.c$652$7$16 ==.
+                           2747 ;	..\fb_lpc922.c:652: send_obj_value(NCD_ACK);
+   0886 75 82 81           2748 	mov	dpl,#0x81
+   0889 12s06r7E           2749 	lcall	_send_obj_value
+                    088C   2750 	C$fb_lpc922.c$653$7$16 ==.
+                           2751 ;	..\fb_lpc922.c:653: send_obj_value(READ_MEMORY_RESPONSE);
+   088C 75 82 84           2752 	mov	dpl,#0x84
+   088F 12s06r7E           2753 	lcall	_send_obj_value
+                    0892   2754 	C$fb_lpc922.c$656$5$8 ==.
+                           2755 ;	..\fb_lpc922.c:656: break;
+   0892 02s09rB6           2756 	ljmp	00176$
+                    0895   2757 	C$fb_lpc922.c$658$5$8 ==.
+                           2758 ;	..\fb_lpc922.c:658: case DATA_PDU_MISC_OPERATIONS:
+   0895                    2759 00130$:
+                    0895   2760 	C$fb_lpc922.c$659$5$8 ==.
+                           2761 ;	..\fb_lpc922.c:659: senders_pcount=telegramm[6]&0x3C;
+   0895 74 3C              2762 	mov	a,#0x3C
+   0897 5F                 2763 	anl	a,r7
+   0898 F5*06              2764 	mov	_senders_pcount,a
+                    089A   2765 	C$fb_lpc922.c$660$5$8 ==.
+                           2766 ;	..\fb_lpc922.c:660: if(apdu==RESTART_REQUEST) {		// 01pppp11 10000000
+   089A A8*00              2767 	mov	r0,_bp
+   089C 08                 2768 	inc	r0
+   089D B6 80 03           2769 	cjne	@r0,#0x80,00132$
+                    08A0   2770 	C$fb_lpc922.c$661$6$17 ==.
+                           2771 ;	..\fb_lpc922.c:661: AUXR1|=0x08;				// Software Reset
+   08A0 43 A2 08           2772 	orl	_AUXR1,#0x08
+   08A3                    2773 00132$:
+                    08A3   2774 	C$fb_lpc922.c$663$5$8 ==.
+                           2775 ;	..\fb_lpc922.c:663: if(apdu==READ_MASK_VERSION_REQUEST) {		// 01pppp11 00000000
+   08A3 A8*00              2776 	mov	r0,_bp
+   08A5 08                 2777 	inc	r0
+   08A6 E6                 2778 	mov	a,@r0
+   08A7 60 03              2779 	jz	00255$
+   08A9 02s09rB6           2780 	ljmp	00176$
+   08AC                    2781 00255$:
+                    08AC   2782 	C$fb_lpc922.c$664$6$18 ==.
+                           2783 ;	..\fb_lpc922.c:664: send_obj_value(NCD_ACK);
+   08AC 75 82 81           2784 	mov	dpl,#0x81
+   08AF 12s06r7E           2785 	lcall	_send_obj_value
+                    08B2   2786 	C$fb_lpc922.c$665$6$18 ==.
+                           2787 ;	..\fb_lpc922.c:665: send_obj_value(READ_MASK_VERSION_RESPONSE);
+   08B2 75 82 82           2788 	mov	dpl,#0x82
+   08B5 12s06r7E           2789 	lcall	_send_obj_value
+                    08B8   2790 	C$fb_lpc922.c$667$5$8 ==.
+                           2791 ;	..\fb_lpc922.c:667: break;
+   08B8 02s09rB6           2792 	ljmp	00176$
+                    08BB   2793 	C$fb_lpc922.c$669$5$8 ==.
+                           2794 ;	..\fb_lpc922.c:669: case CONNECT_PDU:	// 10000000 xxxxxxxx
+   08BB                    2795 00135$:
+                    08BB   2796 	C$fb_lpc922.c$670$5$8 ==.
+                           2797 ;	..\fb_lpc922.c:670: if(!connected) {				// wenn bereits verbunden: ignorieren
+   08BB 30*0D 03           2798 	jnb	_connected,00256$
+   08BE 02s09rB6           2799 	ljmp	00176$
+   08C1                    2800 00256$:
+                    08C1   2801 	C$fb_lpc922.c$671$6$19 ==.
+                           2802 ;	..\fb_lpc922.c:671: connected=1;
+   08C1 D2*0D              2803 	setb	_connected
+                    08C3   2804 	C$fb_lpc922.c$672$6$19 ==.
+                           2805 ;	..\fb_lpc922.c:672: conh=telegramm[1];			// phys. Adresse des Verbindungspartners
+   08C3 85*08*00           2806 	mov	_conh,(_telegramm + 0x0001)
+                    08C6   2807 	C$fb_lpc922.c$673$6$19 ==.
+                           2808 ;	..\fb_lpc922.c:673: conl=telegramm[2];
+   08C6 85*09*01           2809 	mov	_conl,(_telegramm + 0x0002)
+                    08C9   2810 	C$fb_lpc922.c$674$6$19 ==.
+                           2811 ;	..\fb_lpc922.c:674: pcount=0;					// Paketzaehler zuruecksetzen
+   08C9 75*02 00           2812 	mov	_pcount,#0x00
+                    08CC   2813 	C$fb_lpc922.c$675$6$19 ==.
+                           2814 ;	..\fb_lpc922.c:675: inc_pcount=0;
+   08CC C2*0E              2815 	clr	_inc_pcount
+                    08CE   2816 	C$fb_lpc922.c$676$6$19 ==.
+                           2817 ;	..\fb_lpc922.c:676: RTCCON=0x60;	//RTC stoppen
+   08CE 75 D1 60           2818 	mov	_RTCCON,#0x60
+                    08D1   2819 	C$fb_lpc922.c$677$6$19 ==.
+                           2820 ;	..\fb_lpc922.c:677: RTCH=0x0B;      // reload Real Time Clock, 52ms
+   08D1 75 D2 0B           2821 	mov	_RTCH,#0x0B
+                    08D4   2822 	C$fb_lpc922.c$678$6$19 ==.
+                           2823 ;	..\fb_lpc922.c:678: RTCL=0xB3;
+   08D4 75 D3 B3           2824 	mov	_RTCL,#0xB3
+                    08D7   2825 	C$fb_lpc922.c$679$6$19 ==.
+                           2826 ;	..\fb_lpc922.c:679: RTCCON=0x61;	// RTC starten
+   08D7 75 D1 61           2827 	mov	_RTCCON,#0x61
+                    08DA   2828 	C$fb_lpc922.c$682$5$8 ==.
+                           2829 ;	..\fb_lpc922.c:682: break;
+   08DA 02s09rB6           2830 	ljmp	00176$
+                    08DD   2831 	C$fb_lpc922.c$684$5$8 ==.
+                           2832 ;	..\fb_lpc922.c:684: case DISCONNECT_PDU:	// 10000001 xxxxxxxx
+   08DD                    2833 00138$:
+                    08DD   2834 	C$fb_lpc922.c$685$5$8 ==.
+                           2835 ;	..\fb_lpc922.c:685: if(conh==telegramm[1] && conl==telegramm[2] )	{	// nur abbauen, wenn verbunden und Anforderung vom Verbindungspartner, kein ACK senden
+   08DD E5*08              2836 	mov	a,(_telegramm + 0x0001)
+   08DF B5*00 02           2837 	cjne	a,_conh,00257$
+   08E2 80 03              2838 	sjmp	00258$
+   08E4                    2839 00257$:
+   08E4 02s09rB6           2840 	ljmp	00176$
+   08E7                    2841 00258$:
+   08E7 E5*09              2842 	mov	a,(_telegramm + 0x0002)
+   08E9 B5*01 02           2843 	cjne	a,_conl,00259$
+   08EC 80 03              2844 	sjmp	00260$
+   08EE                    2845 00259$:
+   08EE 02s09rB6           2846 	ljmp	00176$
+   08F1                    2847 00260$:
+                    08F1   2848 	C$fb_lpc922.c$686$6$20 ==.
+                           2849 ;	..\fb_lpc922.c:686: connected=0;// warum: && connected ???
+   08F1 C2*0D              2850 	clr	_connected
+                    08F3   2851 	C$fb_lpc922.c$688$5$8 ==.
+                           2852 ;	..\fb_lpc922.c:688: break;
+   08F3 02s09rB6           2853 	ljmp	00176$
+                    08F6   2854 	C$fb_lpc922.c$690$5$8 ==.
+                           2855 ;	..\fb_lpc922.c:690: case NACK_PDU:	// 11pppp11 xxxxxxxx
+   08F6                    2856 00142$:
+                    08F6   2857 	C$fb_lpc922.c$691$5$8 ==.
+                           2858 ;	..\fb_lpc922.c:691: send_obj_value(T_DISCONNECT);
+   08F6 75 82 85           2859 	mov	dpl,#0x85
+   08F9 12s06r7E           2860 	lcall	_send_obj_value
+                    08FC   2861 	C$fb_lpc922.c$692$5$8 ==.
+                           2862 ;	..\fb_lpc922.c:692: connected=0;//connected_timeout=111; spartipp 5 Byte wenn send.. weg kommt.
+   08FC C2*0D              2863 	clr	_connected
+                    08FE   2864 	C$fb_lpc922.c$694$1$5 ==.
+                           2865 ;	..\fb_lpc922.c:694: }
+   08FE 02s09rB6           2866 	ljmp	00176$
+   0901                    2867 00166$:
+                    0901   2868 	C$fb_lpc922.c$699$2$5 ==.
+                           2869 ;	..\fb_lpc922.c:699: else if(tpdu==GROUP_PDU){
+   0901 EE                 2870 	mov	a,r6
+   0902 60 03              2871 	jz	00261$
+   0904 02s09rB6           2872 	ljmp	00176$
+   0907                    2873 00261$:
+                    0907   2874 	C$fb_lpc922.c$704$3$21 ==.
+                           2875 ;	..\fb_lpc922.c:704: gapos = gapos_in_gat(telegramm[3], telegramm[4]);
+   0907 C0*0B              2876 	push	(_telegramm + 0x0004)
+   0909 8C 82              2877 	mov	dpl,r4
+   090B 12s06r30           2878 	lcall	_gapos_in_gat
+   090E AF 82              2879 	mov	r7,dpl
+   0910 15 81              2880 	dec	sp
+                    0912   2881 	C$fb_lpc922.c$706$3$21 ==.
+                           2882 ;	..\fb_lpc922.c:706: if (gapos != 0xFF)
+   0912 BF FF 03           2883 	cjne	r7,#0xFF,00262$
+   0915 02s09rB6           2884 	ljmp	00176$
+   0918                    2885 00262$:
+                    0918   2886 	C$fb_lpc922.c$708$4$22 ==.
+                           2887 ;	..\fb_lpc922.c:708: atp = eeprom[ASSOCTABPTR];  // Association Table Pointer
+   0918 90 1D 11           2888 	mov	dptr,#(_eeprom + 0x0011)
+   091B E4                 2889 	clr	a
+   091C 93                 2890 	movc	a,@a+dptr
+                    091D   2891 	C$fb_lpc922.c$709$4$22 ==.
+                           2892 ;	..\fb_lpc922.c:709: assmax = atp + eeprom[atp] * 2;	// Erster Eintrag = Anzahl Eintraege
+   091D FE                 2893 	mov	r6,a
+   091E F5 82              2894 	mov	dpl,a
+   0920 75 83 1D           2895 	mov	dph,#(_eeprom >> 8)
+   0923 E4                 2896 	clr	a
+   0924 93                 2897 	movc	a,@a+dptr
+   0925 25 E0              2898 	add	a,acc
+   0927 2E                 2899 	add	a,r6
+   0928 FD                 2900 	mov	r5,a
+                    0929   2901 	C$fb_lpc922.c$713$4$22 ==.
+                           2902 ;	..\fb_lpc922.c:713: for (asspos = atp + 1; asspos < assmax; asspos+=2)
+   0929 0E                 2903 	inc	r6
+   092A A8*00              2904 	mov	r0,_bp
+   092C 08                 2905 	inc	r0
+   092D 74 C0              2906 	mov	a,#0xC0
+   092F 56                 2907 	anl	a,@r0
+   0930 FC                 2908 	mov	r4,a
+   0931 E4                 2909 	clr	a
+   0932 BC 80 01           2910 	cjne	r4,#0x80,00263$
+   0935 04                 2911 	inc	a
+   0936                    2912 00263$:
+   0936 FC                 2913 	mov	r4,a
+   0937                    2914 00157$:
+   0937 C3                 2915 	clr	c
+   0938 EE                 2916 	mov	a,r6
+   0939 9D                 2917 	subb	a,r5
+   093A 40 03              2918 	jc	00265$
+   093C 02s09rB6           2919 	ljmp	00176$
+   093F                    2920 00265$:
+                    093F   2921 	C$fb_lpc922.c$717$5$23 ==.
+                           2922 ;	..\fb_lpc922.c:717: if (gapos == eeprom[asspos])
+   093F 8E 82              2923 	mov	dpl,r6
+   0941 75 83 1D           2924 	mov	dph,#(_eeprom >> 8)
+   0944 E4                 2925 	clr	a
+   0945 93                 2926 	movc	a,@a+dptr
+   0946 FB                 2927 	mov	r3,a
+   0947 EF                 2928 	mov	a,r7
+   0948 B5 03 66           2929 	cjne	a,ar3,00159$
+                    094B   2930 	C$fb_lpc922.c$719$6$24 ==.
+                           2931 ;	..\fb_lpc922.c:719: objno = eeprom[asspos + 1];	     // Objektnummer
+   094B EE                 2932 	mov	a,r6
+   094C 04                 2933 	inc	a
+   094D 90 1D 00           2934 	mov	dptr,#_eeprom
+   0950 93                 2935 	movc	a,@a+dptr
+                    0951   2936 	C$fb_lpc922.c$720$6$24 ==.
+                           2937 ;	..\fb_lpc922.c:720: objflags = read_objflags(objno); // Objekt Flags lesen
+   0951 FB                 2938 	mov	r3,a
+   0952 F5 82              2939 	mov	dpl,a
+   0954 C0 07              2940 	push	ar7
+   0956 C0 06              2941 	push	ar6
+   0958 C0 05              2942 	push	ar5
+   095A C0 04              2943 	push	ar4
+   095C C0 03              2944 	push	ar3
+   095E 12s09rBC           2945 	lcall	_read_objflags
+   0961 AA 82              2946 	mov	r2,dpl
+   0963 D0 03              2947 	pop	ar3
+   0965 D0 04              2948 	pop	ar4
+   0967 D0 05              2949 	pop	ar5
+   0969 D0 06              2950 	pop	ar6
+   096B D0 07              2951 	pop	ar7
+                    096D   2952 	C$fb_lpc922.c$723$6$24 ==.
+                           2953 ;	..\fb_lpc922.c:723: if((apdu&0xC0)==WRITE_GROUP)
+   096D EC                 2954 	mov	a,r4
+   096E 60 2E              2955 	jz	00150$
+                    0970   2956 	C$fb_lpc922.c$728$1$1 ==.
+                           2957 ;	..\fb_lpc922.c:728: if ((objflags & 0x14) == 0x14)
+   0970 C0 04              2958 	push	ar4
+   0972 74 14              2959 	mov	a,#0x14
+   0974 5A                 2960 	anl	a,r2
+   0975 FC                 2961 	mov	r4,a
+   0976 BC 14 02           2962 	cjne	r4,#0x14,00269$
+   0979 80 04              2963 	sjmp	00270$
+   097B                    2964 00269$:
+   097B D0 04              2965 	pop	ar4
+   097D 80 1F              2966 	sjmp	00150$
+   097F                    2967 00270$:
+   097F D0 04              2968 	pop	ar4
+                    0981   2969 	C$fb_lpc922.c$729$7$25 ==.
+                           2970 ;	..\fb_lpc922.c:729: write_value_req(objno);
+   0981 8B 82              2971 	mov	dpl,r3
+   0983 C0 07              2972 	push	ar7
+   0985 C0 06              2973 	push	ar6
+   0987 C0 05              2974 	push	ar5
+   0989 C0 04              2975 	push	ar4
+   098B C0 03              2976 	push	ar3
+   098D C0 02              2977 	push	ar2
+   098F 12s00r00           2978 	lcall	_write_value_req
+   0992 D0 02              2979 	pop	ar2
+   0994 D0 03              2980 	pop	ar3
+   0996 D0 04              2981 	pop	ar4
+   0998 D0 05              2982 	pop	ar5
+   099A D0 06              2983 	pop	ar6
+   099C D0 07              2984 	pop	ar7
+   099E                    2985 00150$:
+                    099E   2986 	C$fb_lpc922.c$731$6$24 ==.
+                           2987 ;	..\fb_lpc922.c:731: if(apdu==READ_GROUP_REQUEST)
+   099E A8*00              2988 	mov	r0,_bp
+   09A0 08                 2989 	inc	r0
+   09A1 E6                 2990 	mov	a,@r0
+   09A2 70 0D              2991 	jnz	00159$
+                    09A4   2992 	C$fb_lpc922.c$733$7$26 ==.
+                           2993 ;	..\fb_lpc922.c:733: if ((objflags & 0x0C) == 0x0C)
+   09A4 53 02 0C           2994 	anl	ar2,#0x0C
+   09A7 BA 0C 0C           2995 	cjne	r2,#0x0C,00176$
+                    09AA   2996 	C$fb_lpc922.c$734$7$26 ==.
+                           2997 ;	..\fb_lpc922.c:734: read_value_req(objno);	// Objektwert lesen und read_value_response senden	00000000 00000000
+   09AA 8B 82              2998 	mov	dpl,r3
+   09AC 12s00r00           2999 	lcall	_read_value_req
+                    09AF   3000 	C$fb_lpc922.c$735$7$26 ==.
+                           3001 ;	..\fb_lpc922.c:735: break;
+   09AF 80 05              3002 	sjmp	00176$
+   09B1                    3003 00159$:
+                    09B1   3004 	C$fb_lpc922.c$713$4$22 ==.
+                           3005 ;	..\fb_lpc922.c:713: for (asspos = atp + 1; asspos < assmax; asspos+=2)
+   09B1 0E                 3006 	inc	r6
+   09B2 0E                 3007 	inc	r6
+   09B3 02s09r37           3008 	ljmp	00157$
+   09B6                    3009 00176$:
+   09B6 85*00 81           3010 	mov	sp,_bp
+   09B9 D0*00              3011 	pop	_bp
+                    09BB   3012 	C$fb_lpc922.c$742$1$1 ==.
+                    09BB   3013 	XG$process_tel$0$0 ==.
+   09BB 22                 3014 	ret
+                           3015 ;------------------------------------------------------------
+                           3016 ;Allocation info for local variables in function 'read_objflags'
+                           3017 ;------------------------------------------------------------
+                           3018 ;objno                     Allocated to registers r7 
+                           3019 ;------------------------------------------------------------
+                    09BC   3020 	G$read_objflags$0$0 ==.
+                    09BC   3021 	C$fb_lpc922.c$791$1$1 ==.
+                           3022 ;	..\fb_lpc922.c:791: unsigned char read_objflags(unsigned char objno)
+                           3023 ;	-----------------------------------------
+                           3024 ;	 function read_objflags
+                           3025 ;	-----------------------------------------
+   09BC                    3026 _read_objflags:
+   09BC AF 82              3027 	mov	r7,dpl
+                    09BE   3028 	C$fb_lpc922.c$794$1$1 ==.
+                           3029 ;	..\fb_lpc922.c:794: return(eeprom[eeprom[COMMSTABPTR]+3+objno+objno+objno]);
+   09BE 90 1D 12           3030 	mov	dptr,#(_eeprom + 0x0012)
+   09C1 E4                 3031 	clr	a
+   09C2 93                 3032 	movc	a,@a+dptr
+   09C3 FE                 3033 	mov	r6,a
+   09C4 0E                 3034 	inc	r6
+   09C5 0E                 3035 	inc	r6
+   09C6 0E                 3036 	inc	r6
+   09C7 EF                 3037 	mov	a,r7
+   09C8 2E                 3038 	add	a,r6
+   09C9 2F                 3039 	add	a,r7
+   09CA 2F                 3040 	add	a,r7
+   09CB 90 1D 00           3041 	mov	dptr,#_eeprom
+   09CE 93                 3042 	movc	a,@a+dptr
+                    09CF   3043 	C$fb_lpc922.c$795$1$1 ==.
+                    09CF   3044 	XG$read_objflags$0$0 ==.
+   09CF F5 82              3045 	mov	dpl,a
+   09D1 22                 3046 	ret
+                           3047 ;------------------------------------------------------------
+                           3048 ;Allocation info for local variables in function 'restart_hw'
+                           3049 ;------------------------------------------------------------
+                    09D2   3050 	G$restart_hw$0$0 ==.
+                    09D2   3051 	C$fb_lpc922.c$830$1$1 ==.
+                           3052 ;	..\fb_lpc922.c:830: void restart_hw(void)
+                           3053 ;	-----------------------------------------
+                           3054 ;	 function restart_hw
+                           3055 ;	-----------------------------------------
+   09D2                    3056 _restart_hw:
+                    09D2   3057 	C$fb_lpc922.c$832$1$1 ==.
+                           3058 ;	..\fb_lpc922.c:832: DIVM=0;			// Taktferquenz nicht teilen -> volles Tempo
+   09D2 75 95 00           3059 	mov	_DIVM,#0x00
+                    09D5   3060 	C$fb_lpc922.c$834$1$1 ==.
+                           3061 ;	..\fb_lpc922.c:834: P1M1=0x14;		// Port 1 auf quasi-bidirektional,
+   09D5 75 91 14           3062 	mov	_P1M1,#0x14
+                    09D8   3063 	C$fb_lpc922.c$835$1$1 ==.
+                           3064 ;	..\fb_lpc922.c:835: P1M2=0x4C;		// ausser P1.2(T0 als PWM Ausgang)=open-drain,
+   09D8 75 92 4C           3065 	mov	_P1M2,#0x4C
+                    09DB   3066 	C$fb_lpc922.c$839$1$1 ==.
+                           3067 ;	..\fb_lpc922.c:839: FBOUTC=0;		// Bus-Ausgang auf low
+   09DB C2 96              3068 	clr	_P1_6
+                    09DD   3069 	C$fb_lpc922.c$841$1$1 ==.
+                           3070 ;	..\fb_lpc922.c:841: TMOD=0x21;		// Timer 0 als 16-Bit Timer, Timer 1 als 8 Bit autoreload
+   09DD 75 89 21           3071 	mov	_TMOD,#0x21
+                    09E0   3072 	C$fb_lpc922.c$842$1$1 ==.
+                           3073 ;	..\fb_lpc922.c:842: TAMOD=0x00;
+   09E0 75 8F 00           3074 	mov	_TAMOD,#0x00
+                    09E3   3075 	C$fb_lpc922.c$843$1$1 ==.
+                           3076 ;	..\fb_lpc922.c:843: TR0=0;			// Timer 0 (zur Verwendung in app) zunaechst stoppen
+   09E3 C2 8C              3077 	clr	_TCON_4
+                    09E5   3078 	C$fb_lpc922.c$844$1$1 ==.
+                           3079 ;	..\fb_lpc922.c:844: TR1=0;			// Timer 1 (Empfangs-Timer, nicht in app verwenden!) zunaechst stoppen
+   09E5 C2 8E              3080 	clr	_TCON_6
+                    09E7   3081 	C$fb_lpc922.c$845$1$1 ==.
+                           3082 ;	..\fb_lpc922.c:845: TH1=128;		// Timer 1 auf 104us/3
+   09E7 75 8D 80           3083 	mov	_TH1,#0x80
+                    09EA   3084 	C$fb_lpc922.c$846$1$1 ==.
+                           3085 ;	..\fb_lpc922.c:846: TL1=128;
+   09EA 75 8B 80           3086 	mov	_TL1,#0x80
+                    09ED   3087 	C$fb_lpc922.c$847$1$1 ==.
+                           3088 ;	..\fb_lpc922.c:847: TF1=0;
+   09ED C2 8F              3089 	clr	_TCON_7
+                    09EF   3090 	C$fb_lpc922.c$854$1$1 ==.
+                           3091 ;	..\fb_lpc922.c:854: interrupted=0;	// wird durch die interrupt-routine auf 1 gesetzt
+   09EF C2*01              3092 	clr	_interrupted
+                    09F1   3093 	C$fb_lpc922.c$855$1$1 ==.
+                           3094 ;	..\fb_lpc922.c:855: IEN0=0x80;// mit 0x80 sind die unten auskommentierten erschlagen.
+   09F1 75 A8 80           3095 	mov	_IEN0,#0x80
+                    09F4   3096 	C$fb_lpc922.c$856$1$1 ==.
+                           3097 ;	..\fb_lpc922.c:856: IEN1=0x00;
+   09F4 75 E8 00           3098 	mov	_IEN1,#0x00
+                    09F7   3099 	C$fb_lpc922.c$863$1$1 ==.
+                           3100 ;	..\fb_lpc922.c:863: IP0=0x04;		// hÃ¶chste PrioritÃ¤t fuer ext1
+   09F7 75 B8 04           3101 	mov	_IP0,#0x04
+                    09FA   3102 	C$fb_lpc922.c$864$1$1 ==.
+                           3103 ;	..\fb_lpc922.c:864: IP0H=0x0C;
+   09FA 75 B7 0C           3104 	mov	_IP0H,#0x0C
+                    09FD   3105 	C$fb_lpc922.c$865$1$1 ==.
+                           3106 ;	..\fb_lpc922.c:865: IT1=1;			// Interrupt 1 flankengetriggert=1
+   09FD D2 8A              3107 	setb	_TCON_2
+                    09FF   3108 	C$fb_lpc922.c$867$1$1 ==.
+                           3109 ;	..\fb_lpc922.c:867: status60=0x2E;	// Status-Byte (steht normal im userram an 0x60)
+   09FF 75*2E 2E           3110 	mov	_status60,#0x2E
+                    0A02   3111 	C$fb_lpc922.c$869$1$1 ==.
+                           3112 ;	..\fb_lpc922.c:869: ack=0;			// ack und nack flag zurÃ¼cksetzen
+   0A02 C2*03              3113 	clr	_ack
+                    0A04   3114 	C$fb_lpc922.c$870$1$1 ==.
+                           3115 ;	..\fb_lpc922.c:870: nack=0;
+   0A04 C2*04              3116 	clr	_nack
+                    0A06   3117 	C$fb_lpc922.c$871$1$1 ==.
+                           3118 ;	..\fb_lpc922.c:871: send_ack=0;
+   0A06 C2*0B              3119 	clr	_send_ack
+                    0A08   3120 	C$fb_lpc922.c$872$1$1 ==.
+                           3121 ;	..\fb_lpc922.c:872: send_nack=0;
+   0A08 C2*0C              3122 	clr	_send_nack
+                    0A0A   3123 	C$fb_lpc922.c$873$1$1 ==.
+                           3124 ;	..\fb_lpc922.c:873: tel_arrived=0;	// kein Telegramm empfangen
+   0A0A C2*06              3125 	clr	_tel_arrived
+                    0A0C   3126 	C$fb_lpc922.c$874$1$1 ==.
+                           3127 ;	..\fb_lpc922.c:874: auto_ack=1;		// empfangene Telegramme automatisch mit ack bestaetigen
+   0A0C D2*08              3128 	setb	_auto_ack
+                    0A0E   3129 	C$fb_lpc922.c$875$1$1 ==.
+                           3130 ;	..\fb_lpc922.c:875: tx_nextwrite=0;	// Zeiger auf naechste zu schreibende Objektnr. in tx_buffer
+   0A0E 75*2C 00           3131 	mov	_tx_nextwrite,#0x00
+                    0A11   3132 	C$fb_lpc922.c$876$1$1 ==.
+                           3133 ;	..\fb_lpc922.c:876: tx_nextsend=0;	// Zeiger auf naechste zu sendende Objektnr. in tx_buffer
+   0A11 75*2D 00           3134 	mov	_tx_nextsend,#0x00
+                    0A14   3135 	C$fb_lpc922.c$877$1$1 ==.
+                           3136 ;	..\fb_lpc922.c:877: pcount=0;		// Paketzaehler initialisieren
+   0A14 75*02 00           3137 	mov	_pcount,#0x00
+                    0A17   3138 	C$fb_lpc922.c$878$1$1 ==.
+                           3139 ;	..\fb_lpc922.c:878: inc_pcount=0;
+   0A17 C2*0E              3140 	clr	_inc_pcount
+                    0A19   3141 	C$fb_lpc922.c$879$1$1 ==.
+                           3142 ;	..\fb_lpc922.c:879: connected=0;	// keine Verbindung
+   0A19 C2*0D              3143 	clr	_connected
+                    0A1B   3144 	C$fb_lpc922.c$881$1$1 ==.
+                           3145 ;	..\fb_lpc922.c:881: init_rx();		// Empfang initialisieren
+   0A1B 12s05rB8           3146 	lcall	_init_rx
+                    0A1E   3147 	C$fb_lpc922.c$882$1$1 ==.
+                    0A1E   3148 	XG$restart_hw$0$0 ==.
+   0A1E 22                 3149 	ret
+                           3150 	.area CSEG    (CODE)
+                           3151 	.area CONST   (CODE)
+                    1D00   3152 G$eeprom$0$0 == 0x1d00
+                    1D00   3153 _eeprom	=	0x1d00
+                    0000   3154 G$priotable$0$0 == .
+   0000                    3155 _priotable:
+   0000 B0                 3156 	.db #0xB0	; 176
+   0001 B8                 3157 	.db #0xB8	; 184
+   0002 B4                 3158 	.db #0xB4	; 180
+   0003 BC                 3159 	.db #0xBC	; 188
+                           3160 	.area XINIT   (CODE)
+                           3161 	.area CABS    (ABS,CODE)
