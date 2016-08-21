@@ -171,7 +171,7 @@ extern __code unsigned char __at(EEPROM_ADDR)  eeprom[255];	 // Bereich im Flash
 // Funktionen
 void X1_int(void) __interrupt (2);
 void T1_int(void) __interrupt (3) ;
-void init_rx(void) ;
+void init_rx(__bit longwait) ;
 void init_tx(__bit low_prio_time) ;
 
 unsigned char gapos_in_gat(unsigned char gah, unsigned char gal) ;

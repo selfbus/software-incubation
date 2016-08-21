@@ -14,6 +14,7 @@ S:Lfb_lpc922.T1_int$asspos$3$3({1}SC:U),R,0,0,[r4]
 S:Lfb_lpc922.T1_int$type$3$3({1}SB0$1:U),R,0,0,[b2]
 S:Lfb_lpc922.T1_int$repeatflag$3$3({1}SB0$1:U),R,0,0,[b1]
 F:G$init_rx$0$0({2}DF,SV:S),Z,0,0,0,0,0
+S:Lfb_lpc922.init_rx$longwait$1$1({1}SB0$1:U),R,0,0,[b0]
 F:G$init_tx$0$0({2}DF,SV:S),Z,0,0,0,0,0
 S:Lfb_lpc922.init_tx$low_prio_time$1$1({1}SB0$1:U),R,0,0,[b0]
 S:Lfb_lpc922.init_tx$n$1$1({1}SC:U),R,0,0,[r6]
