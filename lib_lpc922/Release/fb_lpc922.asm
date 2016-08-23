@@ -1,7 +1,7 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
 ; Version 3.1.0 #7066 (Nov 22 2011) (MINGW32)
-; This file was generated Sun Aug 21 21:51:58 2016
+; This file was generated Tue Aug 23 08:14:10 2016
 ;--------------------------------------------------------
 	.module fb_lpc922
 	.optsdcc -mmcs51 --model-small
@@ -785,39 +785,39 @@ _T1_int:
 	mov	a,_fb_state
 	mov	r7,a
 	add	a,#0xff - 0x0E
-	jnc	00331$
-	ljmp	00254$
-00331$:
+	jnc	00333$
+	ljmp	00256$
+00333$:
 	mov	a,r7
 	add	a,r7
 	add	a,r7
-	mov	dptr,#00332$
+	mov	dptr,#00334$
 	jmp	@a+dptr
-00332$:
+00334$:
 	ljmp	00101$
-	ljmp	00254$
-	ljmp	00150$
-	ljmp	00187$
-	ljmp	00188$
-	ljmp	00209$
-	ljmp	00254$
-	ljmp	00254$
-	ljmp	00254$
-	ljmp	00216$
-	ljmp	00217$
-	ljmp	00238$
-	ljmp	00254$
-	ljmp	00245$
-	ljmp	00253$
+	ljmp	00256$
+	ljmp	00152$
+	ljmp	00189$
+	ljmp	00190$
+	ljmp	00211$
+	ljmp	00256$
+	ljmp	00256$
+	ljmp	00256$
+	ljmp	00218$
+	ljmp	00219$
+	ljmp	00240$
+	ljmp	00256$
+	ljmp	00247$
+	ljmp	00255$
 	C$fb_lpc922.c$88$2$2 ==.
 ;	..\fb_lpc922.c:88: case 0:
 00101$:
 	C$fb_lpc922.c$97$2$2 ==.
 ;	..\fb_lpc922.c:97: if(tx_nextsend != tx_nextwrite) { 			// wenn zu sendendes Objekt vorhanden
 	mov	a,_tx_nextwrite
-	cjne	a,_tx_nextsend,00333$
-	ljmp	00148$
-00333$:
+	cjne	a,_tx_nextsend,00335$
+	ljmp	00150$
+00335$:
 	C$fb_lpc922.c$101$3$3 ==.
 ;	..\fb_lpc922.c:101: unsigned char objno=tx_buffer[tx_nextsend];
 	mov	a,_tx_nextsend
@@ -855,11 +855,11 @@ _T1_int:
 	mov	(_telegramm + 0x0002),r4
 	C$fb_lpc922.c$114$3$3 ==.
 ;	..\fb_lpc922.c:114: if(objno<128) {		// Multicast
-	cjne	r7,#0x80,00334$
-00334$:
-	jc	00335$
-	ljmp	00133$
-00335$:
+	cjne	r7,#0x80,00336$
+00336$:
+	jc	00337$
+	ljmp	00135$
+00337$:
 	C$fb_lpc922.c$115$1$1 ==.
 ;	..\fb_lpc922.c:115: type=(objno&0x40);	// bei Multicast ist type0 normal und type1 response telegramm
 	push	ar5
@@ -914,13 +914,13 @@ _T1_int:
 	mov	dptr,#_eeprom
 	movc	a,@a+dptr
 	mov	r6,a
-	cjne	a,ar7,00336$
-	sjmp	00337$
-00336$:
+	cjne	a,ar7,00338$
+	sjmp	00339$
+00338$:
 	pop	ar6
 	pop	ar5
 	sjmp	00103$
-00337$:
+00339$:
 	pop	ar6
 	pop	ar5
 	mov	dpl,r4
@@ -933,10 +933,10 @@ _T1_int:
 00103$:
 	C$fb_lpc922.c$124$4$4 ==.
 ;	..\fb_lpc922.c:124: if (gapos!=0xFE) // wenn keine Gruppenadresse hinterlegt nix tun
-	cjne	r5,#0xFE,00338$
-	cjne	r6,#0x00,00338$
-	ljmp	00134$
-00338$:
+	cjne	r5,#0xFE,00340$
+	cjne	r6,#0x00,00340$
+	ljmp	00136$
+00340$:
 	C$fb_lpc922.c$126$5$5 ==.
 ;	..\fb_lpc922.c:126: n=eeprom[COMMSTABPTR]+objno+objno+objno+3; //Adresse obj flags für Priorität holen
 	mov	dptr,#(_eeprom + 0x0012)
@@ -1095,8 +1095,8 @@ _T1_int:
 	C$fb_lpc922.c$144$5$5 ==.
 ;	..\fb_lpc922.c:144: build_ok=1;
 	setb	b0
-	ljmp	00134$
-00133$:
+	ljmp	00136$
+00135$:
 	C$fb_lpc922.c$148$4$6 ==.
 ;	..\fb_lpc922.c:148: telegramm[0]=0xB0;				// Control Byte
 	mov	_telegramm,#0xB0
@@ -1110,22 +1110,24 @@ _T1_int:
 ;	..\fb_lpc922.c:154: switch(objno&0x1F) {
 	anl	ar7,#0x1F
 	mov	a,r7
-	add	a,#0xff - 0x05
-	jnc	00345$
-	ljmp	00131$
-00345$:
+	add	a,#0xff - 0x07
+	jnc	00347$
+	ljmp	00133$
+00347$:
 	mov	a,r7
 	add	a,r7
 	add	a,r7
-	mov	dptr,#00346$
+	mov	dptr,#00348$
 	jmp	@a+dptr
-00346$:
-	ljmp	00131$
+00348$:
+	ljmp	00133$
 	ljmp	00121$
 	ljmp	00122$
 	ljmp	00123$
 	ljmp	00124$
 	ljmp	00130$
+	ljmp	00131$
+	ljmp	00132$
 	C$fb_lpc922.c$155$5$7 ==.
 ;	..\fb_lpc922.c:155: case 1:	// NCD ACK Quittierung (129) mit Paketnummer vom Sender, nicht der Eigenen!!!
 00121$:
@@ -1139,7 +1141,7 @@ _T1_int:
 	mov	(_telegramm + 0x0006),a
 	C$fb_lpc922.c$158$5$7 ==.
 ;	..\fb_lpc922.c:158: break;
-	ljmp	00131$
+	ljmp	00133$
 	C$fb_lpc922.c$159$5$7 ==.
 ;	..\fb_lpc922.c:159: case 2:	// read mask response (130)
 00122$:
@@ -1165,7 +1167,7 @@ _T1_int:
 	setb	_inc_pcount
 	C$fb_lpc922.c$166$5$7 ==.
 ;	..\fb_lpc922.c:166: break;
-	ljmp	00131$
+	ljmp	00133$
 	C$fb_lpc922.c$167$5$7 ==.
 ;	..\fb_lpc922.c:167: case 3:	// read PA response (131)
 00123$:
@@ -1186,18 +1188,18 @@ _T1_int:
 	mov	(_telegramm + 0x0007),#0x40
 	C$fb_lpc922.c$173$5$7 ==.
 ;	..\fb_lpc922.c:173: break;
+	ljmp	00133$
 	C$fb_lpc922.c$174$5$7 ==.
 ;	..\fb_lpc922.c:174: case 4:	// memory_read_response (132)
-	sjmp	00131$
 00124$:
 	C$fb_lpc922.c$175$1$1 ==.
 ;	..\fb_lpc922.c:175: for(n=0;n<mem_length;n++) {
 	mov	r7,#0x00
-00255$:
+00257$:
 	clr	c
 	mov	a,r7
 	subb	a,_mem_length
-	jnc	00258$
+	jnc	00260$
 	C$fb_lpc922.c$176$6$8 ==.
 ;	..\fb_lpc922.c:176: if (mem_adrh==0) {
 	mov	a,_mem_adrh
@@ -1221,14 +1223,14 @@ _T1_int:
 	mov	a,r4
 	addc	a,r6
 	mov	r6,a
-	cjne	r5,#0x60,00257$
-	cjne	r6,#0x00,00257$
+	cjne	r5,#0x60,00259$
+	cjne	r6,#0x00,00259$
 	mov	a,#0x0A
 	add	a,r7
 	add	a,#_telegramm
 	mov	r0,a
 	mov	@r0,_status60
-	sjmp	00257$
+	sjmp	00259$
 00128$:
 	C$fb_lpc922.c$180$6$8 ==.
 ;	..\fb_lpc922.c:180: else telegramm[n+10]=eeprom[mem_adrl+n];//else if (mem_adrh==1)
@@ -1242,12 +1244,12 @@ _T1_int:
 	movc	a,@a+dptr
 	mov	r6,a
 	mov	@r1,a
-00257$:
+00259$:
 	C$fb_lpc922.c$175$5$7 ==.
 ;	..\fb_lpc922.c:175: for(n=0;n<mem_length;n++) {
 	inc	r7
-	sjmp	00255$
-00258$:
+	sjmp	00257$
+00260$:
 	C$fb_lpc922.c$183$5$7 ==.
 ;	..\fb_lpc922.c:183: telegramm[5]=mem_length+0x63;		// DRL (Anzahl Bytes + 3)
 	mov	a,#0x63
@@ -1276,7 +1278,7 @@ _T1_int:
 ;	..\fb_lpc922.c:189: break;
 	C$fb_lpc922.c$190$5$7 ==.
 ;	..\fb_lpc922.c:190: case 5:	// T-disconnect (133)
-	sjmp	00131$
+	sjmp	00133$
 00130$:
 	C$fb_lpc922.c$191$5$7 ==.
 ;	..\fb_lpc922.c:191: telegramm[5]=0x60;
@@ -1287,33 +1289,78 @@ _T1_int:
 	C$fb_lpc922.c$193$5$7 ==.
 ;	..\fb_lpc922.c:193: connected=0;
 	clr	_connected
+	C$fb_lpc922.c$194$5$7 ==.
+;	..\fb_lpc922.c:194: break;
+	C$fb_lpc922.c$196$5$7 ==.
+;	..\fb_lpc922.c:196: case 6: // READ_ADC_RESPONSE (134)
+	sjmp	00133$
+00131$:
+	C$fb_lpc922.c$197$5$7 ==.
+;	..\fb_lpc922.c:197: telegramm[5]=0x64;                  // DRL
+	mov	(_telegramm + 0x0005),#0x64
+	C$fb_lpc922.c$198$5$7 ==.
+;	..\fb_lpc922.c:198: telegramm[6]=pcount |0x41;          // eigener Paketzaehler, TCPI und erstes Befehlsbit
+	mov	a,#0x41
+	orl	a,_pcount
+	mov	(_telegramm + 0x0006),a
+	C$fb_lpc922.c$199$5$7 ==.
+;	..\fb_lpc922.c:199: telegramm[7]=mem_adrh |0x40;        // ARCRead Response for selected channel
+	mov	a,#0x40
+	orl	a,_mem_adrh
+	mov	(_telegramm + 0x0007),a
+	C$fb_lpc922.c$200$5$7 ==.
+;	..\fb_lpc922.c:200: telegramm[8]=mem_adrl;              // Requested sample count
+	mov	(_telegramm + 0x0008),_mem_adrl
+	C$fb_lpc922.c$201$5$7 ==.
+;	..\fb_lpc922.c:201: telegramm[9]=0x05;                  // ADC1 Bus Voltage 0x0610 = 29.1V (ADC = U/0.1875)
+	mov	(_telegramm + 0x0009),#0x05
+	C$fb_lpc922.c$202$5$7 ==.
+;	..\fb_lpc922.c:202: telegramm[10]=0xA0;                 // 0x0602=28.8V, 0x0605=28.9V, 0x0642=30V, 0x0648=30.2V
+	mov	(_telegramm + 0x000a),#0xA0
+	C$fb_lpc922.c$203$5$7 ==.
+;	..\fb_lpc922.c:203: inc_pcount=1;                       // ADC4 PEI Type 0x0610 = PEI 15, 0x05A0 = PEI 14
+	setb	_inc_pcount
+	C$fb_lpc922.c$204$5$7 ==.
+;	..\fb_lpc922.c:204: break;
+	C$fb_lpc922.c$206$5$7 ==.
+;	..\fb_lpc922.c:206: case 7: // NCD ACK Quittierung (135) mit eigener Paketnummer
+	sjmp	00133$
+00132$:
+	C$fb_lpc922.c$207$5$7 ==.
+;	..\fb_lpc922.c:207: telegramm[5]=0x60;                  // DRL
+	mov	(_telegramm + 0x0005),#0x60
+	C$fb_lpc922.c$208$5$7 ==.
+;	..\fb_lpc922.c:208: telegramm[6]=pcount + 0xC2;         // Bit 6,7(TCPI = 11 NCD Quittierung) und Bit 0,1 (10=ACK)
+	mov	a,#0xC2
+	add	a,_pcount
+	mov	(_telegramm + 0x0006),a
 	C$fb_lpc922.c$211$4$6 ==.
 ;	..\fb_lpc922.c:211: }
-00131$:
+00133$:
 	C$fb_lpc922.c$212$4$6 ==.
 ;	..\fb_lpc922.c:212: build_ok=1;
 	setb	b0
-00134$:
+00136$:
 	C$fb_lpc922.c$214$3$3 ==.
 ;	..\fb_lpc922.c:214: if(repeatflag) telegramm[0]&=0xDF;		// Wiederholungsbit loeschen fuer Wiederholtelegramm
-	jnb	b1,00136$
+	jnb	b1,00138$
 	mov	a,#0xDF
 	anl	a,_telegramm
 	mov	_telegramm,a
-00136$:
+00138$:
 	C$fb_lpc922.c$217$3$3 ==.
 ;	..\fb_lpc922.c:217: if(build_ok){//(build_tel(tx_buffer[tx_nextsend])) {	// wenn Telegramm gebildet werden konnte
-	jnb	b0,00145$
+	jnb	b0,00147$
 	C$fb_lpc922.c$218$4$10 ==.
 ;	..\fb_lpc922.c:218: EX1=0; 				//Um zu vermeiden dass man in die Abfrage hinein-empfaengt
 	clr	_IEN0_2
 	C$fb_lpc922.c$219$4$10 ==.
 ;	..\fb_lpc922.c:219: if(!fb_state) { 	//nur senden wenn vorher kein rx_intit durch ext int kam
 	mov	a,_fb_state
-	jnz	00143$
+	jnz	00145$
 	C$fb_lpc922.c$220$5$11 ==.
 ;	..\fb_lpc922.c:220: if(!repeatflag) {	// wenn erstmaliges Senden des Objektes
-	jb	b1,00138$
+	jb	b1,00140$
 	C$fb_lpc922.c$221$6$12 ==.
 ;	..\fb_lpc922.c:221: tx_buffer[tx_nextsend]|=0x20;		// Bit fuer "wird gerade gesendet" (war vorher im state 0 )
 	mov	a,_tx_nextsend
@@ -1326,37 +1373,37 @@ _T1_int:
 	C$fb_lpc922.c$222$6$12 ==.
 ;	..\fb_lpc922.c:222: repeat_count=0;						// Wiederholungszaehler fuer nicht geackte Telegramme
 	mov	_repeat_count,#0x00
-00138$:
+00140$:
 	C$fb_lpc922.c$224$5$11 ==.
 ;	..\fb_lpc922.c:224: if (repeat_count<4) init_tx((__bit)(telegramm[0]&0x01)&& !repeat_count);// Senden starten (eventuell mit 3 Bit verzögerung)
 	mov	a,#0x100 - 0x04
 	add	a,_repeat_count
-	jc	00140$
+	jc	00142$
 	mov	a,_telegramm
 	anl	a,#0x01
 	mov	r7,a
 	add	a,#0xff
 	mov	b0,c
-	jnc	00261$
+	jnc	00263$
 	mov	a,_repeat_count
-	cjne	a,#0x01,00357$
-00357$:
+	cjne	a,#0x01,00359$
+00359$:
 	clr	a
 	rlc	a
 	mov	r7,a
-	jnz	00262$
-00261$:
-	clr	b0
-	sjmp	00263$
-00262$:
-	setb	b0
+	jnz	00264$
 00263$:
+	clr	b0
+	sjmp	00265$
+00264$:
+	setb	b0
+00265$:
 	mov	c,b0
 	mov	b[0],c
 	mov	bits,b
 	lcall	_init_tx
-	sjmp	00143$
-00140$:
+	sjmp	00145$
+00142$:
 	C$fb_lpc922.c$226$6$13 ==.
 ;	..\fb_lpc922.c:226: tx_nextsend++;
 	inc	_tx_nextsend
@@ -1386,20 +1433,20 @@ _T1_int:
 	C$fb_lpc922.c$234$6$13 ==.
 ;	..\fb_lpc922.c:234: TR1=1;
 	setb	_TCON_6
-00143$:
+00145$:
 	C$fb_lpc922.c$237$4$10 ==.
 ;	..\fb_lpc922.c:237: EX1=1;	// ext1 int einschalten falls Empfang...
 	setb	_IEN0_2
-	ljmp	00254$
-00145$:
+	ljmp	00256$
+00147$:
 	C$fb_lpc922.c$240$4$14 ==.
 ;	..\fb_lpc922.c:240: tx_nextsend++; //hier Zeiger erhoehen wenn Telegramm nicht gebildet werden konnte
 	inc	_tx_nextsend
 	C$fb_lpc922.c$241$4$14 ==.
 ;	..\fb_lpc922.c:241: tx_nextsend&=0x07;
 	anl	_tx_nextsend,#0x07
-	ljmp	00254$
-00148$:
+	ljmp	00256$
+00150$:
 	C$fb_lpc922.c$245$3$15 ==.
 ;	..\fb_lpc922.c:245: TR1=0;		// nichts mehr zu tun, also statemachine stoppen
 	clr	_TCON_6
@@ -1408,10 +1455,10 @@ _T1_int:
 	setb	_IEN0_2
 	C$fb_lpc922.c$248$2$2 ==.
 ;	..\fb_lpc922.c:248: break;
-	ljmp	00254$
+	ljmp	00256$
 	C$fb_lpc922.c$251$2$2 ==.
 ;	..\fb_lpc922.c:251: case 2: // T=75us
-00150$:
+00152$:
 	C$fb_lpc922.c$252$2$2 ==.
 ;	..\fb_lpc922.c:252: fbrx_bit=!IE1;				// Flipflop des ext. Int. 1 auslesen, ist 1 bei fallender Flanke am Pin
 	mov	c,_TCON_3
@@ -1429,7 +1476,7 @@ _T1_int:
 	C$fb_lpc922.c$256$2$2 ==.
 ;	..\fb_lpc922.c:256: if(fb_pattern==0) {			// fb_pattern=0 bedeutet, dass bisher nur das Startbit empfangen wurde
 	mov	a,_fb_pattern
-	jnz	00185$
+	jnz	00187$
 	C$fb_lpc922.c$257$3$16 ==.
 ;	..\fb_lpc922.c:257: fb_pattern=1;			// 70us nach Startbit, als naecstes kommt Datenbit 0
 	mov	_fb_pattern,#0x01
@@ -1439,16 +1486,16 @@ _T1_int:
 	C$fb_lpc922.c$259$3$16 ==.
 ;	..\fb_lpc922.c:259: nack=0;
 	clr	_nack
-	ljmp	00254$
-00185$:
+	ljmp	00256$
+00187$:
 	C$fb_lpc922.c$262$3$17 ==.
 ;	..\fb_lpc922.c:262: if(fb_pattern<129) {					// Daten-Bit LSB first
 	mov	a,#0x100 - 0x81
 	add	a,_fb_pattern
-	jc	00182$
+	jc	00184$
 	C$fb_lpc922.c$263$4$18 ==.
 ;	..\fb_lpc922.c:263: if(fbrx_bit) {
-	jnb	b0,00152$
+	jnb	b0,00154$
 	C$fb_lpc922.c$264$5$19 ==.
 ;	..\fb_lpc922.c:264: fb_parity=!fb_parity;			// Paritybit berechnen
 	cpl	_fb_parity
@@ -1457,7 +1504,7 @@ _T1_int:
 	mov	a,_fb_pattern
 	add	a,_fbrx_byte
 	mov	_fbrx_byte,a
-00152$:
+00154$:
 	C$fb_lpc922.c$267$4$18 ==.
 ;	..\fb_lpc922.c:267: fb_pattern=fb_pattern<<1;			// naechstes Bit
 	mov	a,_fb_pattern
@@ -1465,12 +1512,12 @@ _T1_int:
 	C$fb_lpc922.c$268$4$18 ==.
 ;	..\fb_lpc922.c:268: if(fb_pattern==0) fb_pattern=129;	// alle Daten-Bits gelesen, Parity-Bit folgt
 	mov	_fb_pattern,a
-	jz	00362$
-	ljmp	00254$
-00362$:
+	jz	00364$
+	ljmp	00256$
+00364$:
 	mov	_fb_pattern,#0x81
-	ljmp	00254$
-00182$:
+	ljmp	00256$
+00184$:
 	C$fb_lpc922.c$271$4$20 ==.
 ;	..\fb_lpc922.c:271: TR1=0;
 	clr	_TCON_6
@@ -1480,33 +1527,33 @@ _T1_int:
 	C$fb_lpc922.c$273$4$20 ==.
 ;	..\fb_lpc922.c:273: if(fb_parity==fbrx_bit) {				// Parity-Bit OK
 	mov	c,_fb_parity
-	jb	b0,00363$
+	jb	b0,00365$
 	cpl	c
-00363$:
-	jnc	00166$
+00365$:
+	jnc	00168$
 	C$fb_lpc922.c$274$5$21 ==.
 ;	..\fb_lpc922.c:274: if (telpos==0) {						// erstes empfangenes Byte
 	mov	a,_telpos
-	jnz	00160$
+	jnz	00162$
 	C$fb_lpc922.c$275$6$22 ==.
 ;	..\fb_lpc922.c:275: if (fbrx_byte==0xCC) ack=1;				// ACK empfangen
 	mov	a,#0xCC
-	cjne	a,_fbrx_byte,00156$
+	cjne	a,_fbrx_byte,00158$
 	setb	_ack
-00156$:
+00158$:
 	C$fb_lpc922.c$276$6$22 ==.
 ;	..\fb_lpc922.c:276: if (fbrx_byte==0x0C) nack=1;			// NACK empfangen
 	mov	a,#0x0C
-	cjne	a,_fbrx_byte,00160$
+	cjne	a,_fbrx_byte,00162$
 	setb	_nack
-00160$:
+00162$:
 	C$fb_lpc922.c$278$5$21 ==.
 ;	..\fb_lpc922.c:278: if (!ack && !nack && telpos<=22) {			// Datenbyte empfangen, pointer auf Arraygroesse begrenzen
-	jb	_ack,00167$
-	jb	_nack,00167$
+	jb	_ack,00169$
+	jb	_nack,00169$
 	mov	a,_telpos
 	add	a,#0xff - 0x16
-	jc	00167$
+	jc	00169$
 	C$fb_lpc922.c$279$6$23 ==.
 ;	..\fb_lpc922.c:279: telegramm[telpos]=fbrx_byte;			// Byte speichern
 	mov	a,_telpos
@@ -1520,23 +1567,23 @@ _T1_int:
 	C$fb_lpc922.c$281$6$23 ==.
 ;	..\fb_lpc922.c:281: telpos++;								// Telegrammzeiger erhoehen
 	inc	_telpos
-	sjmp	00167$
-00166$:
+	sjmp	00169$
+00168$:
 	C$fb_lpc922.c$284$4$20 ==.
 ;	..\fb_lpc922.c:284: else parity_ok=0;						// Parity Error
 	clr	_parity_ok
-00167$:
+00169$:
 	C$fb_lpc922.c$286$4$20 ==.
 ;	..\fb_lpc922.c:286: if (wait_for_ack) {						// es wird ein ACK erwartet
 	C$fb_lpc922.c$287$5$24 ==.
 ;	..\fb_lpc922.c:287: wait_for_ack=0;							// Flag zurücksetzen, da wir es ja gerade abarbeiten
-	jbc	_wait_for_ack,00373$
-	sjmp	00179$
-00373$:
+	jbc	_wait_for_ack,00375$
+	sjmp	00181$
+00375$:
 	C$fb_lpc922.c$288$5$24 ==.
 ;	..\fb_lpc922.c:288: if (ack && parity_ok) {					// ACK empfangen und auch erwartet
-	jnb	_ack,00171$
-	jnb	_parity_ok,00171$
+	jnb	_ack,00173$
+	jnb	_parity_ok,00173$
 	C$fb_lpc922.c$289$6$25 ==.
 ;	..\fb_lpc922.c:289: repeat_count=4;						// keine Wiederholtelegramme mehr senden
 	mov	_repeat_count,#0x04
@@ -1544,9 +1591,9 @@ _T1_int:
 ;	..\fb_lpc922.c:293: if(inc_pcount) {
 	C$fb_lpc922.c$294$7$26 ==.
 ;	..\fb_lpc922.c:294: inc_pcount=0;
-	jbc	_inc_pcount,00376$
-	sjmp	00171$
-00376$:
+	jbc	_inc_pcount,00378$
+	sjmp	00173$
+00378$:
 	C$fb_lpc922.c$295$7$26 ==.
 ;	..\fb_lpc922.c:295: pcount+=4;
 	mov	a,_pcount
@@ -1555,19 +1602,19 @@ _T1_int:
 	C$fb_lpc922.c$296$7$26 ==.
 ;	..\fb_lpc922.c:296: pcount&=0x3C;
 	anl	_pcount,#0x3C
-00171$:
+00173$:
 	C$fb_lpc922.c$299$5$24 ==.
 ;	..\fb_lpc922.c:299: init_rx(0);
 	clr	b[0]
 	mov	bits,b
 	lcall	_init_rx
-	ljmp	00254$
-00179$:
+	ljmp	00256$
+00181$:
 	C$fb_lpc922.c$302$5$27 ==.
 ;	..\fb_lpc922.c:302: if (parity_ok && (!ack && !nack)) {		// ganz normales Datenbyte
-	jnb	_parity_ok,00174$
-	jb	_ack,00174$
-	jb	_nack,00174$
+	jnb	_parity_ok,00176$
+	jb	_ack,00176$
+	jb	_nack,00176$
 	C$fb_lpc922.c$303$6$28 ==.
 ;	..\fb_lpc922.c:303: TMOD=(TMOD & 0x0F) +0x10;			// Timer 1 als 16-Bit Timer
 	mov	a,#0x0F
@@ -1589,8 +1636,8 @@ _T1_int:
 	C$fb_lpc922.c$308$6$28 ==.
 ;	..\fb_lpc922.c:308: EX1=1;								// int1 aktiv, falls noch ein Byte kommt
 	setb	_IEN0_2
-	ljmp	00254$
-00174$:
+	ljmp	00256$
+00176$:
 	C$fb_lpc922.c$310$5$27 ==.
 ;	..\fb_lpc922.c:310: else init_rx(0);							// irgendwas empfangen
 	clr	b[0]
@@ -1598,10 +1645,10 @@ _T1_int:
 	lcall	_init_rx
 	C$fb_lpc922.c$314$2$2 ==.
 ;	..\fb_lpc922.c:314: break;
-	ljmp	00254$
+	ljmp	00256$
 	C$fb_lpc922.c$316$2$2 ==.
 ;	..\fb_lpc922.c:316: case 3: // T=104us=0us
-00187$:
+00189$:
 	C$fb_lpc922.c$317$2$2 ==.
 ;	..\fb_lpc922.c:317: TH1=128;// reload auf 35Âµs (Zeit zwischen State 2 und 3)
 	mov	_TH1,#0x80
@@ -1610,18 +1657,18 @@ _T1_int:
 	mov	_fb_state,#0x02
 	C$fb_lpc922.c$319$2$2 ==.
 ;	..\fb_lpc922.c:319: break;
-	ljmp	00254$
+	ljmp	00256$
 	C$fb_lpc922.c$321$2$2 ==.
 ;	..\fb_lpc922.c:321: case 4:	//	Timeout, d.h. Telegramm-Ende
-00188$:
+00190$:
 	C$fb_lpc922.c$322$2$2 ==.
 ;	..\fb_lpc922.c:322: if (auto_ack && telpos>7) {//>4		// wenn ACK/NACK gesendet werden soll und Telegramm zumindest 7 Bytes hat, da sonst ein NACK wenig Sinn macht
-	jb	_auto_ack,00380$
-	ljmp	00206$
-00380$:
+	jb	_auto_ack,00382$
+	ljmp	00208$
+00382$:
 	mov	a,_telpos
 	add	a,#0xff - 0x07
-	jnc	00206$
+	jnc	00208$
 	C$fb_lpc922.c$323$3$29 ==.
 ;	..\fb_lpc922.c:323: TR1=0;
 	clr	_TCON_6
@@ -1646,7 +1693,7 @@ _T1_int:
 	C$fb_lpc922.c$329$3$29 ==.
 ;	..\fb_lpc922.c:329: if(telegramm[5]&0x80) {
 	mov	a,(_telegramm + 0x0005)
-	jnb	acc.7,00198$
+	jnb	acc.7,00200$
 	C$fb_lpc922.c$330$4$30 ==.
 ;	..\fb_lpc922.c:330: if (gapos_in_gat(telegramm[3],telegramm[4])!=0xFF) its_me=1;	// Gruppenadresse
 	mov	dpl,(_telegramm + 0x0003)
@@ -1654,38 +1701,38 @@ _T1_int:
 	lcall	_gapos_in_gat
 	mov	r7,dpl
 	dec	sp
-	cjne	r7,#0xFF,00383$
-	sjmp	00190$
-00383$:
+	cjne	r7,#0xFF,00385$
+	sjmp	00192$
+00385$:
 	setb	_its_me
-00190$:
+00192$:
 	C$fb_lpc922.c$331$4$30 ==.
 ;	..\fb_lpc922.c:331: if (telegramm[3]==0 && telegramm[4]==0) its_me=1;				// Broadcast
 	mov	a,(_telegramm + 0x0003)
-	jnz	00199$
+	jnz	00201$
 	mov	a,(_telegramm + 0x0004)
-	jnz	00199$
+	jnz	00201$
 	setb	_its_me
-	sjmp	00199$
-00198$:
+	sjmp	00201$
+00200$:
 	C$fb_lpc922.c$333$3$29 ==.
 ;	..\fb_lpc922.c:333: else if(telegramm[3]==eeprom[ADDRTAB+1] && telegramm[4]==eeprom[ADDRTAB+2]) its_me=1;	// phys. Adresse
 	mov	dptr,#(_eeprom + 0x0017)
 	clr	a
 	movc	a,@a+dptr
 	mov	r7,a
-	cjne	a,(_telegramm + 0x0003),00199$
+	cjne	a,(_telegramm + 0x0003),00201$
 	mov	dptr,#(_eeprom + 0x0018)
 	clr	a
 	movc	a,@a+dptr
 	mov	r7,a
-	cjne	a,(_telegramm + 0x0004),00199$
+	cjne	a,(_telegramm + 0x0004),00201$
 	setb	_its_me
-00199$:
+00201$:
 	C$fb_lpc922.c$336$3$29 ==.
 ;	..\fb_lpc922.c:336: if ((cs==0xFF)&&((telegramm[5]&0x0F)+8)== (telpos))
 	mov	a,#0xFF
-	cjne	a,_cs,00203$
+	cjne	a,_cs,00205$
 	mov	a,#0x0F
 	anl	a,(_telegramm + 0x0005)
 	mov	r7,a
@@ -1699,22 +1746,22 @@ _T1_int:
 	mov	r4,_telpos
 	mov	r5,#0x00
 	mov	a,r7
-	cjne	a,ar4,00203$
+	cjne	a,ar4,00205$
 	mov	a,r6
-	cjne	a,ar5,00203$
+	cjne	a,ar5,00205$
 	C$fb_lpc922.c$338$4$31 ==.
 ;	..\fb_lpc922.c:338: telegramm_ok=1;
 	setb	_telegramm_ok
 	C$fb_lpc922.c$339$4$31 ==.
 ;	..\fb_lpc922.c:339: if(its_me)tel_arrived=1;//&&(telegramm[5]&0x0F== telpos-8)
-	jnb	_its_me,00203$
+	jnb	_its_me,00205$
 	setb	_tel_arrived
-00203$:
+00205$:
 	C$fb_lpc922.c$341$3$29 ==.
 ;	..\fb_lpc922.c:341: fb_state=5;					// naechster state: ACK-Position erreicht
 	mov	_fb_state,#0x05
-	ljmp	00254$
-00206$:
+	ljmp	00256$
+00208$:
 	C$fb_lpc922.c$346$3$32 ==.
 ;	..\fb_lpc922.c:346: init_rx(1);						// wieder in den Empfang zurück
 	setb	b[0]
@@ -1722,19 +1769,19 @@ _T1_int:
 	lcall	_init_rx
 	C$fb_lpc922.c$348$2$2 ==.
 ;	..\fb_lpc922.c:348: break;
-	ljmp	00254$
+	ljmp	00256$
 	C$fb_lpc922.c$350$2$2 ==.
 ;	..\fb_lpc922.c:350: case 5:	// ACK-Position erreicht
-00209$:
+00211$:
 	C$fb_lpc922.c$351$2$2 ==.
 ;	..\fb_lpc922.c:351: TR1=0;
 	clr	_TCON_6
 	C$fb_lpc922.c$352$2$2 ==.
 ;	..\fb_lpc922.c:352: if (telegramm_ok) {	// Checksum und Laenge OK
-	jnb	_telegramm_ok,00214$
+	jnb	_telegramm_ok,00216$
 	C$fb_lpc922.c$353$3$33 ==.
 ;	..\fb_lpc922.c:353: if (its_me) {					// Gerät adressiert
-	jnb	_its_me,00211$
+	jnb	_its_me,00213$
 	C$fb_lpc922.c$354$4$34 ==.
 ;	..\fb_lpc922.c:354: send_ack=1;
 	setb	_send_ack
@@ -1746,15 +1793,15 @@ _T1_int:
 	C$fb_lpc922.c$356$4$34 ==.
 ;	..\fb_lpc922.c:356: wait_for_ack=0;					// bei ACK senden nicht erneut auf ACK warten
 	clr	_wait_for_ack
-	ljmp	00254$
-00211$:
+	ljmp	00256$
+00213$:
 	C$fb_lpc922.c$358$3$33 ==.
 ;	..\fb_lpc922.c:358: else init_rx(0);					// Gerät nicht adressiert, also zurück zu Empfang
 	clr	b[0]
 	mov	bits,b
 	lcall	_init_rx
-	ljmp	00254$
-00214$:
+	ljmp	00256$
+00216$:
 	C$fb_lpc922.c$361$3$35 ==.
 ;	..\fb_lpc922.c:361: send_nack=1;
 	setb	_send_nack
@@ -1768,10 +1815,10 @@ _T1_int:
 	clr	_wait_for_ack
 	C$fb_lpc922.c$365$2$2 ==.
 ;	..\fb_lpc922.c:365: break;
-	ljmp	00254$
+	ljmp	00256$
 	C$fb_lpc922.c$367$2$2 ==.
 ;	..\fb_lpc922.c:367: case 9:
-00216$:
+00218$:
 	C$fb_lpc922.c$368$2$2 ==.
 ;	..\fb_lpc922.c:368: TR1=0;			// Timer 1 stoppen
 	clr	_TCON_6
@@ -1798,7 +1845,7 @@ _T1_int:
 	mov	_fb_state,#0x0A
 	C$fb_lpc922.c$377$2$2 ==.
 ;	..\fb_lpc922.c:377: case 10:	// Byte Senden, T=0us
-00217$:
+00219$:
 	C$fb_lpc922.c$378$2$2 ==.
 ;	..\fb_lpc922.c:378: send_byte=telegramm[telpos];
 	mov	a,_telpos
@@ -1807,35 +1854,35 @@ _T1_int:
 	mov	ar7,@r1
 	C$fb_lpc922.c$379$2$2 ==.
 ;	..\fb_lpc922.c:379: if (send_ack) send_byte=0xCC;
-	jnb	_send_ack,00219$
+	jnb	_send_ack,00221$
 	mov	r7,#0xCC
-00219$:
+00221$:
 	C$fb_lpc922.c$380$2$2 ==.
 ;	..\fb_lpc922.c:380: if (send_nack) send_byte=0x0C;
-	jnb	_send_nack,00221$
+	jnb	_send_nack,00223$
 	mov	r7,#0x0C
-00221$:
+00223$:
 	C$fb_lpc922.c$381$2$2 ==.
 ;	..\fb_lpc922.c:381: EX1=0;					// Empfang verhindern
 	clr	_IEN0_2
 	C$fb_lpc922.c$382$2$2 ==.
 ;	..\fb_lpc922.c:382: if(fb_state==10){
 	mov	a,#0x0A
-	cjne	a,_fb_state,00399$
-	sjmp	00400$
-00399$:
-	ljmp	00254$
-00400$:
+	cjne	a,_fb_state,00401$
+	sjmp	00402$
+00401$:
+	ljmp	00256$
+00402$:
 	C$fb_lpc922.c$383$3$36 ==.
 ;	..\fb_lpc922.c:383: if (fb_pattern<=128) {			// Startbit und Datenbits (pattern=0:startbit, 1 2 4 8 .. 128 Datenbits, 129 parity)
 	mov	a,_fb_pattern
 	add	a,#0xff - 0x80
-	jc	00234$
+	jc	00236$
 	C$fb_lpc922.c$384$4$37 ==.
 ;	..\fb_lpc922.c:384: if ((send_byte & fb_pattern)==0) {	// wenn Bit logisch 0 ist
 	mov	a,_fb_pattern
 	anl	a,r7
-	jnz	00223$
+	jnz	00225$
 	C$fb_lpc922.c$386$5$38 ==.
 ;	..\fb_lpc922.c:386: FBOUTC=1;						// Bus runter ziehen
 	setb	_P1_6
@@ -1845,56 +1892,56 @@ _T1_int:
 	C$fb_lpc922.c$389$5$38 ==.
 ;	..\fb_lpc922.c:389: fb_parity=!fb_parity;			// Parity-Bit berechnen
 	cpl	_fb_parity
-	sjmp	00224$
-00223$:
+	sjmp	00226$
+00225$:
 	C$fb_lpc922.c$391$4$37 ==.
 ;	..\fb_lpc922.c:391: else fbtx_bit=1;
 	setb	_fbtx_bit
-00224$:
+00226$:
 	C$fb_lpc922.c$392$4$37 ==.
 ;	..\fb_lpc922.c:392: if (fb_pattern==0) {				// wenn Startbit: parity zuruecksetzen
 	mov	a,_fb_pattern
-	jnz	00226$
+	jnz	00228$
 	C$fb_lpc922.c$393$5$39 ==.
 ;	..\fb_lpc922.c:393: fb_pattern=1;					// auf erstes Datenbit zeigen
 	mov	_fb_pattern,#0x01
 	C$fb_lpc922.c$394$5$39 ==.
 ;	..\fb_lpc922.c:394: fb_parity=0;
 	clr	_fb_parity
-	sjmp	00227$
-00226$:
+	sjmp	00229$
+00228$:
 	C$fb_lpc922.c$396$4$37 ==.
 ;	..\fb_lpc922.c:396: else fb_pattern=fb_pattern<<1;		// naechstes Datenbit
 	mov	a,_fb_pattern
 	add	a,_fb_pattern
 	mov	_fb_pattern,a
-00227$:
+00229$:
 	C$fb_lpc922.c$397$4$37 ==.
 ;	..\fb_lpc922.c:397: if(fb_pattern==0) fb_pattern=129;	// alle Daten-Bits gesendet, Parity-Bit folgt
 	mov	a,_fb_pattern
-	jnz	00229$
+	jnz	00231$
 	mov	_fb_pattern,#0x81
-00229$:
+00231$:
 	C$fb_lpc922.c$398$4$37 ==.
 ;	..\fb_lpc922.c:398: fb_state=11;
 	mov	_fb_state,#0x0B
-	sjmp	00235$
-00234$:
+	sjmp	00237$
+00236$:
 	C$fb_lpc922.c$401$4$40 ==.
 ;	..\fb_lpc922.c:401: if (!fb_parity) {				// wenn Parity-Bit logisch 0
-	jb	_fb_parity,00231$
+	jb	_fb_parity,00233$
 	C$fb_lpc922.c$402$5$41 ==.
 ;	..\fb_lpc922.c:402: FBOUTC=1;						// Bus runterziehen
 	setb	_P1_6
 	C$fb_lpc922.c$403$5$41 ==.
 ;	..\fb_lpc922.c:403: fbtx_bit=0;						// fbtx_bit dient zur spaeteren Kollisionspruefung
 	clr	_fbtx_bit
-	sjmp	00232$
-00231$:
+	sjmp	00234$
+00233$:
 	C$fb_lpc922.c$405$4$40 ==.
 ;	..\fb_lpc922.c:405: else fbtx_bit=1;
 	setb	_fbtx_bit
-00232$:
+00234$:
 	C$fb_lpc922.c$406$4$40 ==.
 ;	..\fb_lpc922.c:406: telpos++;					// naechstes Byte
 	inc	_telpos
@@ -1904,26 +1951,26 @@ _T1_int:
 	C$fb_lpc922.c$408$4$40 ==.
 ;	..\fb_lpc922.c:408: fb_state=13;				// Pruefen ob Telegramm fertig
 	mov	_fb_state,#0x0D
-00235$:
+00237$:
 	C$fb_lpc922.c$410$3$36 ==.
 ;	..\fb_lpc922.c:410: TH1=18; //reload 70µ -delay interrupt (von state 11 auf 13)
 	mov	_TH1,#0x12
 	C$fb_lpc922.c$412$2$2 ==.
 ;	..\fb_lpc922.c:412: break;
-	ljmp	00254$
+	ljmp	00256$
 	C$fb_lpc922.c$414$2$2 ==.
 ;	..\fb_lpc922.c:414: case 11:	// Sendestufe aus, T=35us
-00238$:
+00240$:
 	C$fb_lpc922.c$415$2$2 ==.
 ;	..\fb_lpc922.c:415: if(telpos==0 && fb_pattern==1) {	// 1. Byte Startbit
 	mov	a,_telpos
-	jnz	00240$
+	jnz	00242$
 	mov	a,#0x01
-	cjne	a,_fb_pattern,00240$
+	cjne	a,_fb_pattern,00242$
 	C$fb_lpc922.c$416$3$42 ==.
 ;	..\fb_lpc922.c:416: repeat_count++;		// angefangener Sendeversuch, also Zaehler erhoehen
 	inc	_repeat_count
-00240$:
+00242$:
 	C$fb_lpc922.c$418$2$2 ==.
 ;	..\fb_lpc922.c:418: FBOUTC=0;				// Sendestufe aus
 	clr	_P1_6
@@ -1931,7 +1978,7 @@ _T1_int:
 ;	..\fb_lpc922.c:419: if (fbtx_bit & IE1) {	// Kollision
 	mov	c,_fbtx_bit
 	anl	c,_TCON_3
-	jnc	00243$
+	jnc	00245$
 	C$fb_lpc922.c$420$3$43 ==.
 ;	..\fb_lpc922.c:420: wait_for_ack=0;
 	clr	_wait_for_ack
@@ -1940,15 +1987,15 @@ _T1_int:
 	clr	b[0]
 	mov	bits,b
 	lcall	_init_rx
-	sjmp	00244$
-00243$:
+	sjmp	00246$
+00245$:
 	C$fb_lpc922.c$424$3$44 ==.
 ;	..\fb_lpc922.c:424: fb_state=10;//12;
 	mov	_fb_state,#0x0A
 	C$fb_lpc922.c$425$3$44 ==.
 ;	..\fb_lpc922.c:425: TH1=110;// 35Âµs + delay (von state 10 auf 11)
 	mov	_TH1,#0x6E
-00244$:
+00246$:
 	C$fb_lpc922.c$427$2$2 ==.
 ;	..\fb_lpc922.c:427: IE1=0;					// Flipflop loeschen
 	clr	_TCON_3
@@ -1956,8 +2003,8 @@ _T1_int:
 ;	..\fb_lpc922.c:428: break;
 	C$fb_lpc922.c$434$2$2 ==.
 ;	..\fb_lpc922.c:434: case 13:	// Byte uebertragen, T=35us, pruefen ob Telegramm fertig
-	sjmp	00254$
-00245$:
+	sjmp	00256$
+00247$:
 	C$fb_lpc922.c$435$2$2 ==.
 ;	..\fb_lpc922.c:435: FBOUTC=0;
 	clr	_P1_6
@@ -1981,16 +2028,16 @@ _T1_int:
 	setb	_TCON_6
 	C$fb_lpc922.c$441$2$2 ==.
 ;	..\fb_lpc922.c:441: if (send_ack || send_nack) {	// ACK/NACK senden
-	jb	_send_ack,00249$
-	jnb	_send_nack,00250$
-00249$:
+	jb	_send_ack,00251$
+	jnb	_send_nack,00252$
+00251$:
 	C$fb_lpc922.c$442$3$45 ==.
 ;	..\fb_lpc922.c:442: init_rx(0);					// ACK senden abgeschlossen, also statemachine auf Anfang
 	clr	b[0]
 	mov	bits,b
 	lcall	_init_rx
-	sjmp	00251$
-00250$:
+	sjmp	00253$
+00252$:
 	C$fb_lpc922.c$445$3$46 ==.
 ;	..\fb_lpc922.c:445: if (telpos>((telegramm[5]&0x0F)+7)) {		// Telegramm fertig gesendet
 	mov	a,#0x0F
@@ -2013,7 +2060,7 @@ _T1_int:
 	mov	b,r5
 	xrl	b,#0x80
 	subb	a,b
-	jnc	00247$
+	jnc	00249$
 	C$fb_lpc922.c$446$4$47 ==.
 ;	..\fb_lpc922.c:446: tel_sent=1;
 	setb	_tel_sent
@@ -2022,12 +2069,12 @@ _T1_int:
 	setb	b[0]
 	mov	bits,b
 	lcall	_init_rx
-	sjmp	00251$
-00247$:
+	sjmp	00253$
+00249$:
 	C$fb_lpc922.c$449$3$46 ==.
 ;	..\fb_lpc922.c:449: else fb_state=14;		// naechstes Byte: Interbyte Abstand einhalten
 	mov	_fb_state,#0x0E
-00251$:
+00253$:
 	C$fb_lpc922.c$451$2$2 ==.
 ;	..\fb_lpc922.c:451: IE1=0;
 	clr	_TCON_3
@@ -2035,8 +2082,8 @@ _T1_int:
 ;	..\fb_lpc922.c:452: break;
 	C$fb_lpc922.c$454$2$2 ==.
 ;	..\fb_lpc922.c:454: case 14:	// Interbyte Abstand erreicht (=Stopbit + 2 Bit)
-	sjmp	00254$
-00253$:
+	sjmp	00256$
+00255$:
 	C$fb_lpc922.c$455$2$2 ==.
 ;	..\fb_lpc922.c:455: TR1=0;
 	clr	_TCON_6
@@ -2063,7 +2110,7 @@ _T1_int:
 	mov	_fb_state,#0x0A
 	C$fb_lpc922.c$466$1$1 ==.
 ;	..\fb_lpc922.c:466: }
-00254$:
+00256$:
 	C$fb_lpc922.c$467$1$1 ==.
 ;	..\fb_lpc922.c:467: interrupted=1;			// zeigt der app, dass sie unterbrochen wurde
 	setb	_interrupted
@@ -2129,13 +2176,13 @@ _init_rx:
 ;	..\fb_lpc922.c:481: if(longwait){
 	jnb	b0,00102$
 	C$fb_lpc922.c$482$2$2 ==.
-;	..\fb_lpc922.c:482: TH1=0x89;					// busfree Zeit = 15 Bit (auf ACK) + 11 Bit (ACK) + 53 Bit
-	mov	_TH1,#0x89
+;	..\fb_lpc922.c:482: TH1=0x8E;					// busfree Zeit = 15 Bit (auf ACK) + 11 Bit (ACK) + 50 Bit
+	mov	_TH1,#0x8E
 	sjmp	00103$
 00102$:
 	C$fb_lpc922.c$485$2$3 ==.
-;	..\fb_lpc922.c:485: TH1=0xB0;					// busfree Zeit =  53 Bit
-	mov	_TH1,#0xB0
+;	..\fb_lpc922.c:485: TH1=0xB5;					// busfree Zeit =  50 Bit
+	mov	_TH1,#0xB5
 00103$:
 	C$fb_lpc922.c$487$1$1 ==.
 ;	..\fb_lpc922.c:487: TL1=0xAF;
@@ -2492,22 +2539,23 @@ _process_tel:
 	mov	r6,a
 	C$fb_lpc922.c$588$1$1 ==.
 ;	..\fb_lpc922.c:588: apdu=telegramm[7];
+	mov	r5,(_telegramm + 0x0007)
 	mov	r0,_bp
 	inc	r0
-	mov	@r0,(_telegramm + 0x0007)
+	mov	@r0,ar5
 	C$fb_lpc922.c$591$1$1 ==.
 ;	..\fb_lpc922.c:591: if(telegramm[3]==0 && telegramm[4]==0) {	// nur wenn wenn Zieladresse = 0
 	mov	a,(_telegramm + 0x0003)
-	mov	r4,a
-	jnz	00169$
+	mov	r3,a
+	jnz	00170$
 	mov	a,(_telegramm + 0x0004)
-	jnz	00169$
+	jnz	00170$
 	C$fb_lpc922.c$592$2$2 ==.
 ;	..\fb_lpc922.c:592: if(status60 & 0x01) {					// und nur im prog mode
 	mov	a,_status60
-	jb	acc.0,00222$
-	ljmp	00176$
-00222$:
+	jb	acc.0,00224$
+	ljmp	00177$
+00224$:
 	C$fb_lpc922.c$593$3$3 ==.
 ;	..\fb_lpc922.c:593: if(tpdu==BROADCAST_PDU_SET_PA_REQ && apdu==SET_PHYSADDR_REQUEST) //set_pa();				// 00000000 11000000
 	mov	a,r6
@@ -2547,77 +2595,100 @@ _process_tel:
 00105$:
 	C$fb_lpc922.c$611$3$3 ==.
 ;	..\fb_lpc922.c:611: if(tpdu==BROADCAST_PDU_READ_PA && apdu==READ_PHYSADDR_REQUEST) send_obj_value(READ_PHYSADDR_RESPONSE);	// 00000001 00000000
-	cjne	r6,#0x01,00227$
-	sjmp	00228$
-00227$:
-	ljmp	00176$
-00228$:
+	cjne	r6,#0x01,00229$
+	sjmp	00230$
+00229$:
+	ljmp	00177$
+00230$:
 	mov	r0,_bp
 	inc	r0
 	mov	a,@r0
-	jz	00229$
-	ljmp	00176$
-00229$:
+	jz	00231$
+	ljmp	00177$
+00231$:
 	mov	dpl,#0x83
 	lcall	_send_obj_value
-	ljmp	00176$
-00169$:
+	ljmp	00177$
+00170$:
 	C$fb_lpc922.c$616$2$5 ==.
 ;	..\fb_lpc922.c:616: if((telegramm[5]&0x80)==0x00) {	// Destination Adress Flag Bit 7, 0=phys. Adr., 1=Gruppenadr.
 	mov	a,(_telegramm + 0x0005)
-	jnb	acc.7,00230$
-	ljmp	00166$
-00230$:
+	jnb	acc.7,00232$
+	ljmp	00167$
+00232$:
 	C$fb_lpc922.c$617$3$6 ==.
 ;	..\fb_lpc922.c:617: if(telegramm[3]==eeprom[ADDRTAB+1] && telegramm[4]==eeprom[ADDRTAB+2]) {	// nur wenn es die eigene phys. Adr. ist
 	mov	dptr,#(_eeprom + 0x0017)
 	clr	a
 	movc	a,@a+dptr
-	mov	r3,a
-	mov	a,r4
-	cjne	a,ar3,00231$
-	sjmp	00232$
-00231$:
-	ljmp	00176$
-00232$:
+	mov	r2,a
+	mov	a,r3
+	cjne	a,ar2,00233$
+	sjmp	00234$
+00233$:
+	ljmp	00177$
+00234$:
 	mov	dptr,#(_eeprom + 0x0018)
 	clr	a
 	movc	a,@a+dptr
-	mov	r3,a
-	cjne	a,(_telegramm + 0x0004),00233$
-	sjmp	00234$
-00233$:
-	ljmp	00176$
-00234$:
+	mov	r2,a
+	cjne	a,(_telegramm + 0x0004),00235$
+	sjmp	00236$
+00235$:
+	ljmp	00177$
+00236$:
 	C$fb_lpc922.c$618$4$7 ==.
 ;	..\fb_lpc922.c:618: connected_timeout=0;//wenn ein unicast uns betrifft den timeout ruecksetzen
 	mov	_connected_timeout,#0x00
 	C$fb_lpc922.c$621$4$7 ==.
 ;	..\fb_lpc922.c:621: switch (tpdu) {	// transport layer control field
-	cjne	r6,#0x42,00235$
+	cjne	r6,#0x41,00237$
 	sjmp	00112$
-00235$:
-	cjne	r6,#0x43,00236$
-	ljmp	00130$
-00236$:
-	cjne	r6,#0x80,00237$
-	ljmp	00135$
 00237$:
-	cjne	r6,#0x81,00238$
-	ljmp	00138$
+	cjne	r6,#0x42,00238$
+	sjmp	00113$
 00238$:
-	cjne	r6,#0x83,00239$
-	ljmp	00142$
+	cjne	r6,#0x43,00239$
+	ljmp	00131$
 00239$:
-	ljmp	00176$
+	cjne	r6,#0x80,00240$
+	ljmp	00136$
+00240$:
+	cjne	r6,#0x81,00241$
+	ljmp	00139$
+00241$:
+	cjne	r6,#0x83,00242$
+	ljmp	00143$
+00242$:
+	ljmp	00177$
+	C$fb_lpc922.c$623$5$8 ==.
+;	..\fb_lpc922.c:623: case DATA_PDU_ADC_READ:
+00112$:
+	C$fb_lpc922.c$624$5$8 ==.
+;	..\fb_lpc922.c:624: mem_adrh = telegramm[7];    // Remember ADC Channel, reuse mem_adrh to save ram
+	mov	_mem_adrh,r5
+	C$fb_lpc922.c$625$5$8 ==.
+;	..\fb_lpc922.c:625: mem_adrl = telegramm[8];    // Remember sample count
+	mov	_mem_adrl,(_telegramm + 0x0008)
+	C$fb_lpc922.c$626$5$8 ==.
+;	..\fb_lpc922.c:626: send_obj_value(NCD_ACK_OWN);
+	mov	dpl,#0x87
+	lcall	_send_obj_value
+	C$fb_lpc922.c$627$5$8 ==.
+;	..\fb_lpc922.c:627: send_obj_value(READ_ADC_RESPONSE);
+	mov	dpl,#0x86
+	lcall	_send_obj_value
+	C$fb_lpc922.c$628$5$8 ==.
+;	..\fb_lpc922.c:628: break;
+	ljmp	00177$
 	C$fb_lpc922.c$631$5$8 ==.
 ;	..\fb_lpc922.c:631: case DATA_PDU_MEMORY_OPERATIONS:
-00112$:
+00113$:
 	C$fb_lpc922.c$632$5$8 ==.
 ;	..\fb_lpc922.c:632: if(connected){
-	jb	_connected,00240$
-	ljmp	00176$
-00240$:
+	jb	_connected,00243$
+	ljmp	00177$
+00243$:
 	C$fb_lpc922.c$633$6$9 ==.
 ;	..\fb_lpc922.c:633: senders_pcount=telegramm[6]&0x3C;
 	mov	a,#0x3C
@@ -2634,11 +2705,11 @@ _process_tel:
 ;	..\fb_lpc922.c:635: if(apdu==WRITE_MEMORY_REQUEST) {	// 01pppp10 1000xxxx
 	mov	r0,_bp
 	inc	r0
-	cjne	@r0,#0x80,00241$
-	sjmp	00242$
-00241$:
-	ljmp	00125$
-00242$:
+	cjne	@r0,#0x80,00244$
+	sjmp	00245$
+00244$:
+	ljmp	00126$
+00245$:
 	C$fb_lpc922.c$636$7$10 ==.
 ;	..\fb_lpc922.c:636: send_obj_value(NCD_ACK);
 	mov	dpl,#0x81
@@ -2650,9 +2721,9 @@ _process_tel:
 	mov	r7,a
 	C$fb_lpc922.c$641$8$11 ==.
 ;	..\fb_lpc922.c:641: while(fb_state!=0);					// warten falls noch gesendet wird
-00113$:
+00114$:
 	mov	a,_fb_state
-	jnz	00113$
+	jnz	00114$
 	C$fb_lpc922.c$643$8$11 ==.
 ;	..\fb_lpc922.c:643: EA=0;
 	clr	_IEN0_7
@@ -2665,26 +2736,26 @@ _process_tel:
 	mov	a,#0x01
 	anl	a,r2
 	add	a,#0x1C
-	mov	r4,a
+	mov	r3,a
 	mov	r6,(_telegramm + 0x0009)
 	mov	r0,_bp
 	inc	r0
 	inc	r0
 	mov	@r0,#0x00
-00172$:
+00173$:
 	mov	r0,_bp
 	inc	r0
 	inc	r0
 	clr	c
 	mov	a,@r0
 	subb	a,r7
-	jc	00244$
-	ljmp	00175$
-00244$:
+	jc	00247$
+	ljmp	00176$
+00247$:
 	C$fb_lpc922.c$646$9$12 ==.
 ;	..\fb_lpc922.c:646: if(telegramm[8]==0)
 	mov	a,r2
-	jnz	00119$
+	jnz	00120$
 	C$fb_lpc922.c$648$1$1 ==.
 ;	..\fb_lpc922.c:648: if((telegramm[9]+n)==0x60) status60=telegramm[10+n];
 	push	ar2
@@ -2697,25 +2768,25 @@ _process_tel:
 	mov	r0,_bp
 	inc	r0
 	inc	r0
-	mov	ar3,@r0
+	mov	ar4,@r0
 	mov	r5,#0x00
 	mov	a,_bp
 	add	a,#0x03
 	mov	r0,a
-	mov	a,r3
+	mov	a,r4
 	add	a,@r0
-	mov	r3,a
+	mov	r4,a
 	mov	a,r5
 	inc	r0
 	addc	a,@r0
 	mov	r5,a
-	cjne	r3,#0x60,00246$
-	cjne	r5,#0x00,00246$
-	sjmp	00247$
-00246$:
+	cjne	r4,#0x60,00249$
+	cjne	r5,#0x00,00249$
+	sjmp	00250$
+00249$:
 	pop	ar2
-	sjmp	00120$
-00247$:
+	sjmp	00121$
+00250$:
 	pop	ar2
 	mov	r0,_bp
 	inc	r0
@@ -2725,11 +2796,11 @@ _process_tel:
 	add	a,#_telegramm
 	mov	r1,a
 	mov	_status60,@r1
-	sjmp	00120$
-00119$:
+	sjmp	00121$
+00120$:
 	C$fb_lpc922.c$659$10$14 ==.
 ;	..\fb_lpc922.c:659: WRITE_BYTE(telegramm[8],telegramm[9]+n,telegramm[n+10]);
-	mov	_FMADRH,r4
+	mov	_FMADRH,r3
 	mov	r0,_bp
 	inc	r0
 	inc	r0
@@ -2744,10 +2815,10 @@ _process_tel:
 	add	a,#_telegramm
 	mov	r1,a
 	mov	_FMDATA,@r1
-00120$:
+00121$:
 	C$fb_lpc922.c$661$9$12 ==.
 ;	..\fb_lpc922.c:661: if ((((telegramm[9]+n)&0x3F)==0x3F) && n!=(ab-1)) {		// Ende des 64-Byte Pageregisters, also zwischendurch flashen
-	mov	ar3,r6
+	mov	ar4,r6
 	mov	r5,#0x00
 	mov	r0,_bp
 	inc	r0
@@ -2763,61 +2834,61 @@ _process_tel:
 	add	a,#0x03
 	mov	r0,a
 	mov	a,@r0
-	add	a,r3
-	mov	r3,a
+	add	a,r4
+	mov	r4,a
 	inc	r0
 	mov	a,@r0
 	addc	a,r5
-	anl	ar3,#0x3F
+	anl	ar4,#0x3F
 	mov	r5,#0x00
-	cjne	r3,#0x3F,00174$
-	cjne	r5,#0x00,00174$
-	mov	ar3,r7
+	cjne	r4,#0x3F,00175$
+	cjne	r5,#0x00,00175$
+	mov	ar4,r7
 	mov	r5,#0x00
-	dec	r3
-	cjne	r3,#0xFF,00250$
+	dec	r4
+	cjne	r4,#0xFF,00253$
 	dec	r5
-00250$:
+00253$:
 	mov	a,_bp
 	add	a,#0x03
 	mov	r0,a
 	mov	a,@r0
-	cjne	a,ar3,00251$
+	cjne	a,ar4,00254$
 	inc	r0
 	mov	a,@r0
-	cjne	a,ar5,00251$
-	sjmp	00174$
-00251$:
+	cjne	a,ar5,00254$
+	sjmp	00175$
+00254$:
 	C$fb_lpc922.c$662$10$15 ==.
 ;	..\fb_lpc922.c:662: STOP_WRITECYCLE;			// write command, schreibt pageregister ins flash und versetzt CPU in idle fuer 4ms
 	mov	_FMCON,#0x68
 	C$fb_lpc922.c$663$10$15 ==.
 ;	..\fb_lpc922.c:663: START_WRITECYCLE;		// load command, leert das pageregister
 	mov	_FMCON,#0x00
-00174$:
+00175$:
 	C$fb_lpc922.c$645$8$11 ==.
 ;	..\fb_lpc922.c:645: for(n=0;n<ab;n++) {
 	mov	r0,_bp
 	inc	r0
 	inc	r0
 	inc	@r0
-	ljmp	00172$
-00175$:
+	ljmp	00173$
+00176$:
 	C$fb_lpc922.c$666$8$11 ==.
 ;	..\fb_lpc922.c:666: STOP_WRITECYCLE;					// write command, schreibt pageregister ins flash und versetzt CPU in idle fuer 4ms
 	mov	_FMCON,#0x68
 	C$fb_lpc922.c$667$8$11 ==.
 ;	..\fb_lpc922.c:667: EA=1;
 	setb	_IEN0_7
-00125$:
+00126$:
 	C$fb_lpc922.c$670$6$9 ==.
 ;	..\fb_lpc922.c:670: if(apdu==READ_MEMORY_REQUEST) {		// 01pppp10 0000xxxx
 	mov	r0,_bp
 	inc	r0
 	mov	a,@r0
-	jz	00252$
-	ljmp	00176$
-00252$:
+	jz	00255$
+	ljmp	00177$
+00255$:
 	C$fb_lpc922.c$671$7$16 ==.
 ;	..\fb_lpc922.c:671: mem_length=telegramm[7];		// Anzahl Bytes fuer spaeteres(!) memory Auslesen
 	mov	_mem_length,(_telegramm + 0x0007)
@@ -2837,10 +2908,10 @@ _process_tel:
 	lcall	_send_obj_value
 	C$fb_lpc922.c$678$5$8 ==.
 ;	..\fb_lpc922.c:678: break;
-	ljmp	00176$
+	ljmp	00177$
 	C$fb_lpc922.c$680$5$8 ==.
 ;	..\fb_lpc922.c:680: case DATA_PDU_MISC_OPERATIONS:
-00130$:
+00131$:
 	C$fb_lpc922.c$681$5$8 ==.
 ;	..\fb_lpc922.c:681: senders_pcount=telegramm[6]&0x3C;
 	mov	a,#0x3C
@@ -2850,19 +2921,19 @@ _process_tel:
 ;	..\fb_lpc922.c:682: if(apdu==RESTART_REQUEST) {		// 01pppp11 10000000
 	mov	r0,_bp
 	inc	r0
-	cjne	@r0,#0x80,00132$
+	cjne	@r0,#0x80,00133$
 	C$fb_lpc922.c$683$6$17 ==.
 ;	..\fb_lpc922.c:683: AUXR1|=0x08;				// Software Reset
 	orl	_AUXR1,#0x08
-00132$:
+00133$:
 	C$fb_lpc922.c$685$5$8 ==.
 ;	..\fb_lpc922.c:685: if(apdu==READ_MASK_VERSION_REQUEST) {		// 01pppp11 00000000
 	mov	r0,_bp
 	inc	r0
 	mov	a,@r0
-	jz	00255$
-	ljmp	00176$
-00255$:
+	jz	00258$
+	ljmp	00177$
+00258$:
 	C$fb_lpc922.c$686$6$18 ==.
 ;	..\fb_lpc922.c:686: send_obj_value(NCD_ACK);
 	mov	dpl,#0x81
@@ -2873,15 +2944,15 @@ _process_tel:
 	lcall	_send_obj_value
 	C$fb_lpc922.c$689$5$8 ==.
 ;	..\fb_lpc922.c:689: break;
-	ljmp	00176$
+	ljmp	00177$
 	C$fb_lpc922.c$691$5$8 ==.
 ;	..\fb_lpc922.c:691: case CONNECT_PDU:	// 10000000 xxxxxxxx
-00135$:
+00136$:
 	C$fb_lpc922.c$692$5$8 ==.
 ;	..\fb_lpc922.c:692: if(!connected) {				// wenn bereits verbunden: ignorieren
-	jnb	_connected,00256$
-	ljmp	00176$
-00256$:
+	jnb	_connected,00259$
+	ljmp	00177$
+00259$:
 	C$fb_lpc922.c$693$6$19 ==.
 ;	..\fb_lpc922.c:693: connected=1;
 	setb	_connected
@@ -2911,33 +2982,33 @@ _process_tel:
 	mov	_RTCCON,#0x61
 	C$fb_lpc922.c$704$5$8 ==.
 ;	..\fb_lpc922.c:704: break;
-	ljmp	00176$
+	ljmp	00177$
 	C$fb_lpc922.c$706$5$8 ==.
 ;	..\fb_lpc922.c:706: case DISCONNECT_PDU:	// 10000001 xxxxxxxx
-00138$:
+00139$:
 	C$fb_lpc922.c$707$5$8 ==.
 ;	..\fb_lpc922.c:707: if(conh==telegramm[1] && conl==telegramm[2] )	{	// nur abbauen, wenn verbunden und Anforderung vom Verbindungspartner, kein ACK senden
 	mov	a,(_telegramm + 0x0001)
-	cjne	a,_conh,00257$
-	sjmp	00258$
-00257$:
-	ljmp	00176$
-00258$:
-	mov	a,(_telegramm + 0x0002)
-	cjne	a,_conl,00259$
-	sjmp	00260$
-00259$:
-	ljmp	00176$
+	cjne	a,_conh,00260$
+	sjmp	00261$
 00260$:
+	ljmp	00177$
+00261$:
+	mov	a,(_telegramm + 0x0002)
+	cjne	a,_conl,00262$
+	sjmp	00263$
+00262$:
+	ljmp	00177$
+00263$:
 	C$fb_lpc922.c$708$6$20 ==.
 ;	..\fb_lpc922.c:708: connected=0;// warum: && connected ???
 	clr	_connected
 	C$fb_lpc922.c$710$5$8 ==.
 ;	..\fb_lpc922.c:710: break;
-	ljmp	00176$
+	ljmp	00177$
 	C$fb_lpc922.c$712$5$8 ==.
 ;	..\fb_lpc922.c:712: case NACK_PDU:	// 11pppp11 xxxxxxxx
-00142$:
+00143$:
 	C$fb_lpc922.c$713$5$8 ==.
 ;	..\fb_lpc922.c:713: send_obj_value(T_DISCONNECT);
 	mov	dpl,#0x85
@@ -2947,26 +3018,26 @@ _process_tel:
 	clr	_connected
 	C$fb_lpc922.c$716$1$5 ==.
 ;	..\fb_lpc922.c:716: }
-	ljmp	00176$
-00166$:
+	ljmp	00177$
+00167$:
 	C$fb_lpc922.c$721$2$5 ==.
 ;	..\fb_lpc922.c:721: else if(tpdu==GROUP_PDU){
 	mov	a,r6
-	jz	00261$
-	ljmp	00176$
-00261$:
+	jz	00264$
+	ljmp	00177$
+00264$:
 	C$fb_lpc922.c$726$3$21 ==.
 ;	..\fb_lpc922.c:726: gapos = gapos_in_gat(telegramm[3], telegramm[4]);
 	push	(_telegramm + 0x0004)
-	mov	dpl,r4
+	mov	dpl,r3
 	lcall	_gapos_in_gat
 	mov	r7,dpl
 	dec	sp
 	C$fb_lpc922.c$728$3$21 ==.
 ;	..\fb_lpc922.c:728: if (gapos != 0xFF)
-	cjne	r7,#0xFF,00262$
-	ljmp	00176$
-00262$:
+	cjne	r7,#0xFF,00265$
+	ljmp	00177$
+00265$:
 	C$fb_lpc922.c$730$4$22 ==.
 ;	..\fb_lpc922.c:730: atp = eeprom[ASSOCTABPTR];  // Association Table Pointer
 	mov	dptr,#(_eeprom + 0x0011)
@@ -2991,17 +3062,17 @@ _process_tel:
 	anl	a,@r0
 	mov	r4,a
 	clr	a
-	cjne	r4,#0x80,00263$
+	cjne	r4,#0x80,00266$
 	inc	a
-00263$:
+00266$:
 	mov	r4,a
-00157$:
+00158$:
 	clr	c
 	mov	a,r6
 	subb	a,r5
-	jc	00265$
-	ljmp	00176$
-00265$:
+	jc	00268$
+	ljmp	00177$
+00268$:
 	C$fb_lpc922.c$739$5$23 ==.
 ;	..\fb_lpc922.c:739: if (gapos == eeprom[asspos])
 	mov	dpl,r6
@@ -3010,7 +3081,7 @@ _process_tel:
 	movc	a,@a+dptr
 	mov	r3,a
 	mov	a,r7
-	cjne	a,ar3,00159$
+	cjne	a,ar3,00160$
 	C$fb_lpc922.c$741$6$24 ==.
 ;	..\fb_lpc922.c:741: objno = eeprom[asspos + 1];	     // Objektnummer
 	mov	a,r6
@@ -3036,19 +3107,19 @@ _process_tel:
 	C$fb_lpc922.c$745$6$24 ==.
 ;	..\fb_lpc922.c:745: if((apdu&0xC0)==WRITE_GROUP)
 	mov	a,r4
-	jz	00150$
+	jz	00151$
 	C$fb_lpc922.c$750$1$1 ==.
 ;	..\fb_lpc922.c:750: if ((objflags & 0x14) == 0x14)
 	push	ar4
 	mov	a,#0x14
 	anl	a,r2
 	mov	r4,a
-	cjne	r4,#0x14,00269$
-	sjmp	00270$
-00269$:
+	cjne	r4,#0x14,00272$
+	sjmp	00273$
+00272$:
 	pop	ar4
-	sjmp	00150$
-00270$:
+	sjmp	00151$
+00273$:
 	pop	ar4
 	C$fb_lpc922.c$751$7$25 ==.
 ;	..\fb_lpc922.c:751: write_value_req(objno);
@@ -3066,31 +3137,31 @@ _process_tel:
 	pop	ar5
 	pop	ar6
 	pop	ar7
-00150$:
+00151$:
 	C$fb_lpc922.c$753$6$24 ==.
 ;	..\fb_lpc922.c:753: if(apdu==READ_GROUP_REQUEST)
 	mov	r0,_bp
 	inc	r0
 	mov	a,@r0
-	jnz	00159$
+	jnz	00160$
 	C$fb_lpc922.c$755$7$26 ==.
 ;	..\fb_lpc922.c:755: if ((objflags & 0x0C) == 0x0C)
 	anl	ar2,#0x0C
-	cjne	r2,#0x0C,00176$
+	cjne	r2,#0x0C,00177$
 	C$fb_lpc922.c$756$7$26 ==.
 ;	..\fb_lpc922.c:756: read_value_req(objno);	// Objektwert lesen und read_value_response senden	00000000 00000000
 	mov	dpl,r3
 	lcall	_read_value_req
 	C$fb_lpc922.c$757$7$26 ==.
 ;	..\fb_lpc922.c:757: break;
-	sjmp	00176$
-00159$:
+	sjmp	00177$
+00160$:
 	C$fb_lpc922.c$735$4$22 ==.
 ;	..\fb_lpc922.c:735: for (asspos = atp + 1; asspos < assmax; asspos+=2)
 	inc	r6
 	inc	r6
-	ljmp	00157$
-00176$:
+	ljmp	00158$
+00177$:
 	mov	sp,_bp
 	pop	_bp
 	C$fb_lpc922.c$764$1$1 ==.

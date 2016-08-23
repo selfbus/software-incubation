@@ -479,10 +479,10 @@ void init_rx(__bit longwait) 	// Empfangen initiieren (statemachine auf Anfang)
 	TR1=0;
 	TMOD=(TMOD & 0x0F) +0x10;	// Timer 1 als 16-Bit Timer
 	if(longwait){
-		TH1=0x89;					// busfree Zeit = 15 Bit (auf ACK) + 11 Bit (ACK) + 53 Bit
+		TH1=0x8E;					// busfree Zeit = 15 Bit (auf ACK) + 11 Bit (ACK) + 50 Bit
 	}
 	else{
-		TH1=0xB0;					// busfree Zeit =  53 Bit
+		TH1=0xB5;					// busfree Zeit =  50 Bit
 	}
 	TL1=0xAF;
 	send_ack=0;
