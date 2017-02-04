@@ -182,7 +182,8 @@ __bit checksume(unsigned char p_no)
 
 void update(void)// update der Objekte nach Funk Telegramm Empfang
 {
-	unsigned char p_no,channel;
+	unsigned char p_no,channel,impulsfaktor=eeprom[0xD9];
+	if(impulsfaktor ==0 )impulsfaktor=50;
 	for(p_no=0;p_no<=10;p_no+=5)
 	{
 		if(checksume(p_no))
@@ -219,14 +220,14 @@ void update(void)// update der Objekte nach Funk Telegramm Empfang
 					case 0x10:
 						if(!(eeprom[0xD7]&0x10))
 							{
-							wind_speed_av=stream[p_no+3]*50;
+							wind_speed_av=stream[p_no+3]*impulsfaktor;
 							updated_objects |= 0x40;
 							}
 					break;
 					case 0x70:
 						if(!(eeprom[0xD7]&0x20))
 						{
-						wind_speed_max=stream[p_no+3]*50;
+						wind_speed_max=stream[p_no+3]*impulsfaktor;
 						}
 						wind_angle=(stream[p_no+2]<<1)+(stream[p_no+1]>>7);
 						updated_objects|= 0x0180;
@@ -247,7 +248,7 @@ void update(void)// update der Objekte nach Funk Telegramm Empfang
 					humidity[channel-1]=((stream[p_no+3]>>4)*10)+(stream[p_no+3]&0x0F);
 					if(stream[p_no+2]& 0x80)// negative temperatur
 					{
-						temp[channel-1]=((((int)stream[p_no+2])<<4)|0xF000)|((stream[p_no+1]>>4))*10;// temperatur
+						temp[channel-1]=(((((int)stream[p_no+2])<<4)|0xF000)|(stream[p_no+1]>>4))*10;// temperatur
 					}
 					else
 					{
