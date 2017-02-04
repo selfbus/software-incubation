@@ -1,10 +1,10 @@
 /*
  *      __________  ________________  __  _______
  *     / ____/ __ \/ ____/ ____/ __ )/ / / / ___/
- *    / /_  / /_/ / __/ / __/ / __  / / / /\__ \ 
- *   / __/ / _, _/ /___/ /___/ /_/ / /_/ /___/ / 
- *  /_/   /_/ |_/_____/_____/_____/\____//____/  
- *                                      
+ *    / /_  / /_/ / __/ / __/ / __  / / / /\__ \
+ *   / __/ / _, _/ /___/ /___/ /_/ / /_/ /___/ /
+ *  /_/   /_/ |_/_____/_____/_____/\____//____/
+ *
  *  Copyright (c) 2008-2013 Andreas Krebs <kubi@krebsworld.de>
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -17,9 +17,9 @@
 #ifndef FB_APP_2i2o
 #define FB_APP_2i2o
 
-#define debugmode
+//#define debugmode
 
-#include "debug.h"
+//#include "debug.h"
 #include "fb_rs232.h"
 #include "watchdog.h"
 
@@ -27,7 +27,7 @@
 #ifdef LPC936
 	#include <fb_lpc936_1.55.h>
 #else
-#include <fb_lpc922_1.55.h>
+#include <fb_lpc922.h>
 #endif
 
 //#define IO_BISTAB
@@ -94,7 +94,7 @@ extern const unsigned char __at 0x1CFF PORTSAVE;
 
 #define REFRESH \
 		P0= oldportbuffer;	// refresh des Portzustandes in der hal
-							// für astabile Relaise 
+							// für astabile Relaise
 // SPI Konfiguration
 #define CLK			P0_3
 #define BOT_OUT		P0_0

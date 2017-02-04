@@ -1,10 +1,10 @@
 /*
  *      __________  ________________  __  _______
  *     / ____/ __ \/ ____/ ____/ __ )/ / / / ___/
- *    / /_  / /_/ / __/ / __/ / __  / / / /\__ \ 
+ *    / /_  / /_/ / __/ / __/ / __  / / / /\__ \
  *   / __/ / _, _/ /___/ /___/ /_/ / /_/ /___/ /
- *  /_/   /_/ |_/_____/_____/_____/\____//____/  
- *                                      
+ *  /_/   /_/ |_/_____/_____/_____/\____//____/
+ *
  *  Copyright (c) 2008-2011 Andreas Krebs <kubi@krebsworld.de>
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -16,14 +16,14 @@
 * @file   fb_out.c
 * @author Andreas Krebs <kubi@krebsworld.de>
 * @date   Tue Jan 01 17:44:47 2009
-* 
+*
 * @brief  The Freebus relais application to switch  up to 8 relais \n
 * Manufactorer code is 0x04 = Jung \n
 * Device type    8 out (2038.10) 0x2060 Ordernumber: 2138.10REG    or \n
-* 		4 out Devicetype 0x2062 = Jung Aktor 2134.16 
+* 		4 out Devicetype 0x2062 = Jung Aktor 2134.16
 *
 * \par Changes:
- 
+
 * @todo:
 	- Prio beim Senden implementieren \n
 	- Zwangsstellungsobjekte implementieren \n
@@ -37,23 +37,23 @@
 
 
 
-/** 
+/**
 * The start point of the program, init all libraries, start the bus interface, the application
 * and check the status of the program button.
-* 
+*
 *
 */
 #ifdef MAX_PORTS_4
 	#ifdef SPIBISTAB
 		#ifdef HAND
 			#define TYPE 7
-		#else	
+		#else
 			#define TYPE 6
 		#endif
 	#else	// kein SPIBISTAB
 		#ifdef HAND
 			#define TYPE 5
-		#else	
+		#else
 			#define TYPE 4
 		#endif
 	#endif
@@ -61,30 +61,38 @@
 	#ifdef SPIBISTAB
 		#ifdef HAND
 			#define TYPE 3
-		#else	
+		#else
 			#define TYPE 2
 		#endif
 	#else	// kein SPIBISTAB
 		#ifdef HAND
-			#define TYPE 1 
-		#else	
+			#define TYPE 1
+		#else
 			#define TYPE 0
 		#endif
 	#endif
 #endif
-#define VERSION 39
+#define VERSION 40
 
 unsigned char __idata __at 0x00 RAM[00];
-static __code unsigned char __at 0x1D03 manufacturer[2]={0,4};	// Herstellercode 0x0004 = Jung
-static __code unsigned char __at 0x1D0C port_A_direction={0};	// PORT A Direction Bit Setting
-static __code unsigned char __at 0x1D0D run_state={255};		// Run-Status (00=stop FF=run)
-__code unsigned int __at (EEPROM_ADDR + 0x17) start_pa={0xFFFF};      // Default PA is 15.15.255
 
-__bit bus_return_ready=0; 
+static __code unsigned char __at (EEPROM_ADDR + 0x00) option_reg={0xFF};            // Option Register, ETS will write 0xFF
+static __code unsigned char __at (EEPROM_ADDR + 0x01) fw_version[2]={TYPE,VERSION}; // Man. Data, used for FW Version
+static __code unsigned char __at (EEPROM_ADDR + 0x03) manufacturer[2]={0x00,0x04};  // Herstellercode 0x0004 = Jung *
+//static __code unsigned char __at (EEPROM_ADDR + 0x05) device_type[2]={0x04,0x38};   // 0x0438 = Selfbus 1080 4sense #
+//static __code unsigned char __at (EEPROM_ADDR + 0x07) vd_version={0x06};            // VD Version V0.6 #
+//static __code unsigned char __at (EEPROM_ADDR + 0x08) eeprom_chk_limit={0xFF};      // EEPROM Check Limit
+//static __code unsigned char __at (EEPROM_ADDR + 0x09) pei_type={0x00};              // Required PEI Type, written by VD
+static __code unsigned char __at (EEPROM_ADDR + 0x0C) port_A_direction={0x00};      // PORT A Direction Bit Setting *
+static __code unsigned char __at (EEPROM_ADDR + 0x0D) run_error={0xFB};             // Run Time Error Flags, set when 0
+static __code unsigned int  __at (EEPROM_ADDR + 0x17) start_pa={0xFFFF};            // Default PA is 15.15.255 *
+
+
+__bit bus_return_ready=0;
 const unsigned char bitmask_1[8] ={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
 //const unsigned char __at 0x1CFF PORTSAVE;
 void main(void)
-{ 
+{
 	unsigned char timer_precounter=0;
 
 	unsigned char n,tasterpegel=0,pin=2;
@@ -103,7 +111,7 @@ void main(void)
 	TR0=1;
 	restart_app();							// Anwendungsspezifische Einstellungen zuruecksetzen
 	if(!wduf){
-	  // Verzögerung Busspannungswiederkehr	
+	  // Verzögerung Busspannungswiederkehr
 		  for(base=0;base<=(eeprom[0xD4]<<(eeprom[0xFE]>>4)) ;base++){//faktor startverz hohlen und um basis nach links schieben
 		//	  start_rtc(130);		// rtc auf 130ms
 				RTCCON=0x60;		// RTC anhalten und Flag löschen
@@ -125,13 +133,13 @@ void main(void)
 	WATCHDOG_START
 
 #ifndef debugmode
-	RS_INIT_600
+//	RS_INIT_600
 #else
 	RS_INIT_115200
 #endif
 	SBUF=0x55;
 
-// ################## main loop #########################	
+// ################## main loop #########################
 
 	do  {
 		WATCHDOG_FEED
@@ -147,8 +155,8 @@ void main(void)
 	  	  if(!wduf)bus_return();			// Anwendungsspezifische Einstellungen zurücksetzen
 	  	  bus_return_ready=1;
 	  }
-	  if (p0h!=portbuffer) 
-	    {	
+	  if (p0h!=portbuffer)
+	    {
 
 		  if (((p0h^portbuffer) & bitmask_1[pin])&& !(in_blocked & bitmask_1[pin]) )//kürzeste Version
 	        {
@@ -177,8 +185,8 @@ void main(void)
 				TR0=1;
 			}
 
-		
-			
+
+
 			if (portchanged)port_schalten();	// Ausgänge schalten
 
 			// Rückmeldungen senden
@@ -197,17 +205,17 @@ void main(void)
 
 
 			// portbuffer flashen, Abbruch durch ext-int wird akzeptiert und später neu probiert
-			// T1-int wird solange abgeschaltet, 
+			// T1-int wird solange abgeschaltet,
 
 			if (fb_state==0 && (TH1<0XC0) && (!wait_for_ack)&& portbuffer!=PORTSAVE) {
 				START_WRITECYCLE;
 				WRITE_BYTE(0x00,0xFF,portbuffer);
 				STOP_WRITECYCLE;
 			}
-			
+
 #ifdef zykls
-		for(objno=2;objno<=3;objno++){	
-	    	tmp=(eeprom[0xD5+(objno*4)]&0x0C);//0xD5/ bit 2-3 zykl senden aktiv 
+		for(objno=2;objno<=3;objno++){
+	    	tmp=(eeprom[0xD5+(objno*4)]&0x0C);//0xD5/ bit 2-3 zykl senden aktiv
     		objstate=read_obj_value(objno);
     		if (((eeprom[0xCE+(objno>>1)] >> ((objno & 0x01)*4)) & 0x0F)==1){// bei Funktion=Schalten
 	    		if ((tmp==0x04 && objstate==1)||(tmp==0x08 && objstate==0)|| tmp==0x0C){//bei zykl senden aktiviert
@@ -229,8 +237,8 @@ void main(void)
 
 #endif
 
-			
-		
+
+
 		}// end if(APPLICATION RUN..
 		else if (RTCCON>=0x80 && connected)	// Realtime clock ueberlauf
 			{			// wenn connected den timeout für Unicast connect behandeln
@@ -241,9 +249,9 @@ void main(void)
 				}
 				else send_obj_value(T_DISCONNECT);// wenn timeout dann disconnect, flag und var wird in build_tel() gelöscht
 			}
-		
 
-		
+
+
 		// Telegrammverarbeitung..
 		if (tel_arrived || tel_sent) {
 			tel_arrived=0;
@@ -254,9 +262,9 @@ void main(void)
 			for(n=0;n<100;n++);	// falls Hauptroutine keine Zeit verbraucht, der PROG LED etwas Zeit geben, damit sie auch leuchten kann
 		}
 
-DEBUGPOINT;
-//SNIFFPOINT;	
-		
+//DEBUGPOINT;
+//SNIFFPOINT;
+
 		TASTER=1;				// Pin als Eingang schalten um Taster abzufragen
 		if(!TASTER){ // Taster gedrückt
 			if(tasterpegel<255)	tasterpegel++;
