@@ -1,10 +1,10 @@
 /*
  *      __________  ________________  __  _______
  *     / ____/ __ \/ ____/ ____/ __ )/ / / / ___/
- *    / /_  / /_/ / __/ / __/ / __  / / / /\__ \ 
- *   / __/ / _, _/ /___/ /___/ /_/ / /_/ /___/ / 
- *  /_/   /_/ |_/_____/_____/_____/\____//____/  
- *                                      
+ *    / /_  / /_/ / __/ / __/ / __  / / / /\__ \
+ *   / __/ / _, _/ /___/ /___/ /_/ / /_/ /___/ /
+ *  /_/   /_/ |_/_____/_____/_____/\____//____/
+ *
  *  Copyright (c) 2011 Andreas Krieger
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -16,15 +16,34 @@
 #ifndef FB_APP_LC
 #define FB_APP_LC
 
-//#define debugmode
-#ifdef LPC936
-	#include <fb_lpc936_1.54.h>
-#else
-#include <fb_lpc922_1.54.h>
+// Damit die Eclipse Code Analyse nicht so viele Warnungen anzeigt:
+#ifndef SDCC
+# define __interrupt(x)
+# define __at(x)
+# define __idata
+# define __data
+# define __code
 #endif
 
+// Version number
+#define VER_MAJ     0x02
+#define VER_MIN     0x01
+
+
+#ifdef LPC936
+	#include <fb_lpc936_1.56.h>
+#else
+#include <fb_lpc922.h>
+#endif
+
+#include "fb_rs232.h"
+
+// Include to turn on and use debug mode
+//#include "debug.h"
+
+
 //#define einkanal
-#define applilpc
+//#define applilpc
 
 //#define HAND				// Handsteuerung aktiv (auskommentieren wenn nicht gewünscht)
 #define MAX_PORTS_4			// Anzahl Ausgänge (nur 4 oder 8 erlaubt)
@@ -51,7 +70,7 @@
 
 #define REFRESH \
 		//P0= oldportbuffer;	// refresh des Portzustandes in der hal
-							// für astabile Relaise 
+							// für astabile Relaise
 // SPI Konfiguration
 #define CLK			P0_3
 #define BOT_OUT		P0_0
@@ -90,7 +109,7 @@ extern const unsigned char bitmask_1[];
 extern const unsigned char bitmask_0[];
 extern const unsigned char bitmask_11[];
 
-void ext0int (void) __interrupt (0);
+//void ext0int (void) __interrupt (0);  // Für Netzsync
 void timer0_int(void) __interrupt (1);
 //void write_delay_record(unsigned char objno, unsigned char delay_status, long delay_target);	// Schreibt die Schalt-Verzoegerungswerte ins Flash
 //void clear_delay_record(unsigned char objno); // Loescht den Delay Eintrag
@@ -99,8 +118,6 @@ void timer0_int(void) __interrupt (1);
 void delay_timer(void);		// zählt alle 130ms die Variable Timer hoch und prüft Queue
 void port_schalten(void);	// Ausgänge schalten
 void object_schalten(unsigned char objno, __bit objstate);	// Objekt schalten
-void spi_2_out(unsigned int daten);
-unsigned int sort_output(unsigned char portbuffer);
 void bus_return(void);		// Aktionen bei Busspannungswiederkehr
 void restart_app(void);		// Alle Applikations-Parameter zurücksetzen
 void read_dimmziel(unsigned char objno,unsigned char offset);

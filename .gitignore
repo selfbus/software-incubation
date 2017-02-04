@@ -1,3 +1,15 @@
 .metadata/
 *~
-
+*.prefs
+*.o
+*.d
+*.map
+*.lk
+*.omf
+*.asm
+*.lst
+*.rel
+*.rst
+*.sym
+*.cdb
+*.adb

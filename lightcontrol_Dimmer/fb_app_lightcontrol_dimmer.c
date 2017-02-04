@@ -1,10 +1,10 @@
 /*
  *      __________  ________________  __  _______
  *     / ____/ __ \/ ____/ ____/ __ )/ / / / ___/
- *    / /_  / /_/ / __/ / __/ / __  / / / /\__ \ 
- *   / __/ / _, _/ /___/ /___/ /_/ / /_/ /___/ / 
- *  /_/   /_/ |_/_____/_____/_____/\____//____/  
- *                                      
+ *    / /_  / /_/ / __/ / __/ / __  / / / /\__ \
+ *   / __/ / _, _/ /___/ /___/ /_/ / /_/ /___/ /
+ *  /_/   /_/ |_/_____/_____/_____/\____//____/
+ *
  *  Copyright (c) 2011 Andreas Krieger
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -17,15 +17,8 @@
 
 
 
-
-//#include <P89LPC922.h>
-//#include "../lib_lpc922/Releases/fb_lpc922_1.4x.h"
-//#include "fb_lpc922.h"
 #include  "fb_app_lightcontrol_dimmer.h"
 
-#include "../com/fb_rs232.h"
-
-__data __at(00)RAM[];
 
 __data __at (0x25)  unsigned char portbuffer;	// Zwischenspeicherung der Portzustände
 __bit __at(0x28)M1;// bitadresse 0x28 ist byteadresse 0x25_0 (portbuffer_4)
@@ -74,7 +67,7 @@ unsigned char zf_state;		// Werte der Objekte 8-11 (Zusatzfunktionen 1-4)
 
 unsigned char oldportbuffer;// Wert von portbuffer vor Änderung (war früher ...0x29)
 unsigned char logicstate;	// Zustand der Verknüpfungen pro Ausgang
-const unsigned char grundhelligkeit_tabelle[]={15,30,46,61,77,92,107,127};
+const unsigned char grundhelligkeit_tabelle[]={1,30,46,61,77,92,107,127};
 const unsigned char prozentvalue[]={25,51,75,102,128,154,179,204,230,255};
 
 const unsigned int timerflagmask[]={0x0000,0x0000,0x0008,0x0080,0x0800,0x8000};
@@ -88,7 +81,7 @@ __bit delay_toggle;			// um nur jedes 2. Mal die delay routine auszuführen
 __bit portchanged;
 
 
-/*+++++++++++  Auto reload interrupt TIMER 0 ++++++++++++++++ 
+/*+++++++++++  Auto reload interrupt TIMER 0 ++++++++++++++++
 * zählt dimmcompare stetig hoch(überlauf)
 * zählt dimmtimervorteiler hoch. (wird in main zurückgerechnet)
 * schaltet P0_0 - P0_3 je nach dimmwert[pin] und schaltmerker A1-3  ein/aus
@@ -128,26 +121,26 @@ void ext0int(void) __interrupt (0){ //Interrupt ext0int für Netzsyncronisierung
 	if (syncval>=128)syncval++;
 	else syncval--;	//A5;//A2
 	dimmcompare=syncval+19;
-	
+
 */
-#ifdef einkanal	
+#ifdef einkanal
 	__asm
-	mov a,_dimmcompare	;dimmcompare in den akku
-	subb a,#19;
+	mov a,_dimmcompare      ; dimmcompare in den akku
+	subb a,#19
 		jz $00001			; wenn 0 dann nichts machen
 		jb acc.7,$00002		; wenn kleiner 128 dann...
 		jnb acc.1,$00003	; wenn >1 dann 2 zusätzlich erniedrigen
 		dec a
 		dec a
-$00003:	dec a	;erniedrigen um auf 0 zu kommen
-		sjmp $00001			;
-$00002:	jb acc.1,$00004		;wenn < 0-1 dann 2 zusätzlich erhöhen
+$00003:	dec a	            ; erniedrigen um auf 0 zu kommen
+		sjmp $00001
+$00002:	jb acc.1,$00004		; wenn < 0-1 dann 2 zusätzlich erhöhen
 		inc a
 		inc a
-$00004:	inc a	;sonst erhöhen um auf 0 zu kommen
+$00004:	inc a	            ; sonst erhöhen um auf 0 zu kommen
 $00001:	add a,#19
 		mov _dimmcompare,a
-		__endasm;	
+		__endasm;
 #else
 		dimmcompare=19;
 #endif
@@ -158,17 +151,16 @@ void timer0_int  (void) __interrupt (1) {// Interrupt T0 für abschnitt zeit= 10m
 //  dimmtimervorteiler++;
   TF0=0;
   // Diese variante mit festen Arraypointern ist die schnellste.
- 
- 	if ((dimmcompare<=dimmpwm[0]))P0_0=0;
-  	else P0_0=1;
-#ifndef einkanal
-  	if ((dimmcompare<=dimmpwm[1]))P0_1=0;
-	else P0_1=1;
 
-	if ((dimmcompare<=dimmpwm[2]))P0_2=0;
-	else P0_2=1;
-#endif	 
- 
+ 	if ((dimmcompare<dimmpwm[0]))P0_0=1;
+  	else P0_0=0;
+#ifndef einkanal
+  	if ((dimmcompare<dimmpwm[1]))P0_1=1;
+	else P0_1=0;
+
+	if ((dimmcompare<dimmpwm[2]))P0_2=1;
+	else P0_2=0;
+#endif
 
 } // timer0_int
 
@@ -177,7 +169,7 @@ void timer0_int  (void) __interrupt (1) {// Interrupt T0 für abschnitt zeit= 10m
 void write_value_req(unsigned char objno)	// Objekte steuern gemäß EIS  Protokoll (an/aus/dimm/set)
 {
 //  unsigned char objno,objflags,assno,n,gaposh;
- 
+
   unsigned char obj,Dimmschritt,valtmp,tmp;
 
           obj=objno%3;// modulo 3 ergibt die Kanalnummer
@@ -208,20 +200,20 @@ void write_value_req(unsigned char objno)	// Objekte steuern gemäß EIS  Protokol
                 	}
                 	else dimmziel[obj]=grundhelligkeit[obj];
                 }
-            	
+
             	if (!obj){// Dimmobjekt 3
 	                timerbase[0]=(eeprom[0xc6])&0x07;
 	            }
 	            else{
 		            if(obj==1){// Dimmobjekt 4
-		               	timerbase[1]=((eeprom[0xc6]>>4)&0x07);	
+		               	timerbase[1]=((eeprom[0xc6]>>4)&0x07);
 		            }
 		            else{// Dimmobjekt 5
-		            	timerbase[2]=eeprom[0xc7]&0x07;	
+		            	timerbase[2]=eeprom[0xc7]&0x07;
 		            }
-		        }    
+		        }
 	            timerstart[obj]=eeprom[0xc8+obj];
-	            
+
             }
             else{			// dimmen: stop!
             	//valtmp hier mit Parameter laden
@@ -248,7 +240,7 @@ void write_value_req(unsigned char objno)	// Objekte steuern gemäß EIS  Protokol
           }// ende if (objno>2 && objno<6)..Dimmen
           //####################################################################
           // ++++ Helligkeit +++++
-          
+
           if (objno>5 && objno<9)	// Objektnummer 6-8 Helligkeit
           {
            write_obj_value(objno, telegramm[8]);
@@ -278,9 +270,9 @@ void write_value_req(unsigned char objno)	// Objekte steuern gemäß EIS  Protokol
 	        	}
 	        	else{ // normales LZ tele
 	        	tmp=eeprom[0xE7+(obj*8)+ (valtmp&0x07)];
-	        	hell_stellen(obj,tmp);	
+	        	hell_stellen(obj,tmp);
 	        	}
-       	}// ende if(((valtmp&0x07)<8....nur 8 LZ	
+       	}// ende if(((valtmp&0x07)<8....nur 8 LZ
          }// ende if(objno>14... Lichtszene
          //
          //
@@ -310,7 +302,7 @@ void write_value_req(unsigned char objno)	// Objekte steuern gemäß EIS  Protokol
         	  }// ende ende Sperre
          } //   ende  sperrobjekt
           //###########################################################
-          
+
 //        }// ende if (gaspos_in_gat...
 //      }// ende for(n....
       if (portbuffer&0xF0 != oldportbuffer&0xF0) portchanged=1;//post für port_schalten hinterlegen
@@ -337,10 +329,10 @@ void hell_stellen (unsigned char obj,unsigned char value){
     }
     else{
         if(obj==1){				// Helligkeit 7
-           	timerbase[1]=((eeprom[0xc6]>>4)&0x0F);	
+           	timerbase[1]=((eeprom[0xc6]>>4)&0x0F);
         }
         else{					// Helligkeit 8
-        timerbase[2]=eeprom[0xc7]&0x0F;	
+        timerbase[2]=eeprom[0xc7]&0x0F;
             }
     }
 	//eventuell auto EIN
@@ -361,32 +353,32 @@ void hell_stellen (unsigned char obj,unsigned char value){
 		portchanged=1;
 		schalten&=bitmask_0[obj];// schaltobjekte rücksetzen
 	}
-	
+
 	if (timerbase[obj]&0x08){	//anspringen
 		dimmwert[obj]=dimmziel[obj];
 	}
  	else{ //andimmen
-        timerstart[obj]=eeprom[0xc8+obj];    
- 	}    
+        timerstart[obj]=eeprom[0xc8+obj];
+ 	}
 
 }
 
 
-/** 
+/**
 * Objektwert lesen wurde angefordert, read_value_response Telegramm zurücksenden
 *
-* 
+*
 * @return
-* 
+*
 */
 void read_value_req(unsigned char objno)
 {
 /*	unsigned char objno, objflags;
 	unsigned int objvalue;
-	
+
 	objno=find_first_objno(telegramm[3],telegramm[4]);	// erste Objektnummer zu empfangener GA finden
 	if(objno!=0xFF) {	// falls Gruppenadresse nicht gefunden
-		
+
 		objvalue=read_obj_value(objno);		// Objektwert aus USER-RAM lesen (Standard Einstellung)
 
 		objflags=read_objflags(objno);		// Objekt Flags lesen
@@ -394,7 +386,7 @@ void read_value_req(unsigned char objno)
 		if((objflags&0x0C)==0x0C) send_obj_value(objno+64); //send_value(0,objno,objvalue);
     }
 */
-	send_obj_value(objno+64);	
+	send_obj_value(objno+64);
 }
 
 
@@ -420,7 +412,7 @@ unsigned long read_obj_value(unsigned char objno)	// gibt den Wert eines Objekte
 	if(objno>=15) {
 		ret_val= lz[obj];
 	}
-	
+
 	return(ret_val);
 }
 
@@ -450,7 +442,7 @@ unsigned char obj;
 	if(objno>=15) {
 		lz[obj]=objvalue;
 	}
-	
+
 
 }
 
@@ -537,11 +529,11 @@ unsigned char obj;
 	//
 	//portbuffer=(A1<<0 | A2<<1 | A3<<2 | A4<<3)<<4;
 	if(objno<0x03){// Einschalten-Einschalthelligkeit
-		 if ((objstate) && ((portbuffer& bitmask_1[obj])||(!(oldportbuffer& bitmask_1[obj+4])))) {//einschalten Flanke((timerbase[objno]&0x02)|| 	
-			 read_dimmziel(objno,0xC4);		
+		 if ((objstate) && ((portbuffer& bitmask_1[obj])||(!(oldportbuffer& bitmask_1[obj+4])))) {//einschalten Flanke((timerbase[objno]&0x02)||
+			 read_dimmziel(objno,0xC4);
 				if (!timerstart[objno])dimmwert[objno]=dimmziel[objno];
 				portbuffer &= bitmask_0[objno];// ausschaltmerker löschen
-		 }  
+		 }
 		  if ((!objstate)&&(oldportbuffer & bitmask_1[obj+4])) {//ausschalten Flanke
 			  aushell[objno]=dimmwert[objno];
 			  if (timerstart[obj]){// wenn soft "AUS"
@@ -564,7 +556,7 @@ unsigned char obj;
 
 
 
-void delay_timer(void)	// zählt alle 0,5ms die Variable Timer hoch 
+void delay_timer(void)	// zählt alle 0,5ms die Variable Timer hoch
 {
 	unsigned char objno,n,m;
 	unsigned int timerflags;
@@ -590,7 +582,7 @@ void delay_timer(void)	// zählt alle 0,5ms die Variable Timer hoch
 						}// end if (timercnt...
 					}//end if(timerbase...
 				}// end  for(m..
-		
+
 		// ab Hier die aktion...
 		for (n=0;n<3;n++){// autoreload der Dimm Timer
 			if(timerbase[n]){
@@ -617,9 +609,9 @@ void delay_timer(void)	// zählt alle 0,5ms die Variable Timer hoch
 			}
 		}
 		for (n=3;n<6;n++){// Zeiten für Aktionen wie Ausschalten(zeitdimmer...
-			m=n-3;		// und Ausschaltverzögerung)	
+			m=n-3;		// und Ausschaltverzögerung)
 			if(!timercnt[n]){// wenn timer inaktiv oder abgelaufen
-				if (timerstate[m]& 0x01){// state.0: Ausschalthelligkeit 
+				if (timerstate[m]& 0x01){// state.0: Ausschalthelligkeit
 					portbuffer &= bitmask_0[m+4];//Ausgang abschalten
 					portchanged=1;
 					timerstate[m] &= 0xFE;//state löschen
@@ -630,7 +622,7 @@ void delay_timer(void)	// zählt alle 0,5ms die Variable Timer hoch
 				}
 			}
 		if(!(sperren & bitmask_11[m])){
-			dimmpwm[m]=dimmwert[m];	
+			dimmpwm[m]=dimmwert[m];
 			//if (dimmpwm[m]){
 			//	if(dimmpwm[m]<grundhelligkeit[m])// wenn Wert<Grundhell
 			//		dimmpwm[m]=grundhelligkeit[m];// dann Grundhell
@@ -642,7 +634,7 @@ void delay_timer(void)	// zählt alle 0,5ms die Variable Timer hoch
 		//A4=A1|A2;
 		//A4|=A3;
 
-/*	
+/*
 #ifdef HAND		//+++++++   Handbetätigung  ++++++++++
 
 	if((TMOD&0x0F)==0x02 && fb_state==0) {
@@ -652,12 +644,12 @@ void delay_timer(void)	// zählt alle 0,5ms die Variable Timer hoch
 	#ifdef MAX_PORTS_4
 		while( (TMOD&0x0F)==0x02 && ( TL0>0x72));// PWM scannen um "Hand"-Tasten abzufragen
 	#endif
-		interrupted=0;	  
-		Tasten=0;				
+		interrupted=0;
+		Tasten=0;
 
 	#ifdef MAX_PORTS_4
 		ledport=0x01;
-		for (n=0;n<4;n++) {  						
+		for (n=0;n<4;n++) {
 			P0=~ledport;
 			P0_5=1;			//P0.5 auf 1, wird über Dioden und taster auf low IO gezogen.
 			if (!P0_5){
@@ -666,9 +658,9 @@ void delay_timer(void)	// zählt alle 0,5ms die Variable Timer hoch
 		  		n=3;
 		  	}
 		  	ledport=ledport<<1;
-		} 
+		}
 	#endif
-		
+
 		//if (interrupted==1) Tasten=Tval;  // wenn unterbrochen wurde verwerfen wir die Taste
 		REFRESH;
 		//	Tasten = Tval; // ##############  <----- Hier wird Handbetätigung quasi mit ausgeschaltet !! #########################
@@ -685,6 +677,10 @@ void delay_timer(void)	// zählt alle 0,5ms die Variable Timer hoch
 	}
 #endif
 */
+#ifdef HW_PWM
+		// Wert auf PWM Register schreiben
+		TH0 = 255-dimmpwm[0]; // Nur 1 Kanal wird auf PWM Pin mit 14kHz zusätzlich ausgegeben
+#endif
 
 }
 
@@ -693,7 +689,7 @@ void delay_timer(void)	// zählt alle 0,5ms die Variable Timer hoch
 
 
 
-void port_schalten(void)		// Schaltet die Ports 
+void port_schalten(void)		// Schaltet die Ports
 {
 	unsigned char n, pattern,m;
 	pattern;
@@ -705,7 +701,7 @@ void port_schalten(void)		// Schaltet die Ports
 	sync_blocked=1;
 	for(n=0;n<3;n++){
 		if(pattern&bitmask_1[n]){
-			
+
 			send_obj_value(n+9);
 			for(m=0;m<30;m++) // verzögerung wegen ft1.2
 				while(dimmcompare);
@@ -737,124 +733,11 @@ void port_schalten(void)		// Schaltet die Ports
 
 	oldportbuffer=portbuffer;
 	portchanged=0;
-
-#else	// also normaler out8 oder out4
-
-	if(portbuffer & ~oldportbuffer) {	// Vollstrom nur wenn ein relais eingeschaltet wird
-		TR0=0;
-		AUXR1&=0xE9;	// PWM von Timer 0 nicht mehr auf Pin ausgeben
-
-
-		PWM=0;			// Vollstrom an
-
-		P0=portbuffer;		// Ports schalten
-		TF0=0;			// Timer 0 für Haltezeit Vollstrom verwenden
-		TH0=0x00;		// 16ms (10ms=6fff)
-		TL0=0x00;
-		TMOD=(TMOD & 0xF0) +1;		// Timer 0 als 16-Bit Timer
-		TAMOD=0x00;
-		TR0=1;
-	}
-	else P0=portbuffer;
-
-	rm_state=portbuffer ^ eeprom[RMINV];	// Rückmeldeobjekte setzen
-	for (n=0;n<8;n++) {	// Rückmeldung wenn ein Ausgag sich geändert hat
-		pattern=1<<n;
-		if((portbuffer&pattern)!=(oldportbuffer&pattern)) send_obj_value(n+12);
-	}
-
-	oldportbuffer=portbuffer;
-	portchanged=0;
-	
 #endif
 */
 }
 
-/*
-unsigned int sort_output(unsigned char portbuffer){
-   unsigned char diff;
-   unsigned int result;
-   diff=portbuffer ^ oldportbuffer;
-   result=0;
-   // A1 
-   if (diff & 0x01){
-	   if(portbuffer & 0x01){
-		   result|=0x1000;
-	   }
-	   else{
-		   result|=0x2000;
-	   }
-   }
 
-   // A2
-   if (diff & 0x02){
-	   if(portbuffer & 0x02){
-	      result|=0x0004;
-	   }
-	   else{
-	      result|=0x0008;
-	   }
-   }
-   // A3
-   if (diff & 0x04){
-	   if(portbuffer & 0x04){
-	      result|=0x4000;
-	   }
-	   else{
-	      result|=0x8000;
-	   }
-   }
-   // A4
-   if (diff & 0x08){
-	   if(portbuffer & 0x08){
-	      result|=0x0001;
-	   }
-	   else{
-	      result|=0x0002;
-	   }
-   }
-   
-   // A5
-   if (diff & 0x10){
-	   if(portbuffer & 0x10){
-	      result|=0x0040;
-	   }
-	   else{
-	      result|=0x0080;
-	   }
-   }
-   // A6
-   if (diff & 0x20){
-   	   if(portbuffer & 0x20){
-	      result|=0x0100;
-	   }
-	   else{
-	      result|=0x0200;
-	   }
-   }
-   
-   // A7
-   if (diff & 0x40){
-	   if(portbuffer & 0x40){
-	      result|=0x0010;
-	   }
-	   else{
-	      result|=0x0020;
-	   }
-   }
-   // A8
-   if (diff & 0x80){
-	   if(portbuffer & 0x80){
-	      result|=0x0400;
-	   }
-	   else{
-	      result|=0x0800;
-	   }
-   }
-   return result;
-
-}
-*/
 /*
 void spi_2_out(unsigned int daten){
 
@@ -866,11 +749,11 @@ void spi_2_out(unsigned int daten){
    WRITE=0;
    CLK=0;
    for(n=0;n<=7;n++){
-      
+
 
       BOT_OUT=(unten & 0x080)>>7;
       unten<<=1;
-      
+
       MID_OUT=(mitte & 0x080)>>7;
       mitte<<=1;
 
@@ -920,7 +803,7 @@ void bus_return(void)		// Aktionen bei Busspannungswiederkehr
 
 void read_dimmziel(unsigned char n,unsigned char offset){
 unsigned char valtmp,bw=0;
-	
+
 		if (!n)valtmp=eeprom[offset]&0x0F;//n=0
 		else{
 			if (n&0x02)	valtmp=eeprom[offset+1]&0x0F;//n=2
@@ -931,7 +814,7 @@ unsigned char valtmp,bw=0;
 		if (valtmp>1&&valtmp<12)bw=prozentvalue[valtmp-2];
 	    if (valtmp==13) bw=aushell[n];
 	    dimmziel[n]=bw;
-	
+
 }
 
 
@@ -944,22 +827,20 @@ void restart_app(void)		// Alle Applikations-Parameter zurücksetzen
 #endif
 	P0=0;
 	P0M1=0x00;		// Port 0 Modus push-pull für Ausgang
-
-
 	P0M2= 0xFF;
-	
- 
+
+
 //	portbuffer=eeprom[PORTSAVE];	// Verhalten nach Busspannungs-Wiederkehr
 
 //	bw=eeprom[0xF6];
 //	for(n=0;n<=3;n++) {			// Ausgänge 1-3
-//		bwh=(bw>>(2*n))&0x03; 
+//		bwh=(bw>>(2*n))&0x03;
 //		if(bwh==0x01)  portbuffer=portbuffer & (0xFF-(0x01<<n));
 //		if(bwh==0x02)  portbuffer=portbuffer | (0x01<<n);
 //	}
-	
 
-	
+
+
 //	oldportbuffer=0; 	// auf 0 setzen, da sonst kein Vollstrom aktiviert wird
 //	portchanged=1;		// Post hinterlegen damit in delaytimer nach portschalten springt
 
@@ -967,62 +848,95 @@ void restart_app(void)		// Alle Applikations-Parameter zurücksetzen
 //	rm_state=portbuffer ^ eeprom[RMINV];	// Rückmeldeobjekte setzen
 
 
-	
+
 	ET0=0;			// Interrupt für Timer 0 sperren
 
 //	zf_state=0x00;		// Zustand der Zusatzfunktionen 1-4
 
 	timer=0;			// Timer-Variable, wird alle 130ms inkrementiert
- 
+
 	RTCCON=0x81; //RTC starten, ov flag setzen
-	
-	EA=0;						// Interrupts sperren, damit flashen nicht unterbrochen wird
-	START_WRITECYCLE
-	WRITE_BYTE(0x01,0x03,0x00)	// Herstellercode 0x0004 = Jung
-	WRITE_BYTE(0x01,0x04,0x04)
-/*
 
-#ifdef MAX_PORTS_4				// 4-fach Aktor
-	WRITE_BYTE(0x01,0x05,0x30)	// Devicetype 0x2062 = Jung Aktor 2134.16
-	WRITE_BYTE(0x01,0x06,0x18)
+    EA=0;                       // Interrupts sperren, damit flashen nicht unterbrochen wird
+    #ifdef FB_DEBUG
+    // Werte hier schreiben anstatt per static __code wenn Debug aktiv
+    START_WRITECYCLE
+    WRITE_BYTE(0x01,0x03,0x00)  // Herstellercode 0x0004 = Jung
+    WRITE_BYTE(0x01,0x04,0x04)
+
+    WRITE_BYTE(0x01,0x0C,0x00)  // PORT A Direction Bit Setting
+    WRITE_BYTE(0x01,0x0D,0xFF)  // Run-Status (00=stop FF=run)
+    STOP_WRITECYCLE
 #endif
-
-	WRITE_BYTE(0x01,0x07,0x01)	// Versionnumber of application programm
-*/
-	WRITE_BYTE(0x01,0x0C,0x00)	// PORT A Direction Bit Setting
-	WRITE_BYTE(0x01,0x0D,0xFF)	// Run-Status (00=stop FF=run)
-//	WRITE_BYTE(0x01,0x12,0x8A)	// COMMSTAB Pointer
-	STOP_WRITECYCLE
 	// set timer 0 autoreload 0.05ms
 	TR0=0;
+#ifndef HW_PWM
 	TMOD &= 0xF0;
 	TMOD |= 0x02;// T0 autoreload
 	TH0=0x70; //für 10ms / 256
-	TL0=0x70; //für 10ms / 256  
-	TR0=1;
+	TL0=0x70; //für 10ms / 256
+#else
+        TMOD=(TMOD & 0xF0) + 2;     // Timer 0 als PWM
+        TAMOD=0x01;
+        TH0=0;          // Pulsverhältnis PWM, start mit 0
+        TF0=0;
+        AUXR1|=0x10;    // PWM von Timer 0 auf Pin ausgeben, gleichzeitig low-powermode ein (da <8MHz)
+        PWM=1;          // PWM Pin muss auf 1 gesetzt werden, damit PWM geht !!!
+        ET0=0;          // Interrupt für Timer 0 sperren
+#endif
+        TR0=1;          // Timer 0 starten (PWM)
 	// prirority bits in p0 byte;bit     7     6     5    4      3    2     1     0
 	//IP0* Interrupt priority 0 B8H -          PWDRT PBO  PS/PSR PT1  PX1   PT0   PX0
 	//IP0H Interrupt priority 0 HIGH B7H -     PWDRT PBOH PSH/   PT1H PX1H  PT0H  PX0H
-	
+
 	//IP1* Interrupt priority 1    F8H   PAD   PST   -    -      -    PC    PKBI  PI2C
 //	IP1H Interrupt priority 1 HIGH F7H   PADH  PSTH  -    -      -    PCH   PKBIH PI2CH
 
 
 	// set timer 0 isr priority to level 0, timer 1 level 1, ext0int level 2, ext1 level 3
 #ifdef einkanal
-	IP0 &= 0xF6; //FC		F6	für flackerfrei bei 1 kanal
-	IP0 |= 0x06; //0C		06	dto.
+	IP0 &= 0xF6;    // F6 für flackerfrei bei 1 kanal
+	IP0 |= 0x06;    // 06 dto. 0110
 #else
-	IP0 &= 0xFC; //FC		F6	für flackerfrei bei 1 kanal
-	IP0 |= 0x0C; //0C		06	dto.
+	IP0 &= 0xFC;    // FC
+	IP0 |= 0x0C;    // 0C      1100
 #endif
-	IP0H &= 0xF5;// 
-	IP0H |= 0x05;// 		Timer 1 auf Level 2
-	TF0=0; //timer0 flag löschen
-	IT0=1;// int mode auf fallende Flanke
-	ET0=1;// timer 0 interupt freigeben	
-	EX0=1;//ext int freigeben
-	EA=1;						// Interrupts freigeben
-	
+	IP0H &= 0xF5;   //
+	IP0H |= 0x05;   // Timer 1 auf Level 2  0101
+	TF0=0;          // timer0 flag löschen
+	IT0=1;          // int mode auf fallende Flanke
+#ifndef HW_PWM
+	ET0=1;          // timer 0 interupt freigeben
+#endif
+	//EX0=1;        // ext int freigeben
+	EA=1;			// Interrupts freigeben
+
 
 }// Ende restart app
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
