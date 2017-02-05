@@ -1,10 +1,10 @@
 /*
  *      __________  ________________  __  _______
  *     / ____/ __ \/ ____/ ____/ __ )/ / / / ___/
- *    / /_  / /_/ / __/ / __/ / __  / / / /\__ \ 
- *   / __/ / _, _/ /___/ /___/ /_/ / /_/ /___/ / 
- *  /_/   /_/ |_/_____/_____/_____/\____//____/  
- *                                      
+ *    / /_  / /_/ / __/ / __/ / __  / / / /\__ \
+ *   / __/ / _, _/ /___/ /___/ /_/ / /_/ /___/ /
+ *  /_/   /_/ |_/_____/_____/_____/\____//____/
+ *
  *  Copyright (c) 2011 Andreas Krieger
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -17,17 +17,14 @@
 
 
 
-
-//#include <P89LPC922.h>
-//#include "../lib_lpc922/Releases/fb_lpc922_1.4x.h"
 #include  "fb_app_dimmer_2channel.h"
 
 //#include "../com/fb_rs232.h"
 #include "fb_i2c.h"
-#define ledpwm
+//#define ledpwm
 
 __data __at (00) RAM[];
-__data __at (0x25)  unsigned char portbuffer;	// Zwischenspeicherung der Portzust‰nde
+__data __at (0x25)  unsigned char portbuffer;	// Zwischenspeicherung der Portzust√§nde
 __bit __at(0x28)M1;// bitadresse 0x28 ist byteadresse 0x25_0 (portbuffer_4)
 __bit __at(0x29)M2;
 __bit __at(0x2A)M3;
@@ -36,7 +33,7 @@ __bit __at(0x2C)A1;// bitadresse 0x2C ist byteadresse 0x25_4 (portbuffer_4)
 __bit __at(0x2D)A2;
 __bit __at(0x2E)A3;
 __bit __at(0x2F)A4;
-__bit __at(0x40)S_1;// Die Sperren bitadressen f¸r byte 0x28
+__bit __at(0x40)S_1;// Die Sperren bitadressen f√ºr byte 0x28
 __bit __at(0x41)S_2;
 //__bit __at(0x42)S_3;
 __bit __at(0x44)SM_1;// Die Sperrmerker
@@ -60,24 +57,24 @@ __data __at (0x1A) unsigned char dimmpwm[3];//14
  unsigned char lastausfall;
 
 
-unsigned char ctaste;    //z‰hler f¸r Taste welche gerade abgefragt wird
-unsigned char mtaste[8]; //merker Taste mit z‰hler (Tastenprllung und langer tastendruck)  1-8 =tasten
- 
+unsigned char ctaste;    //z√§hler f√ºr Taste welche gerade abgefragt wird
+unsigned char mtaste[8]; //merker Taste mit z√§hler (Tastenprllung und langer tastendruck)  1-8 =tasten
+
 unsigned char mk[2];
 unsigned char aushell[2];
 unsigned char timerstart[2];
 unsigned char timerstate[2];
 //unsigned char dimmtimervorteiler;
-unsigned char timerbase[TIMERANZ];// Speicherplatz f¸r die Zeitbasis und 4 status bits
-unsigned char timercnt[TIMERANZ];// speicherplatz f¸r den timercounter und 1 status bit
+unsigned char timerbase[TIMERANZ];// Speicherplatz f√ºr die Zeitbasis und 4 status bits
+unsigned char timercnt[TIMERANZ];// speicherplatz f√ºr den timercounter und 1 status bit
 
 
-unsigned int timer;		// Timer f¸r Schaltverzˆgerungen, wird alle 250µs hochgez‰hlt
+unsigned int timer;		// Timer f√ºr Schaltverz√∂gerungen, wird alle 250¬µs hochgez√§hlt
 
 
 unsigned char Tval;
 
-unsigned char oldportbuffer;// Wert von portbuffer vor ƒnderung (war fr¸her ...0x29)
+unsigned char oldportbuffer;// Wert von portbuffer vor √Ñnderung (war fr√ºher ...0x29)
 
 const unsigned char grundhelligkeit_tabelle[]={15,30,46,61,77,92,107,127};
 const unsigned char prozentvalue[]={25,51,75,102,128,154,179,204,230,255};
@@ -89,17 +86,17 @@ const unsigned char bitmask_11[]={11,22,44,88};
 
 //__bit sync_blocked;		// Sperrung der Syncronisation
 
-__bit delay_toggle;			// um nur jedes 2. Mal die delay routine auszuf¸hren
+__bit delay_toggle;			// um nur jedes 2. Mal die delay routine auszuf√ºhren
 __bit portchanged;
 
 
-/*+++++++++++  Auto reload interrupt TIMER 0 ++++++++++++++++ 
-* z‰hlt dimmcompare stetig hoch(¸berlauf)
-* z‰hlt dimmtimervorteiler hoch. (wird in main zur¸ckgerechnet)
+/*+++++++++++  Auto reload interrupt TIMER 0 ++++++++++++++++
+* z√§hlt dimmcompare stetig hoch(√ºberlauf)
+* z√§hlt dimmtimervorteiler hoch. (wird in main zur√ºckgerechnet)
 * schaltet P0_0 - P0_3 je nach dimmwert[pin] und schaltmerker A1-3  ein/aus
 * +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-void timer0_int  (void) interrupt 1 {// Interrupt T0 f¸r soft PWM LED
+void timer0_int  (void) interrupt 1 {// Interrupt T0 f√ºr soft PWM LED
 
   dimmcompare++;
   dimmtimervorteiler++;
@@ -127,40 +124,40 @@ void timer0_int  (void) interrupt 1 {// Interrupt T0 f¸r soft PWM LED
 }
 */
 // Synconisation des Netzes
-void ext0int(void) __interrupt (0){ //Interrupt ext0int f¸r Netzsyncronisierung
+void ext0int(void) __interrupt (0){ //Interrupt ext0int f√ºr Netzsyncronisierung
 /*	unsigned syncval=dimmcompare-19;
 	IE0=0; // flankengesteuert???
 	if (syncval>=128)syncval++;
 	else syncval--;	//A5;//A2
 	dimmcompare=syncval+19;
-	
+
 */
-#ifdef einkanal	
+#ifdef einkanal
 	__asm
 	mov a,_dimmcompare	;dimmcompare in den akku
 	subb a,#19;
 		jz $00001			; wenn 0 dann nichts machen
 		jb acc.7,$00002		; wenn kleiner 128 dann...
-		jnb acc.1,$00003	; wenn >1 dann 2 zus‰tzlich erniedrigen
+		jnb acc.1,$00003	; wenn >1 dann 2 zus√§tzlich erniedrigen
 		dec a
 		dec a
 $00003:	dec a	;erniedrigen um auf 0 zu kommen
 		sjmp $00001			;
-$00002:	jb acc.1,$00004		;wenn < 0-1 dann 2 zus‰tzlich erhˆhen
+$00002:	jb acc.1,$00004		;wenn < 0-1 dann 2 zus√§tzlich erh√∂hen
 		inc a
 		inc a
-$00004:	inc a	;sonst erhˆhen um auf 0 zu kommen
+$00004:	inc a	;sonst erh√∂hen um auf 0 zu kommen
 $00001:	add a,#19
 		mov _dimmcompare,a
-		__endasm;	
+		__endasm;
 #else
 		dimmcompare=61;// 19
 #endif
 }
 
 /*
-// Interrupt f¸r direkte Ansteuerung vom Master aus
-void timer0_int  (void) __interrupt (1) {// Interrupt T0 f¸r abschnitt zeit= 10ms/256
+// Interrupt f√ºr direkte Ansteuerung vom Master aus
+void timer0_int  (void) __interrupt (1) {// Interrupt T0 f√ºr abschnitt zeit= 10ms/256
 	dimmcompare++;
 //  dimmtimervorteiler++;
   TF0=0;
@@ -197,7 +194,7 @@ void timer0_int(void) __interrupt (1)         //n=nummer 0x03+8*n
     if(dimmpwm[1]>220 ) P0_4=1;
     else P0_4=0;
 
-  /*if(ie<40000)                   //interwallm‰siges senden kann evetuel raus
+  /*if(ie<40000)                   //interwallm√§siges senden kann evetuel raus
     ++ie;
    else
     {
@@ -206,7 +203,7 @@ void timer0_int(void) __interrupt (1)         //n=nummer 0x03+8*n
     }
 	*/
 
-    if(dimmpwm[0]!=mk[0]||dimmpwm[1]!=mk[1])   //i2c ¸bertragen
+    if(dimmpwm[0]!=mk[0]||dimmpwm[1]!=mk[1])   //i2c √ºbertragen
      {
  //      ie=0;
        mk[0]=dimmpwm[0];
@@ -227,7 +224,7 @@ void tastenauswertung(void)
   P0M1=~(1<<ctaste);    // Port 0  PIN Output
   P0M2=(1<<ctaste);
   P0=~(1<<ctaste);      //nur eine Taste aktivieren
-  if(P1_3==0)           //abfrage Taste getr¸ckt
+  if(P1_3==0)           //abfrage Taste getr√ºckt
     {
       if(mtaste[ctaste]<254)  mtaste[ctaste]++;
       if(mtaste[ctaste]==200) //langer tastendruck
@@ -272,7 +269,7 @@ void tastenauswertung(void)
 
 }
 
-void write_value_req(unsigned char objno)	// Objekte steuern gem‰ﬂ EIS  Protokoll (an/aus/dimm/set)
+void write_value_req(unsigned char objno)	// Objekte steuern gem√§√ü EIS  Protokoll (an/aus/dimm/set)
 {
   unsigned char obj,valtmp,tmp;
 
@@ -283,7 +280,7 @@ void write_value_req(unsigned char objno)	// Objekte steuern gem‰ﬂ EIS  Protokol
          if((objno<10 || objno>11)&&(!(sperren & bitmask_1[obj]))){ // alles ausser Sperren.. und wenn nicht gesperrt
           //############################################################
           if ((objno<2)&&(!(sperren & bitmask_1[obj+4]))){	// Objekt 0-2 Schaltobjekt nicht bei Sperrmerker schalten
-        	  object_schalten(objno,valtmp);	// Objektnummer 0-2 entspricht den Ausg‰ngen 1-3
+        	  object_schalten(objno,valtmp);	// Objektnummer 0-2 entspricht den Ausg√§ngen 1-3
           }
           //############################################################
           if (objno>1 && objno<4)	// Objektnummer 2,3 Dimmen
@@ -293,7 +290,7 @@ void write_value_req(unsigned char objno)	// Objekte steuern gem‰ﬂ EIS  Protokol
           }// ende if (objno>)..Dimmen
           //####################################################################
           // ++++ Helligkeit +++++
-          
+
           if (objno>3 && objno<6)	// Objektnummer 4,5 Helligkeit
           {
         	  write_obj_value(objno, telegramm[8]);
@@ -308,7 +305,7 @@ void write_value_req(unsigned char objno)	// Objekte steuern gem‰ﬂ EIS  Protokol
          //
         if (objno>11 && objno<14 && (!(sperren&(bitmask_11[obj])))){
        	valtmp=telegramm[8];
-       	if((valtmp&0x7F)< 8){//Nur 8 LZ mˆglich
+       	if((valtmp&0x7F)< 8){//Nur 8 LZ m√∂glich
 	        	write_obj_value(objno,valtmp);
 	        	if (valtmp & 0x80){// LZ speichern tele
 	    			EA=0;		// Interrupts sperren, damit flashen nicht unterbrochen wird
@@ -319,9 +316,9 @@ void write_value_req(unsigned char objno)	// Objekte steuern gem‰ﬂ EIS  Protokol
 	        	}
 	        	else{ // normales LZ tele
 	        	tmp=eeprom[0xE7+(obj*8)+ (valtmp&0x07)];
-	        	hell_stellen(obj,tmp);	
+	        	hell_stellen(obj,tmp);
 	        	}
-       	}// ende if(((valtmp&0x07)<8....nur 8 LZ	
+       	}// ende if(((valtmp&0x07)<8....nur 8 LZ
          }// ende if(objno>14... Lichtszene
          //
          //
@@ -333,25 +330,25 @@ void write_value_req(unsigned char objno)	// Objekte steuern gem‰ﬂ EIS  Protokol
         	  //obj=objno-12;
         	  //write_obj_value(objno,valtmp&0x01);
         	  //tmp=0;
-        	  if(((valtmp&0x01)^(eeprom[0xC3]& bitmask_1[obj+3]))&& !(sperren & bitmask_1[obj])){//bit 3,4,5 polarit‰t, Beginn Sperre(flanke)
+        	  if(((valtmp&0x01)^(eeprom[0xC3]& bitmask_1[obj+3]))&& !(sperren & bitmask_1[obj])){//bit 3,4,5 polarit√§t, Beginn Sperre(flanke)
         		  tmp=eeprom[0xDF+obj];//Parameter verhalten bei Sperrbeginn
-        		  if((tmp>>4)==14) sperren|=bitmask_1[obj+4];//Nur Sperrmerker setzen da nachgef¸hrt werden darf/soll
+        		  if((tmp>>4)==14) sperren|=bitmask_1[obj+4];//Nur Sperrmerker setzen da nachgef√ºhrt werden darf/soll
         		  else sperren|=bitmask_1[obj];// Objekte sperren(Sperre setzen)
         		  tmp &= 0x0F;
         		  dimmpwm[obj]=sperrvalue(tmp,obj);
         	  }// ende beginn Sperre
         	  if(((valtmp&0x01)^(eeprom[0xC3]& bitmask_1[obj+3]))&& (sperren & bitmask_1[obj])){	// Ende Sperre (flanke)
         		  tmp=eeprom[0xDF+obj]>>4;//Parameter Verhalten bei SPerrende
-        		  sperren &= bitmask_0[obj];// Sperre lˆschen
-        		  sperren &= bitmask_0[obj+4];//Sperrmerker lˆschen
-        		  if (tmp==14) valtmp=dimmwert[obj];//nachgef¸hrten Wert ¸bernehmen
+        		  sperren &= bitmask_0[obj];// Sperre l√∂schen
+        		  sperren &= bitmask_0[obj+4];//Sperrmerker l√∂schen
+        		  if (tmp==14) valtmp=dimmwert[obj];//nachgef√ºhrten Wert √ºbernehmen
         		  else valtmp=sperrvalue(tmp,obj);
         		  dimmziel[obj]=valtmp;
     			  dimmwert[obj]=valtmp;
         	  }// ende ende Sperre
          } //   ende  sperrobjekt
           //###########################################################
-      if (portbuffer&0xF0 != oldportbuffer&0xF0) portchanged=1;//post f¸r port_schalten hinterlegen
+      if (portbuffer&0xF0 != oldportbuffer&0xF0) portchanged=1;//post f√ºr port_schalten hinterlegen
 
 }
 unsigned char sperrvalue(unsigned char index,unsigned char obj){
@@ -361,7 +358,7 @@ unsigned char sperrvalue(unsigned char index,unsigned char obj){
 	if (index>1 && index<12)retval=prozentvalue[index-2];
 	if (index==12)retval=dimmwert[obj];
  	if (index==13){
- 		if (aushell[obj]>=grundhelligkeit[obj])retval=aushell[obj];// gespeicherte Helligkeit falls nicht kleiner 
+ 		if (aushell[obj]>=grundhelligkeit[obj])retval=aushell[obj];// gespeicherte Helligkeit falls nicht kleiner
  		else retval=grundhelligkeit[obj];							// Grundhelligkeit
  	}
 
@@ -370,31 +367,31 @@ unsigned char sperrvalue(unsigned char index,unsigned char obj){
 
 
  void dimmen_obj(unsigned char obj,unsigned char valtmp){
-	unsigned char Dimmschritt; 
+	unsigned char Dimmschritt;
     Dimmschritt = 255>>((valtmp&0x07)-1);
     //obj=objno-3;
     if (valtmp&0x07){// wenn gedimmt werden soll,Zeit laden
-        if (valtmp&0x08){//aufw‰rts dimmen
+        if (valtmp&0x08){//aufw√§rts dimmen
         	if(dimmwert[obj]<=(255-Dimmschritt)){
         		dimmziel[obj]=dimmwert[obj]+Dimmschritt;
         	}
         	else dimmziel[obj]=255;
         }
-        else{	//abw‰rts dimmen
+        else{	//abw√§rts dimmen
         	if(dimmwert[obj]>=(Dimmschritt + grundhelligkeit[obj])){
         		dimmziel[obj]=dimmwert[obj] - Dimmschritt;
         	}
         	else dimmziel[obj]=grundhelligkeit[obj];
         }
-    	
+
     	if (!obj){// Dimmobjekt 2
             timerbase[0]=(eeprom[0xc6])&0x07;
         }
         else{		// Dimmobjekt 3
-               	timerbase[1]=((eeprom[0xc6]>>4)&0x07);	
-        }    
+               	timerbase[1]=((eeprom[0xc6]>>4)&0x07);
+        }
         timerstart[obj]=eeprom[0xc8+obj];
-        
+
     }
     else{			// dimmen: stop!
     	//valtmp hier mit Parameter laden
@@ -414,17 +411,17 @@ unsigned char sperrvalue(unsigned char index,unsigned char obj){
     	dimmziel[obj]=dimmwert[obj];
     }// ende bei stop!
 
- 
+
  }
 
 void hell_stellen (unsigned char obj,unsigned char value){
-    // parameter f¸r andimmen holen
+    // parameter f√ºr andimmen holen
 
 	if (!obj){					// Helligkeit 4
         timerbase[0]=(eeprom[0xc6])&0x0F;
     }
     else{						// Helligkeit 5
-           	timerbase[1]=((eeprom[0xc6]>>4)&0x0F);	
+           	timerbase[1]=((eeprom[0xc6]>>4)&0x0F);
         }
 	//eventuell auto EIN
 	if (value){// wenn Helligkeit >0
@@ -442,29 +439,29 @@ void hell_stellen (unsigned char obj,unsigned char value){
 		dimmziel[obj]=0;
 		portbuffer|=bitmask_1[obj];// ausschalten merken
 		portchanged=1;
-		schalten&=bitmask_0[obj];// schaltobjekte r¸cksetzen
+		schalten&=bitmask_0[obj];// schaltobjekte r√ºcksetzen
 	}
-	
+
 	if (timerbase[obj]&0x08){	//anspringen
 		dimmwert[obj]=dimmziel[obj];
 	}
  	else{ //andimmen
-        timerstart[obj]=eeprom[0xc8+obj];    
- 	}    
+        timerstart[obj]=eeprom[0xc8+obj];
+ 	}
 
 }
 
 
-/** 
-* Objektwert lesen wurde angefordert, read_value_response Telegramm zur¸cksenden
+/**
+* Objektwert lesen wurde angefordert, read_value_response Telegramm zur√ºcksenden
 *
-* 
+*
 * @return
-* 
+*
 */
 void read_value_req(unsigned char objno)
 {
-	send_obj_value(objno+64);	
+	send_obj_value(objno+64);
 }
 
 
@@ -499,7 +496,7 @@ unsigned long read_obj_value(unsigned char objno)	// gibt den Wert eines Objekte
 	if(objno>=16 && objno <18) {
 		if(lastausfall &(bitmask_1[obj])) ret_val=1;
 	}
-	
+
 	return(ret_val);
 }
 
@@ -532,7 +529,7 @@ unsigned char obj;
 	if(objno>=12 && objno <14) {
 		lz[obj]=objvalue;
 	}
-	
+
 
 }
 
@@ -541,7 +538,7 @@ unsigned char obj;
 
 
 
-void object_schalten(unsigned char objno, __bit objstate)	// Schaltet einen Ausgang gem‰ﬂ objstate und den zugˆrigen Parametern
+void object_schalten(unsigned char objno, __bit objstate)	// Schaltet einen Ausgang gem√§√ü objstate und den zug√∂rigen Parametern
 {
 unsigned char obj;
 	obj=objno&0x0F;
@@ -559,7 +556,7 @@ unsigned char obj;
 			}
 		}
 		else {// wenn "aus" tele war
-			timerstate[0]&=0xFD;// timerstate Zeitdimmer lˆschen
+			timerstate[0]&=0xFD;// timerstate Zeitdimmer l√∂schen
 			timerstart[0]=eeprom[0xD7];//soft "aus"
 			if(timerstart[0]){
 				timerbase[0]=eeprom[0xD6]&0x07;
@@ -581,7 +578,7 @@ unsigned char obj;
 			}
 		}
 		else {
-			timerstate[1]&=0xFD;// timerstate Zeitdimmer lˆschen
+			timerstate[1]&=0xFD;// timerstate Zeitdimmer l√∂schen
 			timerstart[1]=eeprom[0xD8];// soft "aus"
 			if (timerstart[1]){
 				timerbase[1]=eeprom[0xD6]>>4;
@@ -595,11 +592,11 @@ unsigned char obj;
 	portchanged=1;
 	//
 	if(objno<0x02){// Einschalten-Einschalthelligkeit
-		 if ((objstate) && ((portbuffer& bitmask_1[obj])||(!(oldportbuffer& bitmask_1[obj+4])))) {//einschalten Flanke((timerbase[objno]&0x02)|| 	
-			 read_dimmziel(objno,0xC4);		
+		 if ((objstate) && ((portbuffer& bitmask_1[obj])||(!(oldportbuffer& bitmask_1[obj+4])))) {//einschalten Flanke((timerbase[objno]&0x02)||
+			 read_dimmziel(objno,0xC4);
 				if (!timerstart[objno])dimmwert[objno]=dimmziel[objno];
-				portbuffer &= bitmask_0[objno];// ausschaltmerker lˆschen
-		 }  
+				portbuffer &= bitmask_0[objno];// ausschaltmerker l√∂schen
+		 }
 		  if ((!objstate)&&(oldportbuffer & bitmask_1[obj+4])) {//ausschalten Flanke
 			  aushell[objno]=dimmwert[objno];
 			  if (timerstart[obj]){// wenn soft "AUS"
@@ -621,18 +618,18 @@ unsigned char obj;
 
 
 
-void delay_timer(void)	// z‰hlt alle 0,5ms die Variable Timer hoch 
+void delay_timer(void)	// z√§hlt alle 0,5ms die Variable Timer hoch
 {
 	unsigned char objno,n,m;
 	unsigned int timerflags;
 	objno;n;m;
-#ifdef HAND		// f¸r Handbet‰tigung
+#ifdef HAND		// f√ºr Handbet√§tigung
 //	unsigned char n;
 	unsigned char ledport;
 	unsigned char Tasten=0;
 #endif
-	
-	RTCCON=0x60;		// RTC anhalten und Flag lˆschen
+
+	RTCCON=0x60;		// RTC anhalten und Flag l√∂schen
 	RTCH=0x00;			// reload Real Time Clock
 	RTCL=0x1D;			//0.5ms laden
 	RTCCON=0x61;		// RTC starten
@@ -642,29 +639,29 @@ void delay_timer(void)	// z‰hlt alle 0,5ms die Variable Timer hoch
 		timer++;// wird alle 0.50ms aufgerufen
 		timerflags = timer&(~(timer-1));
 				for(m=0;m < TIMERANZ;m++){// die timer der reihe nach checken und dec wenn laufen
-					if((timerbase[m]==1)||(timerflags & (timerflagmask[timerbase[m]]))){// wenn das flag mit der gespeicherten base ¸bereinstimmt
-						if (timercnt[m]){// wenn der counter l‰uft...
+					if((timerbase[m]==1)||(timerflags & (timerflagmask[timerbase[m]]))){// wenn das flag mit der gespeicherten base √ºbereinstimmt
+						if (timercnt[m]){// wenn der counter l√§uft...
 							timercnt[m]=timercnt[m]-1;// den timer [m]decrementieren
 						}// end if (timercnt...
 					}//end if(timerbase...
 				}// end  for(m..
-		
+
 		// ab Hier die aktion...
 		for (n=0;n<2;n++){// autoreload der Dimm Timer
 			if(timerbase[n]){
 				if(! timercnt[n]){
 					timercnt[n]=timerstart[n];
-					if (dimmziel[n]>dimmwert[n]){ //aufw‰rts
+					if (dimmziel[n]>dimmwert[n]){ //aufw√§rts
 						dimmwert[n]++;
 						if(dimmwert[n]<grundhelligkeit[n])dimmwert[n]=grundhelligkeit[n];// NEU TODO testen
 					}
-					if(dimmziel[n]<dimmwert[n]){  //abw‰rts
+					if(dimmziel[n]<dimmwert[n]){  //abw√§rts
 						dimmwert[n]--;
 						if(dimmwert[n]<grundhelligkeit[n])dimmwert[n]=0;// NEU TODO testen
 					}
 				}// if (! timercnt...
 			}//if(timerbase..
-			if (portbuffer& bitmask_1[n]){// Merker f¸r "Soft Aus"
+			if (portbuffer& bitmask_1[n]){// Merker f√ºr "Soft Aus"
 				if (!dimmwert[n]){
 					portbuffer&=(bitmask_0[n]); //M1...2 und Ausgang abschalten ausschalten
 					portbuffer&=(bitmask_0[n+4]);
@@ -672,21 +669,21 @@ void delay_timer(void)	// z‰hlt alle 0,5ms die Variable Timer hoch
 				}
 			}
 		}
-		for (n=3;n<5;n++){// Zeiten f¸r Aktionen wie Ausschalten(zeitdimmer...
-			m=n-3;		// und Ausschaltverzˆgerung)	
+		for (n=3;n<5;n++){// Zeiten f√ºr Aktionen wie Ausschalten(zeitdimmer...
+			m=n-3;		// und Ausschaltverz√∂gerung)	
 			if(!timercnt[n]){// wenn timer inaktiv oder abgelaufen
-				if (timerstate[m]& 0x01){// state.0: Ausschalthelligkeit 
+				if (timerstate[m]& 0x01){// state.0: Ausschalthelligkeit
 					portbuffer &= bitmask_0[m+4];//Ausgang abschalten
 					portchanged=1;
-					timerstate[m] &= 0xFE;//state lˆschen
+					timerstate[m] &= 0xFE;//state l√∂schen
 				}
 				if(timerstate[m]& 0x02){// wenn zeitdimmer aktiviert war und abgelaufen
 					object_schalten(m,0);// ausschalten
-					//state wird in object_schalten gelˆscht
+					//state wird in object_schalten gel√∂scht
 				}
 			}
 		if(!(sperren & bitmask_11[m])){
-			dimmpwm[m]=dimmwert[m];	
+			dimmpwm[m]=dimmwert[m];
 			if (dimmpwm[m]){
 				if(dimmpwm[m]<grundhelligkeit[m])// wenn Wert<Grundhell
 					dimmpwm[m]=grundhelligkeit[m];// dann Grundhell
@@ -701,7 +698,7 @@ void delay_timer(void)	// z‰hlt alle 0,5ms die Variable Timer hoch
 
 
 
-void port_schalten(void)		// Schaltet die Ports 
+void port_schalten(void)		// Schaltet die Ports
 {
 	unsigned char n, pattern,m;
 	pattern;
@@ -710,15 +707,15 @@ void port_schalten(void)		// Schaltet die Ports
 	rueckmelden=schalten;
 	for(n=0;n<=1;n++){//<3
 		if(pattern&bitmask_1[n]){
-			
+
 			send_obj_value(n+6);
-			for(m=0;m<30;m++) // verzˆgerung wegen ft1.2
+			for(m=0;m<30;m++) // verz√∂gerung wegen ft1.2
 				while(dimmcompare);
 			}
 
 	}
 
-	portchanged=0;					//postvariable zur¸cksetzen
+	portchanged=0;					//postvariable zur√ºcksetzen
 	oldportbuffer=portbuffer;
 
 }
@@ -731,10 +728,10 @@ void bus_return(void)		// Aktionen bei Busspannungswiederkehr
 {
 	__bit bitval;
 	unsigned char n,m;
-	// R¸ckmeldung bei Busspannungswiederkehr
+	// R√ºckmeldung bei Busspannungswiederkehr
 	for (n=6;n<8;n++) {
 //		send_obj_value(n);
-		for(m=0;m<30;m++){// verzˆgerung wegen ft1.2	30
+		for(m=0;m<30;m++){// verz√∂gerung wegen ft1.2	30
 			while(dimmcompare);
 		}
 	}
@@ -755,10 +752,10 @@ void bus_return(void)		// Aktionen bei Busspannungswiederkehr
 
 void read_dimmziel(unsigned char n,unsigned char offset){
 unsigned char valtmp,bw=0;
-	
+
 		if (!n)valtmp=eeprom[offset]&0x0F;//n=0
 		else valtmp=(eeprom[offset]&0xF0)>>4;//n=1
-		
+
 		if (!valtmp)bw=0;
 		if(valtmp==1 )bw=grundhelligkeit[n];
 		if (valtmp>1&&valtmp<12)bw=prozentvalue[valtmp-2];
@@ -767,75 +764,81 @@ unsigned char valtmp,bw=0;
 	    	else bw=grundhelligkeit[n];
 	    }
 	    dimmziel[n]=bw;
-	
+
 }
 
 
-void restart_app(void)		// Alle Applikations-Parameter zur¸cksetzen
+void restart_app(void)		// Alle Applikations-Parameter zur√ºcksetzen
 
 {
-	
+
 	Tval=0x00;
 	timer=0;			// Timer-Variable, wird alle 130ms inkrementiert
-	
-	P0M1=0xEE;            // Port 0 Modus push-pull f¸r Ausgang nur PIN 0 und 4 Output
+
+	P0M1=0xEE;            // Port 0 Modus push-pull f√ºr Ausgang nur PIN 0 und 4 Output
 	P0M2=0x11;            // nur PIN 0 und 4 Output
 	P0=0;
-	
-	ET0=0;			// Interrupt f¸r Timer 0 sperren
 
- 
+	ET0=0;			// Interrupt f√ºr Timer 0 sperren
+
+
 	RTCCON=0x81;		// RTC starten und OV flag setzen
 
-	
+
 	EA=0;						// Interrupts sperren, damit flashen nicht unterbrochen wird
 	// set timer 0 autoreload 0.05ms
 	TR0=0;
     //Timer0 einstellen
-    TMOD&=0xf0;   //register f¸r Timer 0 lˆschen
-    TMOD|=0x01;   // Timer 0 als 16bit, Timer 1 nicht ‰ndern !
+    TMOD&=0xf0;   //register f√ºr Timer 0 l√∂schen
+    TMOD|=0x01;   // Timer 0 als 16bit, Timer 1 nicht √§ndern !
     TAMOD&=0xf0;
     TH0 = 0xff;
     AUXR1&=~0x10;      // toggled whenever Timer0 overflows ausschalten
-    ET0=1;             // Interrupt f¸r Timer 0 freigeben
+    ET0=1;             // Interrupt f√ºr Timer 0 freigeben
     TR0=1;             // Timer 0 starten
 
 
-	
-	
-	
-	
+
+
+
+
 	// prirority bits in p0 byte;bit     7     6     5    4      3    2     1     0
 	//IP0* Interrupt priority 0 B8H -          PWDRT PBO  PS/PSR PT1  PX1   PT0   PX0
 	//IP0H Interrupt priority 0 HIGH B7H -     PWDRT PBOH PSH/   PT1H PX1H  PT0H  PX0H
-	
+
 	//IP1* Interrupt priority 1    F8H   PAD   PST   -    -      -    PC    PKBI  PI2C
 //	IP1H Interrupt priority 1 HIGH F7H   PADH  PSTH  -    -      -    PCH   PKBIH PI2CH
 
 
 	// set timer 0 isr priority to level 0, timer 1 level 1, ext0int level 2, ext1 level 3
 #ifdef einkanal
-	IP0 &= 0xF6; //FC		F6	f¸r flackerfrei bei 1 kanal
+	IP0 &= 0xF6; //FC		F6	f√ºr flackerfrei bei 1 kanal
 	IP0 |= 0x06; //0C		06	dto.
 #else
-	IP0 &= 0xFC; //FC		F6	f¸r flackerfrei bei 1 kanal
+	IP0 &= 0xFC; //FC		F6	f√ºr flackerfrei bei 1 kanal
 	IP0 |= 0x0C; //0C		06	dto.
 #endif
-//	IP0H &= 0xF5;// 
+//	IP0H &= 0xF5;//
 //	IP0H |= 0x05;// 		Timer 1 auf Level 2
-	TF0=0; //timer0 flag lˆschen
+	TF0=0; //timer0 flag l√∂schen
 	IT0=1;// int mode auf fallende Flanke
-	ET0=1;// timer 0 interupt freigeben	
+	ET0=1;// timer 0 interupt freigeben
 //	EX0=1;//ext int freigeben
 
-	START_WRITECYCLE
-	WRITE_BYTE(0x01,0x03,0x00)	// Herstellercode 0x0008 = GIRA
-	WRITE_BYTE(0x01,0x04,0x08)
+#ifdef DEBUG_H_
+    // Werte hier schreiben anstatt per static __code wenn Debug aktiv
+    //EA=0;               // Interrupts sperren, damit flashen nicht unterbrochen wird
+    START_WRITECYCLE
+    WRITE_BYTE(0x01,0x03,0x00)  // Herstellercode 0x0008 = GIRA
+    WRITE_BYTE(0x01,0x04,0x08)
 	WRITE_BYTE(0x01,0x0C,0x00)	// PORT A Direction Bit Setting
-	WRITE_BYTE(0x01,0x0D,0xFF)	// Run-Status (00=stop FF=run)
-	STOP_WRITECYCLE
+    //WRITE_BYTE(0x01,0x05,0x04)    // Devicetype 0x0438 = Selfbus 1080 4Sense
+    //WRITE_BYTE(0x01,0x06,0x38)
+    //WRITE_BYTE(0x01,0x07,0x05)    // Versionnumber of application programm
+    //WRITE_BYTE(0x01,0x0D,0xFF)    // Run-Error Status (00=stop FF=run)
+    STOP_WRITECYCLE
+    EA=1;               // Interrupts freigeben
+#endif
 
-	EA=1;						// Interrupts freigeben
-	
 
 }// Ende restart app
