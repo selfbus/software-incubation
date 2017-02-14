@@ -1,11 +1,11 @@
 /*
  *    _____ ______ __   __________  __  _______ *
  *   / ___// ____// /  / ____/ __ )/ / / / ___/ *
- *   \__ \/ __/  / /  / /__ / __  / / / /\__ \  * 
- *  ___/ / /__  / /__/ /__// /_/ / /_/ /___/ /  * 
- * /____/_____//____/_/   /_____/\____//____/   *  
- *                                      
- *  Copyright (c) 2010-2014 Andreas Krieger 
+ *   \__ \/ __/  / /  / /__ / __  / / / /\__ \  *
+ *  ___/ / /__  / /__/ /__// /_/ / /_/ /___/ /  *
+ * /____/_____//____/_/   /_____/\____//____/   *
+ *
+ *  Copyright (c) 2010-2014 Andreas Krieger
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License version 2 as
@@ -15,21 +15,19 @@
 /*
 * \par Changes:
 *	2.00	Umstellung auf neue backendsoftware, neue timer
+*	2.10    Update Lib to V1.58
 */
 
-
-//#include <P89LPC922.h>
-//#include "../lib_lpc922/Releases/fb_lpc922_1.5x.h"
 #include "fb_app_jalo2204regh.h"
 
 #include "../com/fb_rs232.h"
 #include"../com/watchdog.h"
 //#include "../com/debug.h"
 
-/** 
+/**
 * The start point of the program, init all libraries, start the bus interface, the application
 * and check the status of the program button.
-* 
+*
 *
 */
 //
@@ -37,19 +35,22 @@
 //#define debugger
 
 #ifdef MAX_PORTS_8
-	#define TYPE 4 
+	#define TYPE 4
 #endif
 #ifdef MAX_PORTS_4
 	#define TYPE 2
 #endif
 
-#define VERSION 11
-unsigned char __at 0x00 RAM[00]; 
+#define VERSION 21
+unsigned char __at (0x00) RAM[00];
 
-static __code unsigned char __at 0x1D03 manufacturer[2]={0,4};	// Herstellercode 0x0004 = Jung
-static __code unsigned char __at 0x1D0C port_A_direction={0};	// PORT A Direction Bit Setting
-static __code unsigned char __at 0x1D0D run_state={255};		// Run-Status (00=stop FF=run)
-__code unsigned int __at (EEPROM_ADDR + 0x17) start_pa={0xFFFF};      // Default PA is 15.15.255
+static __code unsigned char __at (EEPROM_ADDR + 0x00) option_reg={0xFF};            // Option Register, ETS will write 0xFF
+static __code unsigned char __at (EEPROM_ADDR + 0x01) fw_version[2]={TYPE,VERSION}; // Man. Data, used for FW Version
+static __code unsigned char __at (EEPROM_ADDR + 0x03) manufacturer[2]={0x00,0x04};  // Herstellercode 0x0004 = Jung *
+static __code unsigned char __at (EEPROM_ADDR + 0x0C) port_A_direction={0x00};      // PORT A Direction Bit Setting *
+static __code unsigned char __at (EEPROM_ADDR + 0x0D) run_error={0xFB};             // Run Time Error Flags, set when 0
+static __code unsigned int  __at (EEPROM_ADDR + 0x17) start_pa={0xFFFF};            // Default PA is 15.15.255 *
+
 
 void main(void)
 {
@@ -58,15 +59,15 @@ void main(void)
 	//signed char cal;
 	//static __code signed char __at 0x1CFC trimsave;	//0x1BFF
 #ifdef zeroswitch
-	static __code unsigned char __at 0x1CFB phisave;	//0x1BFE
+	static __code unsigned char __at (0x1CFB) phisave;	//0x1BFE
 #endif
-	static __code unsigned char __at 0x1CFF blockedsave;	//
+	static __code unsigned char __at (0x1CFF) blockedsave;	//
 	unsigned char rm_count=0;
 	__bit wduf,tastergetoggelt=0,objbitval;
 	wduf=WDCON&0x02;
 	restart_hw();							// Hardware zuruecksetzen
-// im folgendem wird der watchdog underflow abgefragt und mit gedrücktem Progtaster
-// ein resetten der cal Variable veranlasst um wieder per rs232 trimmen zu können.	
+// im folgendem wird der watchdog underflow abgefragt und mit gedrÃ¼cktem Progtaster
+// ein resetten der cal Variable veranlasst um wieder per rs232 trimmen zu kÃ¶nnen.
 //	TASTER=0;
 //	if(!TASTER && wduf)cal=0;
 //	else cal=trimsave;
@@ -77,12 +78,12 @@ void main(void)
 	else phival=0;
 #endif
 	TASTER=0;
-	if (!wduf){// BUS return verzögerung nur wenn nicht watchdog underflow
+	if (!wduf){// BUS return verzÃ¶gerung nur wenn nicht watchdog underflow
 		for (n=0;n<50;n++) {		// Warten bis Bus stabil
 			TR0=0;					// Timer 0 anhalten
-			TH0=eeprom[ADDRTAB+1];	// Timer 0 setzen mit phys. Adr. damit Geräte unterschiedlich beginnen zu senden
+			TH0=eeprom[ADDRTAB+1];	// Timer 0 setzen mit phys. Adr. damit GerÃ¤te unterschiedlich beginnen zu senden
 			TL0=255;//eeprom[ADDRTAB+2];
-			TF0=0;					// Überlauf-Flag zurücksetzen
+			TF0=0;					// Ãœberlauf-Flag zurÃ¼cksetzen
 			TR0=1;					// Timer 0 starten
 			while(!TF0);
 		}
@@ -94,7 +95,7 @@ void main(void)
 #ifdef debugger
 	RS_INIT_115200
 	TI=1;
-#else	
+#else
 //	RS_INIT_600
 //	SBUF=0x55;
 #endif
@@ -103,18 +104,18 @@ void main(void)
 		//hand =((eeprom[0xE5]& 0xC0)>0);
 		if(APPLICATION_RUN) {	// nur wenn run-mode gesetzt
 /*			if (eeprom[0xE5]& 0xC0){
-				if (((delay_toggle & 0x07)==0x07))handsteuerung();   // Handbetätigung nur jedes 8.mal ausführen
+				if (((delay_toggle & 0x07)==0x07))handsteuerung();   // HandbetÃ¤tigung nur jedes 8.mal ausfÃ¼hren
 			}
 */			if(RTCCON>=0x80) delay_timer();	// Realtime clock Ueberlauf
 			for(n= eeprom[0xE8]&0x40? 0:4 ;n<8;n++)//parameter Jalo(1) versus Rollo(0)
 			{// Abhandlung der Positionierungsanforderungen
-			
+
 				objbitval=0;objval=0;
 				if(((~blocked)&positions_req & bitmask_1[n]) )
 				{
 					if((!timerstate[(n&0x03)+11])&& !(kanal[n&0x03]&0x33))
 					{
-						if(n<4 )// Lamelle angefordert.. 
+						if(n<4 )// Lamelle angefordert..
 						{
 							objval=l_position_target[n];
 					       	mode=0x02;// in mode wird die abzuziehende Objektnummer eincodiert
@@ -122,11 +123,11 @@ void main(void)
 						else
 						{	// jalo angefordert
 							if (!j_position_target[n&0x03])// bei 0 mache eine Langzeitfahrt auf 0
-							{							//Lamelle nicht nachführen!
+							{							//Lamelle nicht nachfÃ¼hren!
 			        		 mode=0x00;// in mode wird die abzuziehende Objektnummer eincodiert
 			        		 objbitval=0;
 							}
-							else 
+							else
 							{
 				        		 objbitval=1;
 				        		 if (j_position_target[n&0x03]==255)// bei 255 mache eine Langzeitfahrt auf 1
@@ -148,7 +149,7 @@ void main(void)
 						object_schalten(n,objval,mode&0x0F,objbitval);
 
 					}//ende if ! timerstate
-					else if (drive_priority & 0x40)// Priorität auf Sonne-> stoppen.
+					else if (drive_priority & 0x40)// PrioritÃ¤t auf Sonne-> stoppen.
 					{
 						timercnt[n]=0;
 						timercnt[n+4]=0;
@@ -160,12 +161,12 @@ void main(void)
 
 
 #ifndef zeroswitch
-			if(TF0 && (TMOD & 0x0F)==0x01) {	// Vollstrom für Relais ausschalten und wieder PWM ein
+			if(TF0 && (TMOD & 0x0F)==0x01) {	// Vollstrom fÃ¼r Relais ausschalten und wieder PWM ein
 	#ifndef SPIBISTAB
 				TMOD=(TMOD & 0xF0) + 2;			// Timer 0 als PWM
 				TAMOD=0x01;
 				TH0=DUTY;
-	#endif				
+	#endif
 				TF0=0;
 	#ifndef SPIBISTAB
 				AUXR1|=0x10;	// PWM von Timer 0 auf Pin ausgeben
@@ -178,35 +179,36 @@ void main(void)
 	#endif
 			}
 #endif
-			
-//			if (portchanged)port_schalten();	// Ausgänge schalten
 
-//			void port_schalten(void)		// Schaltet die Ports mit PWM, DUTY ist Pulsverhältnis
+//			if (portchanged)port_schalten();	// AusgÃ¤nge schalten
+
+//			void port_schalten(void)		// Schaltet die Ports mit PWM, DUTY ist PulsverhÃ¤ltnis
 			if(portchanged)
 			{
 				//unsigned char n, pattern;
 				unsigned char kmod;
-				portbuffer=0;
+				//portbuffer=0;
 				if (eeprom[0xE4]& 0x80) kmod=0x01;		// bit 7 ist Kanal-mode
 				else kmod=0x03;
 				for (knr=0;knr<=0x03;knr++){
-					portbuffer=portbuffer|((kanal[knr & kmod]& 0x03)<<(knr<<1));
+					//portbuffer=portbuffer|((kanal[knr & kmod]& 0x03)<<(knr<<1));
+					portbuffer=((kanal[knr & kmod]& 0x03)<<(knr<<1));
 					}
-					
+
 			#ifdef zeroswitch //### Nullspannungsschalter ###
-				
-			 #ifdef SPIBISTAB	//serielle schiebeausgang für bistabile Relaise
+
+			 #ifdef SPIBISTAB	//serielle schiebeausgang fÃ¼r bistabile Relaise
 					spi_2_out(sort_output(portbuffer));		// Ports schalten
 					PWM=0;
-					TF0=0;			// Timer 0 für Haltezeit Vollstrom verwenden
+					TF0=0;			// Timer 0 fÃ¼r Haltezeit Vollstrom verwenden
 					TH0=0x6f;		// 16ms (10ms=6fff)
 					TL0=0xff;
 					TMOD=(TMOD & 0xF0) +1;		// Timer 0 als 16-Bit Timer
 					TAMOD=0x00;
 					TR0=1;
 
-			/*	rm_state=portbuffer ^ eeprom[RMINV];	// Rückmeldeobjekte setzen
-				for (n=0;n<8;n++) {	// Rückmeldung wenn ein Ausgag sich geändert hat
+			/*	rm_state=portbuffer ^ eeprom[RMINV];	// RÃ¼ckmeldeobjekte setzen
+				for (n=0;n<8;n++) {	// RÃ¼ckmeldung wenn ein Ausgag sich geÃ¤ndert hat
 					pattern=1<<n;
 					if((portbuffer&pattern)!=(oldportbuffer&pattern)) send_obj_value(n+12);
 				}
@@ -215,16 +217,16 @@ void main(void)
 				portchanged=0;
 
 			 #else	// also normaler out8 oder out4 mit zeroswitch
-				if(!EX0 && !schalten_state) {	//nur wenn schaltenstate inaktiv 
+				if(!EX0 && !schalten_state) {	//nur wenn schaltenstate inaktiv
 					portausgabe_on=portbuffer | oldportbuffer;
 					portausgabe_off=portbuffer;//& oldportbuffer;
 
-					IE0=0;// interrupt flipflop löschen
+					IE0=0;// interrupt flipflop lÃ¶schen
 					EX0=1;// zero U interrupt einschalten
 
 
-					rm_state=portbuffer ^ eeprom[RMINV];	// Rückmeldeobjekte setzen
-					for (n=0;n<8;n++) {	// Rückmeldung wenn ein Ausgag sich geändert hat
+					rm_state=portbuffer ^ eeprom[RMINV];	// RÃ¼ckmeldeobjekte setzen
+					for (n=0;n<8;n++) {	// RÃ¼ckmeldung wenn ein Ausgag sich geÃ¤ndert hat
 						pattern=1<<n;
 						//if((portbuffer&pattern)!=(oldportbuffer&pattern)) rm_send|=pattern;		//send_obj_value(n+12);
 					}
@@ -234,18 +236,18 @@ void main(void)
 				}
 			 #endif
 			#else // sonst normaler sporatisch schaltender out
-			#ifdef SPIBISTAB	//serielle schiebeausgang für bistabile Relaise
+			#ifdef SPIBISTAB	//serielle schiebeausgang fÃ¼r bistabile Relaise
 					spi_2_out(sort_output(portbuffer));		// Ports schalten
 					PWM=0;
-					TF0=0;			// Timer 0 für Haltezeit Vollstrom verwenden
+					TF0=0;			// Timer 0 fÃ¼r Haltezeit Vollstrom verwenden
 					TH0=0x6f;		// 16ms (10ms=6fff)
 					TL0=0xff;
 					TMOD=(TMOD & 0xF0) +1;		// Timer 0 als 16-Bit Timer
 					TAMOD=0x00;
 					TR0=1;
 
-				rm_state=portbuffer ^ eeprom[RMINV];	// Rückmeldeobjekte setzen
-				for (n=0;n<8;n++) {	// Rückmeldung wenn ein Ausgag sich geändert hat
+				rm_state=portbuffer ^ eeprom[RMINV];	// RÃ¼ckmeldeobjekte setzen
+				for (n=0;n<8;n++) {	// RÃ¼ckmeldung wenn ein Ausgag sich geÃ¤ndert hat
 					pattern=1<<n;
 					if((portbuffer&pattern)!=(oldportbuffer&pattern)) send_obj_value(n+12);
 				}
@@ -263,7 +265,7 @@ void main(void)
 					PWM=0;			// Vollstrom an
 
 					P0=portbuffer;		// Ports schalten
-					TF0=0;			// Timer 0 für Haltezeit Vollstrom verwenden
+					TF0=0;			// Timer 0 fÃ¼r Haltezeit Vollstrom verwenden
 					TH0=0x00;		// 16ms (10ms=6fff)
 					TL0=0x00;
 					TMOD=(TMOD & 0xF0) +1;		// Timer 0 als 16-Bit Timer
@@ -275,31 +277,31 @@ void main(void)
 
 				oldportbuffer=portbuffer;
 				portchanged=0;
-				
-			#endif	
+
+			#endif
 			#endif
 			}
 
-			// portbuffer flashen, Abbruch durch ext-int wird akzeptiert und später neu probiert
-			// T1-int wird solange abgeschaltet, 
+			// portbuffer flashen, Abbruch durch ext-int wird akzeptiert und spÃ¤ter neu probiert
+			// T1-int wird solange abgeschaltet,
 		if (fb_state==0 && (TH1<0XC0) && (!wait_for_ack)&& blocked!=blockedsave) {
 			START_WRITECYCLE;
-			FMADRH= 0x1c;		
-			FMADRL= 0xFF; 
+			FMADRH= 0x1c;
+			FMADRL= 0xFF;
 			FMDATA= blocked;
 			STOP_WRITECYCLE;
 		}
 
-		
+
 		}// end if(runstate...
 		else if (RTCCON>=0x80 && connected)	// Realtime clock ueberlauf
-			{			// wenn connected den timeout für Unicast connect behandeln
-			RTCCON=0x61;// RTC flag löschen
+			{			// wenn connected den timeout fÃ¼r Unicast connect behandeln
+			RTCCON=0x61;// RTC flag lÃ¶schen
 			if(connected_timeout <= 110)// 11x 520ms --> ca 6 Sekunden
 				{
 				connected_timeout ++;
 				}
-				else send_obj_value(T_DISCONNECT);// wenn timeout dann disconnect, flag und var wird in build_tel() gelöscht
+				else send_obj_value(T_DISCONNECT);// wenn timeout dann disconnect, flag und var wird in build_tel() gelÃ¶scht
 			}
 
 		// Telegrammverarbeitung..
@@ -337,12 +339,12 @@ cmd;
 				EA=0;
 				START_WRITECYCLE;	//cal an 0x1bff schreiben
 #ifdef zeroswitch
-				FMADRH= 0x1c;		
-				FMADRL= 0xfb; 
+				FMADRH= 0x1c;
+				FMADRL= 0xfb;
 				FMDATA= phival;
 #else
-				FMADRH= 0x1c;		
-				FMADRL= 0xfc; 
+				FMADRH= 0x1c;
+				FMADRL= 0xfc;
 #endif
 				FMDATA=	cal;
 				STOP_WRITECYCLE;
@@ -356,15 +358,15 @@ cmd;
 					TI=0;
 					SBUF=phival;
 				}
-			}	
+			}
 			if(cmd=='>'){
 				if(phival<35){
-					phival++;	// 
+					phival++;	//
 					TI=0;
 					SBUF=phival;
 				}
 			}
-#endif			
+#endif
 			if(cmd=='v'){
 				while(!TI);
 				TI=0;
@@ -382,9 +384,9 @@ cmd;
 #ifdef debugger
 	DEBUGPOINT
 #endif
-//#endif		
+//#endif
 		TASTER=1;				// Pin als Eingang schalten um Taster abzufragen
-		if(!TASTER){ // Taster gedrückt
+		if(!TASTER){ // Taster gedrÃ¼ckt
 			if(tasterpegel<255)	tasterpegel++;
 			else{
 				if(!tastergetoggelt)status60^=0x81;	// Prog-Bit und Parity-Bit im system_state toggeln
